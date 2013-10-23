@@ -1,31 +1,36 @@
 package com.bizeu.escandaloh;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.bizeu.escandaloh.adapters.EscandaloAdapter;
-import com.bizeu.escandaloh.model.Escandalo;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.MediaStore;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+import android.widget.Toast;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.adapters.EscandaloAdapter;
+import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.util.Base64;
 
 public class MainActivity extends SherlockActivity {
 
@@ -35,8 +40,9 @@ public class MainActivity extends SherlockActivity {
 	EscandaloAdapter escanAdapter;
 	private int first_visible_item_count;
 	private ListView list_escandalos;
-
-
+	
+	Bitmap taken_photo;
+	
 	
 	/**
 	 * onCreate
@@ -196,37 +202,52 @@ public class MainActivity extends SherlockActivity {
 		}
 		return true;
 	}
+	
+	
 
 	/**
 	 * onActivityResult
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
+
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == SHOW_CAMERA) {
-			if (data.hasExtra("data")) {
-				Bitmap taken_photo = (Bitmap) data.getParcelableExtra("data");
-
-				// Añadimos y actualizamos listado
-				escandalos_prueba.add(new Escandalo("Nueva foto",
-						Escandalo.SERIO, taken_photo, 3));
-				escanAdapter.notifyDataSetChanged();
-
-				/*
-				 * Metadata metadata = null; try { metadata =
-				 * ImageMetadataReader.readMetadata(photo); } catch
-				 * (ImageProcessingException e) { Log.v("WE","Entr aen catch");
-				 * e.printStackTrace(); } catch (IOException e) { // TODO
-				 * Auto-generated catch block e.printStackTrace(); }
-				 * 
-				 * for (Directory directory : metadata.getDirectories()) { for
-				 * (Tag tag : directory.getTags()) { Log.v("WE","Tag es: " +
-				 * tag); System.out.println(tag); } }
-				 */
+			if (data != null){
+				if (data.hasExtra("data")) {
+					Uri photoUri = data.getData();
+					taken_photo = (Bitmap) data.getParcelableExtra("data");
+		
+					Intent i = new Intent(MainActivity.this, CreateEscandalo.class);
+					i.putExtras(data);
+					//i.setData(photoUri);
+					startActivity(i);
+					
+					
+					// Añadimos y actualizamos listado
+					//escandalos_prueba.add(new Escandalo("Nueva foto",
+							//Escandalo.SERIO, taken_photo, 3));
+					//escanAdapter.notifyDataSetChanged();
+	
+					/*
+					 * Metadata metadata = null; try { metadata =
+					 * ImageMetadataReader.readMetadata(photo); } catch
+					 * (ImageProcessingException e) { Log.v("WE","Entr aen catch");
+					 * e.printStackTrace(); } catch (IOException e) { // TODO
+					 * Auto-generated catch block e.printStackTrace(); }
+					 * 
+					 * for (Directory directory : metadata.getDirectories()) { for
+					 * (Tag tag : directory.getTags()) { Log.v("WE","Tag es: " +
+					 * tag); System.out.println(tag); } }
+					 */
+				}
 			}
 		}
 	}
 
+
+	
+	
+	
 	public InputStream bitmapToInput(Bitmap bit) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		bit.compress(CompressFormat.PNG, 0 /* ignored for PNG */, bos);
@@ -235,6 +256,7 @@ public class MainActivity extends SherlockActivity {
 		return (InputStream) bs;
 	}
 
+	
 	public File bitmapToFile(Bitmap bit) {
 
 		File file = null;
@@ -323,5 +345,13 @@ public class MainActivity extends SherlockActivity {
         }
 		return action_bar_height;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
