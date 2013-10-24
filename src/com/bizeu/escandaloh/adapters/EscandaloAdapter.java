@@ -2,17 +2,20 @@ package com.bizeu.escandaloh.adapters;
 
 import java.util.ArrayList;
 
+import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -26,6 +29,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    int layoutResourceId;    
 	    ArrayList<Escandalo> data;
 	    private int available_height;
+	    
+	    private Escandalo escanda;
+	    
+	    private ImageView foto_escandalo;
 	    
 	    
 	    /**
@@ -66,7 +73,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
 	            LayoutParams params4 = holder.lheight.getLayoutParams();
 	            params4.height = available_height;
-	            holder.lheight.setLayoutParams(params4);
+	            holder.lheight.setLayoutParams(params4);	           
 
 	            mView.setTag(holder);
 	        }
@@ -75,17 +82,31 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
 	        
-	        Escandalo escanda = data.get(position);
+	        escanda = data.get(position);
 	        holder.imgPicture.setImageBitmap(escanda.getPicture());
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
-	        if (escanda.getCategory().equals(Escandalo.CONIA)){
+	        if (escanda.getCategory().equals(Escandalo.HAPPY)){
 	        	holder.imgCategory.setImageResource(R.drawable.cara_riendose);
 	        }
 	        else{
 	        	holder.imgCategory.setImageResource(R.drawable.cara_enfadado);
 	        }
+	        
+	        
+            // Listener para la foto
+            foto_escandalo = (ImageView) mView.findViewById(R.id.img_foto);
+            foto_escandalo.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Log.v("WE","llega");
+					Intent i = new Intent(context, DetailPhotoActivity.class);
+					//i.putExtra("Image", escanda.getPicture());
+					context.startActivity(i);					
+				}
+			});
 	        
 	        return mView;
 	    }

@@ -1,19 +1,21 @@
 package com.bizeu.escandaloh;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,21 +27,24 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
-import com.bizeu.escandaloh.util.Base64;
 
 public class MainActivity extends SherlockActivity {
 
 	private static final int SHOW_CAMERA = 10;
+    private static final int CREATE_ESCANDALO = 11;
 	private File photo;
-	public static ArrayList<Escandalo> escandalos_prueba;
+	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
 	private int first_visible_item_count;
 	private ListView list_escandalos;
+	private Uri fileUri;
+	private Uri mImageUri;
 	
 	Bitmap taken_photo;
 	
@@ -59,34 +64,35 @@ public class MainActivity extends SherlockActivity {
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		
 		// Datos de prueba
-		escandalos_prueba = new ArrayList<Escandalo>();
-		escandalos_prueba.add(new Escandalo("Prueba 1", Escandalo.CONIA,
+		escandalos = new ArrayList<Escandalo>();
+		escandalos.add(new Escandalo("Prueba 1", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_1), 222));
-		escandalos_prueba.add(new Escandalo("Prueba 2", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 2", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_2), 12));
-		escandalos_prueba.add(new Escandalo("Prueba 3", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 3", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_3), 2));
-		escandalos_prueba.add(new Escandalo("Prueba 4", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 4", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_4), 3));
-		escandalos_prueba.add(new Escandalo("Prueba 5", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 5", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_5), 32));
-		escandalos_prueba.add(new Escandalo("Prueba 6", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 6", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_1), 332));
-		escandalos_prueba.add(new Escandalo("Prueba 7", Escandalo.CONIA,
+		escandalos.add(new Escandalo("Prueba 7", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_2), 2));
-		escandalos_prueba.add(new Escandalo("Grande", Escandalo.SERIO,
+		escandalos.add(new Escandalo("Grande", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_grande), 234));
+		
 
 		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo,
-				escandalos_prueba);
+				escandalos);
 		
 
 		list_escandalos = (ListView) findViewById(R.id.list_escandalos);
@@ -162,15 +168,22 @@ public class MainActivity extends SherlockActivity {
 		case R.id.take_photo:
 
 			// --------------- VERSION PARA LISTVIEW ------------------------
-			Intent takePictureIntent = new Intent(
-					MediaStore.ACTION_IMAGE_CAPTURE);
+			Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+			File photo;
+			try{
+		        // place where to store camera taken picture
+		        photo = this.createTemporaryFile("picture", ".png");
+		        photo.delete();
+		    }
+		    catch(Exception e){
+		        Log.v("WE", "Can't create file to take picture!");
+		        return false;
+		    }
+			
+		    mImageUri = Uri.fromFile(photo);
+		    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 			startActivityForResult(takePictureIntent, SHOW_CAMERA);
 
-			// Intent cameraintent = new
-			// Intent("android.media.action.IMAGE_CAPTURE");
-			// cameraintent.putExtra(MediaStore.EXTRA_OUTPUT,
-			// Uri.fromFile(photo));
-			// startActivityForResult(cameraintent, SHOW_CAMERA);
 
 			// --------------- VERSION PARA EXIF ------------------------------
 			/*
@@ -209,25 +222,12 @@ public class MainActivity extends SherlockActivity {
 	 * onActivityResult
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == SHOW_CAMERA) {
-			if (data != null){
-				if (data.hasExtra("data")) {
-					Uri photoUri = data.getData();
-					taken_photo = (Bitmap) data.getParcelableExtra("data");
 		
-					Intent i = new Intent(MainActivity.this, CreateEscandalo.class);
-					i.putExtras(data);
-					//i.setData(photoUri);
-					startActivity(i);
+		if (requestCode == SHOW_CAMERA) {
+				Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
+				i.putExtra("photoUri", mImageUri.toString());
+				startActivityForResult(i, CREATE_ESCANDALO);
 					
-					
-					// Añadimos y actualizamos listado
-					//escandalos_prueba.add(new Escandalo("Nueva foto",
-							//Escandalo.SERIO, taken_photo, 3));
-					//escanAdapter.notifyDataSetChanged();
-	
 					/*
 					 * Metadata metadata = null; try { metadata =
 					 * ImageMetadataReader.readMetadata(photo); } catch
@@ -239,9 +239,26 @@ public class MainActivity extends SherlockActivity {
 					 * (Tag tag : directory.getTags()) { Log.v("WE","Tag es: " +
 					 * tag); System.out.println(tag); } }
 					 */
-				}
-			}
 		}
+		
+		else if (requestCode == CREATE_ESCANDALO){
+			taken_photo = (Bitmap) data.getParcelableExtra("data");
+			String written_title = data.getExtras().getString("title");
+			String selected_category = data.getExtras().getString("category");
+			
+			// Añadimos y actualizamos listado					
+			if (selected_category.equals(CreateEscandaloActivity.HAPPY_CATEGORY)){
+				escandalos.add(new Escandalo(written_title,
+						Escandalo.HAPPY, taken_photo, 3));
+			}
+			else{
+				escandalos.add(new Escandalo(written_title,
+						Escandalo.ANGRY, taken_photo, 3));
+			}
+			escanAdapter.notifyDataSetChanged();
+
+
+		}	
 	}
 
 
@@ -274,6 +291,8 @@ public class MainActivity extends SherlockActivity {
 		return file;
 	}
 
+	
+	
 	public String getRealPathFromURI(Uri contentUri) {
 		try {
 			String[] proj = { MediaStore.Images.Media.DATA };
@@ -348,7 +367,58 @@ public class MainActivity extends SherlockActivity {
 	
 	
 	
+	/**
+	 * Crea una Uri para guardar una foto
+	 */
+	private static Uri getOutputMediaFileUri(){
+	  return Uri.fromFile(getOutputMediaFile());
+	}
+
+	/** Create a File for saving an image or video */
+	/**
+	 * Crea un File para guardar una foto
+	 * @return
+	 */
+	private static File getOutputMediaFile(){
+	    // To be safe, you should check that the SDCard is mounted
+	    // using Environment.getExternalStorageState() before doing this.
+
+	    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+	          Environment.DIRECTORY_PICTURES), "Scandal-oh!");
+	    // This location works best if you want the created images to be shared
+	    // between applications and persist after your app has been uninstalled.
+
+	    // Create the storage directory if it does not exist
+	    if (!mediaStorageDir.exists()){
+	        if (!mediaStorageDir.mkdirs()){
+	            Log.d("Scandal-oh!", "failed to create directory Scandal-oh!");
+	            return null;
+	        }
+	    }
+
+	    // Create a media file name
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    File mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+	        "IMG_"+ timeStamp + ".jpg");
+
+	    return mediaFile;
+	}
 	
+	
+	
+	private File createTemporaryFile(String part, String ext) throws Exception
+	{
+	    File tempDir= Environment.getExternalStorageDirectory();
+	    tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
+	    if(!tempDir.exists())
+	    {
+	        tempDir.mkdir();
+	    }
+	    return File.createTempFile(part, ext, tempDir);
+	}
+	
+	
+
 	
 	
 	

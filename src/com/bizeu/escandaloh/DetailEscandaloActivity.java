@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class DetalleEscandalo extends Activity {
+public class DetailEscandaloActivity extends Activity {
 
 	private TextView titulo;
 	private ImageView foto;
@@ -22,7 +22,7 @@ public class DetalleEscandalo extends Activity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 		    int value = extras.getInt("posicion");
-		    esca = MainActivity.escandalos_prueba.get(value);  
+		    esca = MainActivity.escandalos.get(value);  
 		}
 		
 		titulo = (TextView) findViewById(R.id.txt_titulo);

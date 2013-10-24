@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="8"
         android:targetSdkVersion="18" />
          
     <uses-feature android:name="android.hardware.camera" />
@@ -26,8 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.bizeu.escandaloh.DetalleEscandalo"></activity>
- 		<activity android:name="com.bizeu.escandaloh.CreateEscandalo"></activity>
+        <activity android:name="com.bizeu.escandaloh.DetailEscandaloActivity"></activity>
+ 		<activity android:name="com.bizeu.escandaloh.CreateEscandaloActivity"></activity>
+ 		<activity android:name="com.bizeu.escandaloh.DetailPhotoActivity"></activity>
     </application>
 
 </manifest>

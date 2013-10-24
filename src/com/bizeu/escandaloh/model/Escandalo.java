@@ -3,8 +3,8 @@ package com.bizeu.escandaloh.model;
 import android.graphics.Bitmap;
 
 public class Escandalo {
-	public static final String SERIO = "Serio";
-	public static final String CONIA = "Coña";
+	public static final String ANGRY = "Angry";
+	public static final String HAPPY = "Happy";
 
 	private String title;
 	private String category;
