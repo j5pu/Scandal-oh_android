@@ -5,11 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -224,6 +220,7 @@ public class MainActivity extends SherlockActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
 		if (requestCode == SHOW_CAMERA) {
+			if (resultCode == RESULT_OK) {
 				Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
 				i.putExtra("photoUri", mImageUri.toString());
 				startActivityForResult(i, CREATE_ESCANDALO);
@@ -239,14 +236,20 @@ public class MainActivity extends SherlockActivity {
 					 * (Tag tag : directory.getTags()) { Log.v("WE","Tag es: " +
 					 * tag); System.out.println(tag); } }
 					 */
+			}
+			else if (resultCode == RESULT_CANCELED) {
+		           
+	        }		 
 		}
 		
 		else if (requestCode == CREATE_ESCANDALO){
+			/*
 			taken_photo = (Bitmap) data.getParcelableExtra("data");
 			String written_title = data.getExtras().getString("title");
 			String selected_category = data.getExtras().getString("category");
 			
-			// Añadimos y actualizamos listado					
+			// Añadimos y actualizamos listado	
+			
 			if (selected_category.equals(CreateEscandaloActivity.HAPPY_CATEGORY)){
 				escandalos.add(new Escandalo(written_title,
 						Escandalo.HAPPY, taken_photo, 3));
@@ -255,7 +258,9 @@ public class MainActivity extends SherlockActivity {
 				escandalos.add(new Escandalo(written_title,
 						Escandalo.ANGRY, taken_photo, 3));
 			}
+			
 			escanAdapter.notifyDataSetChanged();
+			*/
 
 
 		}	

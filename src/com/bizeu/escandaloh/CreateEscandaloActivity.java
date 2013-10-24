@@ -190,10 +190,7 @@ public class CreateEscandaloActivity extends Activity {
 	
 	
 
-	
-	
-	
-	
+
 	/*
 	private void guardaTextoImage(String texto){
 		   Writer writer;
