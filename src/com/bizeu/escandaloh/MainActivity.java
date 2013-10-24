@@ -265,46 +265,6 @@ public class MainActivity extends SherlockActivity {
 	
 	
 	
-	public InputStream bitmapToInput(Bitmap bit) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bit.compress(CompressFormat.PNG, 0 /* ignored for PNG */, bos);
-		byte[] bitmapdata = bos.toByteArray();
-		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
-		return (InputStream) bs;
-	}
-
-	
-	public File bitmapToFile(Bitmap bit) {
-
-		File file = null;
-		// Bitmap bitmap = Utils.decodeBase64(base64);
-		try {
-			file = new File(this.getCacheDir(), "prueba.jpg");
-			FileOutputStream fOut = new FileOutputStream(file);
-			bit.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-			fOut.flush();
-			fOut.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.v(null, "Save file error!");
-		}
-		return file;
-	}
-
-	
-	
-	public String getRealPathFromURI(Uri contentUri) {
-		try {
-			String[] proj = { MediaStore.Images.Media.DATA };
-			Cursor cursor = managedQuery(contentUri, proj, null, null, null);
-			int column_index = cursor
-					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-			cursor.moveToFirst();
-			return cursor.getString(column_index);
-		} catch (Exception e) {
-			return contentUri.getPath();
-		}
-	}
 
 
 	
@@ -367,45 +327,14 @@ public class MainActivity extends SherlockActivity {
 	
 	
 	
+	
 	/**
-	 * Crea una Uri para guardar una foto
-	 */
-	private static Uri getOutputMediaFileUri(){
-	  return Uri.fromFile(getOutputMediaFile());
-	}
-
-	/** Create a File for saving an image or video */
-	/**
-	 * Crea un File para guardar una foto
+	 * Crea un archivo (File) temporal
+	 * @param part
+	 * @param ext
 	 * @return
+	 * @throws Exception
 	 */
-	private static File getOutputMediaFile(){
-	    // To be safe, you should check that the SDCard is mounted
-	    // using Environment.getExternalStorageState() before doing this.
-
-	    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-	          Environment.DIRECTORY_PICTURES), "Scandal-oh!");
-	    // This location works best if you want the created images to be shared
-	    // between applications and persist after your app has been uninstalled.
-
-	    // Create the storage directory if it does not exist
-	    if (!mediaStorageDir.exists()){
-	        if (!mediaStorageDir.mkdirs()){
-	            Log.d("Scandal-oh!", "failed to create directory Scandal-oh!");
-	            return null;
-	        }
-	    }
-
-	    // Create a media file name
-	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-	    File mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-	        "IMG_"+ timeStamp + ".jpg");
-
-	    return mediaFile;
-	}
-	
-	
-	
 	private File createTemporaryFile(String part, String ext) throws Exception
 	{
 	    File tempDir= Environment.getExternalStorageDirectory();
@@ -420,7 +349,48 @@ public class MainActivity extends SherlockActivity {
 	
 
 	
+
+	public InputStream bitmapToInput(Bitmap bit) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bit.compress(CompressFormat.PNG, 0 /* ignored for PNG */, bos);
+		byte[] bitmapdata = bos.toByteArray();
+		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
+		return (InputStream) bs;
+	}
+
+
 	
+	public File bitmapToFile(Bitmap bit) {
+
+		File file = null;
+		// Bitmap bitmap = Utils.decodeBase64(base64);
+		try {
+			file = new File(this.getCacheDir(), "prueba.jpg");
+			FileOutputStream fOut = new FileOutputStream(file);
+			bit.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+			fOut.flush();
+			fOut.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.v(null, "Save file error!");
+		}
+		return file;
+	}
+
+	
+	
+	public String getRealPathFromURI(Uri contentUri) {
+		try {
+			String[] proj = { MediaStore.Images.Media.DATA };
+			Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+			int column_index = cursor
+					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			cursor.moveToFirst();
+			return cursor.getString(column_index);
+		} catch (Exception e) {
+			return contentUri.getPath();
+		}
+	}
 	
 	
 

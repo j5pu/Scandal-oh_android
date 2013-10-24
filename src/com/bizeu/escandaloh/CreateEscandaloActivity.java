@@ -1,33 +1,20 @@
 package com.bizeu.escandaloh;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 
+import java.io.File;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
-import com.bizeu.escandaloh.util.Base64;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -143,8 +130,8 @@ public class CreateEscandaloActivity extends Activity {
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
 	             
+	             // Obtenemos los datos y comprimimos en Multipart para su envío
 	             written_title = edit_title.getText().toString();    
-	             
 	             int id_category_selected = radio_category.getCheckedRadioButtonId();
 			     switch(id_category_selected){
 			        case R.id.rb_create_category_happy:
@@ -159,8 +146,7 @@ public class CreateEscandaloActivity extends Activity {
 	             FileBody bin1 = new FileBody(photo_file);
 	             StringBody titleBody = new StringBody(written_title);
 	             StringBody userBody = new StringBody("/api/v1/user/2/");        
-
-	             
+             
 	             MultipartEntity reqEntity = new MultipartEntity();
   
 	             reqEntity.addPart("img", bin1);
@@ -172,6 +158,7 @@ public class CreateEscandaloActivity extends Activity {
 	             HttpResponse response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
+	             
 	             if (resEntity != null) {
 	                 Log.i("RESPONSE",response_str);
 	                 result = true;

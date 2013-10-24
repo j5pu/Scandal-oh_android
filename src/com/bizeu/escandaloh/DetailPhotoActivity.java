@@ -1,15 +1,14 @@
 package com.bizeu.escandaloh;
 
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.widget.ImageView;
+
 
 public class DetailPhotoActivity extends Activity {
 
-	private ImageView img_photo;
-	
-	private Bitmap photo;
+	ImageViewTouch mImage;
 	
 	/**
 	 * onCreate
@@ -19,14 +18,14 @@ public class DetailPhotoActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo_detail);
 		
+		/*
 		if (getIntent() != null){
-			//photo = getIntent().getParcelableExtra("Image");
+			photo = getIntent().getParcelableExtra("Image");
 		}
+		*/
 		
-		//img_photo = (ImageView) findViewById(R.id.img_photo_detail);
-		//img_photo.setImageBitmap(photo);
-		
-		
-
+		mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
+		mImage.setDisplayType( DisplayType.FIT_IF_BIGGER );
+		mImage.setImageResource(R.drawable.pastor_aleman_1);
 	}
 }

@@ -4,10 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ImageView
+      <it.sephiroth.android.library.imagezoom.ImageViewTouch
         android:id="@+id/img_photo_detail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/pastor_aleman_1" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="fitCenter" />
+    
 
 </LinearLayout>
