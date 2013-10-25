@@ -81,6 +81,7 @@ public class CreateEscandaloActivity extends Activity {
 		
 		picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
 		picture.setImageBitmap(taken_photo);
+	
 		
 		but_accept = (Button) findViewById(R.id.but_new_escandalo_accept);
 		but_accept.setOnClickListener(new OnClickListener() {

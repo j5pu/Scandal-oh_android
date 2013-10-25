@@ -28,8 +28,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    Context context; 
 	    int layoutResourceId;    
 	    ArrayList<Escandalo> data;
-	    private int available_height;
-	    
+	    private int available_height;	    
 	    private Escandalo escanda;
 	    
 	    private ImageView foto_escandalo;

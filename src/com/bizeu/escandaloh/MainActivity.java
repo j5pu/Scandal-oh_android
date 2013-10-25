@@ -1,17 +1,40 @@
 package com.bizeu.escandaloh;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +50,13 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 
@@ -41,7 +71,7 @@ public class MainActivity extends SherlockActivity {
 	private ListView list_escandalos;
 	private Uri fileUri;
 	private Uri mImageUri;
-	
+	public static AmazonClientManager clientManager = null;	
 	Bitmap taken_photo;
 	
 	
@@ -59,8 +89,11 @@ public class MainActivity extends SherlockActivity {
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		
+		
 		// Datos de prueba
+		
 		escandalos = new ArrayList<Escandalo>();
+		/*
 		escandalos.add(new Escandalo("Prueba 1", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_aleman_1), 222));
@@ -85,10 +118,12 @@ public class MainActivity extends SherlockActivity {
 		escandalos.add(new Escandalo("Grande", Escandalo.ANGRY,
 				BitmapFactory.decodeResource(getResources(),
 						R.drawable.pastor_grande), 234));
-		
+		*/
 
 		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo,
 				escandalos);
+		
+		new GetEscandalos().execute();
 		
 
 		list_escandalos = (ListView) findViewById(R.id.list_escandalos);
@@ -161,53 +196,53 @@ public class MainActivity extends SherlockActivity {
 		super.onOptionsItemSelected(item);
 
 		switch (item.getItemId()) {
-		case R.id.take_photo:
+			case R.id.take_photo:
 
-			// --------------- VERSION PARA LISTVIEW ------------------------
-			Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-			File photo;
-			try{
-		        // place where to store camera taken picture
-		        photo = this.createTemporaryFile("picture", ".png");
-		        photo.delete();
-		    }
-		    catch(Exception e){
-		        Log.v("WE", "Can't create file to take picture!");
-		        return false;
-		    }
-			
-		    mImageUri = Uri.fromFile(photo);
-		    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-			startActivityForResult(takePictureIntent, SHOW_CAMERA);
+				// --------------- VERSION PARA LISTVIEW ------------------------
+				Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+				File photo;
+				try{
+			        // place where to store camera taken picture
+			        photo = this.createTemporaryFile("picture", ".png");
+			        photo.delete();
+			    }
+			    catch(Exception e){
+			        Log.v("WE", "Can't create file to take picture!");
+			        return false;
+			    }
+				
+			    mImageUri = Uri.fromFile(photo);
+			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+				startActivityForResult(takePictureIntent, SHOW_CAMERA);
+	
+	
+				// --------------- VERSION PARA EXIF ------------------------------
+				/*
+				 * SimpleDateFormat dateFormat = new
+				 * SimpleDateFormat("yyyyMMdd-HHmmss"); String fileName =
+				 * dateFormat.format(new Date()) + ".jpg";
+				 * 
+				 * // or use timestamp e.g String fileName =
+				 * System.currentTimeMillis()+".jpg";
+				 * 
+				 * photo = new File(Environment.getExternalStorageDirectory(),
+				 * fileName);
+				 * 
+				 * Intent takePictureIntent = new
+				 * Intent(MediaStore.ACTION_IMAGE_CAPTURE); File dir=
+				 * Environment.getExternalStoragePublicDirectory
+				 * (Environment.DIRECTORY_DCIM);
+				 * 
+				 * File output=new File(dir, "CameraContentDemo.jpeg");
+				 * takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+				 * Uri.fromFile(output)); startActivityForResult(takePictureIntent,
+				 * SHOW_CAMERA);
+				 */
+				break;
 
-
-			// --------------- VERSION PARA EXIF ------------------------------
-			/*
-			 * SimpleDateFormat dateFormat = new
-			 * SimpleDateFormat("yyyyMMdd-HHmmss"); String fileName =
-			 * dateFormat.format(new Date()) + ".jpg";
-			 * 
-			 * // or use timestamp e.g String fileName =
-			 * System.currentTimeMillis()+".jpg";
-			 * 
-			 * photo = new File(Environment.getExternalStorageDirectory(),
-			 * fileName);
-			 * 
-			 * Intent takePictureIntent = new
-			 * Intent(MediaStore.ACTION_IMAGE_CAPTURE); File dir=
-			 * Environment.getExternalStoragePublicDirectory
-			 * (Environment.DIRECTORY_DCIM);
-			 * 
-			 * File output=new File(dir, "CameraContentDemo.jpeg");
-			 * takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-			 * Uri.fromFile(output)); startActivityForResult(takePictureIntent,
-			 * SHOW_CAMERA);
-			 */
-			break;
-
-		case R.id.update_list:
-			Log.v("WE", "update list");
-			break;
+			case R.id.update_list:
+				Log.v("WE", "update list");
+				break;
 		}
 		return true;
 	}
@@ -354,49 +389,110 @@ public class MainActivity extends SherlockActivity {
 	
 
 	
+	
+	
+	/**
+	 * Obtiene los escandalos del servidor y los muestra en pantalla
+	 * @author Alejandro
+	 *
+	 */
+	private class GetEscandalos extends AsyncTask<Void,Integer,Boolean> {
+		 
+		@Override
+	    protected Boolean doInBackground(Void... params) {
+	    	boolean result = false;
+	
+	    	
+	    	HttpClient httpClient = new DefaultHttpClient();
+	        String url = "http://192.168.1.48:8000/api/v1/photo/";
+	        	    	        
+	        HttpGet getEscandalos = new HttpGet(url);
+	        getEscandalos.setHeader("content-type", "application/json");        
+	        
+	        
+	        try{
+	        	// Hacemos la petición a Amazon y obtenemos el bucket "scandaloh"
+		    	AmazonS3Client s3Client = new AmazonS3Client( new BasicAWSCredentials( "AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
+				
+				// Hacemos la petición al servidor
+	        	HttpResponse resp = httpClient.execute(getEscandalos);
+	        	String respStr = EntityUtils.toString(resp.getEntity());
+	         
+	        	// Obtenemos el json
+	            JSONObject respJson = new JSONObject(respStr);
+	            
+	            if (respJson != null){
+	            	result = true;
+	            }
+	            
+	            // Parseamos el json para obtener los escandalos
+	            JSONArray escandalosObject = null;
+	            
+	            escandalosObject = respJson.getJSONArray("objects");
+	            
+	            for (int i=0 ; i < escandalosObject.length(); i++){
+	            	JSONObject escanObject = escandalosObject.getJSONObject(i);
+	            	
+	            	String category = escanObject.getString("category");
+	            	String date = escanObject.getString("date");
+	            	String id = escanObject.getString("id");
+	            	String img = escanObject.getString("img");
+	            	String comments_count = escanObject.getString("comments_count");
+	            	String latitude = escanObject.getString("latitude");
+	            	String longitude = escanObject.getString("longitude");
+	            	String resource_uri = escanObject.getString("resource_uri");	        
+	            	String title = escanObject.getString("title");
+	            	String user = escanObject.getString("user");
+	            	String visits_count = escanObject.getString("visits_count");	
+	            	
+	            	S3Object obj = s3Client.getObject(new GetObjectRequest("scandaloh", "photos/cat_1/photo_107.png"));
+	            	//S3Object obj = s3Client.getObject("scandaloh", img);
+					InputStream in = new BufferedInputStream(obj.getObjectContent());
+					BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
 
-	public InputStream bitmapToInput(Bitmap bit) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bit.compress(CompressFormat.PNG, 0 /* ignored for PNG */, bos);
-		byte[] bitmapdata = bos.toByteArray();
-		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
-		return (InputStream) bs;
+					Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+					
+					obj.close();
+					in.close();
+	            	
+	            	// Añadimos el escandalo al ArrayList
+	        		escandalos.add(new Escandalo(title, category, bmp, Integer.parseInt(comments_count)));
+	            }	         
+	                    
+	        }
+	        catch(Exception ex){
+	                Log.e("ServicioRest","Error!", ex);
+	        }
+	        	   			
+					/*
+					ObjectListing current = s3.listObjects(bucketName,prefix);
+					List<S3ObjectSummary> keyList = current.getObjectSummaries();
+					current = s3.listNextBatchOfObjects(current);
+
+					while (current.isTruncated()){
+					keyList.addAll(current.getObjectSummaries());
+					current = s3.listNextBatchOfObjects(current);
+					}
+					keyList.addAll(current.getObjectSummaries());  
+					*/
+				
+	    	
+	        return result;
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Boolean result) {
+			
+	        if (result){
+		        // Notificamos al adaptador para que actualice listado
+		        escanAdapter.notifyDataSetChanged();
+	        	Log.v("WE","escandalos recibidos");
+	        }
+	        else{
+	        	Log.v("WE","escandalos NO recibidos");
+	        }
+	        
+	    }
 	}
-
-
-	
-	public File bitmapToFile(Bitmap bit) {
-
-		File file = null;
-		// Bitmap bitmap = Utils.decodeBase64(base64);
-		try {
-			file = new File(this.getCacheDir(), "prueba.jpg");
-			FileOutputStream fOut = new FileOutputStream(file);
-			bit.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-			fOut.flush();
-			fOut.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.v(null, "Save file error!");
-		}
-		return file;
-	}
-
-	
-	
-	public String getRealPathFromURI(Uri contentUri) {
-		try {
-			String[] proj = { MediaStore.Images.Media.DATA };
-			Cursor cursor = managedQuery(contentUri, proj, null, null, null);
-			int column_index = cursor
-					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-			cursor.moveToFirst();
-			return cursor.getString(column_index);
-		} catch (Exception e) {
-			return contentUri.getPath();
-		}
-	}
-	
-	
-
 }

@@ -20,6 +20,7 @@ public class DetailEscandaloActivity extends Activity {
 		setContentView(R.layout.escandalo);
 		
 		Bundle extras = getIntent().getExtras();
+		
 		if (extras != null) {
 		    int value = extras.getInt("posicion");
 		    esca = MainActivity.escandalos.get(value);  
