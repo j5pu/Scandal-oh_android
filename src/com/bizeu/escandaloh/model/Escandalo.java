@@ -14,6 +14,8 @@ public class Escandalo {
 	private String category;
 	private Bitmap picture;
 	private int num_comments;
+	private String resource_uri; // Uri de la foto
+	private String route_img; // Ruta de la foto
 
 	
 	
@@ -30,7 +32,7 @@ public class Escandalo {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Escandalo(String title, String category, Bitmap picture, int num_comments){
+	public Escandalo(String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img){
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
 	        	this.category = HAPPY;
@@ -40,6 +42,8 @@ public class Escandalo {
 		}
 		this.picture = picture;
 		this.num_comments = num_comments;
+		this.resource_uri = resource_uri;
+		this.route_img = route_img;
 	}
 	
 	
@@ -74,6 +78,22 @@ public class Escandalo {
 	
 	public int getNumComments(){
 		return num_comments;
+	}
+	
+	public void setResourceUri(String new_resource){
+		this.resource_uri = new_resource;
+	}
+	
+	public String getResourceUri(){
+		return this.resource_uri;
+	}
+	
+	public void setRouteImg(String new_route){
+		this.route_img = new_route;
+	}
+	
+	public String getRouteImg(){
+		return this.route_img;
 	}
 	
 }

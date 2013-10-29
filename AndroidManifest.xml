@@ -29,6 +29,7 @@
         <activity android:name="com.bizeu.escandaloh.DetailEscandaloActivity"></activity>
  		<activity android:name="com.bizeu.escandaloh.CreateEscandaloActivity"></activity>
  		<activity android:name="com.bizeu.escandaloh.DetailPhotoActivity"></activity>
+ 		<activity android:name="com.bizeu.escandaloh.DetailCommentsActivity"></activity>
     </application>
 
 </manifest>

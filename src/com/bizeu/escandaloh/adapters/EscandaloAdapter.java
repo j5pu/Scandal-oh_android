@@ -1,7 +1,9 @@
 package com.bizeu.escandaloh.adapters;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
+import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
@@ -9,6 +11,8 @@ import com.bizeu.escandaloh.model.Escandalo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -30,6 +34,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    ArrayList<Escandalo> data;
 	    private int available_height;	    
 	    private Escandalo escanda;
+	    private int pos;
 	    
 	    private ImageView foto_escandalo;
 	    
@@ -55,6 +60,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        View mView = convertView;
 	        EscandaloHolder holder = null;
+
+	        escanda = data.get(position);
 	        
 	        if(mView == null){
 	            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
@@ -66,14 +73,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.txtTitle = (TextView)mView.findViewById(R.id.txt_titulo);
 	            holder.imgCategory = (ImageView)mView.findViewById(R.id.img_categoria);
 	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
-	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios);      
-	            
-	            // Cambiamos el alto por código
-	            holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
-	            LayoutParams params4 = holder.lheight.getLayoutParams();
-	            params4.height = available_height;
-	            holder.lheight.setLayoutParams(params4);	           
-
+	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
+	        
 	            mView.setTag(holder);
 	        }
 	        
@@ -81,7 +82,14 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
 	        
-	        escanda = data.get(position);
+            
+            // Cambiamos el alto por código
+            holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
+            LayoutParams params4 = holder.lheight.getLayoutParams();
+            params4.height = available_height;
+            holder.lheight.setLayoutParams(params4);
+	        
+	        
 	        holder.imgPicture.setImageBitmap(escanda.getPicture());
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
@@ -95,15 +103,28 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        
 	        
             // Listener para la foto
-            foto_escandalo = (ImageView) mView.findViewById(R.id.img_foto);
-            foto_escandalo.setOnClickListener(new OnClickListener() {
+            holder.imgPicture.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {							
+					Intent i = new Intent(context, DetailPhotoActivity.class);
+					ImageView imView = (ImageView) v;
+					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
+					Log.v("WE","route img: " + escanda.getRouteImg());
+					i.putExtra("route_img", "/api/v1/photo/117/");
+					//i.putExtra("bitmap", bitm);
+					context.startActivity(i);
+				}
+			});
+            
+            // Listener para los comentarios  
+            holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					Log.v("WE","llega");
-					Intent i = new Intent(context, DetailPhotoActivity.class);
-					//i.putExtra("Image", escanda.getPicture());
-					context.startActivity(i);					
+					Intent i = new Intent(context, DetailCommentsActivity.class);
+					i.putExtra("resource_uri", "/api/v1/photo/117/");
+					context.startActivity(i);	
 				}
 			});
 	        
@@ -118,12 +139,21 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	     * @author Alejandro
 	     *
 	     */
-	    static class EscandaloHolder{
+	    public static class EscandaloHolder{
 	        TextView txtTitle;
 	        ImageView imgCategory;
 	        ImageView imgPicture;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
+	        
+	        public ImageView getPicture(){
+	        	return imgPicture;
+	        }
+	        
+	        public TextView getNumComments(){
+	        	return txtNumComments;
+	        }
+	        
 	    }
 	    
    

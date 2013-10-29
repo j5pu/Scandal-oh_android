@@ -2,6 +2,9 @@ package com.bizeu.escandaloh;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,7 +14,9 @@ import org.apache.http.util.EntityUtils;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -65,7 +70,8 @@ public class CreateEscandaloActivity extends Activity {
 				this.getContentResolver().notifyChange(mImageUri, null);
 			    ContentResolver cr = this.getContentResolver();
 			    try{
-			    	taken_photo = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageUri);
+			    	taken_photo = readBitmap(mImageUri);
+			    	//taken_photo = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageUri);
 			        
 			    }
 			    catch (Exception e)
@@ -154,7 +160,7 @@ public class CreateEscandaloActivity extends Activity {
 	             reqEntity.addPart("title", titleBody);
 	             reqEntity.addPart("category", categoryBody);
 	             reqEntity.addPart("user", userBody);
-	             	                    
+	             	           
 	             post.setEntity(reqEntity);
 	             HttpResponse response = client.execute(post);
 	             resEntity = response.getEntity();
@@ -190,6 +196,29 @@ public class CreateEscandaloActivity extends Activity {
 	}
 	
 	
+	
+	// Read bitmap 
+	private Bitmap readBitmap(Uri selectedImage) { 
+	Bitmap bm = null; 
+	BitmapFactory.Options options = new BitmapFactory.Options(); 
+	options.inSampleSize = 5; 
+	AssetFileDescriptor fileDescriptor =null; 
+	try { 
+	fileDescriptor = this.getContentResolver().openAssetFileDescriptor(selectedImage,"r"); 
+	} catch (FileNotFoundException e) { 
+	e.printStackTrace(); 
+	} 
+	finally{ 
+	try { 
+	bm = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options); 
+	fileDescriptor.close(); 
+	} catch (IOException e) { 
+	e.printStackTrace(); 
+	} 
+	} 
+	return bm; 
+	} 
+	
 
 
 	/*
@@ -216,4 +245,8 @@ public class CreateEscandaloActivity extends Activity {
 	        }       
 	}
 	*/
+	
+	
+	
+	
 }
