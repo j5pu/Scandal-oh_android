@@ -1,23 +1,23 @@
 package com.bizeu.escandaloh;
 
+import java.util.ArrayList;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,6 +29,9 @@ public class DetailCommentsActivity extends Activity {
 	private ImageView img_new_comment;	
 	private String resource_uri;
 	private String written_comment;	
+	private ArrayAdapter<String> commentsAdapter;
+	private ArrayList<String> comments;
+	
 	/**
 	 * onCreate
 	 */
@@ -45,16 +48,24 @@ public class DetailCommentsActivity extends Activity {
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		img_new_comment = (ImageView) findViewById(R.id.img_new_comment);
 		
+		comments = new ArrayList<String>();
+		commentsAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, comments);
+		list_comments.setAdapter(commentsAdapter);
+		
 		img_new_comment.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				Log.e("WE","subir comentario");
-				new SendComment().execute();
+				written_comment = edit_new_comment.getText().toString();
+				// Si ha escrito algo enviamos el comentario
+				if (written_comment != ""){
+					new SendComment().execute();
+				}		
 			}
 		});
+		
+		new GetComments().execute();
 	}
-	
 	
 	
 	
@@ -83,8 +94,8 @@ public class DetailCommentsActivity extends Activity {
 	             written_comment= edit_new_comment.getText().toString();   
 	             
 	             dato.put("user", "/api/v1/user/2/");
-	             dato.put("photo", "/api/v1/photo/117/");
-	             dato.put("text", "prueba asdjfaksdfjk");
+	             dato.put("photo", resource_uri);
+	             dato.put("text", written_comment);
 
 	             StringEntity entity = new StringEntity(dato.toString());
 	             post.setEntity(entity);
@@ -110,10 +121,82 @@ public class DetailCommentsActivity extends Activity {
 	    protected void onPostExecute(Boolean result) {
 	        if (result){
 	        	Log.v("WE","comentario enviado");
+	        	comments.add(written_comment);
+	        	commentsAdapter.notifyDataSetChanged();
 	        }
 	        else{
 	        	Log.v("WE","comentario no enviado");
 	        }
 	    }
 	}
+	
+	
+	
+	
+	/**
+	 * Muestra la lista de comentarios
+	 * @author Alejandro
+	 *
+	 */
+	private class GetComments extends AsyncTask<Void,Integer,Boolean> {
+		 
+		@Override
+	    protected Boolean doInBackground(Void... params) {
+			
+			boolean result = false;
+			
+			HttpClient httpClient = new DefaultHttpClient();
+			
+			int id = 117;
+			
+			HttpGet del = new HttpGet("http://192.168.1.48:8000/api/v1/comment/?photo__id=" + id);
+			 
+			del.setHeader("content-type", "application/json");
+			 
+			try{
+			        HttpResponse resp = httpClient.execute(del);
+			        String respStr = EntityUtils.toString(resp.getEntity());
+			 
+			        JSONObject respJSON = new JSONObject(respStr);
+			        
+			        if (respStr != null){
+		            	result = true;
+		            }
+			        
+			        // Parseamos el json para obtener los escandalos
+		            JSONArray escandalosObject = null;
+		            
+		            escandalosObject = respJSON.getJSONArray("objects");
+		            
+		            for (int i=0 ; i < escandalosObject.length(); i++){
+		            	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		            	
+		            	 String comment = escanObject.getString("text");
+					     
+					     comments.add(comment);					 
+		            }		            
+			}
+			catch(Exception ex){
+				Log.e("ServicioRest","Error!", ex);
+			}
+			       
+	        return result;
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Boolean result) {
+	        if (result){
+	        	Log.v("WE","comentarios listados");
+	        	commentsAdapter.notifyDataSetChanged();
+	        }
+	        else{
+	        	Log.v("WE","comentarios no listados");
+	        }
+	    }
+	}
+	
+	
+	
+	
 }

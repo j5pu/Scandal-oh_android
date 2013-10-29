@@ -70,6 +70,7 @@ import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter.EscandaloHolder;
 import com.bizeu.escandaloh.model.Cache;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.users.MainLoginActivity;
 
 public class MainActivity extends SherlockActivity {
 
@@ -227,7 +228,8 @@ public class MainActivity extends SherlockActivity {
 				break;
 
 			case R.id.update_list:
-				Log.v("WE", "update list");
+				Intent i = new Intent(this, MainLoginActivity.class);
+				startActivity(i);
 				break;
 		}
 		return true;
@@ -422,8 +424,6 @@ public class MainActivity extends SherlockActivity {
 			
 	        if (result){
 	        	Log.v("WE","escandalos recibidos");
-	        	// Indicamos que descague su foto y la muestre (cuando la tenga)
-
 	        }
 	        else{
 	        	Log.v("WE","escandalos NO recibidos");
@@ -465,7 +465,7 @@ public class MainActivity extends SherlockActivity {
 				    // Añadimos la foto a caché
 				    Cache.getInstance(getBaseContext()).aniadeImagenAcache(params[0], bitm);  // La almacenamos en cache		   
 	    	    }
-	    	    else{
+	    	    else{	    	    	
 	    	    }
 	 							
 	    	result = true;

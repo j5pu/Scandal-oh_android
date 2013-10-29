@@ -35,7 +35,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    private int available_height;	    
 	    private Escandalo escanda;
 	    private int pos;
-	    
+	    EscandaloHolder holder;
 	    private ImageView foto_escandalo;
 	    
 	    
@@ -59,7 +59,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    @Override
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        View mView = convertView;
-	        EscandaloHolder holder = null;
+	        holder = null;
 
 	        escanda = data.get(position);
 	        
@@ -74,15 +74,28 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.imgCategory = (ImageView)mView.findViewById(R.id.img_categoria);
 	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
+	            holder.route = escanda.getRouteImg();
 	        
+	            /*
+	            // boton de descripcion
+				((Button) itemView.findViewById(R.id.FLCinfoButton))
+						.setTag(familia.getMyId());
+				((Button) itemView.findViewById(R.id.FLCinfoButton))
+						.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {				
+								Family familia = dao.getFamilyWithID(Integer
+										.parseInt(v.getTag().toString()));
+							}
+						});
+	            */
 	            mView.setTag(holder);
 	        }
 	        
 	        else{
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
-	        
-            
+	                 
             // Cambiamos el alto por código
             holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
             LayoutParams params4 = holder.lheight.getLayoutParams();
@@ -106,12 +119,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {							
+				public void onClick(View v) {
+			            
 					Intent i = new Intent(context, DetailPhotoActivity.class);
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					Log.v("WE","route img: " + escanda.getRouteImg());
-					i.putExtra("route_img", "/api/v1/photo/117/");
+					Log.v("WE","route img: " + holder.route);
+					i.putExtra("route_img", holder.route);
 					//i.putExtra("bitmap", bitm);
 					context.startActivity(i);
 				}
@@ -145,6 +159,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        ImageView imgPicture;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
+	        public String route;
 	        
 	        public ImageView getPicture(){
 	        	return imgPicture;

@@ -31,7 +31,6 @@
             android:layout_weight="8"
             android:ems="10" >
 
-            <requestFocus />
         </EditText>
 
         <ImageView

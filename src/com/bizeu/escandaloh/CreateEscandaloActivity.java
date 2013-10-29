@@ -71,11 +71,9 @@ public class CreateEscandaloActivity extends Activity {
 			    ContentResolver cr = this.getContentResolver();
 			    try{
 			    	taken_photo = readBitmap(mImageUri);
-			    	//taken_photo = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageUri);
-			        
+			    	//taken_photo = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageUri);      
 			    }
-			    catch (Exception e)
-			    {
+			    catch (Exception e){
 			        Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
 			        Log.d("WE", "Failed to load", e);
 			    }
