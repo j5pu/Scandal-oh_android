@@ -31,6 +31,7 @@ public class DetailCommentsActivity extends Activity {
 	private String written_comment;	
 	private ArrayAdapter<String> commentsAdapter;
 	private ArrayList<String> comments;
+	private String id;
 	
 	/**
 	 * onCreate
@@ -41,7 +42,7 @@ public class DetailCommentsActivity extends Activity {
 		setContentView(R.layout.comments);
 		
 		if (getIntent() != null){
-			resource_uri = getIntent().getExtras().getString("resource_uri");
+			id = getIntent().getExtras().getString("id");
 		}
 		
 		list_comments = (ListView) findViewById(R.id.list_comments);
@@ -58,7 +59,7 @@ public class DetailCommentsActivity extends Activity {
 			public void onClick(View v) {
 				written_comment = edit_new_comment.getText().toString();
 				// Si ha escrito algo enviamos el comentario
-				if (written_comment != ""){
+				if (!written_comment.equals("")){
 					new SendComment().execute();
 				}		
 			}
@@ -94,13 +95,14 @@ public class DetailCommentsActivity extends Activity {
 	             written_comment= edit_new_comment.getText().toString();   
 	             
 	             dato.put("user", "/api/v1/user/2/");
-	             dato.put("photo", resource_uri);
+	             dato.put("photo", "/api/v1/photo/" + id +"/"); // Formato: /api/v1/photo/id/
 	             dato.put("text", written_comment);
 
 	             StringEntity entity = new StringEntity(dato.toString());
 	             post.setEntity(entity);
 
 	             HttpResponse response = client.execute(post);
+	             Log.v("WE","response subir comentario: " + response.getStatusLine().getStatusCode());
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
 	             
@@ -147,14 +149,13 @@ public class DetailCommentsActivity extends Activity {
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			
-			int id = 117;
-			
 			HttpGet del = new HttpGet("http://192.168.1.48:8000/api/v1/comment/?photo__id=" + id);
 			 
 			del.setHeader("content-type", "application/json");
 			 
 			try{
 			        HttpResponse resp = httpClient.execute(del);
+		            Log.v("WE","response get comments: " + resp.getStatusLine().getStatusCode());
 			        String respStr = EntityUtils.toString(resp.getEntity());
 			 
 			        JSONObject respJSON = new JSONObject(respStr);

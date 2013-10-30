@@ -1,40 +1,18 @@
 package com.bizeu.escandaloh;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,7 +31,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -71,6 +48,7 @@ import com.bizeu.escandaloh.adapters.EscandaloAdapter.EscandaloHolder;
 import com.bizeu.escandaloh.model.Cache;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 public class MainActivity extends SherlockActivity {
 
@@ -87,7 +65,7 @@ public class MainActivity extends SherlockActivity {
 	Bitmap taken_photo;
 	AmazonS3Client s3Client;
 	private int escandalo_loading = 0 ;
-	private Bitmap bitm;
+	private byte[] bytes;
 	
 	
 	/**
@@ -388,22 +366,22 @@ public class MainActivity extends SherlockActivity {
 	            	
 	            	final String category = escanObject.getString("category");
 	            	String date = escanObject.getString("date");
-	            	String id = escanObject.getString("id");
+	            	final String id = escanObject.getString("id");
 	            	final String img = escanObject.getString("img");
-	            	String comments_count = escanObject.getString("comments_count");
+	            	final String comments_count = escanObject.getString("comments_count");
 	            	String latitude = escanObject.getString("latitude");
 	            	String longitude = escanObject.getString("longitude");
 	            	final String resource_uri = escanObject.getString("resource_uri");	        
 	            	final String title = escanObject.getString("title");
 	            	String user = escanObject.getString("user");
-	            	final String visits_count = escanObject.getString("visits_count");		            		           
+	            	String visits_count = escanObject.getString("visits_count");		            		           
 	    	    	
 		        	runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 				            // Añadimos el escandalo al ArrayList
-				        	escandalos.add(new Escandalo(title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(visits_count), resource_uri, img));
+				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
 							escanAdapter.notifyDataSetChanged();	
 							
 				        	new GetPictureFromAmazon().execute(img);
@@ -436,7 +414,11 @@ public class MainActivity extends SherlockActivity {
 	
 	
 	
-	
+	/**
+	 * Obtiene la imagen de Amazon y la muestra
+	 * @author Alejandro
+	 *
+	 */
 	private class GetPictureFromAmazon extends AsyncTask<String,Integer,Boolean> {
 		 
 		@Override
@@ -444,29 +426,28 @@ public class MainActivity extends SherlockActivity {
 	    	boolean result = false;
 		            	
 	        //Obtenemos la imagen de cache
-	    	 bitm = Cache.getInstance(getBaseContext()).obtenImagenDeCache(params[0]);
+	    	//bytes = Cache.getInstance(getBaseContext()).obtenImagenDeCache(params[0]);
 	    	    	
-	    	  if (bitm == null){
-	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials( "AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
+	    	  //if (bytes.length == 0){
+	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials("AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
 	    	    	// Hacemos la petición a Amazon y obtenemos la imagen
 				    S3ObjectInputStream content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
-				    byte[] bytes;
 						
 					try {
 						bytes = IOUtils.toByteArray(content);
 						content.close();
 						BitmapFactory.Options options = new BitmapFactory.Options();
 						options.inSampleSize = 5;
-						bitm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+						Bitmap bitm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+						bytes = ImageUtils.BitmapToBytes(bitm);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 
 				    // Añadimos la foto a caché
-				    Cache.getInstance(getBaseContext()).aniadeImagenAcache(params[0], bitm);  // La almacenamos en cache		   
-	    	    }
-	    	    else{	    	    	
-	    	    }
+				  //  Cache.getInstance(getBaseContext()).aniadeImagenAcache(params[0], bytes);  // La almacenamos en cache		   
+	    	   // }
+	    	   // else{}
 	 							
 	    	result = true;
 	        return result;
@@ -475,26 +456,14 @@ public class MainActivity extends SherlockActivity {
 		
 		@Override
 	    protected void onPostExecute(Boolean result) {
-		    final Escandalo esc = escandalos.get(escandalo_loading);
-		    esc.setPicture(bitm);	
+		    final Escandalo esc = escandalos.get(escandalo_loading);    
+		    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
 		    escandalos.set(escandalo_loading, esc);
 		    escandalo_loading++;    
 			escanAdapter.notifyDataSetChanged();
 			Log.v("WE","Imagen añadida");
-			
-
 	    }
 	}
-	
-	
-	
-	
-	
-	
-	
-
-	
-	
 	
 
 }

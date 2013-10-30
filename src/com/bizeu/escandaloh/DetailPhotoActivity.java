@@ -13,6 +13,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.bizeu.escandaloh.model.Cache;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
@@ -39,9 +40,9 @@ public class DetailPhotoActivity extends Activity {
 		setContentView(R.layout.photo_detail);
 			
 		if (getIntent() != null){
-			route_img = getIntent().getExtras().getString("route_img");
-			photo = Cache.getInstance(this).obtenImagenDeCache(route_img);
-
+			byte[] bytes = getIntent().getByteArrayExtra("bytes");
+			//photo = Cache.getInstance(this).obtenImagenDeCache(bytes);
+			photo = ImageUtils.BytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
 			mImage.setDisplayType(DisplayType.FIT_IF_BIGGER);
 			mImage.setImageBitmap(photo);

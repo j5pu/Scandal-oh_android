@@ -1,13 +1,11 @@
 package com.bizeu.escandaloh.adapters;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-
 import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
-
+import com.bizeu.escandaloh.util.ImageUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +13,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -36,8 +32,6 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    private Escandalo escanda;
 	    private int pos;
 	    EscandaloHolder holder;
-	    private ImageView foto_escandalo;
-	    
 	    
 	    /**
 	     * Constructor
@@ -74,21 +68,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.imgCategory = (ImageView)mView.findViewById(R.id.img_categoria);
 	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
-	            holder.route = escanda.getRouteImg();
+	            holder.imgNumComments = (ImageView)mView.findViewById(R.id.img_num_comentarios);
 	        
-	            /*
-	            // boton de descripcion
-				((Button) itemView.findViewById(R.id.FLCinfoButton))
-						.setTag(familia.getMyId());
-				((Button) itemView.findViewById(R.id.FLCinfoButton))
-						.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {				
-								Family familia = dao.getFamilyWithID(Integer
-										.parseInt(v.getTag().toString()));
-							}
-						});
-	            */
 	            mView.setTag(holder);
 	        }
 	        
@@ -101,11 +82,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             LayoutParams params4 = holder.lheight.getLayoutParams();
             params4.height = available_height;
             holder.lheight.setLayoutParams(params4);
-	        
-	        
+	        	        
 	        holder.imgPicture.setImageBitmap(escanda.getPicture());
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
+	        // Guardamos el ID del escandalo para luego recuperarlo al hacer click sobre ellos
+	        holder.txtNumComments.setTag(escanda.getId());
+	        holder.imgNumComments.setTag(escanda.getId());
 	        
 	        if (escanda.getCategory().equals(Escandalo.HAPPY)){
 	        	holder.imgCategory.setImageResource(R.drawable.cara_riendose);
@@ -119,26 +102,34 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {
-			            
+				public void onClick(View v) {	            
 					Intent i = new Intent(context, DetailPhotoActivity.class);
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					Log.v("WE","route img: " + holder.route);
-					i.putExtra("route_img", holder.route);
-					//i.putExtra("bitmap", bitm);
+					byte[] bytes = ImageUtils.BitmapToBytes(bitm);
+					i.putExtra("bytes", bytes);
 					context.startActivity(i);
 				}
 			});
             
-            // Listener para los comentarios  
+            // Listeners para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {
+				public void onClick(View v) {			
 					Intent i = new Intent(context, DetailCommentsActivity.class);
-					i.putExtra("resource_uri", "/api/v1/photo/117/");
+					i.putExtra("id", v.getTag().toString());
 					context.startActivity(i);	
+				}
+			});
+            
+            holder.imgNumComments.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {					
+					Intent i = new Intent(context, DetailCommentsActivity.class);
+					i.putExtra("id", v.getTag().toString());
+					context.startActivity(i);				
 				}
 			});
 	        
@@ -157,9 +148,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        TextView txtTitle;
 	        ImageView imgCategory;
 	        ImageView imgPicture;
+	        ImageView imgNumComments;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
-	        public String route;
+	        
 	        
 	        public ImageView getPicture(){
 	        	return imgPicture;

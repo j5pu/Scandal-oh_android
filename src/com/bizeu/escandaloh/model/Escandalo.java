@@ -1,6 +1,5 @@
 package com.bizeu.escandaloh.model;
 
-import com.bizeu.escandaloh.R;
 
 import android.graphics.Bitmap;
 
@@ -10,6 +9,7 @@ public class Escandalo {
 	public static final String ANGRY = "Angry";
 	public static final String HAPPY = "Happy";
 	
+	private String id;
 	private String title;
 	private String category;
 	private Bitmap picture;
@@ -32,7 +32,8 @@ public class Escandalo {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Escandalo(String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img){
+	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img){
+		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
 	        	this.category = HAPPY;
@@ -46,6 +47,13 @@ public class Escandalo {
 		this.route_img = route_img;
 	}
 	
+	public void setId(String id){
+		this.id = id;
+	}
+	
+	public String getId(){
+		return id;
+	}
 	
 	
 	public void setTitle(String new_title){

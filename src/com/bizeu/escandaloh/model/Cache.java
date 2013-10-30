@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh.model;
 
+import com.bizeu.escandaloh.util.ImageUtils;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -40,7 +42,8 @@ public class Cache {
 	 * @param key: Id de la imagen (usamos el string de la URL)
 	 * @param bitmap: Imagen
 	 */
-	public void aniadeImagenAcache(String key, Bitmap bitmap) {
+	public void aniadeImagenAcache(String key, byte[] bytes) {
+		Bitmap bitmap = ImageUtils.BytesToBitmap(bytes);
 	    if (obtenImagenDeCache(key) == null) {
 	        mMemoryCache.put(key, bitmap);
 	    }
@@ -51,8 +54,13 @@ public class Cache {
 	 * Obtiene una imagen desde cache
 	 * @return bitmap: Imagen obtenida
 	 */
-	public Bitmap obtenImagenDeCache(String key) {
-	    return mMemoryCache.get(key);
+	public byte[] obtenImagenDeCache(String key) {
+	    Bitmap bitmap = mMemoryCache.get(key);
+	    byte[] bytes = null;
+	    if (bitmap != null){
+	    	bytes = ImageUtils.BitmapToBytes(bitmap);
+	    }
+	    return bytes;
 	}
 	
 
