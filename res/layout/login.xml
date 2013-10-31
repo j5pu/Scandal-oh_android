@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="5"
         android:orientation="vertical" >
 
         <EditText
@@ -24,21 +24,6 @@
             android:ems="10"
             android:inputType="textPassword"
             android:text="Password" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
-        android:orientation="vertical" >
-
-        <ProgressBar
-            android:id="@+id/progress_login"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

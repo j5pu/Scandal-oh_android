@@ -11,6 +11,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,7 +32,7 @@ public class LoginActivity extends Activity {
 	private EditText edit_password;
 	private Button boton_aceptar;
 	private Button boton_cancelar;
-	private ProgressBar loading;
+	private ProgressDialog progress;
 	
 	private String reason;
 	private String user_uri;
@@ -47,11 +48,10 @@ public class LoginActivity extends Activity {
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
-		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);
-		loading = (ProgressBar) findViewById(R.id.progress_login);
-		
-		// Inicialmente el progressBar está oculto
-		loading.setVisibility(View.INVISIBLE);
+		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);	
+		progress = new ProgressDialog(this);
+		progress.setTitle("Logueando ...");
+		progress.setCancelable(false);
 		
 		boton_cancelar.setOnClickListener(new View.OnClickListener() {
 			
@@ -104,12 +104,12 @@ public class LoginActivity extends Activity {
 		 
 		@Override
 		protected void onPreExecute(){
-			loading.setVisibility(View.VISIBLE);
+			// Mostramos el ProgressDialog
+			progress.show();
 		}
 		
 		@Override
 	    protected String doInBackground(Void... params) {
-	    	boolean result = false;
 	 
 	    	HttpEntity resEntity;
 	        String urlString = "http://192.168.1.48:8000/api/v1/user/login/";        
@@ -166,8 +166,10 @@ public class LoginActivity extends Activity {
 		@Override
 	    protected void onPostExecute(String result) {
 			
-			// Paramos el progresBar
-			loading.setVisibility(View.INVISIBLE);
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }
 			
 			// Si se ha logeado correctamente guardamos el user_uri como un sharedPreference
 	        if (result.equals("ok")){

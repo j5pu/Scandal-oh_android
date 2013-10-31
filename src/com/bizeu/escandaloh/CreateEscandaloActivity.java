@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +52,7 @@ public class CreateEscandaloActivity extends Activity {
 	private Bitmap bitmap;
 	private File photo_file;
 	private Uri mImageUri;
+	private ProgressDialog progress;
 
 	/**
 	 * OnCreate
@@ -80,6 +82,10 @@ public class CreateEscandaloActivity extends Activity {
 				}
 			}
 		}
+		
+		progress = new ProgressDialog(this);
+		progress.setTitle("Subiendo escándalo ...");
+		progress.setCancelable(false);
 
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
 		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
@@ -121,6 +127,12 @@ public class CreateEscandaloActivity extends Activity {
 	 * 
 	 */
 	private class SendScandalo extends AsyncTask<Void, Integer, Integer> {
+		
+		@Override
+		protected void onPreExecute(){
+			// Mostramos el ProgressDialog
+			progress.show();
+		}
 		
 		@Override
 		protected Integer doInBackground(Void... params) {
@@ -180,6 +192,12 @@ public class CreateEscandaloActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(Integer result) {
+			
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }
+			
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
 				Log.v("WE", "foto enviada");

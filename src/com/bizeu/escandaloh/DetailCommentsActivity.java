@@ -142,9 +142,8 @@ public class DetailCommentsActivity extends Activity {
 	             response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
-	             Log.i("WE",response_str);
-
 	        }
+	        
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	        }
@@ -191,6 +190,8 @@ public class DetailCommentsActivity extends Activity {
 			try{
 					response = httpClient.execute(del);
 			        String respStr = EntityUtils.toString(response.getEntity());
+			        
+			        Log.i("WE",respStr);
 			  
 			        JSONObject respJSON = new JSONObject(respStr);
 			        
@@ -202,10 +203,12 @@ public class DetailCommentsActivity extends Activity {
 		            for (int i=0 ; i < escandalosObject.length(); i++){
 		            	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
-		            	 String comment = escanObject.getString("text");
+		            	 String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+		            	 String username = escanObject.getString("username");
+		            	 String date = escanObject.getString("date");
 		            	 
 					     // Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
-					     comments.add(new String(comment.getBytes("ISO-8859-1"),  HTTP.UTF_8));					 
+					     comments.add(new Comment(comment, username, date));					 
 		            }		            
 			}
 			catch(Exception ex){
