@@ -11,7 +11,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -61,11 +64,11 @@ public class MainActivity extends SherlockActivity {
 	private ListView list_escandalos;
 	private Uri fileUri;
 	private Uri mImageUri;
-	public static AmazonClientManager clientManager = null;	
 	Bitmap taken_photo;
 	AmazonS3Client s3Client;
 	private int escandalo_loading = 0 ;
 	private byte[] bytes;
+	private boolean user_login = false;
 	
 	
 	/**
@@ -81,38 +84,9 @@ public class MainActivity extends SherlockActivity {
 		getSupportActionBar().setLogo(R.drawable.corte_manga);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
-	
 
 		escandalos = new ArrayList<Escandalo>();
 		
-		// Datos de prueba	
-		/*
-		escandalos.add(new Escandalo("Prueba 1", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_1), 222, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 2", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_2), 12, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 3", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_3), 2, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 4", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_4), 3, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 5", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_5), 32, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 6", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_1), 332, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Prueba 7", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_aleman_2), 2, "/api/v1/photo/1/"));
-		escandalos.add(new Escandalo("Grande", Escandalo.ANGRY,
-				BitmapFactory.decodeResource(getResources(),
-						R.drawable.pastor_grande), 234, "/api/v1/photo/1/"));
-		*/
-
 		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo,
 				escandalos);
 				
@@ -169,16 +143,72 @@ public class MainActivity extends SherlockActivity {
 		new GetEscandalos().execute();
 	}
 
+	
+	/**
+	 * onResume
+	 */
+	@Override
+	public void onResume(){
+		super.onResume();
+		// Comprobamos si el usuario esta logueado
+		SharedPreferences prefs = this.getSharedPreferences(
+			      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		
+		String user_uri = prefs.getString("user_uri", null); 
+		if (user_uri != null){
+			user_login = true;
+		}
+		else{
+			user_login = false;
+		}
+		
+		// Refrescamos el action bar
+		supportInvalidateOptionsMenu();
+	}
+
+	
 	/**
 	 * onCreateOptionsMenu
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.action_bar, menu);
+		
+		// Si el usuario esta logueado
+		if (user_login){ 
+			inflater.inflate(R.menu.action_bar_login, menu);
+		}	
+		else{
+			inflater.inflate(R.menu.action_bar_logout, menu);
+		}
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	
+	
+	/**
+	 * onPrepareOptionsMenu
+	 * Actualiza el action bar
+	 */
+    @Override
+    public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
+    	super.onPrepareOptionsMenu(menu);
+    	
+		MenuInflater inflater = getSupportMenuInflater();
+		
+		// Si el usuario esta logueado
+		if (user_login){ 
+			inflater.inflate(R.menu.action_bar_login, menu);
+		}	
+		else{
+			inflater.inflate(R.menu.action_bar_logout, menu);
+		}
+		
+        return true;
+    }
+	
+	
 	/**
 	 * onOptionsItemSelected
 	 */
@@ -188,24 +218,28 @@ public class MainActivity extends SherlockActivity {
 		super.onOptionsItemSelected(item);
 
 		switch (item.getItemId()) {
+		    // Solo puede hacer fotos si el usuario está logueado
 			case R.id.take_photo:
-				Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-				File photo;
-				try{
-			        photo = this.createTemporaryFile("picture", ".png");
-			        photo.delete();
-			    }
-			    catch(Exception e){
-			        Log.v("WE", "Can't create file to take picture!");
-			        return false;
-			    }
+				if (user_login){ 
+					Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+					File photo;
+					try{
+				        photo = this.createTemporaryFile("picture", ".png");
+				        photo.delete();
+				    }
+				    catch(Exception e){
+				        Log.v("WE", "Can't create file to take picture!");
+				        return false;
+				    }
+					
+				    mImageUri = Uri.fromFile(photo);
+				    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+					startActivityForResult(takePictureIntent, SHOW_CAMERA);
+				}
 				
-			    mImageUri = Uri.fromFile(photo);
-			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-				startActivityForResult(takePictureIntent, SHOW_CAMERA);
 				break;
 
-			case R.id.update_list:
+			case R.id.user_settings:
 				Intent i = new Intent(this, MainLoginActivity.class);
 				startActivity(i);
 				break;
@@ -330,31 +364,25 @@ public class MainActivity extends SherlockActivity {
 	 * @author Alejandro
 	 *
 	 */
-	private class GetEscandalos extends AsyncTask<Void,Integer,Boolean> {
+	private class GetEscandalos extends AsyncTask<Void,Integer,Integer> {
 		 
 		@Override
-	    protected Boolean doInBackground(Void... params) {
-	    	boolean result = false;
-	
+	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.48:8000/api/v1/photo/";
+	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=1";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
 	        
-	        
+	        HttpResponse response = null;
 	        try{
 				// Hacemos la petición al servidor
-	        	HttpResponse resp = httpClient.execute(getEscandalos);
-	        	String respStr = EntityUtils.toString(resp.getEntity());
+	        	response = httpClient.execute(getEscandalos);
+	        	String respStr = EntityUtils.toString(response.getEntity());
 	         
 	        	// Obtenemos el json
-	            JSONObject respJson = new JSONObject(respStr);
-	            
-	            if (respJson != null){
-	            	result = true;
-	            }
+	            JSONObject respJson = new JSONObject(respStr);	            
 	            
 	            // Parseamos el json para obtener los escandalos
 	            JSONArray escandalosObject = null;
@@ -392,15 +420,17 @@ public class MainActivity extends SherlockActivity {
 	        catch(Exception ex){
 	                Log.e("ServicioRest","Error!", ex);
 	        }
-	        	   							
-	        return result;
+	        	 
+	        // Devolvemos el código resultado
+	        return (response.getStatusLine().getStatusCode());
 	    }
 
 		
 		@Override
-	    protected void onPostExecute(Boolean result) {
+	    protected void onPostExecute(Integer result) {
 			
-	        if (result){
+			// Si es codigo 2xx --> OK
+	        if (result >= 200 && result <300){
 	        	Log.v("WE","escandalos recibidos");
 	        }
 	        else{
@@ -449,7 +479,6 @@ public class MainActivity extends SherlockActivity {
 	    	   // }
 	    	   // else{}
 	 							
-	    	result = true;
 	        return result;
 	    }
 

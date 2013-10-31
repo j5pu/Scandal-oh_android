@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -90,19 +91,20 @@ public class RegistrationActivity extends Activity {
 	
 	
 	/**
-	 * Sube un comentario
+	 * Registra un usuario
 	 * @author Alejandro
 	 *
 	 */
-	private class SignInUser extends AsyncTask<Void,Integer,Boolean> {
+	private class SignInUser extends AsyncTask<Void,Integer,Integer> {
 		 
 		@Override
-	    protected Boolean doInBackground(Void... params) {
+	    protected Integer doInBackground(Void... params) {
 	    	boolean result = false;
 	 
 	    	HttpEntity resEntity;
 	        String urlString = "http://192.168.1.48:8000/api/v1/user/";        
 
+	        HttpResponse response = null;
 	        try{
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
@@ -114,10 +116,10 @@ public class RegistrationActivity extends Activity {
 	             dato.put("password", edit_password_usuario.getText().toString());
 	             dato.put("email", edit_email_usuario.getText().toString());
 
-	             StringEntity entity = new StringEntity(dato.toString());
+	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);
 
-	             HttpResponse response = client.execute(post);
+	             response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
 	             
@@ -130,13 +132,15 @@ public class RegistrationActivity extends Activity {
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	        }
 	        
-	        return result;
+	        // Devolvemos el código de respuesta
+	        return (response.getStatusLine().getStatusCode());
 	    }
 
 		
 		@Override
-	    protected void onPostExecute(Boolean result) {
-	        if (result){
+	    protected void onPostExecute(Integer result) {
+			// Si es codigo 2xx --> OK
+	        if (result >= 200 && result <300){
 	        	Log.v("WE","usuario registrado");
 	        	finish();
 	        }

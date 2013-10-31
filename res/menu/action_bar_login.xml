@@ -7,16 +7,16 @@
         android:title="@string/action_settings"/>
     
     <item
-        android:id="@+id/update_list"
+        android:id="@+id/user_settings"
         android:title="we1"
-        android:icon="@drawable/actualizar"
+        android:icon="@drawable/on"
         android:showAsAction="ifRoom|withText"
     />
     
     <item
         android:id="@+id/take_photo"
         android:title="we2"
-        android:icon="@drawable/camara"
+        android:icon="@drawable/camara_azul"
         android:showAsAction="ifRoom|withText"
     />
 

@@ -9,10 +9,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +24,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 public class DetailCommentsActivity extends Activity {
@@ -27,11 +32,15 @@ public class DetailCommentsActivity extends Activity {
 	private ListView list_comments;
 	private EditText edit_new_comment;
 	private ImageView img_new_comment;	
+	private LinearLayout layout_write_comment;
+	
 	private String resource_uri;
 	private String written_comment;	
 	private ArrayAdapter<String> commentsAdapter;
 	private ArrayList<String> comments;
 	private String id;
+	private boolean user_login = false;
+	private String user_uri;
 	
 	/**
 	 * onCreate
@@ -48,6 +57,7 @@ public class DetailCommentsActivity extends Activity {
 		list_comments = (ListView) findViewById(R.id.list_comments);
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		img_new_comment = (ImageView) findViewById(R.id.img_new_comment);
+		layout_write_comment = (LinearLayout) findViewById(R.id.ll_write_comment);
 		
 		comments = new ArrayList<String>();
 		commentsAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, comments);
@@ -70,21 +80,47 @@ public class DetailCommentsActivity extends Activity {
 	
 	
 	
+	
+	
+	
+	/**
+	 * onResume
+	 */
+	@Override
+	public void onResume(){
+		super.onResume();
+		// Comprobamos si el usuario esta logueado
+		SharedPreferences prefs = this.getSharedPreferences(
+			      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		
+		user_uri = prefs.getString("user_uri", null); 
+		if (user_uri != null){
+			user_login = true;
+		}
+		else{
+			user_login = false;
+			// Quitamos la vista para que pueda enviar un comentario
+			layout_write_comment.setVisibility(View.GONE);
+		}
+	}
+	
+	
+	
 
 	/**
 	 * Sube un comentario
 	 * @author Alejandro
 	 *
 	 */
-	private class SendComment extends AsyncTask<Void,Integer,Boolean> {
+	private class SendComment extends AsyncTask<Void,Integer,Integer> {
 		 
 		@Override
-	    protected Boolean doInBackground(Void... params) {
-	    	boolean result = false;
+	    protected Integer doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
 	        String urlString = "http://192.168.1.48:8000/api/v1/comment/";        
 
+	        HttpResponse response = null;
 	        try{
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
@@ -92,36 +128,36 @@ public class DetailCommentsActivity extends Activity {
 	             
 	             JSONObject dato = new JSONObject();
 	             
-	             written_comment= edit_new_comment.getText().toString();   
+	             // Obtenemos el comentario en formato UTF-8
+	             written_comment = edit_new_comment.getText().toString();
 	             
-	             dato.put("user", "/api/v1/user/2/");
+	             dato.put("user", user_uri);
 	             dato.put("photo", "/api/v1/photo/" + id +"/"); // Formato: /api/v1/photo/id/
 	             dato.put("text", written_comment);
 
-	             StringEntity entity = new StringEntity(dato.toString());
+	             // Formato UTF-8 (ñ,á,ä,...)
+	             StringEntity entity = new StringEntity(dato.toString(),  HTTP.UTF_8);
 	             post.setEntity(entity);
 
-	             HttpResponse response = client.execute(post);
-	             Log.v("WE","response subir comentario: " + response.getStatusLine().getStatusCode());
+	             response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
-	             
-	             if (resEntity != null) {
-	                 Log.i("RESPONSE",response_str);
-	                 result = true;
-	             }
+	             Log.i("WE",response_str);
+
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	        }
 	        
-	        return result;
+	        // Devolvemos el resultado 
+	        return (response.getStatusLine().getStatusCode());
 	    }
 
 		
 		@Override
-	    protected void onPostExecute(Boolean result) {
-	        if (result){
+	    protected void onPostExecute(Integer result) {
+			// Si es codigo 2xx --> OK
+			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
 	        	comments.add(written_comment);
 	        	commentsAdapter.notifyDataSetChanged();
@@ -136,58 +172,55 @@ public class DetailCommentsActivity extends Activity {
 	
 	
 	/**
-	 * Muestra la lista de comentarios
+	 * Muestra la lista de comentarios para esa foto
 	 * @author Alejandro
 	 *
 	 */
-	private class GetComments extends AsyncTask<Void,Integer,Boolean> {
+	private class GetComments extends AsyncTask<Void,Integer,Integer> {
 		 
 		@Override
-	    protected Boolean doInBackground(Void... params) {
-			
-			boolean result = false;
+	    protected Integer doInBackground(Void... params) {
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			
 			HttpGet del = new HttpGet("http://192.168.1.48:8000/api/v1/comment/?photo__id=" + id);
 			 
 			del.setHeader("content-type", "application/json");
-			 
+			
+			HttpResponse response = null ;
 			try{
-			        HttpResponse resp = httpClient.execute(del);
-		            Log.v("WE","response get comments: " + resp.getStatusLine().getStatusCode());
-			        String respStr = EntityUtils.toString(resp.getEntity());
-			 
+					response = httpClient.execute(del);
+			        String respStr = EntityUtils.toString(response.getEntity());
+			  
 			        JSONObject respJSON = new JSONObject(respStr);
-			        
-			        if (respStr != null){
-		            	result = true;
-		            }
 			        
 			        // Parseamos el json para obtener los escandalos
 		            JSONArray escandalosObject = null;
-		            
+		            		   
 		            escandalosObject = respJSON.getJSONArray("objects");
 		            
 		            for (int i=0 ; i < escandalosObject.length(); i++){
 		            	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
 		            	 String comment = escanObject.getString("text");
-					     
-					     comments.add(comment);					 
+		            	 
+					     // Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
+					     comments.add(new String(comment.getBytes("ISO-8859-1"),  HTTP.UTF_8));					 
 		            }		            
 			}
 			catch(Exception ex){
 				Log.e("ServicioRest","Error!", ex);
 			}
-			       
-	        return result;
+			
+			// Devolvemos el código de respuesta
+	        return (response.getStatusLine().getStatusCode());
 	    }
 
 		
 		@Override
-	    protected void onPostExecute(Boolean result) {
-	        if (result){
+	    protected void onPostExecute(Integer result) {
+			// Si es codigo 2xx --> OK
+	        if (result >= 200 && result <300){
 	        	Log.v("WE","comentarios listados");
 	        	commentsAdapter.notifyDataSetChanged();
 	        }

@@ -7,52 +7,56 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
-        android:gravity="center_vertical"
+        android:layout_weight="3"
         android:orientation="vertical" >
 
         <EditText
-            android:id="@+id/edit_registro_nombre"
+            android:id="@+id/edit_login_nombre_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Nombre de usuario" >
-
-            <requestFocus />
-        </EditText>
+            android:text="User name / email" />
 
         <EditText
-            android:id="@+id/edit_registro_password"
+            android:id="@+id/edit_login_pasword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Password" />
-
-        <EditText
-            android:id="@+id/edit_registro_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Email"
-            android:inputType="textEmailAddress" />
+            android:inputType="textPassword"
+            android:text="Password" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="5"
-        android:gravity="center_vertical|center_horizontal"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <ProgressBar
+            android:id="@+id/progress_login"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center_horizontal"
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/but_confirmar_registro"
+            android:id="@+id/but_confirmar_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Registrar" />
+            android:text="Log in" />
 
         <Button
-            android:id="@+id/but_cancelar_registro"
+            android:id="@+id/but_cancelar_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancelar" />

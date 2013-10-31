@@ -41,7 +41,6 @@ public class DetailPhotoActivity extends Activity {
 			
 		if (getIntent() != null){
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
-			//photo = Cache.getInstance(this).obtenImagenDeCache(bytes);
 			photo = ImageUtils.BytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
 			mImage.setDisplayType(DisplayType.FIT_IF_BIGGER);
