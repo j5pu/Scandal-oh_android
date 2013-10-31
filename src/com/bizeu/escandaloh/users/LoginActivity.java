@@ -124,8 +124,7 @@ public class LoginActivity extends Activity {
 	             
 	             String username_email = edit_nombre_email.getText().toString();
 	             String password = edit_password.getText().toString();
-
-	             
+             
 	             dato.put("username_email", username_email);
 	             dato.put("password", password);
 

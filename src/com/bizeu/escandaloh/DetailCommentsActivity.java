@@ -163,8 +163,8 @@ public class DetailCommentsActivity extends Activity {
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
-	        	//comments.add(written_comment, username);
-	        	//commentsAdapter.notifyDataSetChanged();
+	        	// Mostramos de nuevo los comentarios
+	        	new GetComments().execute();
 	        }
 	        else{
 	        	Log.v("WE","comentario no enviado");
@@ -184,6 +184,8 @@ public class DetailCommentsActivity extends Activity {
 		 
 		@Override
 	    protected Integer doInBackground(Void... params) {
+			
+			comments.clear();
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			

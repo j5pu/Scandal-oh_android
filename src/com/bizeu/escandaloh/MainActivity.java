@@ -3,6 +3,7 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,38 +24,33 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.util.LruCache;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
+import android.view.KeyEvent;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ListObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
-import com.bizeu.escandaloh.adapters.EscandaloAdapter.EscandaloHolder;
-import com.bizeu.escandaloh.model.Cache;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.zed.adserver.AdsSessionController;
+import com.zed.adserver.BannerView;
+import com.zed.adserver.onAdsReadyListener;
 
-public class MainActivity extends SherlockActivity {
+public class MainActivity extends SherlockActivity implements onAdsReadyListener {
 
+	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	private static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
 	private File photo;
@@ -70,6 +66,9 @@ public class MainActivity extends SherlockActivity {
 	private byte[] bytes;
 	private boolean user_login = false;
 	
+	private FrameLayout banner;
+	private BannerView adM;
+
 	
 	/**
 	 * onCreate
@@ -78,6 +77,10 @@ public class MainActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// Ten
+		AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
+        AdsSessionController.registerAdsReadyListener(this);
 
 		// Action bar
 		getSupportActionBar().setTitle(R.string.app_name);
@@ -140,7 +143,7 @@ public class MainActivity extends SherlockActivity {
 			}
 		});
 				
-		new GetEscandalos().execute();
+		new GetEscandalos().execute();	
 	}
 
 	
@@ -150,6 +153,9 @@ public class MainActivity extends SherlockActivity {
 	@Override
 	public void onResume(){
 		super.onResume();
+		
+	    AdsSessionController.enableTracking();
+
 		// Comprobamos si el usuario esta logueado
 		SharedPreferences prefs = this.getSharedPreferences(
 			      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
@@ -165,6 +171,79 @@ public class MainActivity extends SherlockActivity {
 		// Refrescamos el action bar
 		supportInvalidateOptionsMenu();
 	}
+	
+	
+
+	/**
+	 * onPause
+	 */
+	@Override
+	protected void onPause() {
+	    // TODO Auto-generated method stub
+	    super.onPause();
+	    AdsSessionController.pauseTracking();
+	}
+	
+	
+	
+
+
+	
+	/**
+	 * It will be called when the ads are ready to be shown
+	 */
+	@Override
+	public void onAdsReady(){ 	
+	       //The banner will be show inside this view.
+        banner = (FrameLayout) findViewById(R.id.banner);
+     
+        //BannerView initialization
+        adM = new BannerView( this, getApplicationContext());
+ 
+        banner.removeAllViews();
+ 
+        //Add the bannerView to the container view
+        banner.addView( adM );
+ 
+        //Set the visibility to VISIBLE.
+        banner.setVisibility( FrameLayout.VISIBLE );		
+	}
+	 
+
+	
+	
+	/**
+	 * It will be called when any errors ocurred.
+	 */
+	@Override
+	public void onAdsReadyFailed(){
+		Log.e("ZedAdServerLog","Error loading ads");
+	}
+	
+	
+	/**
+	 * onKeyDown
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    // TODO Auto-generated method stub
+	    if (keyCode == KeyEvent.KEYCODE_BACK){
+	        AdsSessionController.stopTracking();
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	 
+	
+	/**
+	 * onUserLeaveHint
+	 */
+	@Override
+	protected void onUserLeaveHint() {
+	    // TODO Auto-generated method stub
+	    super.onUserLeaveHint();
+	    AdsSessionController.detectHomeButtonEvent();
+	}
+	
 
 	
 	/**
@@ -270,9 +349,9 @@ public class MainActivity extends SherlockActivity {
 	}
 
 
+
 	
-	
-	
+
 
 
 	

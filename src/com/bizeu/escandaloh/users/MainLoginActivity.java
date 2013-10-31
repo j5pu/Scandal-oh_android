@@ -3,17 +3,24 @@ package com.bizeu.escandaloh.users;
 import com.bizeu.escandaloh.CreateEscandaloActivity;
 import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.R;
+import com.zed.adserver.AdsSessionController;
+import com.zed.adserver.BannerView;
+import com.zed.adserver.onAdsReadyListener;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class MainLoginActivity extends Activity {
-
+public class MainLoginActivity extends Activity{
+	
 	public static int LOG_IN = 1;
 	
 	private TextView txt_pasar;
@@ -23,24 +30,25 @@ public class MainLoginActivity extends Activity {
 	private boolean esta_logeado;
 	private SharedPreferences prefs;
 	
+	
 	/**
 	 * onCreate
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_login);
+		setContentView(R.layout.main_login);		
 		
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);
 		but_login = (Button) findViewById(R.id.but_log_in);
 		
 		// Comprobamos si el usuario esta logeado
-		prefs = this.getSharedPreferences("com.bizeu.escandaloh", this.MODE_PRIVATE);
+		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
 		String user_uri = prefs.getString("user_uri", null); 
 		
-		// Mostramos "Log in" o "Log out" según el usuario esté logeado o no
+		// Mostramos "Log in" o "Log out" según el usuario esté logueado o no
 		if (user_uri != null){
 			esta_logeado = true;
 			but_login.setText("Log out");
@@ -80,6 +88,8 @@ public class MainLoginActivity extends Activity {
 	
 	
 	
+	 
+
 	
 	/**
 	 * onActivityResult
