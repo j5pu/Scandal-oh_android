@@ -1,6 +1,8 @@
 package com.bizeu.escandaloh;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -13,6 +15,9 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.bizeu.escandaloh.adapters.CommentAdapter;
+import com.bizeu.escandaloh.model.Comment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -36,8 +41,8 @@ public class DetailCommentsActivity extends Activity {
 	
 	private String resource_uri;
 	private String written_comment;	
-	private ArrayAdapter<String> commentsAdapter;
-	private ArrayList<String> comments;
+	private ArrayAdapter<Comment> commentsAdapter;
+	private ArrayList<Comment> comments;
 	private String id;
 	private boolean user_login = false;
 	private String user_uri;
@@ -59,8 +64,8 @@ public class DetailCommentsActivity extends Activity {
 		img_new_comment = (ImageView) findViewById(R.id.img_new_comment);
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_write_comment);
 		
-		comments = new ArrayList<String>();
-		commentsAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, comments);
+		comments = new ArrayList<Comment>();
+		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments);
 		list_comments.setAdapter(commentsAdapter);
 		
 		img_new_comment.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +104,7 @@ public class DetailCommentsActivity extends Activity {
 		}
 		else{
 			user_login = false;
-			// Quitamos la vista para que pueda enviar un comentario
+			// Ocultamos la vista de enviar cometario
 			layout_write_comment.setVisibility(View.GONE);
 		}
 	}
@@ -158,8 +163,8 @@ public class DetailCommentsActivity extends Activity {
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
-	        	comments.add(written_comment);
-	        	commentsAdapter.notifyDataSetChanged();
+	        	//comments.add(written_comment, username);
+	        	//commentsAdapter.notifyDataSetChanged();
 	        }
 	        else{
 	        	Log.v("WE","comentario no enviado");
@@ -206,6 +211,8 @@ public class DetailCommentsActivity extends Activity {
 		            	 String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 		            	 String username = escanObject.getString("username");
 		            	 String date = escanObject.getString("date");
+		            	// SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+		            	// Date date = formatter.parse(date_string);
 		            	 
 					     // Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
 					     comments.add(new Comment(comment, username, date));					 
