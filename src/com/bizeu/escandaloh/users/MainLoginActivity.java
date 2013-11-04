@@ -43,21 +43,9 @@ public class MainLoginActivity extends Activity{
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);
 		but_login = (Button) findViewById(R.id.but_log_in);
 		
-		// Comprobamos si el usuario esta logeado
-		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+
 		
-		String user_uri = prefs.getString("user_uri", null); 
-		
-		// Mostramos "Log in" o "Log out" según el usuario esté logueado o no
-		if (user_uri != null){
-			esta_logeado = true;
-			but_login.setText("Log out");
-		}
-		else{
-			esta_logeado = false;
-			but_login.setText("Log in");
-		}	
-		
+
 		but_registro.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -71,17 +59,9 @@ public class MainLoginActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-				if (esta_logeado){
-					// Deslogueamos al usuario
-					prefs.edit().putString("user_uri", null).commit();
-					but_login.setText("Log in");
-					esta_logeado = false;
-				}
-				else{
-					// Mostramos la pantalla de log in
-					Intent i = new Intent(getBaseContext(), LoginActivity.class);
-					startActivityForResult(i, LOG_IN);
-				}	
+				// Mostramos la pantalla de log in
+				Intent i = new Intent(getBaseContext(), LoginActivity.class);
+				startActivityForResult(i, LOG_IN);	
 			}
 		});
 	}

@@ -7,9 +7,9 @@
         android:title="@string/action_settings"/>
     
     <item
-        android:id="@+id/user_settings"
+        android:id="@+id/logout"
         android:title="we1"
-        android:icon="@drawable/on"
+        android:icon="@drawable/logout"
         android:showAsAction="ifRoom|withText"
     />
     
