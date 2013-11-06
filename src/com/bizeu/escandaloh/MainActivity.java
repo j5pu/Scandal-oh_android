@@ -198,7 +198,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	 * It will be called when the ads are ready to be shown
 	 */
 	@Override
-	public void onAdsReady(){ 	
+	public void onAdsReady(){ 
+		/*
 	       //The banner will be show inside this view.
         banner = (FrameLayout) findViewById(R.id.banner);
      
@@ -211,7 +212,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
         banner.addView( adM );
  
         //Set the visibility to VISIBLE.
-        banner.setVisibility( FrameLayout.VISIBLE );		
+        banner.setVisibility( FrameLayout.VISIBLE );	
+        */	
 	}
 	 
 
@@ -481,7 +483,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=1";
+	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=5";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
@@ -506,21 +508,22 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	            	final String category = escanObject.getString("category");
 	            	String date = escanObject.getString("date");
 	            	final String id = escanObject.getString("id");
-	            	final String img = escanObject.getString("img");
+	            	final String img = escanObject.getString("img_p");
 	            	final String comments_count = escanObject.getString("comments_count");
 	            	String latitude = escanObject.getString("latitude");
 	            	String longitude = escanObject.getString("longitude");
 	            	final String resource_uri = escanObject.getString("resource_uri");	        
 	            	final String title = escanObject.getString("title");
 	            	String user = escanObject.getString("user");
-	            	String visits_count = escanObject.getString("visits_count");		            		           
+	            	String visits_count = escanObject.getString("visits_count");
+	            	final String sound = escanObject.getString("sound");
 	    	    	
 		        	runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 				            // Añadimos el escandalo al ArrayList
 				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img, sound));
 							escanAdapter.notifyDataSetChanged();	
 							
 				        	new GetPictureFromAmazon().execute(img);
@@ -546,8 +549,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	        }
 	        else{
 	        	Log.v("WE","escandalos NO recibidos");
-	        }
-	        
+	        }   
 	    }
 	}
 	
@@ -572,17 +574,25 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    	  //if (bytes.length == 0){
 	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials("AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
 	    	    	// Hacemos la petición a Amazon y obtenemos la imagen
-				    S3ObjectInputStream content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
+	    	    	S3ObjectInputStream content  = null;
+
+	    	    	result = true;
 						
 					try {
+						content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
 						bytes = IOUtils.toByteArray(content);
+						/*
 						content.close();
 						BitmapFactory.Options options = new BitmapFactory.Options();
 						options.inSampleSize = 5;
 						Bitmap bitm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+						
 						bytes = ImageUtils.BitmapToBytes(bitm);
-					} catch (IOException e) {
+						*/
+					} catch (Exception e) {
+						Log.e("WE","Error al obtener imagen");
 						e.printStackTrace();
+						result = false;
 					}
 
 				    // Añadimos la foto a caché
@@ -596,13 +606,15 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		
 		@Override
 	    protected void onPostExecute(Boolean result) {
-		    final Escandalo esc = escandalos.get(escandalo_loading);    
-		    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
-		    escandalos.set(escandalo_loading, esc);
-		    escandalo_loading++;    
-			escanAdapter.notifyDataSetChanged();
-			Log.v("WE","Imagen añadida");
-	    }
+			if (result) {
+			    final Escandalo esc = escandalos.get(escandalo_loading);    
+			    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
+			    escandalos.set(escandalo_loading, esc);
+			    escandalo_loading++;    
+				escanAdapter.notifyDataSetChanged();
+				Log.v("WE","Imagen añadida");
+			}
+		}
 	}
 	
 

@@ -69,6 +69,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
 	            holder.imgNumComments = (ImageView)mView.findViewById(R.id.img_num_comentarios);
+	            holder.imgMicro = (ImageView) mView.findViewById(R.id.img_escandalo_microfono);
 	        
 	            mView.setTag(holder);
 	        }
@@ -86,6 +87,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.imgPicture.setImageBitmap(escanda.getPicture());
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
+	        
+	        if (!escanda.hasAudio()){
+	        	holder.imgMicro.setVisibility(View.INVISIBLE);
+	        }
 	        // Guardamos el ID del escandalo para luego recuperarlo al hacer click sobre ellos
 	        holder.txtNumComments.setTag(escanda.getId());
 	        holder.imgNumComments.setTag(escanda.getId());
@@ -151,6 +156,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        ImageView imgNumComments;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
+	        ImageView imgMicro;
 	        
 	        
 	        public ImageView getPicture(){

@@ -12,8 +12,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-        <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
     </uses-permission>
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
@@ -21,6 +20,8 @@
     </uses-permission>
     <uses-permission android:name="android.permission.GET_TASKS" >
     </uses-permission>
+    <!-- Permission to use MIC Hardware of the device -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -37,7 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.bizeu.escandaloh.CreateEscandaloActivity" >
+        <activity
+            android:name="com.bizeu.escandaloh.CreateEscandaloActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity android:name="com.bizeu.escandaloh.DetailPhotoActivity" >
         </activity>

@@ -381,8 +381,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	            	String visits_count = escanObject.getString("visits_count");	
 
 		            // Añadimos el escandalo al ArrayList
-		        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
+		        //	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+					//		R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
 	            	
 		        	/*
 		        	this.runOnUiThread(new Runnable() {
