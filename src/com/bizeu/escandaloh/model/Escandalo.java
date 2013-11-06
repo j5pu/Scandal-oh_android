@@ -116,8 +116,11 @@ public class Escandalo {
 		return this.resource_audio;
 	}
 	
-	public boolean hasAudio(){
-		return this.has_audio;
+	public void setHasAudio(boolean new_has_audio){
+		this.has_audio = new_has_audio;
 	}
 	
+	public boolean hasAudio(){
+		return this.has_audio;
+	}	
 }

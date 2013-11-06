@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +31,6 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    ArrayList<Escandalo> data;
 	    private int available_height;	    
 	    private Escandalo escanda;
-	    private int pos;
-	    EscandaloHolder holder;
 	    
 	    /**
 	     * Constructor
@@ -53,15 +52,14 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    @Override
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        View mView = convertView;
-	        holder = null;
+	        EscandaloHolder holder = null;
 
 	        escanda = data.get(position);
 	        
 	        if(mView == null){
-	            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-	            mView = inflater.inflate(layoutResourceId, parent, false);
-         
-	            available_height = getAvailableHeightScreen();            
+	            //LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+	            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	            mView = inflater.inflate(layoutResourceId, parent, false);       
 	                        
 	            holder = new EscandaloHolder();
 	            holder.txtTitle = (TextView)mView.findViewById(R.id.txt_titulo);
@@ -69,16 +67,18 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
 	            holder.imgNumComments = (ImageView)mView.findViewById(R.id.img_num_comentarios);
-	            holder.imgMicro = (ImageView) mView.findViewById(R.id.img_escandalo_microfono);
-	        
+	            holder.imgMicro = (ImageView)mView.findViewById(R.id.img_escandalo_microfono);
+     
 	            mView.setTag(holder);
 	        }
 	        
 	        else{
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
-	                 
-            // Cambiamos el alto por código
+	        
+	        
+	        // Cambiamos el alto por código
+            available_height = getAvailableHeightScreen();   
             holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
             LayoutParams params4 = holder.lheight.getLayoutParams();
             params4.height = available_height;
@@ -88,13 +88,15 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
-	        if (!escanda.hasAudio()){
-	        	holder.imgMicro.setVisibility(View.INVISIBLE);
+	        if (escanda.hasAudio()){
+	        	Log.e("WE","TIENE AUDIO");
+	        	holder.imgMicro.setVisibility(View.VISIBLE);
 	        }
-	        // Guardamos el ID del escandalo para luego recuperarlo al hacer click sobre ellos
-	        holder.txtNumComments.setTag(escanda.getId());
-	        holder.imgNumComments.setTag(escanda.getId());
-	        
+	        else{
+	        	Log.e("WE","NO TIENE AUDIO");
+	        	holder.imgMicro.setVisibility(View.GONE);
+	        }
+
 	        if (escanda.getCategory().equals(Escandalo.HAPPY)){
 	        	holder.imgCategory.setImageResource(R.drawable.cara_riendose);
 	        }
@@ -102,7 +104,12 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        	holder.imgCategory.setImageResource(R.drawable.cara_enfadado);
 	        }
 	        
+	        // Guardamos el ID del escandalo para luego recuperarlo al hacer click sobre ellos
+	        holder.txtNumComments.setTag(escanda.getId());
+	        holder.imgNumComments.setTag(escanda.getId());
+	        holder.imgPicture.setTag(escanda.getUriAudio());
 	        
+	        	        
             // Listener para la foto
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
 				
@@ -113,6 +120,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.BitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
+					i.putExtra("uri_audio", v.getTag().toString());
 					context.startActivity(i);
 				}
 			});
@@ -137,7 +145,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					context.startActivity(i);				
 				}
 			});
-	        
+	                         
 	        return mView;
 	    }
 	    
@@ -149,7 +157,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	     * @author Alejandro
 	     *
 	     */
-	    public static class EscandaloHolder{
+	    static class EscandaloHolder{
 	        TextView txtTitle;
 	        ImageView imgCategory;
 	        ImageView imgPicture;

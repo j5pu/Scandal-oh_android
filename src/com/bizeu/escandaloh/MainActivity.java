@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -147,6 +149,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 				first_visible_item_count = firstVisibleItem;
 			}
 		});
+		
+	
 				
 		new GetEscandalos().execute();	
 	}
@@ -315,7 +319,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 					Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 					File photo;
 					try{
-				        photo = this.createTemporaryFile("picture", ".png");
+				        photo = this.createFile("picture", ".png");
 				        photo.delete();
 				    }
 				    catch(Exception e){
@@ -450,21 +454,21 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	
 	
 	/**
-	 * Crea un archivo (File) temporal
+	 * Crea un archivo en una ruta con un formato específico
 	 * @param part
 	 * @param ext
 	 * @return
 	 * @throws Exception
 	 */
-	private File createTemporaryFile(String part, String ext) throws Exception
+	private File createFile(String part, String ext) throws Exception
 	{
-	    File tempDir= Environment.getExternalStorageDirectory();
-	    tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
-	    if(!tempDir.exists())
+	    File scandaloh_dir= Environment.getExternalStorageDirectory();
+	    scandaloh_dir=new File(scandaloh_dir.getAbsolutePath()+"/Scandaloh/");
+	    if(!scandaloh_dir.exists())
 	    {
-	        tempDir.mkdir();
+	    	scandaloh_dir.mkdir();
 	    }
-	    return File.createTempFile(part, ext, tempDir);
+	    return File.createTempFile(part, ext, scandaloh_dir);
 	}
 	
 	
@@ -483,7 +487,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=5";
+	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=15";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        

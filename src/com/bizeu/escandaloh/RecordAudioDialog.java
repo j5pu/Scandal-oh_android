@@ -3,13 +3,10 @@ package com.bizeu.escandaloh;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.bizeu.escandaloh.util.AudioRecorder;
-
+import com.bizeu.escandaloh.util.Audio;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -33,13 +30,11 @@ public class RecordAudioDialog extends Dialog {
 	private Handler myHandler ;
 	private Runnable myRunnable;
 	private boolean recorded = false;
-	
-	private AudioRecorder audio_recorder;
 	OnMyDialogResult mDialogResult; // the callback
 
-	public RecordAudioDialog(Context con, AudioRecorder record) {
+	public RecordAudioDialog(Context con, Audio record) {
 		super(con);
-		audio_recorder = record;
+		//audio_recorder = record;
 		// this.c = a;
 	}
 
@@ -80,14 +75,14 @@ public class RecordAudioDialog extends Dialog {
 						recording = true;
 						but_record.setText("Parar de grabar");	
 						try {
-							audio_recorder.start();
+							Audio.getInstance().start_recording();
 						} catch (IOException e) {
 							Log.e("WE","error grabando audio");
 							e.printStackTrace();
 						}
 					}
 					else{
-						audio_recorder.startPlaying();		
+						Audio.getInstance().startPlaying();		
 					}
 				} 
 				else{
@@ -95,7 +90,7 @@ public class RecordAudioDialog extends Dialog {
 					recorded = true;
 					but_record.setText("Reproducir");
 					try {
-						audio_recorder.stop();
+						Audio.getInstance().stop_recording();
 					} catch (IOException e) {
 						Log.e("WE","Error parando el audio");
 						e.printStackTrace();

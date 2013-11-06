@@ -16,8 +16,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
-import com.bizeu.escandaloh.util.AudioRecorder;
-
+import com.bizeu.escandaloh.util.Audio;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -70,7 +69,6 @@ public class CreateEscandaloActivity extends Activity {
 	private ProgressDialog progress;
 	private Context context;
 	private File audio_file;
-	private AudioRecorder audio_recorder;
 	private boolean con_audio = false;
 	
 	/**
@@ -82,7 +80,6 @@ public class CreateEscandaloActivity extends Activity {
 
 		setContentView(R.layout.create_escandalo);
 		
-		audio_recorder = new AudioRecorder("audio_prueba");	
 		context = this;
 
 		if (getIntent() != null) {
@@ -94,9 +91,6 @@ public class CreateEscandaloActivity extends Activity {
 				ContentResolver cr = this.getContentResolver();
 				try {
 					taken_photo = readBitmap(mImageUri);
-					// taken_photo =
-					// android.provider.MediaStore.Images.Media.getBitmap(cr,
-					// mImageUri);
 				} catch (Exception e) {
 					Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
 							.show();
@@ -135,11 +129,10 @@ public class CreateEscandaloActivity extends Activity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogo1,
 										int id) {
-									RecordAudioDialog record = new RecordAudioDialog(context, audio_recorder);
+									RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
 									record.setDialogResult(new OnMyDialogResult(){
 									    public void finish(String result){
 									       if (result.equals("OK")){
-									    	   Log.v("WE","llega ok");
 									    	   con_audio = true;
 									    	   new SendScandalo().execute();
 									       }						       
@@ -172,6 +165,18 @@ public class CreateEscandaloActivity extends Activity {
 		});
 	}
 
+
+	
+	
+	
+	/**
+	 * onPause Detiene y elimina si había algún audio activo
+	 */
+	@Override
+	protected void onPause(){
+		super.onPause();
+		Audio.getInstance().closeAudio();
+	}
 
 
 	
@@ -225,7 +230,7 @@ public class CreateEscandaloActivity extends Activity {
 				MultipartEntity reqEntity = new MultipartEntity();
 				
 				if (con_audio){
-					audio_file = new File(audio_recorder.getPath());	
+					audio_file = new File(Audio.getInstance().getPath());	
 					FileBody audioBody = new FileBody(audio_file);
 					reqEntity.addPart("sound", audioBody);
 				}				
