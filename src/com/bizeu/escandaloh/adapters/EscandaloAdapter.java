@@ -89,11 +89,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
 	        if (escanda.hasAudio()){
-	        	Log.e("WE","TIENE AUDIO");
 	        	holder.imgMicro.setVisibility(View.VISIBLE);
 	        }
 	        else{
-	        	Log.e("WE","NO TIENE AUDIO");
 	        	holder.imgMicro.setVisibility(View.GONE);
 	        }
 

@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="00:00"
+            android:text="20"
             android:textColor="@android:color/white"
             android:textSize="40sp"
             android:textStyle="bold" />
@@ -33,12 +33,21 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/but_record_stop"
+            android:id="@+id/but_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:text="Grabar"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/but_reproducir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reproducir"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -52,7 +61,8 @@
             android:id="@+id/but_subir_foto_audio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Subir " />
+            android:text="Subir "
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/but_cancelar_foto_audio"

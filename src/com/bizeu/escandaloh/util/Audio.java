@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -11,21 +12,56 @@ import android.util.Log;
 
 public class Audio{
 
-	private MediaRecorder recorder = null;
-	private MediaPlayer   mPlayer = null;
+	PlayListener playListener = null;
+	private MediaRecorder mRecord;
+	private MediaPlayer  mPlayer;
+	private boolean is_recording = false;
 	private String path = null;
 	private static Audio singleton;
 	private static boolean yaCreado = false; // Este atributo nos dice si ya fue creada o no una instancia de esta clase
-
 	
-
+	
+	public void setDataDownloadListener(PlayListener dataDownloadListener) {
+        this.playListener = dataDownloadListener;
+    }
+	
+	public static interface PlayListener {
+        void onPlayFinished();
+    }
 	
 	/**
-	 * Creates a new audio recording at the given path (relative to root of SD
-	 * card).
+	 * Constructor
 	 */
 	private Audio() {
+		
+		// Inicializamos el grabador
 		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio_record_scandaloh.3gp";
+		String state = android.os.Environment.getExternalStorageState();
+		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
+			try {
+				throw new IOException("SD Card is not mounted.  It is " + state
+						+ ".");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		File directory = new File(path).getParentFile();
+		if (!directory.exists() && !directory.mkdirs()) {
+			try {
+				throw new IOException("Path to file could not be created.");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		mRecord = new MediaRecorder();
+		
+		// Inicializamos el reproductor 
+		mPlayer = new MediaPlayer();
+				
 	}
 	
 	
@@ -40,6 +76,7 @@ public class Audio{
 		   singleton = new Audio();
 		   yaCreado = true;
 	   }
+
 	   return singleton;
    }
 	
@@ -49,33 +86,20 @@ public class Audio{
 	 * Comienza una grabación
 	 * @throws IOException
 	 */
-	public void start_recording() throws IOException {
-		String state = android.os.Environment.getExternalStorageState();
-		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
-			throw new IOException("SD Card is not mounted.  It is " + state
-					+ ".");
-		}
-
-		// make sure the directory we plan to store the recording in exists
-		File directory = new File(path).getParentFile();
-		if (!directory.exists() && !directory.mkdirs()) {
-			throw new IOException("Path to file could not be created.");
-		}
-
-		recorder = new MediaRecorder();
-		recorder.setMaxDuration(20000);
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		recorder.setOutputFile(path);
-		
+	public void start_recording() throws IOException {	
+		//recorder.setMaxDuration(20000);
+		mRecord.setAudioSource(MediaRecorder.AudioSource.MIC);
+		mRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		mRecord.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		mRecord.setOutputFile(path);
 		try {
-            recorder.prepare();
+			mRecord.prepare();
         } catch (IOException e) {
             Log.e("WE", "prepare() record audio failed");
         }
 
-		recorder.start();
+		mRecord.start();
+		is_recording = true;
 	}
 
 	
@@ -85,11 +109,14 @@ public class Audio{
 	 * @throws IOException
 	 */
 	public void stop_recording() throws IOException {
-		recorder.stop();
-		recorder.release();
-		recorder = null;
+		mRecord.stop();
+		is_recording = false;
 	}
 	
+	
+	public boolean isRecording(){
+		return is_recording;
+	}
 	
 	
 	
@@ -97,18 +124,30 @@ public class Audio{
 	 * Reproduce el audio recién grabado
 	 */
 	public void startPlaying() {
-        mPlayer = new MediaPlayer();
         if (path != null){
             try {
                 mPlayer.setDataSource(path);
                 mPlayer.prepare();
                 mPlayer.start();
+                mPlayer.setOnCompletionListener(new OnCompletionListener() {
+					
+					@Override
+					public void onCompletion(MediaPlayer mp) {
+						mp.stop();
+						mp.reset();	
+						if (playListener != null){
+							playListener.onPlayFinished();
+						}
+						
+					}
+				});
+            
             } catch (IOException e) {
                 Log.e("WE", "Error al reproducir el audio");
             }
         }
         else{
-        	Log.e("WE","Usar start_recording antes de usar este método");
+        	Log.e("WE","Debes usar start_recording antes de usar este método");
         }
     }
 
@@ -120,22 +159,54 @@ public class Audio{
 	 * @param uri_audio. URL donde se encuentra el audio
 	 */
 	public void startPlaying(String uri_audio) {
-        mPlayer = new MediaPlayer();
-        try {
-            mPlayer.setDataSource(uri_audio);
-            mPlayer.prepareAsync();
-            mPlayer.setOnPreparedListener(new OnPreparedListener() {
-				
-				@Override
-				public void onPrepared(MediaPlayer mp) {
-					mp.start();
-					
-				}
-			});
-        } catch (IOException e) {
-            Log.e("WE", "error al reproducir el audio");
-        }
+        
+        		try {
+        			mPlayer.setDataSource(uri_audio);
+                    mPlayer.prepareAsync();
+                    mPlayer.setOnPreparedListener(new OnPreparedListener() {
+        				
+        				@Override
+        				public void onPrepared(MediaPlayer mp) {
+        					mp.start();	
+        				}
+        			});
+                    
+                    mPlayer.setOnCompletionListener(new OnCompletionListener() {
+						
+						@Override
+						public void onCompletion(MediaPlayer mp) {
+							mp.stop();
+							mp.reset();
+							if (playListener != null){
+								playListener.onPlayFinished();
+							}
+							
+						}
+					});
+                 } catch (IOException e) {
+                    Log.e("WE", "error al reproducir el audio");
+                 }
+        		
+            
+            
     }
+	
+	
+	/**
+	 * Para de reproducir un audio
+	 */
+	public void stopPlaying(){
+		if (mPlayer.isPlaying()){
+			mPlayer.stop();
+			mPlayer.reset();
+		}
+	}
+	
+	
+	public boolean isPlaying(){
+		return mPlayer.isPlaying();
+	}
+	
 	
 	
 	
@@ -153,16 +224,17 @@ public class Audio{
 	 * Cierra y libera el audio
 	 */
 	public void closeAudio(){
-		if (recorder != null){
-			recorder.reset();
-			recorder.release();
-			recorder = null;
+		if (mRecord != null){
+			mRecord.reset();
+			mRecord.release();
+			mRecord = null;
 		}
 		
 		if (mPlayer != null){
 			mPlayer.reset();
 			mPlayer.release();
 			mPlayer = null;
+			
 		}
 		
 		// Eliminamos el archivo creado
@@ -170,5 +242,11 @@ public class Audio{
 			File file = new File(path);
 			file.delete();
 		}
+		
+		yaCreado = false;
 	}
+	
+	
+	
+
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.Audio.PlayListener;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,19 +16,17 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class RecordAudioDialog extends Dialog {
+public class RecordAudioDialog extends Dialog{
 
 	private TextView txt_meter;
-	private Button but_aceptar;
+	private Button but_subir;
 	private Button but_cancelar;
-	
-	// private Activity c;
-	private Context c;
-	private Dialog d;
+	private Button but_reproducir;
 	private Button but_record;
-	private boolean recording = false;
+
+	private boolean recording ;
 	private Timer mTimer;
-	private int contador = 0;
+	private int contador = 20;
 	private Handler myHandler ;
 	private Runnable myRunnable;
 	private boolean recorded = false;
@@ -34,8 +34,6 @@ public class RecordAudioDialog extends Dialog {
 
 	public RecordAudioDialog(Context con, Audio record) {
 		super(con);
-		//audio_recorder = record;
-		// this.c = a;
 	}
 
 	@Override
@@ -50,14 +48,18 @@ public class RecordAudioDialog extends Dialog {
 			@Override
 			public void onClick(View v) {
 				dismiss();
+				Audio.getInstance().closeAudio();
 			}
 		});
 		
-		but_aceptar = (Button) findViewById(R.id.but_subir_foto_audio);
-		but_aceptar.setOnClickListener(new View.OnClickListener() {
+		but_subir = (Button) findViewById(R.id.but_subir_foto_audio);
+		but_subir.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+				if (Audio.getInstance().isPlaying()){
+					Audio.getInstance().stopPlaying();
+				}
 				if( mDialogResult != null ){
 	                mDialogResult.finish("OK");
 	            }
@@ -65,36 +67,65 @@ public class RecordAudioDialog extends Dialog {
 			}
 		});
 		
-		but_record = (Button) findViewById(R.id.but_record_stop);
+		but_record = (Button) findViewById(R.id.but_record);
 		but_record.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if (!recording){
-					if (!recorded){
-						recording = true;
+				// Si no está reproduciendo
+				if (!Audio.getInstance().isPlaying()){
+					Log.v("WE","No esta reproduciendo");
+					// Si está grabando: parar de grabar
+					if (Audio.getInstance().isRecording()){
+						Log.v("WE","Esta grabando");
+						try {
+							Audio.getInstance().stop_recording();
+						} catch (IOException e) {
+							Log.e("WE","Error parando el audio");
+							e.printStackTrace();
+						}				
+						contador = 20;
+						but_record.setText("Grabar");
+						but_subir.setVisibility(View.VISIBLE);	
+						but_reproducir.setVisibility(View.VISIBLE);
+						but_subir.setVisibility(View.VISIBLE);
+					}
+					// No está grabando: comienza a grabar
+					else{
+						Log.v("WE","No esta grabando");
+						txt_meter.setText(Integer.toString(contador));
 						but_record.setText("Parar de grabar");	
+
 						try {
 							Audio.getInstance().start_recording();
 						} catch (IOException e) {
 							Log.e("WE","error grabando audio");
 							e.printStackTrace();
 						}
+						but_reproducir.setVisibility(View.GONE);
+						but_subir.setVisibility(View.GONE);
 					}
-					else{
-						Audio.getInstance().startPlaying();		
-					}
-				} 
+				}
 				else{
-					recording = false;
-					recorded = true;
-					but_record.setText("Reproducir");
-					try {
-						Audio.getInstance().stop_recording();
-					} catch (IOException e) {
-						Log.e("WE","Error parando el audio");
-						e.printStackTrace();
-					}
+					Log.v("WE","Esta reproduciendo");
+				}
+			}
+		});
+		
+		but_reproducir = (Button) findViewById(R.id.but_reproducir);
+		but_reproducir.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (Audio.getInstance().isPlaying()){
+					Audio.getInstance().stopPlaying();
+					but_reproducir.setText("Reproducir");
+					but_record.setVisibility(View.VISIBLE);
+				}
+				else{
+					Audio.getInstance().startPlaying();	
+					but_record.setVisibility(View.GONE);
+					but_reproducir.setText("Parar");
 				}
 			}
 		});
@@ -106,14 +137,29 @@ public class RecordAudioDialog extends Dialog {
 		
 		myRunnable = new Runnable() {
 			   public void run() {
-				   if (recording){
-					   contador++;
-					   if (contador < 10){
-						   txt_meter.setText("00:0" + contador);
+				   if (Audio.getInstance().isRecording()){
+					   contador--;
+					   if (contador > 0){
+						   if (contador < 10){
+							   txt_meter.setText("00:0" + contador);
+						   }
+						   else{
+							   txt_meter.setText("00:" + contador);
+						   }   					   
 					   }
-					   else{
-						   txt_meter.setText("00:" + contador);
-					   }
+					   else if (contador == 0){
+				    	   try {
+								Audio.getInstance().stop_recording();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						   but_record.setText("Reproducir");
+						   txt_meter.setText("0");
+						   but_subir.setVisibility(View.VISIBLE);	  
+						   recording = false;
+						   recorded = true;
+					   }						  
 				   }
 			   }
 			};
@@ -127,6 +173,16 @@ public class RecordAudioDialog extends Dialog {
 				updateMeter();
 			}
 		}, 0, 1000);
+		
+		
+		Audio.getInstance().setDataDownloadListener(new PlayListener(){
+		    @SuppressWarnings("unchecked")	   
+		    @Override
+		    public void onPlayFinished() {
+		    	but_record.setVisibility(View.VISIBLE);
+		    	but_reproducir.setText("Reproducir");
+		    }
+		});
 	}
 
 	
@@ -147,6 +203,12 @@ public class RecordAudioDialog extends Dialog {
     public interface OnMyDialogResult{
        void finish(String result);
     }
+
+
+    
+    
+    
+  
 	
 	
 }

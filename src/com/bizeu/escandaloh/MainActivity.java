@@ -1,7 +1,6 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
@@ -18,10 +17,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -35,8 +33,8 @@ import android.view.KeyEvent;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuInflater;
@@ -48,7 +46,6 @@ import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.zed.adserver.AdsSessionController;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -84,8 +81,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		setContentView(R.layout.main);
 		
 		// Ten
-		AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
-        AdsSessionController.registerAdsReadyListener(this);
+		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
+       // AdsSessionController.registerAdsReadyListener(this);
 
 		// Action bar
 		getSupportActionBar().setTitle(R.string.app_name);
@@ -163,7 +160,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	public void onResume(){
 		super.onResume();
 		
-	    AdsSessionController.enableTracking();
+	   // AdsSessionController.enableTracking();
 
 		// Comprobamos si el usuario esta logueado
 		SharedPreferences prefs = this.getSharedPreferences(
@@ -190,7 +187,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	protected void onPause() {
 	    // TODO Auto-generated method stub
 	    super.onPause();
-	    AdsSessionController.pauseTracking();
+	   // AdsSessionController.pauseTracking();
 	}
 	
 	
@@ -239,7 +236,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    // TODO Auto-generated method stub
 	    if (keyCode == KeyEvent.KEYCODE_BACK){
-	        AdsSessionController.stopTracking();
+	       // AdsSessionController.stopTracking();
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
@@ -252,7 +249,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	protected void onUserLeaveHint() {
 	    // TODO Auto-generated method stub
 	    super.onUserLeaveHint();
-	    AdsSessionController.detectHomeButtonEvent();
+	    //AdsSessionController.detectHomeButtonEvent();
 	}
 	
 	
@@ -316,20 +313,27 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 			case R.id.take_photo:
 			    // Si está logueado iniciamos la cámara
 				if (logged){ 
-					Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-					File photo;
-					try{
-				        photo = this.createFile("picture", ".png");
-				        photo.delete();
-				    }
-				    catch(Exception e){
-				        Log.v("WE", "Can't create file to take picture!");
-				        return false;
-				    }
-					
-				    mImageUri = Uri.fromFile(photo);
-				    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-					startActivityForResult(takePictureIntent, SHOW_CAMERA);
+					if (checkCameraHardware(this)){
+						Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+						File photo;
+						try{
+					        photo = this.createFile("picture", ".png");
+					        photo.delete();
+					    }
+					    catch(Exception e){
+					        Log.v("WE", "Can't create file to take picture!");
+					        return false;
+					    }
+						
+					    mImageUri = Uri.fromFile(photo);
+					    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+						startActivityForResult(takePictureIntent, SHOW_CAMERA);
+					}
+					// El dispositivo no dispone de camara
+					else{
+						Toast toast = Toast.makeText(this, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+						toast.show();
+					}
 				}
 				// Si no, iniciamos la pantalla de login
 				else{
@@ -472,6 +476,22 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	}
 	
 	
+	
+	
+	/**
+	 * Comprueba si el dispositivo dispone de cámara
+	 * @param context
+	 * @return
+	 */
+	private boolean checkCameraHardware(Context context) {
+	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+	
+	
 
 	
 	
@@ -487,7 +507,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=15";
+	        String url = "http://192.168.1.26:8000/api/v1/photo/?limit=10";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
