@@ -46,7 +46,7 @@ public class DetailPhotoActivity extends Activity {
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
 			photo = ImageUtils.BytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
-			mImage.setDisplayType(DisplayType.FIT_IF_BIGGER);
+			mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
 			mImage.setImageBitmap(photo);
 			
 			// Obtenemos y reproducimos el audio (si tiene)

@@ -45,9 +45,10 @@
 
         <ImageView
             android:id="@+id/img_foto"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerInside"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/negro"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_launcher" />
 
     </LinearLayout>
