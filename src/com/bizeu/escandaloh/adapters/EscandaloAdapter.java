@@ -3,6 +3,7 @@ package com.bizeu.escandaloh.adapters;
 import java.util.ArrayList;
 import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
+import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.ImageUtils;
@@ -114,6 +115,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {	            
 					Intent i = new Intent(context, DetailPhotoActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.BitmapToBytes(bitm);
@@ -129,6 +131,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {			
 					Intent i = new Intent(context, DetailCommentsActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					i.putExtra("id", v.getTag().toString());
 					context.startActivity(i);	
 				}
@@ -139,6 +142,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {					
 					Intent i = new Intent(context, DetailCommentsActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					i.putExtra("id", v.getTag().toString());
 					context.startActivity(i);				
 				}
@@ -209,7 +213,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			}
 
 			// Available height
-			available_height = height - action_bar_height - status_bar_height;
+			available_height = height - action_bar_height - status_bar_height - MyApplication.ALTO_TABS;
 			
 			return available_height;
 		}

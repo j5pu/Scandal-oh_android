@@ -1,6 +1,5 @@
 package com.bizeu.escandaloh;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
@@ -12,6 +11,23 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.FragmentTabHost;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.FrameLayout;
+import android.widget.ListView;
+
 import com.actionbarsherlock.app.SherlockFragment;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -19,33 +35,11 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.zed.adserver.AdsSessionController;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerTabStrip;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 
-
-public class ListEscandalosFragment extends SherlockFragment implements onAdsReadyListener{
+public class ListEscandalosFragmentAngry extends SherlockFragment implements onAdsReadyListener{
 
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
@@ -62,17 +56,20 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	private BannerView adM;
 	AmazonS3Client s3Client;
 	int mCurrentPage;
-	private PagerTabStrip pagerTab;
+	Escandalo escan_aux;
+	private FragmentTabHost mTabHost;
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
 	 
 	        /** Getting the arguments to the Bundle object */
-	        Bundle data = getArguments();
+	       // Bundle data = getArguments();
 	 
 	        /** Getting integer data of the key current_page from the bundle */
-	        mCurrentPage = data.getInt("current_page", 0);
+	        //mCurrentPage = data.getInt("current_page", 0);
+	        
+			//prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	        
 			escandalos = new ArrayList<Escandalo>();	
 			escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
@@ -84,29 +81,14 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.main, container, false);
+		View v = inflater.inflate(R.layout.list_escandalos, container, false);
 		
 		Log.v("WE","Entra en oncreateview");
+        mTabHost = (FragmentTabHost) v.findViewById(android.R.id.tabhost);
 		
 		list_escandalos = (ListView) v.findViewById(R.id.list_escandalos);
-		pagerTab = (PagerTabStrip) v.findViewById(R.id.pager_title_strip);
-		
-				
-		return v;
-	}
-	
-	
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		
-		if (savedInstanceState != null && savedInstanceState
-				.containsKey(STATE_ACTIVATED_POSITION)) {
-			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
-			
 		list_escandalos.setAdapter(escanAdapter);
-		
+	
 		list_escandalos.setOnScrollListener(new OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -125,7 +107,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						// Para versión menor a 11: no tenemos en cuenta el status bar
 						if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.GINGERBREAD_MR1){
 							// Si la coordenada Y del segundo escandalo es mayor que la mitad de la pantalla (diponible)
-							if ((location[1] - getActionBarHeight()) >= getAvailableHeightScreen() / 2) {
+							if ((location[1] - getActionBarHeight() + MyApplication.ALTO_TABS) >= getAvailableHeightScreen() / 2) {
 								list_escandalos.setSelection(first_visible_item_count);
 							} 
 							// Si no, mostramos el segundo
@@ -135,7 +117,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						}
 						// Para versión 11+: tenemos en cuenta el status bar
 						else{
-							if ((location[1] - (getActionBarHeight() + getStatusBarHeight() + getPagerTabStripHeight())) >= getAvailableHeightScreen() / 2) {
+							if ((location[1] - (getActionBarHeight() + getStatusBarHeight() + MyApplication.ALTO_TABS)) >= getAvailableHeightScreen() / 2) {
 								list_escandalos.setSelection(first_visible_item_count);
 							} 
 							else {
@@ -153,10 +135,28 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				first_visible_item_count = firstVisibleItem;
 			}
 		});
+				
+		new GetEscandalos().execute();
+		
+		
+				
+		return v;
+	}
+	
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		
+		if (savedInstanceState != null && savedInstanceState
+				.containsKey(STATE_ACTIVATED_POSITION)) {
+			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+		}
+			
 		
 		// Ten
-		AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
-        AdsSessionController.registerAdsReadyListener(this);       		
+		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
+        //AdsSessionController.registerAdsReadyListener(this);       		
 		
 		new GetEscandalos().execute();		
 	}
@@ -169,7 +169,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	@Override
 	public void onPause() {
 	    super.onPause();
-	    AdsSessionController.pauseTracking();
+	    //AdsSessionController.pauseTracking();
 	}
 	
 	
@@ -270,7 +270,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 
 	
 	/**
-	 * Devuelve el alto de pantalla disponible en píxeles: screen height - (status bar height + action bar height)
+	 * Devuelve el alto de pantalla disponible en píxeles: screen height - (status bar height + action bar height) - tabs height
 	 * @return
 	 */
 	private int getAvailableHeightScreen(){
@@ -283,7 +283,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
         screen_height = display.heightPixels;
 
         // Available height
-		available_height = screen_height - getActionBarHeight() - getStatusBarHeight() - getPagerTabStripHeight();
+		available_height = screen_height - getActionBarHeight() - getStatusBarHeight() - MyApplication.ALTO_TABS ;
 		
 		return available_height;
 	}
@@ -328,12 +328,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	
 	
 	
-	private int getPagerTabStripHeight(){
-		return pagerTab.getHeight();
-	}
 	
 	
 	
+	
+	
+
 	
 	/**
 	 * Obtiene los escandalos del servidor y los muestra en pantalla
@@ -346,7 +346,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.48:8000/api/v1/photo/?limit=5";
+	        String url = "http://192.168.1.31:8000/api/v1/photo/?limit=3&category__id=2";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
@@ -371,32 +371,27 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	            	final String category = escanObject.getString("category");
 	            	String date = escanObject.getString("date");
 	            	final String id = escanObject.getString("id");
-	            	final String img = escanObject.getString("img");
+	            	final String img = escanObject.getString("img_p");
 	            	final String comments_count = escanObject.getString("comments_count");
 	            	String latitude = escanObject.getString("latitude");
 	            	String longitude = escanObject.getString("longitude");
 	            	final String resource_uri = escanObject.getString("resource_uri");	        
 	            	final String title = escanObject.getString("title");
 	            	String user = escanObject.getString("user");
-	            	String visits_count = escanObject.getString("visits_count");	
-
-		            // Añadimos el escandalo al ArrayList
-		        //	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-					//		R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
-	            	
-		        	/*
-		        	this.runOnUiThread(new Runnable() {
+	            	String visits_count = escanObject.getString("visits_count");
+	            	final String sound = escanObject.getString("sound");
+            	
+		        	getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 				            // Añadimos el escandalo al ArrayList
 				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img));
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img, sound));
 							escanAdapter.notifyDataSetChanged();	
 							
 				        	new GetPictureFromAmazon().execute(img);
 						}
 		        	});	
-		        	*/
 		        	        	
 	    	    }             
 	        }
@@ -412,15 +407,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		@Override
 	    protected void onPostExecute(Integer result) {
 			
+			//escanAdapter.notifyDataSetChanged();
+			
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
-	        	escanAdapter.notifyDataSetChanged();
 	        	Log.v("WE","escandalos recibidos");
 	        }
 	        else{
 	        	Log.v("WE","escandalos NO recibidos");
-	        }
-	        
+	        }   
 	    }
 	}
 	
@@ -445,17 +440,18 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    	  //if (bytes.length == 0){
 	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials("AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
 	    	    	// Hacemos la petición a Amazon y obtenemos la imagen
-				    S3ObjectInputStream content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
+	    	    	S3ObjectInputStream content  = null;
+
+	    	    	result = true;
 						
 					try {
+						content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
 						bytes = IOUtils.toByteArray(content);
-						content.close();
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inSampleSize = 5;
-						Bitmap bitm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-						bytes = ImageUtils.BitmapToBytes(bitm);
-					} catch (IOException e) {
+
+					} catch (Exception e) {
+						Log.e("WE","Error al obtener imagen");
 						e.printStackTrace();
+						result = false;
 					}
 
 				    // Añadimos la foto a caché
@@ -469,14 +465,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
 		@Override
 	    protected void onPostExecute(Boolean result) {
-		    final Escandalo esc = escandalos.get(escandalo_loading);    
-		    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
-		    escandalos.set(escandalo_loading, esc);
-		    escandalo_loading++;    
-			escanAdapter.notifyDataSetChanged();
-			Log.v("WE","Imagen añadida");
-	    }
+			if (result) {
+			    final Escandalo esc = escandalos.get(escandalo_loading);    
+			    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
+			    escandalos.set(escandalo_loading, esc);
+			    escandalo_loading++;    
+				escanAdapter.notifyDataSetChanged();
+				Log.v("WE","Imagen añadida");
+			}
+		}
 	}
-    
 
 }

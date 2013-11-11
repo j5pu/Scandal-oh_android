@@ -26,11 +26,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentTabHost;
+import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -42,6 +45,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -56,7 +60,7 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
-public class MainActivity extends SherlockActivity implements onAdsReadyListener {
+public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener {
 
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	private static final int SHOW_CAMERA = 10;
@@ -73,11 +77,10 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	private int escandalo_loading = 0 ;
 	private byte[] bytes;
 	private boolean logged = false;
-	
 	private FrameLayout banner;
 	private BannerView adM;
 	private SharedPreferences prefs;
-
+	private FragmentTabHost mTabHost;
 	
 	/**
 	 * onCreate
@@ -85,8 +88,22 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main);	
 		
+		// Tab Host (FragmentTabHost)
+        mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
+        mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
+
+        // Añadimos los tabs para cada uno de los 3 fragmentos
+        mTabHost.addTab(mTabHost.newTabSpec("Feliz").setIndicator("Feliz"),ListEscandalosFragmentHappy.class, null);        
+        mTabHost.addTab(mTabHost.newTabSpec("Enfadado").setIndicator("Enfadado"),ListEscandalosFragmentAngry.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec("Ambos").setIndicator("Ambos"),ListEscandalosFragmentBoth.class, null);
+ 
+        // Almacenamos el alto del FragmentTabHost
+        Display display = getWindowManager().getDefaultDisplay();
+        mTabHost.measure(display.getWidth(), display.getHeight());
+        MyApplication.ALTO_TABS = mTabHost.getMeasuredHeight();
+	             
 		// Ten
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
        // AdsSessionController.registerAdsReadyListener(this);
@@ -97,62 +114,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);		
 		
-		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-
-		escandalos = new ArrayList<Escandalo>();	
-		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo, escandalos);
-				
-		list_escandalos = (ListView) findViewById(R.id.list_escandalos);
-		list_escandalos.setAdapter(escanAdapter);
-	
-		list_escandalos.setOnScrollListener(new OnScrollListener() {
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-							
-				// Comprobamos cuando el scroll termina de moverse
-				if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-					
-					// Si no es el último (tiene uno detrás)
-					if (list_escandalos.getChildAt(1) != null){
-
-						// Obtenemos la coordenada Y donde empieza el segundo escandalo
-						final int[] location = new int[2];
-						list_escandalos.getChildAt(1).getLocationOnScreen(location);
-						
-						// Si el primer escandalo ocupa más pantalla que el segundo mostrado, mostramos el primero			
-						// Para versión menor a 11: no tenemos en cuenta el status bar
-						if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.GINGERBREAD_MR1){
-							// Si la coordenada Y del segundo escandalo es mayor que la mitad de la pantalla (diponible)
-							if ((location[1] - getActionBarHeight()) >= getAvailableHeightScreen() / 2) {
-								list_escandalos.setSelection(first_visible_item_count);
-							} 
-							// Si no, mostramos el segundo
-							else {
-								list_escandalos.setSelection(first_visible_item_count + 1);
-							}
-						}
-						// Para versión 11+: tenemos en cuenta el status bar
-						else{
-							if ((location[1] - (getActionBarHeight() + getStatusBarHeight())) >= getAvailableHeightScreen() / 2) {
-								list_escandalos.setSelection(first_visible_item_count);
-							} 
-							else {
-								list_escandalos.setSelection(first_visible_item_count + 1);
-							}
-						}						
-					}
-				}
-			}
-			
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
-				// Guardamos en que posición está el primer escandalo visible (actualmente) en la pantalla
-				first_visible_item_count = firstVisibleItem;
-			}
-		});
-				
-		new GetEscandalos().execute();	
+		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);	
+		
 	}
 
 	
@@ -164,10 +127,6 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		super.onResume();
 		
 	   // AdsSessionController.enableTracking();
-
-		// Comprobamos si el usuario esta logueado
-		SharedPreferences prefs = this.getSharedPreferences(
-			      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
 		String user_uri = prefs.getString("user_uri", null); 
 		if (user_uri != null){
@@ -312,12 +271,9 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		super.onOptionsItemSelected(item);
 
 		switch (item.getItemId()) {
-		
-		   case 0:
-		        Log.v("WE","Entra en el submenu");
-		        break;
 
-			case R.id.menu_action_bar_take_photo:			
+			case R.id.menu_action_bar_take_photo:	
+				
 			    // Si está logueado iniciamos la cámara
 				if (logged){ 				
 					
@@ -401,72 +357,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	}
 
 
-
 	
 
-
-
-	
-	/**
-	 * Devuelve el alto de pantalla disponible en píxeles: screen height - (status bar height + action bar height)
-	 * @return
-	 */
-	private int getAvailableHeightScreen(){
-		
-		int screen_height = 0;
-		int available_height = 0;
-
-		// Screen height
-		DisplayMetrics display = getResources().getDisplayMetrics();
-        screen_height = display.heightPixels;
-
-        // Available height
-		available_height = screen_height - getActionBarHeight() - getStatusBarHeight();
-		
-		return available_height;
-	}
-	
-	
-	
-	/**
-	 * Devuelve el alto del status bar
-	 * @return
-	 */
-	private int getStatusBarHeight(){
-		int status_bar_height = 0;
-		
-		int resourceId = getResources().getIdentifier("status_bar_height",
-				"dimen", "android");	
-		if (resourceId > 0) {
-			status_bar_height = getResources().getDimensionPixelSize(resourceId);
-		}
-		return status_bar_height;
-	}
-	
-	
-	
-	
-	/**
-	 * Devuelve el alto del action bar
-	 * @return
-	 */
-	private int getActionBarHeight(){
-		TypedValue tv = new TypedValue();
-		int action_bar_height = 0;
-		
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB){
-           if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        	   action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
-        }
-        else if(getTheme().resolveAttribute(com.actionbarsherlock.R.attr.actionBarSize, tv, true)){
-        	action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
-        }
-		return action_bar_height;
-	}
-	
-	
-	
-	
 	/**
 	 * Crea un archivo en una ruta con un formato específico
 	 * @param part
@@ -499,156 +391,6 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    } else {
 	        return false;
 	    }
-	}
-	
-	
-
-	
-	
-	
-	/**
-	 * Obtiene los escandalos del servidor y los muestra en pantalla
-	 * @author Alejandro
-	 *
-	 */
-	private class GetEscandalos extends AsyncTask<Void,Integer,Integer> {
-		 
-		@Override
-	    protected Integer doInBackground(Void... params) {
-	    	
-	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.31:8000/api/v1/photo/?limit=10&category__id=1";
-	        	    	        
-	        HttpGet getEscandalos = new HttpGet(url);
-	        getEscandalos.setHeader("content-type", "application/json");        
-	        
-	        HttpResponse response = null;
-	        try{
-				// Hacemos la petición al servidor
-	        	response = httpClient.execute(getEscandalos);
-	        	String respStr = EntityUtils.toString(response.getEntity());
-	         
-	        	// Obtenemos el json
-	            JSONObject respJson = new JSONObject(respStr);	            
-	            
-	            // Parseamos el json para obtener los escandalos
-	            JSONArray escandalosObject = null;
-	            
-	            escandalosObject = respJson.getJSONArray("objects");
-	            
-	            for (int i=0 ; i < escandalosObject.length(); i++){
-	            	JSONObject escanObject = escandalosObject.getJSONObject(i);
-	            	
-	            	final String category = escanObject.getString("category");
-	            	String date = escanObject.getString("date");
-	            	final String id = escanObject.getString("id");
-	            	final String img = escanObject.getString("img_p");
-	            	final String comments_count = escanObject.getString("comments_count");
-	            	String latitude = escanObject.getString("latitude");
-	            	String longitude = escanObject.getString("longitude");
-	            	final String resource_uri = escanObject.getString("resource_uri");	        
-	            	final String title = escanObject.getString("title");
-	            	String user = escanObject.getString("user");
-	            	String visits_count = escanObject.getString("visits_count");
-	            	final String sound = escanObject.getString("sound");
-	    	    	
-		        	runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-				            // Añadimos el escandalo al ArrayList
-				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img, sound));
-							escanAdapter.notifyDataSetChanged();	
-							
-				        	new GetPictureFromAmazon().execute(img);
-						}
-		        	});		        	
-	    	    }             
-	        }
-	        catch(Exception ex){
-	                Log.e("ServicioRest","Error!", ex);
-	        }
-	        	 
-	        // Devolvemos el código resultado
-	        return (response.getStatusLine().getStatusCode());
-	    }
-
-		
-		@Override
-	    protected void onPostExecute(Integer result) {
-			
-			// Si es codigo 2xx --> OK
-	        if (result >= 200 && result <300){
-	        	Log.v("WE","escandalos recibidos");
-	        }
-	        else{
-	        	Log.v("WE","escandalos NO recibidos");
-	        }   
-	    }
-	}
-	
-	
-	
-	
-	
-	/**
-	 * Obtiene la imagen de Amazon y la muestra
-	 * @author Alejandro
-	 *
-	 */
-	private class GetPictureFromAmazon extends AsyncTask<String,Integer,Boolean> {
-		 
-		@Override
-	    protected Boolean doInBackground(String... params) {
-	    	boolean result = false;
-		            	
-	        //Obtenemos la imagen de cache
-	    	//bytes = Cache.getInstance(getBaseContext()).obtenImagenDeCache(params[0]);
-	    	    	
-	    	  //if (bytes.length == 0){
-	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials("AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
-	    	    	// Hacemos la petición a Amazon y obtenemos la imagen
-	    	    	S3ObjectInputStream content  = null;
-
-	    	    	result = true;
-						
-					try {
-						content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
-						bytes = IOUtils.toByteArray(content);
-						/*
-						content.close();
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inSampleSize = 5;
-						Bitmap bitm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-						
-						bytes = ImageUtils.BitmapToBytes(bitm);
-						*/
-					} catch (Exception e) {
-						Log.e("WE","Error al obtener imagen");
-						e.printStackTrace();
-						result = false;
-					}
-
-				    // Añadimos la foto a caché
-				  //  Cache.getInstance(getBaseContext()).aniadeImagenAcache(params[0], bytes);  // La almacenamos en cache		   
-	    	   // }
-	    	   // else{}
-	 							
-	        return result;
-	    }
-
-		
-		@Override
-	    protected void onPostExecute(Boolean result) {
-			if (result) {
-			    final Escandalo esc = escandalos.get(escandalo_loading);    
-			    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
-			    escandalos.set(escandalo_loading, esc);
-			    escandalo_loading++;    
-				escanAdapter.notifyDataSetChanged();
-				Log.v("WE","Imagen añadida");
-			}
-		}
 	}
 	
 
