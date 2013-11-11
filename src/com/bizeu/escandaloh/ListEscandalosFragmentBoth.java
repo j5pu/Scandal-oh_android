@@ -57,24 +57,10 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
-	private FragmentTabHost mTabHost;
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
-	 
-	        /** Getting the arguments to the Bundle object */
-	       // Bundle data = getArguments();
-	 
-	        /** Getting integer data of the key current_page from the bundle */
-	        //mCurrentPage = data.getInt("current_page", 0);
-	        
-			//prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        
-			escandalos = new ArrayList<Escandalo>();	
-			escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
-					escandalos);
-	 
 	 }
 	
 
@@ -83,8 +69,10 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
 		
-		Log.v("WE","Entra en oncreateview");
-        mTabHost = (FragmentTabHost) v.findViewById(android.R.id.tabhost);
+		escandalo_loading = 0;
+		escandalos = new ArrayList<Escandalo>();	
+		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
+				escandalos);
 		
 		list_escandalos = (ListView) v.findViewById(R.id.list_escandalos);
 		list_escandalos.setAdapter(escanAdapter);
@@ -135,11 +123,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 				first_visible_item_count = firstVisibleItem;
 			}
 		});
-				
-		new GetEscandalos().execute();
-		
-		
-				
+			
 		return v;
 	}
 	

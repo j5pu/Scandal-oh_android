@@ -57,16 +57,10 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
-	private FragmentTabHost mTabHost;
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
-	      	super.onCreate(savedInstanceState);
-	        
-			escandalos = new ArrayList<Escandalo>();	
-			escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
-					escandalos);
-	 
+	      	super.onCreate(savedInstanceState);    
 	 }
 	
 
@@ -75,8 +69,10 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
 		
-		Log.v("WE","Entra en oncreateview");
-        mTabHost = (FragmentTabHost) v.findViewById(android.R.id.tabhost);
+		escandalo_loading = 0;
+		escandalos = new ArrayList<Escandalo>();	
+		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
+				escandalos);
 		
 		list_escandalos = (ListView) v.findViewById(R.id.list_escandalos);
 		list_escandalos.setAdapter(escanAdapter);

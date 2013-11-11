@@ -57,24 +57,10 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
-	private FragmentTabHost mTabHost;
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
-	      	super.onCreate(savedInstanceState);
-	 
-	        /** Getting the arguments to the Bundle object */
-	       // Bundle data = getArguments();
-	 
-	        /** Getting integer data of the key current_page from the bundle */
-	        //mCurrentPage = data.getInt("current_page", 0);
-	        
-			//prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        
-			escandalos = new ArrayList<Escandalo>();	
-			escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
-					escandalos);
-	 
+	      	super.onCreate(savedInstanceState); 
 	 }
 	
 
@@ -83,8 +69,10 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
 		
-		Log.v("WE","Entra en oncreateview");
-        mTabHost = (FragmentTabHost) v.findViewById(android.R.id.tabhost);
+		escandalo_loading = 0;
+		escandalos = new ArrayList<Escandalo>();	
+		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
+				escandalos);
 		
 		list_escandalos = (ListView) v.findViewById(R.id.list_escandalos);
 		list_escandalos.setAdapter(escanAdapter);
@@ -136,7 +124,6 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 			}
 		});
 				
-		new GetEscandalos().execute();
 		
 		
 				
@@ -151,8 +138,7 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 		if (savedInstanceState != null && savedInstanceState
 				.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
-			
+		}		
 		
 		// Ten
 		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
