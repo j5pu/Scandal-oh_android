@@ -123,7 +123,7 @@ public class RegistrationActivity extends Activity {
 	    	boolean result = false;
 	 
 	    	HttpEntity resEntity;
-	        String urlString = "http://192.168.1.26:8000/api/v1/user/";
+	        String urlString = "http://192.168.1.31:8000/api/v1/user/";
 	        
 	        
 
@@ -191,16 +191,19 @@ public class RegistrationActivity extends Activity {
 	    protected void onPostExecute(Void result) {
 
 			if (has_name_error){
-				txt_nombre_usuario.setVisibility(View.VISIBLE);
-				txt_nombre_usuario.setText(name_error);
+				edit_nombre_usuario.setError(name_error);
+				//txt_nombre_usuario.setVisibility(View.VISIBLE);
+				//txt_nombre_usuario.setText(name_error);
 			}
 			if (has_password_error){
-				txt_password_usuario.setVisibility(View.VISIBLE);
-				txt_password_usuario.setText(password_error);
+				edit_password_usuario.setError(password_error);
+				//txt_password_usuario.setVisibility(View.VISIBLE);
+				//txt_password_usuario.setText(password_error);
 			}
 			if (has_email_error){
-				txt_email_usuario.setVisibility(View.VISIBLE);
-				txt_email_usuario.setText(email_error);
+				edit_email_usuario.setError(email_error);
+				//txt_email_usuario.setVisibility(View.VISIBLE);
+				//txt_email_usuario.setText(email_error);
 			}
 			// Se ha logueado correctamente
 			if (!has_name_error && !has_password_error && !has_email_error){

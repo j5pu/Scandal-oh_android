@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item
+        android:id="@+id/menu_take_photo"
+        android:title="Hacer foto"
+        android:icon="@drawable/logout"
+        android:showAsAction="ifRoom|withText"
+    />
+    
+    <item
+        android:id="@+id/menu_select_gallery"
+        android:title="Seleccionar de la galería"
+        android:icon="@drawable/camara_azul"
+        android:showAsAction="ifRoom|withText"
+    />
+
+</menu>

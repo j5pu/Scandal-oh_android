@@ -29,16 +29,23 @@ import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -88,14 +95,12 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		getSupportActionBar().setTitle(R.string.app_name);
 		getSupportActionBar().setLogo(R.drawable.corte_manga);
 		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);		
 		
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 
-		escandalos = new ArrayList<Escandalo>();
-		
-		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo,
-				escandalos);
+		escandalos = new ArrayList<Escandalo>();	
+		escanAdapter = new EscandaloAdapter(this, R.layout.escandalo, escandalos);
 				
 		list_escandalos = (ListView) findViewById(R.id.list_escandalos);
 		list_escandalos.setAdapter(escanAdapter);
@@ -146,8 +151,6 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 				first_visible_item_count = firstVisibleItem;
 			}
 		});
-		
-	
 				
 		new GetEscandalos().execute();	
 	}
@@ -261,10 +264,10 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.action_bar, menu);
-
-		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.take_photo);
-		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.logout);
+		inflater.inflate(R.menu.menu_action_bar, menu);
+		
+		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
+		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
 		if (logged){
 			mi_photo.setIcon(R.drawable.camara_azul);
@@ -284,8 +287,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	@Override
 	public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 
-		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.take_photo);
-		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.logout);
+		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
+		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
 		if (logged){
 			mi_photo.setIcon(R.drawable.camara_azul);
@@ -309,10 +312,15 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		super.onOptionsItemSelected(item);
 
 		switch (item.getItemId()) {
+		
+		   case 0:
+		        Log.v("WE","Entra en el submenu");
+		        break;
 
-			case R.id.take_photo:
+			case R.id.menu_action_bar_take_photo:			
 			    // Si está logueado iniciamos la cámara
-				if (logged){ 
+				if (logged){ 				
+					
 					if (checkCameraHardware(this)){
 						Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 						File photo;
@@ -342,7 +350,8 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 				}
 				
 				break;
-			case R.id.logout:
+				
+			case R.id.menu_action_bar_logout:
 				if (logged){
 					AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
 					alert_logout.setTitle("Cerrar sesión usuario");
@@ -366,8 +375,9 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 		
 		return true;
 	}
-
 	
+	
+
 	
 
 	/**
@@ -507,7 +517,7 @@ public class MainActivity extends SherlockActivity implements onAdsReadyListener
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.26:8000/api/v1/photo/?limit=10";
+	        String url = "http://192.168.1.31:8000/api/v1/photo/?limit=10&category__id=1";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        

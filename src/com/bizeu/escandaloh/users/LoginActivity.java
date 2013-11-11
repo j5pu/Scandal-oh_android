@@ -108,7 +108,7 @@ public class LoginActivity extends Activity {
 	    protected Void doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = "http://192.168.1.26:8000/api/v1/user/login/";        
+	        String urlString = "http://192.168.1.31:8000/api/v1/user/login/";        
 	        
 	        try{
 	             HttpClient client = new DefaultHttpClient();
@@ -186,12 +186,14 @@ public class LoginActivity extends Activity {
 		    }
 			
 			if (has_name_error){
-				txt_nombre_email.setVisibility(View.VISIBLE);
-				txt_nombre_email.setText(name_error);
+				edit_nombre_email.setError(name_error);
+				//txt_nombre_email.setVisibility(View.VISIBLE);
+				//txt_nombre_email.setText(name_error);
 			}
 			if (has_password_error){
-				txt_password.setVisibility(View.VISIBLE);
-				txt_password.setText(password_error);
+				edit_password.setError(password_error);
+				//txt_password.setVisibility(View.VISIBLE);
+				//txt_password.setText(password_error);
 			}
 			// Se ha logueado correctamente
 			if (!has_name_error && !has_password_error){

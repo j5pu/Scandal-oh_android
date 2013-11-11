@@ -1,14 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
     <item
-        android:id="@+id/logout"
+        android:id="@+id/menu_action_bar_logout"
         android:title="we1"
         android:icon="@drawable/logout"
         android:showAsAction="ifRoom|withText"
     />
     
     <item
-        android:id="@+id/take_photo"
+        android:id="@+id/menu_action_bar_take_photo"
         android:title="we2"
         android:icon="@drawable/camara_azul"
         android:showAsAction="ifRoom|withText"

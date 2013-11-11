@@ -198,7 +198,7 @@ public class CreateEscandaloActivity extends Activity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = "http://192.168.1.26:8000/api/v1/photo/";
+			String urlString = "http://192.168.1.31:8000/api/v1/photo/";
 			photo_file = new File(mImageUri.getPath());
 			
 
