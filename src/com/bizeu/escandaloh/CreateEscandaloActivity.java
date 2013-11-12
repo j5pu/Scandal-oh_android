@@ -101,6 +101,7 @@ public class CreateEscandaloActivity extends Activity {
 
 		progress = new ProgressDialog(this);
 		progress.setTitle("Subiendo escándalo ...");
+		progress.setMessage("Espere, por favor");
 		progress.setCancelable(false);
 
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
@@ -198,7 +199,7 @@ public class CreateEscandaloActivity extends Activity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = "http://192.168.1.31:8000/api/v1/photo/";
+			String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photo/";
 			photo_file = new File(mImageUri.getPath());
 			
 
@@ -268,14 +269,19 @@ public class CreateEscandaloActivity extends Activity {
 
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result < 300) {
-				Log.v("WE", "foto enviada");
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra("title", written_title);
 				resultIntent.putExtra("category", selected_category);
+				Toast toast = Toast.makeText(context, "Escándalo subido con éxito", Toast.LENGTH_LONG);
+				toast.show();
+				Log.v("WE", "foto enviada");
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			} else {
+				Toast toast = Toast.makeText(context, "Error subiendo el escándalo", Toast.LENGTH_LONG);
+				toast.show();
 				Log.v("WE", "foto no enviada");
+				finish();
 			}
 		}
 	}

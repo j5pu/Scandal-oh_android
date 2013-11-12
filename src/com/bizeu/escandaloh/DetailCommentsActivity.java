@@ -123,7 +123,8 @@ public class DetailCommentsActivity extends Activity {
 	    protected Integer doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = "http://192.168.1.26:8000/api/v1/comment/";        
+	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";
+	        //String urlString = "http://192.168.1.26:8000/api/v1/comment/";        
 
 	        HttpResponse response = null;
 	        try{
@@ -189,7 +190,7 @@ public class DetailCommentsActivity extends Activity {
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			
-			HttpGet del = new HttpGet("http://192.168.1.26:8000/api/v1/comment/?photo__id=" + id);
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + id);
 			 
 			del.setHeader("content-type", "application/json");
 			

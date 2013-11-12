@@ -106,14 +106,6 @@
             android:gravity="right"
             android:orientation="vertical" >
 
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:scaleType="center"
-                android:src="@drawable/twitter" />
-
         </LinearLayout>
 
     </LinearLayout>

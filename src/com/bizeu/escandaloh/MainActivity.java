@@ -42,8 +42,11 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
@@ -62,7 +65,11 @@ import com.zed.adserver.onAdsReadyListener;
 
 public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener {
 
+	public static final String ANGRY = "Enfadado";
+	public static final String HAPPY = "Feliz";
+	public static final String BOTH = "Ambos";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
+	
 	private static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
 	private File photo;
@@ -95,9 +102,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
 
         // Añadimos los tabs para cada uno de los 3 fragmentos
-        mTabHost.addTab(mTabHost.newTabSpec("Feliz").setIndicator("Feliz"),ListEscandalosFragmentHappy.class, null);        
-        mTabHost.addTab(mTabHost.newTabSpec("Enfadado").setIndicator("Enfadado"),ListEscandalosFragmentAngry.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("Ambos").setIndicator("Ambos"),ListEscandalosFragmentBoth.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragmentHappy.class, null);  
+        mTabHost.addTab(mTabHost.newTabSpec(ANGRY).setIndicator(ANGRY),ListEscandalosFragmentAngry.class, null);
+        mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragmentBoth.class, null);
  
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
@@ -114,8 +121,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);		
 		
-		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);	
-		
+		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+			
 	}
 
 	
@@ -128,6 +135,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 	   // AdsSessionController.enableTracking();
 		
+		Log.v("WE","onresume");
 		String user_uri = prefs.getString("user_uri", null); 
 		if (user_uri != null){
 			logged = true;
@@ -327,6 +335,40 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				        });            
 				     alert_logout.show(); 
 				}
+				
+				break;
+				
+			case R.id.menu_action_bar_update_list:
+				
+				Bundle arguments = new Bundle();
+				
+				// Obtenemos cuál es el tab activo
+				String current_tab = mTabHost.getCurrentTabTag();
+				
+				// Volvemos a mostrar los escandalos según el tab en el que estemos
+				if (current_tab.equals(HAPPY)){
+					ListEscandalosFragmentHappy fragment = new ListEscandalosFragmentHappy();
+					fragment.setArguments(arguments);
+		            getSupportFragmentManager().beginTransaction()
+		                    .replace(R.id.tabcontent, fragment)
+		                    .commit(); 
+				}
+				else if (current_tab.equals(ANGRY)){
+					ListEscandalosFragmentAngry fragment = new ListEscandalosFragmentAngry();
+					fragment.setArguments(arguments);
+		            getSupportFragmentManager().beginTransaction()
+		                    .replace(R.id.tabcontent, fragment)
+		                    .commit(); 
+				}
+				else if (current_tab.equals(BOTH)){
+					ListEscandalosFragmentBoth fragment = new ListEscandalosFragmentBoth();
+					fragment.setArguments(arguments);
+		            getSupportFragmentManager().beginTransaction()
+		                    .replace(R.id.tabcontent, fragment)
+		                    .commit(); 
+				}
+		        Log.v("WE","es: " + mTabHost.getCurrentTabTag());
+		        break;
 		}
 		
 		return true;

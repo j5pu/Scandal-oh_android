@@ -24,14 +24,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 
 public class LoginActivity extends Activity {
 	
 	private EditText edit_nombre_email;
 	private EditText edit_password;
-	private TextView txt_nombre_email;
-	private TextView txt_password;
 	private Button boton_aceptar;
 	private Button boton_cancelar;
 	private ProgressDialog progress;
@@ -46,6 +45,8 @@ public class LoginActivity extends Activity {
 	private boolean has_password_error;
 	
 	private String status = null;
+	private boolean login_error = false;
+	private String loginMessageError;
 	
 	/**
 	 * onCreate
@@ -57,12 +58,11 @@ public class LoginActivity extends Activity {
 		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
-		txt_nombre_email = (TextView) findViewById(R.id.txt_login_nombre_email);
-		txt_password = (TextView) findViewById(R.id.txt_login_password);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
 		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);	
 		progress = new ProgressDialog(this);
 		progress.setTitle("Logueando ...");
+		progress.setMessage("Espere, por favor");
 		progress.setCancelable(false);
 		
 		boton_cancelar.setOnClickListener(new View.OnClickListener() {
@@ -98,8 +98,9 @@ public class LoginActivity extends Activity {
 		protected void onPreExecute(){
 			has_name_error = false;
 			has_password_error = false;
-			txt_nombre_email.setVisibility(View.GONE);
-			txt_password.setVisibility(View.GONE);
+			login_error = false;
+			edit_nombre_email.setError(null);
+			edit_password.setError(null);
 			// Mostramos el ProgressDialog
 			progress.show();
 		}
@@ -108,7 +109,7 @@ public class LoginActivity extends Activity {
 	    protected Void doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = "http://192.168.1.31:8000/api/v1/user/login/";        
+	        String urlString = MyApplication.SERVER_ADDRESS + "api/v1/user/login/";        
 	        
 	        try{
 	             HttpClient client = new DefaultHttpClient();
@@ -145,27 +146,35 @@ public class LoginActivity extends Activity {
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
-	                	 reason_code = Integer.parseInt(respJSON.getString("reason_code"));
-	                	 reason = respJSON.getString("reason");
-	                	 if (reason_code == 1){ // Fallo de identificación: nombre de usuario no existe
-	                		 name_error = reason;
-	                		 has_name_error = true;
+	                	 if (respJSON.has("reason_code")){
+	                		 reason_code = Integer.parseInt(respJSON.getString("reason_code"));
+		                	 reason = respJSON.getString("reason");
+		                	 if (reason_code == 1){ // Fallo de identificación: nombre de usuario no existe
+		                		 name_error = reason;
+		                		 has_name_error = true;
+		                	 }
+		                	 else if (reason_code == 2){ // Fallo de identificación: password no existe
+		                		 password_error = reason;
+		                		 has_password_error = true;
+		                	 }
+		                	 if (reason_code == 3){ // Fallo de autentificación ((caracteres raros, espacio, longitud...)
+		                		 JSONObject jsonReason = new JSONObject(respJSON.getString("reason_details"));
+		                		 if (jsonReason.has("username_email")){
+		                			 name_error = jsonReason.getString("username_email");
+		                			 has_name_error = true;
+		                		 }
+		                		 if (jsonReason.has("password")){
+		                			 password_error = jsonReason.getString("password");
+		                			 has_password_error = true;
+		                		 }	 
+		                	 }
 	                	 }
-	                	 else if (reason_code == 2){ // Fallo de identificación: password no existe
-	                		 password_error = reason;
-	                		 has_password_error = true;
-	                	 }
-	                	 if (reason_code == 3){ // Fallo de autentificación ((caracteres raros, espacio, longitud...)
-	                		 JSONObject jsonReason = new JSONObject(respJSON.getString("reason_details"));
-	                		 if (jsonReason.has("username_email")){
-	                			 name_error = jsonReason.getString("username_email");
-	                			 has_name_error = true;
-	                		 }
-	                		 if (jsonReason.has("password")){
-	                			 password_error = jsonReason.getString("password");
-	                			 has_password_error = true;
-	                		 }	 
-	                	 }
+	                	 // Ha dado error pero no tiene el reason code: mostramos el mensaje de error
+	                	 else{
+	                		 JSONObject jsonMessageError = new JSONObject(respJSON.getString("reason"));
+	                		 loginMessageError = jsonMessageError.getString("error_message");
+	                		 login_error = true;
+	                	 }    	
 	                 }
 	             }
 	        }
@@ -185,28 +194,34 @@ public class LoginActivity extends Activity {
 		        progress.dismiss();
 		    }
 			
-			if (has_name_error){
-				edit_nombre_email.setError(name_error);
-				//txt_nombre_email.setVisibility(View.VISIBLE);
-				//txt_nombre_email.setText(name_error);
+			// Si no ha habido algún error extraño 
+			if (!login_error){
+				if (has_name_error){
+					edit_nombre_email.setError(name_error);
+				}
+				if (has_password_error){
+					edit_password.setError(password_error);
+				}
+				// Se ha logueado correctamente
+				if (!has_name_error && !has_password_error){
+					SharedPreferences prefs = getBaseContext().getSharedPreferences(
+		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		        	prefs.edit().putString("user_uri", user_uri).commit();
+		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
+					.show();
+		        	
+		        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
+		        	setResult(Activity.RESULT_OK);
+		        	finish();
+				}	
 			}
-			if (has_password_error){
-				edit_password.setError(password_error);
-				//txt_password.setVisibility(View.VISIBLE);
-				//txt_password.setText(password_error);
-			}
-			// Se ha logueado correctamente
-			if (!has_name_error && !has_password_error){
-				SharedPreferences prefs = getBaseContext().getSharedPreferences(
-	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        	prefs.edit().putString("user_uri", user_uri).commit();
-	        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
+			
+			// Ha habido algún error extraño: mostramos el mensaje
+			else{
+	        	Toast.makeText(getBaseContext(), loginMessageError, Toast.LENGTH_SHORT)
 				.show();
-	        	
-	        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
-	        	setResult(Activity.RESULT_OK);
-	        	finish();
-			}				
+			}
+						
 	    }
 	}
 }

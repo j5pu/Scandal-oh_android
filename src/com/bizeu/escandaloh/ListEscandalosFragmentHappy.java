@@ -38,6 +38,9 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
+import eu.erikw.PullToRefreshListView;
+import eu.erikw.PullToRefreshListView.OnRefreshListener;
+
 
 public class ListEscandalosFragmentHappy extends SherlockFragment implements onAdsReadyListener{
 
@@ -51,16 +54,22 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	public static ArrayList<Escandalo> escandalos;
 	private byte[] bytes;
 	private int escandalo_loading = 0 ;
-	private ListView list_escandalos;
 	private FrameLayout banner;
 	private BannerView adM;
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
+	private PullToRefreshListView lView;
+	private GetEscandalos escandalos_asyn ;
+	private ArrayList<GetPictureFromAmazon> pictures_asyn;
+	
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
-	      	super.onCreate(savedInstanceState);    
+	      	super.onCreate(savedInstanceState);
+	      	escandalos = new ArrayList<Escandalo>();
+	      	
+	      	pictures_asyn = new ArrayList<GetPictureFromAmazon>();
 	 }
 	
 
@@ -68,16 +77,24 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
-		
-		escandalo_loading = 0;
-		escandalos = new ArrayList<Escandalo>();	
+	
 		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
 				escandalos);
 		
-		list_escandalos = (ListView) v.findViewById(R.id.list_escandalos);
-		list_escandalos.setAdapter(escanAdapter);
+		lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
+		lView.setAdapter(escanAdapter);
+		
+		lView.setOnRefreshListener(new OnRefreshListener() {
+			 
+		    @Override
+		    public void onRefresh() {	    	
+		    	cancelGetEscandalos();
+		    	escandalos_asyn = new GetEscandalos();
+		    	escandalos_asyn.execute();
+		    }
+		});
 	
-		list_escandalos.setOnScrollListener(new OnScrollListener() {
+		lView.setOnScrollListener(new OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 							
@@ -85,31 +102,31 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 				if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
 					
 					// Si no es el último (tiene uno detrás)
-					if (list_escandalos.getChildAt(1) != null){
+					if (lView.getChildAt(1) != null){
 
 						// Obtenemos la coordenada Y donde empieza el segundo escandalo
 						final int[] location = new int[2];
-						list_escandalos.getChildAt(1).getLocationOnScreen(location);
+						lView.getChildAt(1).getLocationOnScreen(location);
 						
 						// Si el primer escandalo ocupa más pantalla que el segundo mostrado, mostramos el primero			
 						// Para versión menor a 11: no tenemos en cuenta el status bar
 						if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.GINGERBREAD_MR1){
 							// Si la coordenada Y del segundo escandalo es mayor que la mitad de la pantalla (diponible)
 							if ((location[1] - getActionBarHeight() + MyApplication.ALTO_TABS) >= getAvailableHeightScreen() / 2) {
-								list_escandalos.setSelection(first_visible_item_count);
+								lView.setSelection(first_visible_item_count);
 							} 
 							// Si no, mostramos el segundo
 							else {
-								list_escandalos.setSelection(first_visible_item_count + 1);
+								lView.setSelection(first_visible_item_count + 1);
 							}
 						}
 						// Para versión 11+: tenemos en cuenta el status bar
 						else{
 							if ((location[1] - (getActionBarHeight() + getStatusBarHeight() + MyApplication.ALTO_TABS)) >= getAvailableHeightScreen() / 2) {
-								list_escandalos.setSelection(first_visible_item_count);
+								lView.setSelection(first_visible_item_count);
 							} 
 							else {
-								list_escandalos.setSelection(first_visible_item_count + 1);
+								lView.setSelection(first_visible_item_count + 1);
 							}
 						}						
 					}
@@ -142,7 +159,8 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
         //AdsSessionController.registerAdsReadyListener(this);       		
 		
-		new GetEscandalos().execute();		
+    	escandalos_asyn = new GetEscandalos();
+    	escandalos_asyn.execute();		
 	}
 	
 	
@@ -153,7 +171,9 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	@Override
 	public void onPause() {
 	    super.onPause();
+	   
 	    //AdsSessionController.pauseTracking();
+	    cancelGetEscandalos();
 	}
 	
 	
@@ -164,7 +184,7 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
      * @param activateOnItemClick
      */
     public void setActivateOnItemClick(boolean activateOnItemClick) {
-    	list_escandalos.setChoiceMode(activateOnItemClick
+    	lView.setChoiceMode(activateOnItemClick
                 ? ListView.CHOICE_MODE_SINGLE
                 : ListView.CHOICE_MODE_NONE);
     }
@@ -176,9 +196,9 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
      */
     public void setActivatedPosition(int position) {
         if (position == ListView.INVALID_POSITION) {
-        	list_escandalos.setItemChecked(mActivatedPosition, false);
+        	lView.setItemChecked(mActivatedPosition, false);
         } else {
-        	list_escandalos.setItemChecked(position, true);
+        	lView.setItemChecked(position, true);
         }
         mActivatedPosition = position;
     }
@@ -325,12 +345,19 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	 *
 	 */
 	private class GetEscandalos extends AsyncTask<Void,Integer,Integer> {
-		 
+		
+		@Override
+		protected void onPreExecute(){
+			escandalo_loading = 0;
+			escandalos.clear();
+			escanAdapter.notifyDataSetChanged();
+		}
+		
 		@Override
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = "http://192.168.1.31:8000/api/v1/photo/?limit=3&category__id=1";
+	    	String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=3&category__id=1";
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
@@ -373,7 +400,9 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img, sound));
 							escanAdapter.notifyDataSetChanged();	
 							
-				        	new GetPictureFromAmazon().execute(img);
+				        	GetPictureFromAmazon getPic = new GetPictureFromAmazon();
+				        	pictures_asyn.add(getPic);
+				        	getPic.execute(img);
 						}
 		        	});	
 		        	        	
@@ -393,13 +422,16 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 			
 			//escanAdapter.notifyDataSetChanged();
 			
-			// Si es codigo 2xx --> OK
-	        if (result >= 200 && result <300){
-	        	Log.v("WE","escandalos recibidos");
-	        }
-	        else{
-	        	Log.v("WE","escandalos NO recibidos");
-	        }   
+			if (!isCancelled()){
+				// Si es codigo 2xx --> OK
+		        if (result >= 200 && result <300){
+		        	Log.v("WE","escandalos recibidos");
+		        }
+		        else{
+		        	Log.v("WE","escandalos NO recibidos");
+		        }        
+			}
+	        lView.onRefreshComplete();
 	    }
 	}
 	
@@ -449,15 +481,30 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		
 		@Override
 	    protected void onPostExecute(Boolean result) {
-			if (result) {
-			    final Escandalo esc = escandalos.get(escandalo_loading);    
-			    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
-			    escandalos.set(escandalo_loading, esc);
-			    escandalo_loading++;    
-				escanAdapter.notifyDataSetChanged();
-				Log.v("WE","Imagen añadida");
+			
+			if (!isCancelled()){
+				final Escandalo esc = escandalos.get(escandalo_loading); 
+				if (result) { 
+				    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
+				    escandalos.set(escandalo_loading, esc);
+				    escandalo_loading++;    
+					escanAdapter.notifyDataSetChanged();
+					Log.v("WE","Imagen buena añadida");
+				}
+				else{
+				//	esc.setPicture(BitmapFactory.decodeResource(getResources(), R.drawable.image);)
+				}
 			}
+			
 		}
 	}
 
+	
+	private void cancelGetEscandalos(){
+		
+		escandalos_asyn.cancel(true);
+		for (int i=0 ; i < pictures_asyn.size(); i++){
+			pictures_asyn.get(i).cancel(true);
+		}
+	}
 }

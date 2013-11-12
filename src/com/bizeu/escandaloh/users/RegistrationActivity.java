@@ -8,9 +8,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -19,9 +21,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
+import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 
 public class RegistrationActivity extends Activity {
@@ -29,9 +30,6 @@ public class RegistrationActivity extends Activity {
 	private EditText edit_nombre_usuario;
 	private EditText edit_password_usuario;
 	private EditText edit_email_usuario;
-	private TextView txt_nombre_usuario;
-	private TextView txt_password_usuario;
-	private TextView txt_email_usuario;
 	private Button aceptar;
 	private Button cancelar;
 	
@@ -44,7 +42,11 @@ public class RegistrationActivity extends Activity {
 	private String email_error; 
 	
 	private String status = null;
+	private String user_uri ;
 	private String reason;
+	private ProgressDialog progress;
+
+	
 	
 	/**
 	 * onCreate
@@ -57,11 +59,13 @@ public class RegistrationActivity extends Activity {
 		edit_nombre_usuario = (EditText) findViewById(R.id.edit_registro_nombre);
 		edit_password_usuario = (EditText) findViewById(R.id.edit_registro_password);
 		edit_email_usuario = (EditText) findViewById(R.id.edit_registro_email);
-		txt_nombre_usuario = (TextView) findViewById(R.id.txt_registro_nombre);
-		txt_password_usuario = (TextView) findViewById(R.id.txt_registro_password);
-		txt_email_usuario = (TextView) findViewById(R.id.txt_registro_email);
 		aceptar = (Button) findViewById(R.id.but_confirmar_registro);
 		cancelar = (Button) findViewById(R.id.but_cancelar_registro);
+		
+		progress = new ProgressDialog(this);
+		progress.setTitle("Registrando usuario ...");
+		progress.setMessage("Espere, por favor");
+		progress.setCancelable(false);
 		
 		cancelar.setOnClickListener(new View.OnClickListener() {
 			
@@ -82,26 +86,6 @@ public class RegistrationActivity extends Activity {
 	
 	
 	/**
-	 * Comprueba si los tres campos de datos han sido rellenados
-	 * @return
-	 */
-	private boolean checkFields(){
-		boolean result;
-		
-		if (edit_nombre_usuario.getText().toString().equals("") ||  
-				edit_password_usuario.getText().toString().equals("")|| 
-				edit_email_usuario.getText().toString().equals("")){
-			result = false;
-		}
-		else{
-			result = true;
-		}
-		
-		return result;
-	}
-	
-	
-	/**
 	 * Registra un usuario
 	 * @author Alejandro
 	 *
@@ -113,9 +97,12 @@ public class RegistrationActivity extends Activity {
 			has_name_error = false;
 			has_password_error = false;
 			has_email_error = false;
-			txt_nombre_usuario.setVisibility(View.GONE);
-			txt_password_usuario.setVisibility(View.GONE);
-			txt_email_usuario.setVisibility(View.GONE);
+			edit_nombre_usuario.setError(null);
+			edit_password_usuario.setError(null);
+			edit_email_usuario.setError(null);
+			
+			// Mostramos el ProgressDialog
+			progress.show();		
 		}
 		
 		@Override
@@ -123,11 +110,8 @@ public class RegistrationActivity extends Activity {
 	    	boolean result = false;
 	 
 	    	HttpEntity resEntity;
-	        String urlString = "http://192.168.1.31:8000/api/v1/user/";
-	        
-	        
-
-	        HttpResponse response = null;
+	        String urlString = MyApplication.SERVER_ADDRESS + "api/v1/user/";
+	
 	        try{
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
@@ -142,11 +126,10 @@ public class RegistrationActivity extends Activity {
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);
 
-	             response = client.execute(post);
+	             HttpResponse response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
-	             
-	             
+	                          
 	             if (resEntity != null) {
 	                 Log.i("RESPONSE",response_str);
 	                 // Obtenemos el json devuelto
@@ -157,23 +140,29 @@ public class RegistrationActivity extends Activity {
 	                 
 	                 // Si es OK obtenemos el user_uri
 	                 if (status.equals("ok")){
-	                	 //user_uri = respJSON.getString("user_uri");
+	                	 user_uri = respJSON.getString("resource_uri");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
 	                	 JSONObject jsonReason = new JSONObject(respJSON.getString("reason"));
-	                	 JSONObject jsonUser = new JSONObject(jsonReason.getString("user"));
-	                	 if (jsonUser.has("username")){
-	                		 name_error = jsonUser.getString("username");
+	                	 //JSONObject jsonUser = new JSONObject(jsonReason.getString("user"));
+	                	 if (jsonReason.has("username")){
+	                		 name_error = jsonReason.getString("username");
 	                		 has_name_error = true;
 	                	 }
-	                	 if (jsonUser.has("password")){
-	                		 password_error = jsonUser.getString("password");
+	                	 if (jsonReason.has("password")){
+	                		 JSONArray array = (JSONArray) jsonReason.get("password");
+	                		 password_error = (String) array.get(0);
+	                		
+	                		 //Log.v("WE",array.toString());
+	                		 //password_error = (ArrayList<String>) jsonReason.get("password");
+	                		// password_error = jsonReason.getString("password");
 	                		 has_password_error = true;
+	                		 
 	                	 }
 	                	 
-	                	 if (jsonUser.has("email")){
-	                		 email_error = jsonUser.getString("email");
+	                	 if (jsonReason.has("email")){
+	                		 email_error = jsonReason.getString("email");
 	                		 has_email_error = true;
 	                	 }
 	                 }
@@ -190,35 +179,32 @@ public class RegistrationActivity extends Activity {
 		@Override
 	    protected void onPostExecute(Void result) {
 
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }
+			
 			if (has_name_error){
 				edit_nombre_usuario.setError(name_error);
-				//txt_nombre_usuario.setVisibility(View.VISIBLE);
-				//txt_nombre_usuario.setText(name_error);
 			}
 			if (has_password_error){
 				edit_password_usuario.setError(password_error);
-				//txt_password_usuario.setVisibility(View.VISIBLE);
-				//txt_password_usuario.setText(password_error);
 			}
 			if (has_email_error){
 				edit_email_usuario.setError(email_error);
-				//txt_email_usuario.setVisibility(View.VISIBLE);
-				//txt_email_usuario.setText(email_error);
 			}
-			// Se ha logueado correctamente
+			// Se se ha registrado correctamente
 			if (!has_name_error && !has_password_error && !has_email_error){
-				/*
 				SharedPreferences prefs = getBaseContext().getSharedPreferences(
 	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	        	prefs.edit().putString("user_uri", user_uri).commit();
-	        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
-				.show();
+	        	Toast.makeText(getBaseContext(), "Registro ok", Toast.LENGTH_SHORT).show();
 	        	
-	        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
+	        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
 	        	setResult(Activity.RESULT_OK);
 	        	finish();
-	        	*/
-				Log.e("WE","Login ok");
+
+				Log.e("WE","Registro ok");
 			}	
 	    }
 	}
