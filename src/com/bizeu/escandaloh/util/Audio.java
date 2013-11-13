@@ -161,6 +161,10 @@ public class Audio{
 	public void startPlaying(String uri_audio) {
         
         		try {
+        			if (mPlayer.isPlaying()){
+        				mPlayer.reset();
+        				mPlayer.release();
+        			}
         			mPlayer.setDataSource(uri_audio);
                     mPlayer.prepareAsync();
                     mPlayer.setOnPreparedListener(new OnPreparedListener() {

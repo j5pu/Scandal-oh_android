@@ -1,20 +1,20 @@
 package com.bizeu.escandaloh.adapters;
 
 import java.util.ArrayList;
+
+import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.ImageUtils;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +23,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
@@ -32,7 +33,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    ArrayList<Escandalo> data;
 	    private int available_height;	    
 	    private Escandalo escanda;
-	    
+
+    
 	    /**
 	     * Constructor
 	     * @param context
@@ -53,39 +55,40 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    @Override
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        View mView = convertView;
+	        
 	        EscandaloHolder holder = null;
 
 	        escanda = data.get(position);
 	        
 	        if(mView == null){
-	            //LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 	            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	            mView = inflater.inflate(layoutResourceId, parent, false);       
 	                        
 	            holder = new EscandaloHolder();
 	            holder.txtTitle = (TextView)mView.findViewById(R.id.txt_titulo);
 	            holder.imgCategory = (ImageView)mView.findViewById(R.id.img_categoria);
-	            holder.imgPicture = (ImageView)mView.findViewById(R.id.img_foto);
+	            holder.imgPicture = (FetchableImageView) mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
 	            holder.imgNumComments = (ImageView)mView.findViewById(R.id.img_num_comentarios);
 	            holder.imgMicro = (ImageView)mView.findViewById(R.id.img_escandalo_microfono);
-     
+	            				  
 	            mView.setTag(holder);
 	        }
 	        
 	        else{
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
-	        
-	        
+	                
 	        // Cambiamos el alto por código
             available_height = getAvailableHeightScreen();   
             holder.lheight = (LinearLayout)mView.findViewById(R.id.l_escandalo);
             LayoutParams params4 = holder.lheight.getLayoutParams();
             params4.height = available_height;
             holder.lheight.setLayoutParams(params4);
-	        	        
-	        holder.imgPicture.setImageBitmap(escanda.getPicture());
+	        	
+            // Pide la imagen por url y la muestra cuando la obtenga. Mientras tanto muestra otra
+            holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.previsualizacion_foto); 
+            
 	        holder.txtTitle.setText(escanda.getTitle());
 	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
@@ -125,6 +128,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				}
 			});
             
+            
+
+			
+     
             // Listeners para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
 				
@@ -162,11 +169,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    static class EscandaloHolder{
 	        TextView txtTitle;
 	        ImageView imgCategory;
-	        ImageView imgPicture;
+	        FetchableImageView imgPicture;
+	       //ImageView imgPicture;
 	        ImageView imgNumComments;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
 	        ImageView imgMicro;
+	        ProgressBar loading;
 	        
 	        
 	        public ImageView getPicture(){
@@ -175,6 +184,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        
 	        public TextView getNumComments(){
 	        	return txtNumComments;
+	        }
+	        
+	        public ProgressBar getProgressBar(){
+	        	return loading;
 	        }
 	        
 	    }

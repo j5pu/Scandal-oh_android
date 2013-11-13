@@ -13,6 +13,7 @@ public class Escandalo {
 	private String title;
 	private String category;
 	private Bitmap picture;
+	private String picture_url;
 	private int num_comments;
 	private String resource_uri; // Uri de la foto
 	private String route_img; // Ruta de la foto
@@ -123,4 +124,12 @@ public class Escandalo {
 	public boolean hasAudio(){
 		return this.has_audio;
 	}	
+	
+	public void setPictureUrl(String new_image_url){
+		this.picture_url = new_image_url;
+	}
+	
+	public String getPictureUrl(){
+		return this.picture_url;
+	}
 }

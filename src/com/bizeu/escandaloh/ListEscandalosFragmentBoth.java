@@ -61,14 +61,11 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	Escandalo escan_aux;
 	private PullToRefreshListView lView;
 	private GetEscandalos escandalos_asyn ;
-	private ArrayList<GetPictureFromAmazon> pictures_asyn;
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
 	      	escandalos = new ArrayList<Escandalo>();
-	      	
-	      	pictures_asyn = new ArrayList<GetPictureFromAmazon>();
 	 }
 	
 
@@ -395,12 +392,8 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 						public void run() {
 				            // Añadimos el escandalo al ArrayList
 				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, img, sound));
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/"+img, sound));
 							escanAdapter.notifyDataSetChanged();	
-							
-				        	GetPictureFromAmazon getPic = new GetPictureFromAmazon();
-				        	pictures_asyn.add(getPic);
-				        	getPic.execute(img);
 						}
 		        	});	
 		        	        	
@@ -417,9 +410,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
-			
-			//escanAdapter.notifyDataSetChanged();
-			
+					
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
@@ -434,77 +425,11 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 			lView.onRefreshComplete();
 	    }
 	}
-	
-	
-	
-	
-	
-	/**
-	 * Obtiene la imagen de Amazon y la muestra
-	 * @author Alejandro
-	 *
-	 */
-	private class GetPictureFromAmazon extends AsyncTask<String,Integer,Boolean> {
-		 
-		@Override
-	    protected Boolean doInBackground(String... params) {
-	    	boolean result = false;
-		            	
-	        //Obtenemos la imagen de cache
-	    	//bytes = Cache.getInstance(getBaseContext()).obtenImagenDeCache(params[0]);
-	    	    	
-	    	  //if (bytes.length == 0){
-	    	    	s3Client = new AmazonS3Client( new BasicAWSCredentials("AKIAJ6GJKNGVTOB3AREA", "RSNSbgY+HJJTufi4Dq6yM/r4tWBdTzEos+lUmDQU") );
-	    	    	// Hacemos la petición a Amazon y obtenemos la imagen
-	    	    	S3ObjectInputStream content  = null;
-
-	    	    	result = true;
-						
-					try {
-						content = s3Client.getObject("scandaloh", params[0]).getObjectContent();
-						bytes = IOUtils.toByteArray(content);
-
-					} catch (Exception e) {
-						Log.e("WE","Error al obtener imagen");
-						e.printStackTrace();
-						result = false;
-					}
-
-				    // Añadimos la foto a caché
-				  //  Cache.getInstance(getBaseContext()).aniadeImagenAcache(params[0], bytes);  // La almacenamos en cache		   
-	    	   // }
-	    	   // else{}
-	 							
-	        return result;
-	    }
-
 		
-		@Override
-	    protected void onPostExecute(Boolean result) {
-			if (!isCancelled()){
-				final Escandalo esc = escandalos.get(escandalo_loading); 
-				if (result) { 
-				    esc.setPicture(ImageUtils.BytesToBitmap(bytes));	
-				    escandalos.set(escandalo_loading, esc);
-				    escandalo_loading++;    
-					escanAdapter.notifyDataSetChanged();
-					Log.v("WE","Imagen buena añadida");
-				}
-				else{
-				//	esc.setPicture(BitmapFactory.decodeResource(getResources(), R.drawable.image);)
-				}
-			}
-		}
-	}
 	
 	
-	
-	private void cancelGetEscandalos(){
-		
+	private void cancelGetEscandalos(){	
 		escandalos_asyn.cancel(true);
-		for (int i=0 ; i < pictures_asyn.size(); i++){
-			pictures_asyn.get(i).cancel(true);
-		}
 	}
 
 }
