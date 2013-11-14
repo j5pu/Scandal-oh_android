@@ -1,13 +1,17 @@
 package com.bizeu.escandaloh;
 
-import com.bizeu.escandaloh.util.Audio;
-import com.bizeu.escandaloh.util.ImageUtils;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 
 public class DetailPhotoActivity extends Activity {
@@ -19,6 +23,7 @@ public class DetailPhotoActivity extends Activity {
 	
 	private Audio audio_recorder;
 	private boolean played_already ;
+	private boolean orientation_changed ;
 	
 	/**
 	 * onCreate
@@ -41,6 +46,8 @@ public class DetailPhotoActivity extends Activity {
 			
 			// Obtenemos y reproducimos el audio (si tiene)
 			uri_audio = getIntent().getStringExtra("uri_audio");
+			
+			orientation_changed = false ;
 		}
 	}
 	
@@ -67,9 +74,19 @@ public class DetailPhotoActivity extends Activity {
 	@Override
 	protected void onPause(){
 		super.onPause();
-		//Audio.getInstance().closeAudio();
+		if (!orientation_changed){
+			Audio.getInstance().closeAudio();
+		}
 	}
 	
+	
+
+	public void onConfigurationChanged(Configuration newConfig) {
+	    super.onConfigurationChanged(newConfig);
+	    
+	    // Ha cambiado la orientación del dispositivo
+        orientation_changed = true;
+	  }
 	
 	
 	@Override

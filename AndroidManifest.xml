@@ -9,6 +9,7 @@
         android:targetSdkVersion="18" />
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" >
@@ -42,7 +43,10 @@
             android:name="com.bizeu.escandaloh.CreateEscandaloActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.bizeu.escandaloh.DetailPhotoActivity" >
+        <activity
+            android:name="com.bizeu.escandaloh.DetailPhotoActivity"
+            android:configChanges="orientation|screenSize" >
+>
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.DetailCommentsActivity"
