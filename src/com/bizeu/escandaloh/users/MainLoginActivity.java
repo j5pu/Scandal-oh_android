@@ -21,7 +21,9 @@ import android.widget.TextView;
 
 public class MainLoginActivity extends Activity{
 	
+	public static final String FIRST_TIME = "First_time";
 	public static int LOG_IN = 1;
+	public static int REGISTRATION = 2;
 	
 	private TextView txt_pasar;
 	private Button but_registro;
@@ -30,6 +32,8 @@ public class MainLoginActivity extends Activity{
 	private boolean esta_logeado;
 	private SharedPreferences prefs;
 	
+	private boolean first_time = false;
+	
 	
 	/**
 	 * onCreate
@@ -37,21 +41,24 @@ public class MainLoginActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_login);		
+		setContentView(R.layout.main_login);	
+		
+		/*
+		if (getIntent() != null){
+			first_time = getIntent().getExtras().getBoolean(FIRST_TIME);
+		}
+		*/
 		
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);
 		but_login = (Button) findViewById(R.id.but_log_in);
 		
-
-		
-
 		but_registro.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), RegistrationActivity.class);
-				startActivity(i);		
+				startActivityForResult(i, REGISTRATION);		
 			}
 		});
 		
@@ -62,6 +69,14 @@ public class MainLoginActivity extends Activity{
 				// Mostramos la pantalla de log in
 				Intent i = new Intent(getBaseContext(), LoginActivity.class);
 				startActivityForResult(i, LOG_IN);	
+			}
+		});
+		
+		txt_pasar.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				finish();	
 			}
 		});
 	}
@@ -76,8 +91,8 @@ public class MainLoginActivity extends Activity{
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
-		// Si viene de hacer log in 
-		if (requestCode == LOG_IN) {
+		// Si viene de hacer log in o registro
+		if (requestCode == LOG_IN || requestCode == REGISTRATION) {
 			// Y lo ha hecho exitosamente
 			if (resultCode == RESULT_OK) {
 				// Cerramos directamente la pantalla

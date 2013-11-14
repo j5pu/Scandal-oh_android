@@ -240,11 +240,13 @@ public class CreateEscandaloActivity extends Activity {
 				FileBody bin1 = new FileBody(photo_file);
 				StringBody titleBody = new StringBody(written_title);
 				StringBody userBody = new StringBody(user_uri);
+				StringBody codeCountryBody = new StringBody(MyApplication.CODE_SELECTED_COUNTRY);
 				
 				reqEntity.addPart("img", bin1);
 				reqEntity.addPart("title", titleBody);
 				reqEntity.addPart("category", categoryBody);
 				reqEntity.addPart("user", userBody);
+				reqEntity.addPart("country", codeCountryBody);
 
 				post.setEntity(reqEntity);
 				response = client.execute(post);

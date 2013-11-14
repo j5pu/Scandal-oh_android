@@ -95,6 +95,13 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Si el usuario no está logueado mostramos la pantalla de registro/login
+		if (!MyApplication.LOGGED_USER){
+	        Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
+	        startActivity(i);
+		}
+    
 		setContentView(R.layout.main);	
 		
 		// Tab Host (FragmentTabHost)
@@ -113,16 +120,21 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	             
 		// Ten
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
-       // AdsSessionController.registerAdsReadyListener(this);
-
+       // AdsSessionController.registerAdsReadyListener(this);	
+	}
+	
+	
+	@Override
+	public void onStart(){
+		super.onStart();
+		
 		// Action bar
 		getSupportActionBar().setTitle(R.string.app_name);
 		getSupportActionBar().setLogo(R.drawable.corte_manga);
 		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayShowHomeEnabled(true);		
+		getSupportActionBar().setDisplayShowHomeEnabled(true);	
 		
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-			
 	}
 
 	
@@ -134,8 +146,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onResume();
 		
 	   // AdsSessionController.enableTracking();
-		
-		Log.v("WE","onresume");
+
 		String user_uri = prefs.getString("user_uri", null); 
 		if (user_uri != null){
 			logged = true;

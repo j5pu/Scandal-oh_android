@@ -11,6 +11,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -352,7 +354,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	    	String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=6";
+	    	String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=6&country=" + MyApplication.CODE_SELECTED_COUNTRY;
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        

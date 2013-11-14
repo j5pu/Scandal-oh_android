@@ -193,7 +193,7 @@ public class RegistrationActivity extends Activity {
 			if (has_email_error){
 				edit_email_usuario.setError(email_error);
 			}
-			// Se se ha registrado correctamente
+			// Se ha registrado correctamente
 			if (!has_name_error && !has_password_error && !has_email_error){
 				SharedPreferences prefs = getBaseContext().getSharedPreferences(
 	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
