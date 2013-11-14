@@ -59,11 +59,7 @@ public class LoginActivity extends Activity {
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
-		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);	
-		progress = new ProgressDialog(this);
-		progress.setTitle("Logueando ...");
-		progress.setMessage("Espere, por favor");
-		progress.setCancelable(false);
+		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);		
 		
 		boton_cancelar.setOnClickListener(new View.OnClickListener() {
 			
@@ -80,6 +76,8 @@ public class LoginActivity extends Activity {
 				new LogInUser().execute();
 			}			
 		});
+		
+		progress = new ProgressDialog(this);
 	}
 	
 	
@@ -101,7 +99,11 @@ public class LoginActivity extends Activity {
 			login_error = false;
 			edit_nombre_email.setError(null);
 			edit_password.setError(null);
+			
 			// Mostramos el ProgressDialog
+			progress.setTitle("Logueando ...");
+			progress.setMessage("Espere, por favor");
+			progress.setCancelable(false);
 			progress.show();
 		}
 		
@@ -206,7 +208,8 @@ public class LoginActivity extends Activity {
 				if (!has_name_error && !has_password_error){
 					SharedPreferences prefs = getBaseContext().getSharedPreferences(
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-		        	prefs.edit().putString("user_uri", user_uri).commit();
+		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+		        	MyApplication.LOGGED_USER = true;
 		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
 					.show();
 		        	

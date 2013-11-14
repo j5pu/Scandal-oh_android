@@ -3,14 +3,6 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,47 +11,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
-import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -75,15 +43,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private File photo;
 	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
-	private int first_visible_item_count;
-	private ListView list_escandalos;
-	private Uri fileUri;
 	private Uri mImageUri;
 	Bitmap taken_photo;
 	AmazonS3Client s3Client;
-	private int escandalo_loading = 0 ;
-	private byte[] bytes;
-	private boolean logged = false;
 	private FrameLayout banner;
 	private BannerView adM;
 	private SharedPreferences prefs;
@@ -146,14 +108,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onResume();
 		
 	   // AdsSessionController.enableTracking();
-
-		String user_uri = prefs.getString("user_uri", null); 
-		if (user_uri != null){
-			logged = true;
-		}
-		else{
-			logged = false;
-		}
 		
 		// Refrescamos el action bar
 		this.supportInvalidateOptionsMenu();
@@ -166,7 +120,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 */
 	@Override
 	protected void onPause() {
-	    // TODO Auto-generated method stub
 	    super.onPause();
 	   // AdsSessionController.pauseTracking();
 	}
@@ -247,7 +200,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
 		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
-		if (logged){
+		if (MyApplication.LOGGED_USER){
 			mi_photo.setIcon(R.drawable.camara_azul);
 			mi_logout.setVisible(true);
 		}
@@ -268,7 +221,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
 		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
-		if (logged){
+		if (MyApplication.LOGGED_USER){
 			mi_photo.setIcon(R.drawable.camara_azul);
 			mi_logout.setVisible(true);
 		}
@@ -294,8 +247,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			case R.id.menu_action_bar_take_photo:	
 				
 			    // Si está logueado iniciamos la cámara
-				if (logged){ 				
-					
+				if (MyApplication.LOGGED_USER){ 								
 					if (checkCameraHardware(this)){
 						Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 						File photo;
@@ -327,15 +279,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				break;
 				
 			case R.id.menu_action_bar_logout:
-				if (logged){
+				if (MyApplication.LOGGED_USER){
 					AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
 					alert_logout.setTitle("Cerrar sesión usuario");
 					alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
 					alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
 				            public void onClick(DialogInterface dialogo1, int id) {  
 								// Deslogueamos al usuario
-								prefs.edit().putString("user_uri", null).commit();
-								logged = false;
+								prefs.edit().putString(MyApplication.USER_URI, null).commit();
+								MyApplication.LOGGED_USER = false;
 								// Refrescamos el action bar
 								supportInvalidateOptionsMenu();
 				            }  

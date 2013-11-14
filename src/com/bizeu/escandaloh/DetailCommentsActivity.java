@@ -1,9 +1,6 @@
 package com.bizeu.escandaloh;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,6 +17,7 @@ import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -38,14 +36,12 @@ public class DetailCommentsActivity extends Activity {
 	private EditText edit_new_comment;
 	private ImageView img_new_comment;	
 	private LinearLayout layout_write_comment;
-	
-	private String resource_uri;
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
 	private ArrayList<Comment> comments;
 	private String id;
-	private boolean user_login = false;
 	private String user_uri;
+	private ProgressDialog progress;
 	
 	/**
 	 * onCreate
@@ -80,6 +76,8 @@ public class DetailCommentsActivity extends Activity {
 			}
 		});
 		
+		progress = new ProgressDialog(this);
+		
 		new GetComments().execute();
 	}
 	
@@ -94,17 +92,9 @@ public class DetailCommentsActivity extends Activity {
 	@Override
 	public void onResume(){
 		super.onResume();
-		// Comprobamos si el usuario esta logueado
-		SharedPreferences prefs = this.getSharedPreferences(
-			      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
-		user_uri = prefs.getString("user_uri", null); 
-		if (user_uri != null){
-			user_login = true;
-		}
-		else{
-			user_login = false;
-			// Ocultamos la vista de enviar cometario
+		// Si el usuario no está logueado ocultamos el campo para escribir comentarios
+		if (!MyApplication.LOGGED_USER){
 			layout_write_comment.setVisibility(View.GONE);
 		}
 	}
@@ -120,11 +110,20 @@ public class DetailCommentsActivity extends Activity {
 	private class SendComment extends AsyncTask<Void,Integer,Integer> {
 		 
 		@Override
+		protected void onPreExecute(){
+		
+			// Mostramos el ProgressDialog
+			progress.setTitle("Enviando comentario ...");
+			progress.setMessage("Espere, por favor");
+			progress.setCancelable(false);
+			progress.show();
+		}
+		
+		@Override
 	    protected Integer doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";
-	        //String urlString = "http://192.168.1.26:8000/api/v1/comment/";        
+	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";        
 
 	        HttpResponse response = null;
 	        try{
@@ -161,6 +160,12 @@ public class DetailCommentsActivity extends Activity {
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
+			
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }
+			
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
@@ -182,7 +187,17 @@ public class DetailCommentsActivity extends Activity {
 	 *
 	 */
 	private class GetComments extends AsyncTask<Void,Integer,Integer> {
-		 
+		 	
+		@Override
+		protected void onPreExecute(){
+
+			// Mostramos el ProgressDialog
+			progress.setTitle("Obteniendo comentarios ...");
+			progress.setMessage("Espere, por favor");
+			progress.setCancelable(false);
+			progress.show();
+		}
+		
 		@Override
 	    protected Integer doInBackground(Void... params) {
 			
@@ -232,6 +247,12 @@ public class DetailCommentsActivity extends Activity {
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
+			
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }
+			
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
 	        	Log.v("WE","comentarios listados");

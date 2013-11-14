@@ -43,7 +43,6 @@ public class RegistrationActivity extends Activity {
 	
 	private String status = null;
 	private String user_uri ;
-	private String reason;
 	private ProgressDialog progress;
 
 	
@@ -62,11 +61,6 @@ public class RegistrationActivity extends Activity {
 		aceptar = (Button) findViewById(R.id.but_confirmar_registro);
 		cancelar = (Button) findViewById(R.id.but_cancelar_registro);
 		
-		progress = new ProgressDialog(this);
-		progress.setTitle("Registrando usuario ...");
-		progress.setMessage("Espere, por favor");
-		progress.setCancelable(false);
-		
 		cancelar.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -82,6 +76,8 @@ public class RegistrationActivity extends Activity {
 				new SignInUser().execute();
 			}
 		});
+		
+		progress = new ProgressDialog(this);
 	}
 	
 	
@@ -102,6 +98,9 @@ public class RegistrationActivity extends Activity {
 			edit_email_usuario.setError(null);
 			
 			// Mostramos el ProgressDialog
+			progress.setTitle("Registrando usuario ...");
+			progress.setMessage("Espere, por favor");
+			progress.setCancelable(false);
 			progress.show();		
 		}
 		
@@ -187,17 +186,21 @@ public class RegistrationActivity extends Activity {
 			if (has_name_error){
 				edit_nombre_usuario.setError(name_error);
 			}
+			
 			if (has_password_error){
 				edit_password_usuario.setError(password_error);
 			}
+			
 			if (has_email_error){
 				edit_email_usuario.setError(email_error);
 			}
+			
 			// Se ha registrado correctamente
 			if (!has_name_error && !has_password_error && !has_email_error){
 				SharedPreferences prefs = getBaseContext().getSharedPreferences(
 	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        	prefs.edit().putString("user_uri", user_uri).commit();
+	        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+	        	MyApplication.LOGGED_USER = true;
 	        	Toast.makeText(getBaseContext(), "Registro ok", Toast.LENGTH_SHORT).show();
 	        	
 	        	// Le indicamos a la anterior actividad que ha habido éxito en el registro

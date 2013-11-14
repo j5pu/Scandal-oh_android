@@ -1,12 +1,7 @@
 package com.bizeu.escandaloh.users;
 
-import com.bizeu.escandaloh.CreateEscandaloActivity;
-import com.bizeu.escandaloh.MainActivity;
-import com.bizeu.escandaloh.R;
-import com.zed.adserver.AdsSessionController;
-import com.zed.adserver.BannerView;
-import com.zed.adserver.onAdsReadyListener;
 
+import com.bizeu.escandaloh.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,16 +16,12 @@ import android.widget.TextView;
 
 public class MainLoginActivity extends Activity{
 	
-	public static final String FIRST_TIME = "First_time";
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
 	
 	private TextView txt_pasar;
 	private Button but_registro;
 	private Button but_login;
-	
-	private boolean esta_logeado;
-	private SharedPreferences prefs;
 	
 	private boolean first_time = false;
 	
@@ -42,12 +33,6 @@ public class MainLoginActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_login);	
-		
-		/*
-		if (getIntent() != null){
-			first_time = getIntent().getExtras().getBoolean(FIRST_TIME);
-		}
-		*/
 		
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);
@@ -76,6 +61,7 @@ public class MainLoginActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
+				// Cerramos esta pantalla
 				finish();	
 			}
 		});
