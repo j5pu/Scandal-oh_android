@@ -166,27 +166,30 @@ public class Audio{
         				mPlayer.release();
         			}
         			mPlayer.setDataSource(uri_audio);
+        			 mPlayer.setOnPreparedListener(new OnPreparedListener() {
+         				
+         				@Override
+         				public void onPrepared(MediaPlayer mp) {
+         					mp.start();	
+         					mp.setOnCompletionListener(new OnCompletionListener() {
+         						
+         						@Override
+         						public void onCompletion(MediaPlayer mp) {
+         							Log.v("WE","Ha terminado");
+         							//mp.stop();
+         							mp.reset();
+         							if (playListener != null){
+         								playListener.onPlayFinished();
+         							}
+         							
+         						}
+         					});					
+         				}
+        			 }); 
                     mPlayer.prepareAsync();
-                    mPlayer.setOnPreparedListener(new OnPreparedListener() {
-        				
-        				@Override
-        				public void onPrepared(MediaPlayer mp) {
-        					mp.start();	
-        				}
-        			});
-                    
-                    mPlayer.setOnCompletionListener(new OnCompletionListener() {
-						
-						@Override
-						public void onCompletion(MediaPlayer mp) {
-							mp.stop();
-							mp.reset();
-							if (playListener != null){
-								playListener.onPlayFinished();
-							}
-							
-						}
-					});
+                   
+        			                
+    
                  } catch (IOException e) {
                     Log.e("WE", "error al reproducir el audio");
                  }

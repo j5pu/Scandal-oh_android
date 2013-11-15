@@ -44,7 +44,7 @@ public class DetailPhotoActivity extends Activity {
 			mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
 			mImage.setImageBitmap(photo);
 			
-			// Obtenemos y reproducimos el audio (si tiene)
+			// Obtenemos el audio
 			uri_audio = getIntent().getStringExtra("uri_audio");
 			
 			orientation_changed = false ;
@@ -59,7 +59,7 @@ public class DetailPhotoActivity extends Activity {
 		super.onResume();
 		// Si no lo ha reproducido ya (sólo lo reproducimos una vez): reproducimos el audio
 		if (!uri_audio.equals("null") && !played_already){
-			played_already = true;
+			played_already = true;	
 			new PlayAudio().execute();	
 		}
 	}
@@ -106,7 +106,7 @@ public class DetailPhotoActivity extends Activity {
 	
 	
 	/**
-	 * Obtiene la imagen de Amazon y la muestra
+	 * Reproduce el audio
 	 * @author Alejandro
 	 *
 	 */

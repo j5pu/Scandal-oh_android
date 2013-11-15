@@ -17,11 +17,13 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,19 +32,23 @@ import android.widget.Toast;
 
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 public class DetailCommentsActivity extends Activity {
 
 	private ListView list_comments;
 	private EditText edit_new_comment;
-	private ImageView img_new_comment;	
+	private ImageView img_photo;
+	private Button but_send;
 	private LinearLayout layout_write_comment;
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
 	private ArrayList<Comment> comments;
 	private String photo_id;
-	private String user_uri;
 	private ProgressDialog progress;
+	
+	private Bitmap bit;
 	
 	/**
 	 * onCreate
@@ -53,21 +59,29 @@ public class DetailCommentsActivity extends Activity {
 		setContentView(R.layout.comments);
 		
 		if (getIntent() != null){
-			photo_id = getIntent().getExtras().getString("id");
+			//photo_id = getIntent().getExtras().getString("id");
+			byte[] bytes = getIntent().getExtras().getByteArray("bytes");
+	
+			bit = ImageUtils.BytesToBitmap(bytes);
+			
+			
 		}
 		
 		final Context context = this.getApplicationContext();
 		
 		list_comments = (ListView) findViewById(R.id.list_comments);
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
-		img_new_comment = (ImageView) findViewById(R.id.img_new_comment);
+		img_photo = (ImageView) findViewById(R.id.img_photo_list_comments);
+		
+		img_photo.setImageBitmap(bit);
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_write_comment);
+		but_send = (Button) findViewById(R.id.but_send_new_comment);
 		
 		comments = new ArrayList<Comment>();
 		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments);
 		list_comments.setAdapter(commentsAdapter);
 		
-		img_new_comment.setOnClickListener(new View.OnClickListener() {
+		but_send.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -293,13 +307,12 @@ public class DetailCommentsActivity extends Activity {
 	        	Toast toast;
 	        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
 	        	toast.show();
-	        }
-	        
-	        
+	        }        
 	    }
 	}
 	
 	
 	
+
 	
 }

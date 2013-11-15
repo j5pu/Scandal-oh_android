@@ -80,7 +80,7 @@ public class CreateEscandaloActivity extends Activity {
 
 		setContentView(R.layout.create_escandalo);
 		
-		context = this;
+		context = this.getApplicationContext();
 
 		if (getIntent() != null) {
 			Intent data = getIntent();
@@ -220,15 +220,6 @@ public class CreateEscandaloActivity extends Activity {
 					selected_category = ANGRY_CATEGORY;
 					break;
 				}
-
-				/*
-				// Obtenemos el user_uri del usuario
-				SharedPreferences prefs = getBaseContext()
-						.getSharedPreferences("com.bizeu.escandaloh",
-								Context.MODE_PRIVATE);
-
-				String user_uri = prefs.getString("user_uri", null);
-				*/
 
 				MultipartEntity reqEntity = new MultipartEntity();
 				

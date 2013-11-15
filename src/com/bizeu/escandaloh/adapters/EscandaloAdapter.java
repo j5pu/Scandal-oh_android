@@ -8,11 +8,13 @@ import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -110,7 +112,20 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setTag(escanda.getId());
 	        holder.imgNumComments.setTag(escanda.getId());
 	        holder.imgPicture.setTag(escanda.getUriAudio());
+	        holder.imgMicro.setTag(escanda.getUriAudio());        
 	        
+	        // Listener para el microfono
+	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance().closeAudio();
+					// Lo reproducimos				
+					new PlayAudio().execute((String)v.getTag());
+					
+				}
+			});
 	        	        
             // Listener para la foto
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
@@ -230,4 +245,22 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			
 			return available_height;
 		}
+		
+		
+		/**
+		 * Reproduce el audio
+		 * @author Alejandro
+		 *
+		 */
+		private class PlayAudio extends AsyncTask<String,Integer,Boolean> {
+			 
+			@Override
+		    protected Boolean doInBackground(String... params) {
+		    	
+		    	Audio.getInstance().startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
+		        return false;
+		    }
+			
+		}
+		
 }
