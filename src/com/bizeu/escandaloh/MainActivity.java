@@ -59,7 +59,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onCreate(savedInstanceState);
 		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
-		if (!MyApplication.LOGGED_USER){
+		if (!MyApplication.logged_user){
 	        Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
 	        startActivity(i);
 		}
@@ -200,7 +200,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
 		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
-		if (MyApplication.LOGGED_USER){
+		if (MyApplication.logged_user){
 			mi_photo.setIcon(R.drawable.camara_azul);
 			mi_logout.setVisible(true);
 		}
@@ -221,7 +221,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
 		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
 		
-		if (MyApplication.LOGGED_USER){
+		if (MyApplication.logged_user){
 			mi_photo.setIcon(R.drawable.camara_azul);
 			mi_logout.setVisible(true);
 		}
@@ -247,7 +247,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			case R.id.menu_action_bar_take_photo:	
 				
 			    // Si está logueado iniciamos la cámara
-				if (MyApplication.LOGGED_USER){ 								
+				if (MyApplication.logged_user){ 								
 					if (checkCameraHardware(this)){
 						Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 						File photo;
@@ -279,7 +279,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				break;
 				
 			case R.id.menu_action_bar_logout:
-				if (MyApplication.LOGGED_USER){
+				if (MyApplication.logged_user){
 					AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
 					alert_logout.setTitle("Cerrar sesión usuario");
 					alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
@@ -287,7 +287,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				            public void onClick(DialogInterface dialogo1, int id) {  
 								// Deslogueamos al usuario
 								prefs.edit().putString(MyApplication.USER_URI, null).commit();
-								MyApplication.LOGGED_USER = false;
+								MyApplication.logged_user = false;
 								// Refrescamos el action bar
 								supportInvalidateOptionsMenu();
 				            }  

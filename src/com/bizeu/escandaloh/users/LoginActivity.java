@@ -209,7 +209,7 @@ public class LoginActivity extends Activity {
 					SharedPreferences prefs = getBaseContext().getSharedPreferences(
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-		        	MyApplication.LOGGED_USER = true;
+		        	MyApplication.logged_user = true;
 		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
 					.show();
 		        	

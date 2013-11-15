@@ -1,6 +1,7 @@
 package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,13 +14,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.bizeu.escandaloh.adapters.CommentAdapter;
-import com.bizeu.escandaloh.model.Comment;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +26,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.bizeu.escandaloh.adapters.CommentAdapter;
+import com.bizeu.escandaloh.model.Comment;
 
 public class DetailCommentsActivity extends Activity {
 
@@ -39,7 +40,7 @@ public class DetailCommentsActivity extends Activity {
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
 	private ArrayList<Comment> comments;
-	private String id;
+	private String photo_id;
 	private String user_uri;
 	private ProgressDialog progress;
 	
@@ -52,8 +53,10 @@ public class DetailCommentsActivity extends Activity {
 		setContentView(R.layout.comments);
 		
 		if (getIntent() != null){
-			id = getIntent().getExtras().getString("id");
+			photo_id = getIntent().getExtras().getString("id");
 		}
+		
+		final Context context = this.getApplicationContext();
 		
 		list_comments = (ListView) findViewById(R.id.list_comments);
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
@@ -69,16 +72,17 @@ public class DetailCommentsActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				written_comment = edit_new_comment.getText().toString();
-				// Si ha escrito algo enviamos el comentario
-				if (!written_comment.equals("")){
-					new SendComment().execute();
+				// Si ha escrito algo y la longitud es menor de 500 caracteres lo intentamos enviar
+				if (!written_comment.equals("") && written_comment.length() < 501){
+					Log.v("WE","Longitud comentario: " + written_comment.length());
+					new SendComment(context).execute();
 				}		
 			}
 		});
 		
 		progress = new ProgressDialog(this);
 		
-		new GetComments().execute();
+		new GetComments(context).execute();
 	}
 	
 	
@@ -94,7 +98,7 @@ public class DetailCommentsActivity extends Activity {
 		super.onResume();
 		
 		// Si el usuario no está logueado ocultamos el campo para escribir comentarios
-		if (!MyApplication.LOGGED_USER){
+		if (!MyApplication.logged_user){
 			layout_write_comment.setVisibility(View.GONE);
 		}
 	}
@@ -109,6 +113,12 @@ public class DetailCommentsActivity extends Activity {
 	 */
 	private class SendComment extends AsyncTask<Void,Integer,Integer> {
 		 
+		private Context mContext;
+		
+	    public SendComment (Context context){
+	         mContext = context;
+	    }
+		
 		@Override
 		protected void onPreExecute(){
 		
@@ -136,8 +146,8 @@ public class DetailCommentsActivity extends Activity {
 	             // Obtenemos el comentario en formato UTF-8
 	             written_comment = edit_new_comment.getText().toString();
 	             
-	             dato.put("user", user_uri);
-	             dato.put("photo", "/api/v1/photo/" + id +"/"); // Formato: /api/v1/photo/id/
+	             dato.put("user", MyApplication.resource_uri);
+	             dato.put("photo", "/api/v1/photo/" + photo_id +"/"); // Formato: /api/v1/photo/id/
 	             dato.put("text", written_comment);
 
 	             // Formato UTF-8 (ñ,á,ä,...)
@@ -147,6 +157,8 @@ public class DetailCommentsActivity extends Activity {
 	             response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);
+	             
+	             Log.i("WE",response_str);
 	        }
 	        
 	        catch (Exception ex){
@@ -166,15 +178,25 @@ public class DetailCommentsActivity extends Activity {
 		        progress.dismiss();
 		    }
 			
+			Toast toast; 
+			
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
+	        	toast = Toast.makeText(mContext, "Comentario enviado", Toast.LENGTH_LONG);
+	        	
+	        	// Vaciamos el editext
+	        	edit_new_comment.setText("");
+	        	
 	        	// Mostramos de nuevo los comentarios
-	        	new GetComments().execute();
+	        	new GetComments(mContext).execute();
 	        }
 	        else{
 	        	Log.v("WE","comentario no enviado");
+	        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
+	        	
 	        }
+			toast.show();
 	    }
 	}
 	
@@ -188,6 +210,11 @@ public class DetailCommentsActivity extends Activity {
 	 */
 	private class GetComments extends AsyncTask<Void,Integer,Integer> {
 		 	
+		private Context mContext;
+	    public GetComments(Context context){
+	         mContext = context;
+	    }
+		
 		@Override
 		protected void onPreExecute(){
 
@@ -205,7 +232,7 @@ public class DetailCommentsActivity extends Activity {
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + id);
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + photo_id);
 			 
 			del.setHeader("content-type", "application/json");
 			
@@ -253,14 +280,22 @@ public class DetailCommentsActivity extends Activity {
 		        progress.dismiss();
 		    }
 			
+			
+			
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
 	        	Log.v("WE","comentarios listados");
+	        	//toast = Toast.makeText(mContext, "Comentarios listados", Toast.LENGTH_LONG);
 	        	commentsAdapter.notifyDataSetChanged();
 	        }
 	        else{
 	        	Log.v("WE","comentarios no listados");
+	        	Toast toast;
+	        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
+	        	toast.show();
 	        }
+	        
+	        
 	    }
 	}
 	

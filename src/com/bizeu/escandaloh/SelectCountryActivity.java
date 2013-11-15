@@ -57,7 +57,7 @@ public class SelectCountryActivity extends Activity {
 				SharedPreferences prefs = getBaseContext().getSharedPreferences(
 	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	        	prefs.edit().putString(MyApplication.CODE_COUNTRY, code_selected_country).commit();
-	        	MyApplication.CODE_SELECTED_COUNTRY = code_selected_country;
+	        	MyApplication.code_selected_country = code_selected_country;
 				
 	        	// Mostramos la pantalla del carrusel
 				Intent i = new Intent(SelectCountryActivity.this, MainActivity.class);

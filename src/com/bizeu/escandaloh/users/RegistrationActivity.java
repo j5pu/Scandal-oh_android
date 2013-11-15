@@ -73,7 +73,14 @@ public class RegistrationActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				new SignInUser().execute();
+				
+				// Comprobamos si el nombre de usuario tiene como máximo 10 caracteres
+				if (edit_nombre_usuario.getText().toString().length() < 11){
+					new SignInUser().execute();
+				}	
+				else{
+					edit_nombre_usuario.setError("El nombre de usuario debe contener como máximo 10 caracteres");
+				}
 			}
 		});
 		
@@ -106,7 +113,6 @@ public class RegistrationActivity extends Activity {
 		
 		@Override
 	    protected Void doInBackground(Void... params) {
-	    	boolean result = false;
 	 
 	    	HttpEntity resEntity;
 	        String urlString = MyApplication.SERVER_ADDRESS + "api/v1/user/";
@@ -200,7 +206,7 @@ public class RegistrationActivity extends Activity {
 				SharedPreferences prefs = getBaseContext().getSharedPreferences(
 	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-	        	MyApplication.LOGGED_USER = true;
+	        	MyApplication.logged_user = true;
 	        	Toast.makeText(getBaseContext(), "Registro ok", Toast.LENGTH_SHORT).show();
 	        	
 	        	// Le indicamos a la anterior actividad que ha habido éxito en el registro

@@ -221,12 +221,14 @@ public class CreateEscandaloActivity extends Activity {
 					break;
 				}
 
+				/*
 				// Obtenemos el user_uri del usuario
 				SharedPreferences prefs = getBaseContext()
 						.getSharedPreferences("com.bizeu.escandaloh",
 								Context.MODE_PRIVATE);
 
 				String user_uri = prefs.getString("user_uri", null);
+				*/
 
 				MultipartEntity reqEntity = new MultipartEntity();
 				
@@ -239,8 +241,8 @@ public class CreateEscandaloActivity extends Activity {
 				StringBody categoryBody = new StringBody(selected_category);
 				FileBody bin1 = new FileBody(photo_file);
 				StringBody titleBody = new StringBody(written_title);
-				StringBody userBody = new StringBody(user_uri);
-				StringBody codeCountryBody = new StringBody(MyApplication.CODE_SELECTED_COUNTRY);
+				StringBody userBody = new StringBody(MyApplication.resource_uri);
+				StringBody codeCountryBody = new StringBody(MyApplication.code_selected_country);
 				
 				reqEntity.addPart("img", bin1);
 				reqEntity.addPart("title", titleBody);

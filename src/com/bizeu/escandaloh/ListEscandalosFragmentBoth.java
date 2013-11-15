@@ -354,7 +354,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	    protected Integer doInBackground(Void... params) {
 	    	
 	    	HttpClient httpClient = new DefaultHttpClient();
-	    	String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=6&country=" + MyApplication.CODE_SELECTED_COUNTRY;
+	    	String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=6&country=" + MyApplication.code_selected_country;
 	        	    	        
 	        HttpGet getEscandalos = new HttpGet(url);
 	        getEscandalos.setHeader("content-type", "application/json");        
