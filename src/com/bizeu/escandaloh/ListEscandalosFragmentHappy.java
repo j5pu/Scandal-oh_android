@@ -2,7 +2,6 @@ package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -11,17 +10,13 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTabHost;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,17 +26,13 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
-import com.bizeu.escandaloh.util.ImageUtils;
+import com.markupartist.android.widget.PullToRefreshListView;
+import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
-
-import eu.erikw.PullToRefreshListView;
-import eu.erikw.PullToRefreshListView.OnRefreshListener;
 
 
 public class ListEscandalosFragmentHappy extends SherlockFragment implements onAdsReadyListener{
@@ -83,15 +74,16 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
 		lView.setAdapter(escanAdapter);
 		
+		
 		lView.setOnRefreshListener(new OnRefreshListener() {
-			 
 		    @Override
-		    public void onRefresh() {	    	
+		    public void onRefresh() {
 		    	cancelGetEscandalos();
 		    	escandalos_asyn = new GetEscandalos();
 		    	escandalos_asyn.execute();
 		    }
 		});
+		
 	
 		lView.setOnScrollListener(new OnScrollListener() {
 			@Override
