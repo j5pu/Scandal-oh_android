@@ -3,24 +3,26 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.util.ArrayList;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -38,8 +40,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static final String BOTH = "Ambos";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	
-	private static final int SHOW_CAMERA = 10;
+	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
+    public static final int FROM_GALLERY = 12;
 	private File photo;
 	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
@@ -50,6 +53,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private BannerView adM;
 	private SharedPreferences prefs;
 	private FragmentTabHost mTabHost;
+	private Context context;
 	
 	/**
 	 * onCreate
@@ -65,6 +69,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		}
     
 		setContentView(R.layout.main);	
+		
+		context = this;
 		
 		// Tab Host (FragmentTabHost)
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
@@ -247,28 +253,46 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			case R.id.menu_action_bar_take_photo:	
 				
 			    // Si está logueado iniciamos la cámara
-				if (MyApplication.logged_user){ 								
-					if (checkCameraHardware(this)){
-						Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-						File photo;
-						try{
-					        photo = this.createFile("picture", ".png");
-					        photo.delete();
-					    }
-					    catch(Exception e){
-					        Log.v("WE", "Can't create file to take picture!");
-					        return false;
-					    }
-						
-					    mImageUri = Uri.fromFile(photo);
-					    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-						startActivityForResult(takePictureIntent, SHOW_CAMERA);
-					}
-					// El dispositivo no dispone de camara
-					else{
-						Toast toast = Toast.makeText(this, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
-						toast.show();
-					}
+				if (MyApplication.logged_user){ 
+					
+					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+					final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
+					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				        builder.setTitle("Añadir foto");
+				        builder.setItems(items, new DialogInterface.OnClickListener() {
+				            @Override
+				            public void onClick(DialogInterface dialog, int item) {
+				                if (items[item].equals("Tomar desde la cámara")) {
+				                	if (checkCameraHardware(context)){
+										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+										File photo = null;
+										try{
+									        photo = createFile("picture", ".png");
+									        photo.delete();
+									    }
+									    catch(Exception e){
+									        Log.v("WE", "Can't create file to take picture!");
+									    }
+										
+									    mImageUri = Uri.fromFile(photo);
+									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+										startActivityForResult(takePictureIntent, SHOW_CAMERA);
+									}
+									// El dispositivo no dispone de camara
+									else{
+										Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+										toast.show();
+									}
+				                } 
+				                else if (items[item].equals("Cogerla desde la galería")) {
+									Intent intent = new Intent();
+			                        intent.setType("image/*");
+			                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
+			                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
+				                } 
+				            }
+				        });
+				        builder.show();                 
 				}
 				// Si no, iniciamos la pantalla de login
 				else{
@@ -303,6 +327,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				
 			case R.id.menu_action_bar_update_list:
 				
+				/*
 				Bundle arguments = new Bundle();
 				
 				// Obtenemos cuál es el tab activo
@@ -332,6 +357,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				}
 		        Log.v("WE","es: " + mTabHost.getCurrentTabTag());
 		        break;
+		        */
 		}
 		
 		return true;
@@ -349,20 +375,27 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		if (requestCode == SHOW_CAMERA) {
 			if (resultCode == RESULT_OK) {
 				Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
+				i.putExtra("photo_from", SHOW_CAMERA);
 				i.putExtra("photoUri", mImageUri.toString());
 				startActivityForResult(i, CREATE_ESCANDALO);					
 			}
-			else if (resultCode == RESULT_CANCELED) {
-		           
-	        }		 
+			else if (resultCode == RESULT_CANCELED) {	           
+	        }	
 		}
+			
+		else if (requestCode == FROM_GALLERY) {
+            Uri selectedImageUri = data.getData();
+            Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
+            i.putExtra("photo_from", FROM_GALLERY);
+            i.putExtra("photoUri", selectedImageUri.toString());
+            startActivityForResult(i, CREATE_ESCANDALO);
+        }
 		
 		else if (requestCode == CREATE_ESCANDALO){
-		}	
+		}
 	}
 
 
-	
 
 	/**
 	 * Crea un archivo en una ruta con un formato específico

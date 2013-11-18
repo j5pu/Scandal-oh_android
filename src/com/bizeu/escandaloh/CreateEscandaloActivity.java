@@ -2,6 +2,7 @@ package com.bizeu.escandaloh;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioFormat;
@@ -36,6 +38,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -70,6 +73,8 @@ public class CreateEscandaloActivity extends Activity {
 	private Context context;
 	private File audio_file;
 	private boolean con_audio = false;
+	private int photo_from;
+
 	
 	/**
 	 * OnCreate
@@ -86,6 +91,7 @@ public class CreateEscandaloActivity extends Activity {
 			Intent data = getIntent();
 
 			if (data != null) {
+
 				mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
 				this.getContentResolver().notifyChange(mImageUri, null);
 				ContentResolver cr = this.getContentResolver();
@@ -96,6 +102,9 @@ public class CreateEscandaloActivity extends Activity {
 							.show();
 					Log.d("WE", "Failed to load", e);
 				}
+				
+				// Obtenemos de donde se ha tomado la foto
+				photo_from = data.getExtras().getInt("photo_from");
 			}
 		}
 
@@ -200,8 +209,16 @@ public class CreateEscandaloActivity extends Activity {
 
 			HttpEntity resEntity;
 			String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photo/";
-			photo_file = new File(mImageUri.getPath());
+
 			
+			// Se ha tomado desde la camara
+			if (photo_from == MainActivity.SHOW_CAMERA){
+				photo_file = new File(mImageUri.getPath());
+			}
+			// Desde la galería
+			else if (photo_from == MainActivity.FROM_GALLERY){
+				photo_file = createFileFromBitmap(taken_photo);		
+			}
 
 			HttpResponse response = null;
 			try {
@@ -213,12 +230,12 @@ public class CreateEscandaloActivity extends Activity {
 				int id_category_selected = radio_category
 						.getCheckedRadioButtonId();
 				switch (id_category_selected) {
-				case R.id.rb_create_category_happy:
-					selected_category = HAPPY_CATEGORY;
-					break;
-				case R.id.rb_create_category_angry:
-					selected_category = ANGRY_CATEGORY;
-					break;
+					case R.id.rb_create_category_happy:
+						selected_category = HAPPY_CATEGORY;	
+						break;
+					case R.id.rb_create_category_angry:
+						selected_category = ANGRY_CATEGORY;
+						break;
 				}
 
 				MultipartEntity reqEntity = new MultipartEntity();
@@ -278,10 +295,21 @@ public class CreateEscandaloActivity extends Activity {
 				Log.v("WE", "foto no enviada");
 				finish();
 			}
+			
+			// Si la foto se tomó de la galería borramos el archivo
+			if (photo_from == MainActivity.FROM_GALLERY && photo_file.exists()){
+				photo_file.delete();
+			}
 		}
 	}
 
-	// Read bitmap
+	
+	
+	/**
+	 * Crea un Bitmap a partir de una Uri
+	 * @param selectedImage
+	 * @return
+	 */
 	private Bitmap readBitmap(Uri selectedImage) {
 		Bitmap bm = null;
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -303,5 +331,43 @@ public class CreateEscandaloActivity extends Activity {
 		}
 		return bm;
 	}
+	
+	
+	
+	
+	
+	/**
+	 * Crea un File a partir de un bitmap
+	 * @param bitm
+	 * @return
+	 */
+	private File createFileFromBitmap(Bitmap bitm){
+		String file_path = Environment.getExternalStorageDirectory().getAbsolutePath();
+		File return_file = new File(file_path, "tmp.png");
+		FileOutputStream fOut = null;
+		try {
+			fOut = new FileOutputStream(return_file);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+		try {
+			fOut.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return return_file;
+	}
 
+	
 }
