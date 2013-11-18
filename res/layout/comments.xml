@@ -10,7 +10,7 @@
         android:layout_gravity="center_horizontal"
         android:orientation="vertical" >
 
-        <ImageView
+        <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_photo_list_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

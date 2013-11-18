@@ -25,5 +25,8 @@
     <string name="republica_dominicana">República Dominicana</string>
     <string name="uruguay">Uruguay</string>
     <string name="venezuela">Venezuela</string>
+    <string name="url_foto">url foto</string>
+    <string name="id">ID</string>
+    <string name="uri_audio">uri audio</string>
 
 </resources>

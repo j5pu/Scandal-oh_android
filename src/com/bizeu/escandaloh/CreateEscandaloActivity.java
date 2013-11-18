@@ -80,7 +80,7 @@ public class CreateEscandaloActivity extends Activity {
 
 		setContentView(R.layout.create_escandalo);
 		
-		context = this.getApplicationContext();
+		context = this;
 
 		if (getIntent() != null) {
 			Intent data = getIntent();

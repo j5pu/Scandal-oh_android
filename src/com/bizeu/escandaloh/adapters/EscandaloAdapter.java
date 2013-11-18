@@ -30,6 +30,8 @@ import android.widget.TextView;
 
 public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 
+		public static int ROUTE_IMAGE = 5;
+		
 	    Context context; 
 	    int layoutResourceId;    
 	    ArrayList<Escandalo> data;
@@ -108,11 +110,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        	holder.imgCategory.setImageResource(R.drawable.cara_enfadado);
 	        }
 	        
-	        // Guardamos el ID del escandalo para luego recuperarlo al hacer click sobre ellos
-	        holder.txtNumComments.setTag(escanda.getId());
-	        holder.imgNumComments.setTag(escanda.getId());
-	        holder.imgPicture.setTag(escanda.getUriAudio());
-	        holder.imgMicro.setTag(escanda.getUriAudio());        
+	        // Guardamos los datos necesarios en las vistas para luego recuperarlos al hacer click
+	        holder.txtNumComments.setTag(R.string.id, escanda.getId());
+	        holder.txtNumComments.setTag(R.string.url_foto, (String) escanda.getRouteImg());
+	        holder.imgNumComments.setTag(R.string.id, escanda.getId());
+	        holder.imgNumComments.setTag(R.string.url_foto,(String) escanda.getRouteImg());
+	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
+	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());        
 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +126,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					// Paramos si hubiera algún audio reproduciéndose
 					Audio.getInstance().closeAudio();
 					// Lo reproducimos				
-					new PlayAudio().execute((String)v.getTag());
+					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));
 					
 				}
 			});
@@ -138,14 +142,12 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.BitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
-					i.putExtra("uri_audio", v.getTag().toString());
+					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 					context.startActivity(i);
 				}
 			});
             
-            
-
-			
+            		
      
             // Listeners para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
@@ -154,7 +156,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				public void onClick(View v) {			
 					Intent i = new Intent(context, DetailCommentsActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					i.putExtra("id", v.getTag().toString());
+					i.putExtra("id", v.getTag(R.string.id).toString());
+					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 					context.startActivity(i);	
 				}
 			});
@@ -165,7 +168,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				public void onClick(View v) {					
 					Intent i = new Intent(context, DetailCommentsActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					i.putExtra("id", v.getTag().toString());
+					i.putExtra("id", v.getTag(R.string.id).toString());
+					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 					context.startActivity(i);				
 				}
 			});

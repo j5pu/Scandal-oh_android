@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.util.Audio;
@@ -39,7 +40,7 @@ public class DetailCommentsActivity extends Activity {
 
 	private ListView list_comments;
 	private EditText edit_new_comment;
-	private ImageView img_photo;
+	private FetchableImageView img_photo;
 	private Button but_send;
 	private LinearLayout layout_write_comment;
 	private String written_comment;	
@@ -47,8 +48,7 @@ public class DetailCommentsActivity extends Activity {
 	private ArrayList<Comment> comments;
 	private String photo_id;
 	private ProgressDialog progress;
-	
-	private Bitmap bit;
+	private String route_image;
 	
 	/**
 	 * onCreate
@@ -59,21 +59,16 @@ public class DetailCommentsActivity extends Activity {
 		setContentView(R.layout.comments);
 		
 		if (getIntent() != null){
-			//photo_id = getIntent().getExtras().getString("id");
-			byte[] bytes = getIntent().getExtras().getByteArray("bytes");
-	
-			bit = ImageUtils.BytesToBitmap(bytes);
-			
-			
+			photo_id = getIntent().getExtras().getString("id");
+			route_image = getIntent().getExtras().getString("route_image");	
 		}
 		
 		final Context context = this.getApplicationContext();
 		
 		list_comments = (ListView) findViewById(R.id.list_comments);
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
-		img_photo = (ImageView) findViewById(R.id.img_photo_list_comments);
-		
-		img_photo.setImageBitmap(bit);
+		img_photo = (FetchableImageView) findViewById(R.id.img_photo_list_comments);
+		img_photo.setImage(route_image, R.drawable.previsualizacion_foto);
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_write_comment);
 		but_send = (Button) findViewById(R.id.but_send_new_comment);
 		
