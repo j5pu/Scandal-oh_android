@@ -39,7 +39,7 @@ public class DetailPhotoActivity extends Activity {
 			
 			// Obtenemos y mostarmos la foto
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
-			photo = ImageUtils.BytesToBitmap(bytes);
+			photo = ImageUtils.bytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
 			mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
 			mImage.setImageBitmap(photo);

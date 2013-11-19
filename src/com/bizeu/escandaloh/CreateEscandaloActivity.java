@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,8 +15,6 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
-import com.bizeu.escandaloh.util.Audio;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -25,21 +22,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,6 +35,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 public class CreateEscandaloActivity extends Activity {
 
@@ -96,7 +87,7 @@ public class CreateEscandaloActivity extends Activity {
 				this.getContentResolver().notifyChange(mImageUri, null);
 				ContentResolver cr = this.getContentResolver();
 				try {
-					taken_photo = readBitmap(mImageUri);
+					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
 				} catch (Exception e) {
 					Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
 							.show();
@@ -217,7 +208,7 @@ public class CreateEscandaloActivity extends Activity {
 			}
 			// Desde la galería
 			else if (photo_from == MainActivity.FROM_GALLERY){
-				photo_file = createFileFromBitmap(taken_photo);		
+				photo_file = ImageUtils.bitmapToFile(taken_photo);		
 			}
 
 			HttpResponse response = null;
@@ -303,71 +294,5 @@ public class CreateEscandaloActivity extends Activity {
 		}
 	}
 
-	
-	
-	/**
-	 * Crea un Bitmap a partir de una Uri
-	 * @param selectedImage
-	 * @return
-	 */
-	private Bitmap readBitmap(Uri selectedImage) {
-		Bitmap bm = null;
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inSampleSize = 5;
-		AssetFileDescriptor fileDescriptor = null;
-		try {
-			fileDescriptor = this.getContentResolver().openAssetFileDescriptor(
-					selectedImage, "r");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				bm = BitmapFactory.decodeFileDescriptor(
-						fileDescriptor.getFileDescriptor(), null, options);
-				fileDescriptor.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return bm;
-	}
-	
-	
-	
-	
-	
-	/**
-	 * Crea un File a partir de un bitmap
-	 * @param bitm
-	 * @return
-	 */
-	private File createFileFromBitmap(Bitmap bitm){
-		String file_path = Environment.getExternalStorageDirectory().getAbsolutePath();
-		File return_file = new File(file_path, "tmp.png");
-		FileOutputStream fOut = null;
-		try {
-			fOut = new FileOutputStream(return_file);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-		try {
-			fOut.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			fOut.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return return_file;
-	}
 
-	
 }

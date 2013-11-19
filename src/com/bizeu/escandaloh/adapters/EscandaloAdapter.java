@@ -140,7 +140,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					byte[] bytes = ImageUtils.BitmapToBytes(bitm);
+					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
 					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 					context.startActivity(i);
