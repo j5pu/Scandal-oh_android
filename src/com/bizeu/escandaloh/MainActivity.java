@@ -30,6 +30,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -62,14 +63,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		setContentView(R.layout.main);
+		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
 		if (!MyApplication.logged_user){
 	        Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
 	        startActivity(i);
 		}
-    
-		setContentView(R.layout.main);	
-		
+	
 		context = this;
 		
 		// Tab Host (FragmentTabHost)
@@ -252,54 +253,60 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 			case R.id.menu_action_bar_take_photo:	
 				
-			    // Si está logueado iniciamos la cámara
-				if (MyApplication.logged_user){ 
-					
-					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
-					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-				        builder.setTitle("Añadir foto");
-				        builder.setItems(items, new DialogInterface.OnClickListener() {
-				            @Override
-				            public void onClick(DialogInterface dialog, int item) {
-				                if (items[item].equals("Tomar desde la cámara")) {
-				                	if (checkCameraHardware(context)){
-										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-										File photo = null;
-										try{
-									        photo = createFile("picture", ".png");
-									        photo.delete();
-									    }
-									    catch(Exception e){
-									        Log.v("WE", "Can't create file to take picture!");
-									    }
-										
-									    mImageUri = Uri.fromFile(photo);
-									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-										startActivityForResult(takePictureIntent, SHOW_CAMERA);
-									}
-									// El dispositivo no dispone de camara
-									else{
-										Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
-										toast.show();
-									}
-				                } 
-				                else if (items[item].equals("Cogerla desde la galería")) {
-									Intent intent = new Intent();
-			                        intent.setType("image/*");
-			                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
-			                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
-				                } 
-				            }
-				        });
-				        builder.show();                 
+				// Si dispone de conexión
+				if (Connectivity.isOnline(context)){
+					// Si está logueado iniciamos la cámara
+					if (MyApplication.logged_user){ 
+						
+						// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+						final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
+						 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+					        builder.setTitle("Añadir foto");
+					        builder.setItems(items, new DialogInterface.OnClickListener() {
+					            @Override
+					            public void onClick(DialogInterface dialog, int item) {
+					                if (items[item].equals("Tomar desde la cámara")) {
+					                	if (checkCameraHardware(context)){
+											Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+											File photo = null;
+											try{
+										        photo = createFile("picture", ".png");
+										        photo.delete();
+										    }
+										    catch(Exception e){
+										        Log.v("WE", "Can't create file to take picture!");
+										    }
+											
+										    mImageUri = Uri.fromFile(photo);
+										    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+											startActivityForResult(takePictureIntent, SHOW_CAMERA);
+										}
+										// El dispositivo no dispone de camara
+										else{
+											Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+											toast.show();
+										}
+					                } 
+					                else if (items[item].equals("Cogerla desde la galería")) {
+										Intent intent = new Intent();
+				                        intent.setType("image/*");
+				                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
+				                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
+					                } 
+					            }
+					        });
+					        builder.show();                 
+					}
+					// Si no, iniciamos la pantalla de login
+					else{
+						Intent i = new Intent(this, MainLoginActivity.class);
+						startActivity(i);
+					}
 				}
-				// Si no, iniciamos la pantalla de login
 				else{
-					Intent i = new Intent(this, MainLoginActivity.class);
-					startActivity(i);
+					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					toast.show();
 				}
-				
 				break;
 				
 			case R.id.menu_action_bar_logout:

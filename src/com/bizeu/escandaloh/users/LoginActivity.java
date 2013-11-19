@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
+import com.bizeu.escandaloh.util.Connectivity;
 
 public class LoginActivity extends Activity {
 	
@@ -47,6 +48,9 @@ public class LoginActivity extends Activity {
 	private String status = null;
 	private boolean login_error = false;
 	private String loginMessageError;
+	private Context context;
+	
+	
 	
 	/**
 	 * onCreate
@@ -55,6 +59,8 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		
+		context = this;
 		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
@@ -73,7 +79,13 @@ public class LoginActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				new LogInUser().execute();
+				if (Connectivity.isOnline(context)){
+					new LogInUser().execute();
+				}
+				else{
+					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					toast.show();
+				}	
 			}			
 		});
 		

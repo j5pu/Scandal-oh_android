@@ -24,11 +24,12 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-
+import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.markupartist.android.widget.PullToRefreshListView;
 import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 import com.zed.adserver.BannerView;
@@ -59,6 +60,8 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
 	      	escandalos = new ArrayList<Escandalo>();
+	      	
+	      	escandalos_asyn = null;
 	 }
 	
 
@@ -77,9 +80,15 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 			 
 		    @Override
 		    public void onRefresh() {
-		    	cancelGetEscandalos();
-		    	escandalos_asyn = new GetEscandalos();
-		    	escandalos_asyn.execute();	       
+				if (Connectivity.isOnline(getActivity().getApplicationContext())){
+					cancelGetEscandalos();
+			    	escandalos_asyn = new GetEscandalos();
+			    	escandalos_asyn.execute();	
+				}
+				else{
+					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+					toast.show();
+				}         
 		    }
 		});
 		
@@ -149,8 +158,14 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
         //AdsSessionController.registerAdsReadyListener(this);       		
 		
-    	escandalos_asyn = new GetEscandalos();
-    	escandalos_asyn.execute();		
+		if (Connectivity.isOnline(getActivity().getApplicationContext())){
+	    	escandalos_asyn = new GetEscandalos();
+	    	escandalos_asyn.execute();	
+		}
+		else{
+			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+			toast.show();
+		}		
 	}
 	
 	
@@ -423,7 +438,9 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	
 	
 	private void cancelGetEscandalos(){	
-		escandalos_asyn.cancel(true);
+		if (escandalos_asyn != null){
+			escandalos_asyn.cancel(true);
+		}
 	}
 
 }

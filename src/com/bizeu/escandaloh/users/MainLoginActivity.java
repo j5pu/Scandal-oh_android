@@ -23,8 +23,6 @@ public class MainLoginActivity extends Activity{
 	private Button but_registro;
 	private Button but_login;
 	
-	private boolean first_time = false;
-	
 	
 	/**
 	 * onCreate

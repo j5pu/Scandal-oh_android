@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
+import com.bizeu.escandaloh.util.Connectivity;
 
 public class RegistrationActivity extends Activity {
 
@@ -44,6 +45,7 @@ public class RegistrationActivity extends Activity {
 	private String status = null;
 	private String user_uri ;
 	private ProgressDialog progress;
+	private Context context;
 
 	
 	
@@ -54,6 +56,8 @@ public class RegistrationActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.registration);
+		
+		context = this;
 		
 		edit_nombre_usuario = (EditText) findViewById(R.id.edit_registro_nombre);
 		edit_password_usuario = (EditText) findViewById(R.id.edit_registro_password);
@@ -74,13 +78,20 @@ public class RegistrationActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				// Comprobamos si el nombre de usuario tiene como máximo 10 caracteres
-				if (edit_nombre_usuario.getText().toString().length() < 11){
-					new SignInUser().execute();
-				}	
-				else{
-					edit_nombre_usuario.setError("El nombre de usuario debe contener como máximo 10 caracteres");
+				if (Connectivity.isOnline(context)){
+					// Comprobamos si el nombre de usuario tiene como máximo 10 caracteres
+					if (edit_nombre_usuario.getText().toString().length() < 11){
+						new SignInUser().execute();
+					}	
+					else{
+						edit_nombre_usuario.setError("El nombre de usuario debe contener como máximo 10 caracteres");
+					}
 				}
+				else{
+					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					toast.show();
+				}
+
 			}
 		});
 		
