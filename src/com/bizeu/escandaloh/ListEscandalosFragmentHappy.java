@@ -127,8 +127,20 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
+				/*
+				Log.v("WE","FirstvisibleItem: " + firstVisibleItem);
+				Log.v("WE","visibleItemCount: " + visibleItemCount);
+				Log.v("WE","totalitemcount: " + totalItemCount);
+				Log.v("WE","escanadapter count: " + escanAdapter.getCount());
+					            final int lastItem = firstVisibleItem + escanAdapter.getCount();
+	            if(lastItem == totalItemCount) {
+	                Log.v("WE","Ultimo!!!!");
+	            }
+				*/
 				// Guardamos en que posición está el primer escandalo visible (actualmente) en la pantalla
 				first_visible_item_count = firstVisibleItem;
+	            
+	            
 			}
 		});
 		

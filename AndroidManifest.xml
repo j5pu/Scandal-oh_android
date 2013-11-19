@@ -41,7 +41,9 @@
             android:name="com.bizeu.escandaloh.MainActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.bizeu.escandaloh.SelectCountryActivity" >
+        <activity 
+            android:name="com.bizeu.escandaloh.SelectCountryActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.CreateEscandaloActivity"
@@ -53,13 +55,20 @@
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.DetailCommentsActivity"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.bizeu.escandaloh.users.MainLoginActivity" >
+        <activity 
+            android:name="com.bizeu.escandaloh.users.MainLoginActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.bizeu.escandaloh.users.RegistrationActivity" >
+        <activity 
+            android:name="com.bizeu.escandaloh.users.RegistrationActivity" 
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.bizeu.escandaloh.users.LoginActivity" >
+        <activity 
+            android:name="com.bizeu.escandaloh.users.LoginActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.google.ads.AdActivity"
