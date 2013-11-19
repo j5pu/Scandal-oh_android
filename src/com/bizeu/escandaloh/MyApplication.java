@@ -13,8 +13,10 @@ public class MyApplication extends Application {
 	public static Boolean logged_user = false;
 	public static String code_selected_country = null;
 	public static String resource_uri = null;
-
-
+	public static boolean FIRST_TIME_HAPPY = true;
+	public static boolean FIRST_TIME_ANGRY = true;
+	public static boolean FIRST_TIME_BOTH = true;
+	
 	
 	@Override
 	public void onCreate() {

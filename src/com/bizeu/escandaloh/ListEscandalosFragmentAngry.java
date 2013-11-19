@@ -25,7 +25,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
@@ -48,8 +47,6 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	private int first_visible_item_count;
 	EscandaloAdapter escanAdapter;
 	public static ArrayList<Escandalo> escandalos;
-	private byte[] bytes;
-	private int escandalo_loading = 0 ;
 	private FrameLayout banner;
 	private BannerView adM;
 	AmazonS3Client s3Client;
@@ -57,12 +54,14 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	Escandalo escan_aux;
 	private PullToRefreshListView lView;
 	private GetEscandalos escandalos_asyn ;
+	private boolean getting_escandalos = true;
+
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
-	      	super.onCreate(savedInstanceState); 
+	      	super.onCreate(savedInstanceState);
 	      	escandalos = new ArrayList<Escandalo>();
-	      	
+	 
 	      	escandalos_asyn = null;
 	 }
 	
@@ -71,28 +70,28 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
-
+	
 		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
 				escandalos);
 		
 		lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
-		lView.setAdapter(escanAdapter);
-			
+		lView.setAdapter(escanAdapter); 
+	
 		lView.setOnRefreshListener(new OnRefreshListener() {
-			 
+			
 		    @Override
-		    public void onRefresh() {	    	
+		    public void onRefresh() {
 				if (Connectivity.isOnline(getActivity().getApplicationContext())){
-					cancelGetEscandalos();
-			    	escandalos_asyn = new GetEscandalos();
-			    	escandalos_asyn.execute();	
+			    	// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
+			    	new GetNewEscandalos().execute();
 				}
 				else{
-					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
 					toast.show();
-				}       
+				}  			
 		    }
 		});
+		
 		
 	
 		lView.setOnScrollListener(new OnScrollListener() {
@@ -136,15 +135,25 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 			
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
+					int visibleItemCount, int totalItemCount) {			
+	            
+				// Si quedan 5 escándalos para llegar al último, obtenemos los 10 siguientes
+	            if (firstVisibleItem == escanAdapter.getCount() - 1){
+	            	// Usamos el booleano como llave de paso (sólo la primera vez entrará). Cuando se obtengan los 10 escándalos se volverá a abrir
+	            	if (!getting_escandalos){
+		            	new GetEscandalos().execute();
+		            	getting_escandalos = true;
+	            	}
+	            }
+	            
+				
 				// Guardamos en que posición está el primer escandalo visible (actualmente) en la pantalla
 				first_visible_item_count = firstVisibleItem;
+	            
+	            
 			}
 		});
-				
 		
-		
-				
 		return v;
 	}
 	
@@ -156,7 +165,8 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 		if (savedInstanceState != null && savedInstanceState
 				.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}		
+		}
+			
 		
 		// Ten
 		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
@@ -167,10 +177,9 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	    	escandalos_asyn.execute();	
 		}
 		else{
-			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
-		}
-	
+		}		
 	}
 	
 	
@@ -181,6 +190,7 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	@Override
 	public void onPause() {
 	    super.onPause();
+	   
 	    //AdsSessionController.pauseTracking();
 	    cancelGetEscandalos();
 	}
@@ -346,84 +356,103 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 	
 	
 	
+	
 
 	
+	
+	
+
 	/**
-	 * Obtiene los escandalos del servidor y los muestra en pantalla
+	 * Obtiene los siguientes 10 escándalos anteriores a partir de uno dado
 	 * @author Alejandro
 	 *
 	 */
 	private class GetEscandalos extends AsyncTask<Void,Integer,Integer> {
-		 
+		
 		@Override
 		protected void onPreExecute(){
-			escandalo_loading = 0;
-			escandalos.clear();
-			escanAdapter.notifyDataSetChanged();
 		}
 		
 		@Override
-	    protected Integer doInBackground(Void... params) {    	
+	    protected Integer doInBackground(Void... params) {
 			
-	    	HttpClient httpClient = new DefaultHttpClient();
-	        String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
-	        	    	        
-	        HttpGet getEscandalos = new HttpGet(url);
-	        getEscandalos.setHeader("content-type", "application/json");        
-	        
-	        HttpResponse response = null;
-	        try{
+			String url = null;
+			
+			// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
+			if (MyApplication.FIRST_TIME_ANGRY){
+				Log.v("WE","primera vez angry");
+				url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
+			}
+			else{
+				// A partir del último ID obtenido
+				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
+			}
+				
+			HttpClient httpClient = new DefaultHttpClient();
+        
+		    HttpGet getEscandalos = new HttpGet(url);
+		    getEscandalos.setHeader("content-type", "application/json");        
+		        
+		    HttpResponse response = null;
+		    try{
 				// Hacemos la petición al servidor
-	        	response = httpClient.execute(getEscandalos);
-	        	String respStr = EntityUtils.toString(response.getEntity());
-	         
-	        	// Obtenemos el json
-	            JSONObject respJson = new JSONObject(respStr);	            
-	            
-	            // Parseamos el json para obtener los escandalos
-	            JSONArray escandalosObject = null;
-	            
-	            escandalosObject = respJson.getJSONArray("objects");
-	            
-	            for (int i=0 ; i < escandalosObject.length(); i++){
-	            	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		        response = httpClient.execute(getEscandalos);
+		        String respStr = EntityUtils.toString(response.getEntity());
+		        //Log.i("WE",respStr);
+		        
+		        JSONArray escandalosObject = null;
+		        
+		        // Si es la primera vez obtenemos los escandalos a partir de un JSONObject, sino obtenemos directamente el JSONArray
+		        if (MyApplication.FIRST_TIME_ANGRY){
+		        	MyApplication.FIRST_TIME_ANGRY = false;
+		        	// Obtenemos el json
+			        JSONObject respJson = new JSONObject(respStr);	                       
+			            
+			        escandalosObject = respJson.getJSONArray("objects");
+		        }
+		        else{
+		        	escandalosObject = new JSONArray(respStr);
+		        }
+		        	            
+		        for (int i=0 ; i < escandalosObject.length(); i++){
+		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		            	
+		            final String category = escanObject.getString("category");
+		            String date = escanObject.getString("date");
+		            final String id = escanObject.getString("id");
+		            final String img = escanObject.getString("img_p");
+		            final String comments_count = escanObject.getString("comments_count");
+		            String latitude = escanObject.getString("latitude");
+		            String longitude = escanObject.getString("longitude");
+		            final String resource_uri = escanObject.getString("resource_uri");	        
+		            final String title = escanObject.getString("title");
+		            String user = escanObject.getString("user");
+		            String visits_count = escanObject.getString("visits_count");
+		            final String sound = escanObject.getString("sound");
 	            	
-	            	final String category = escanObject.getString("category");
-	            	String date = escanObject.getString("date");
-	            	final String id = escanObject.getString("id");
-	            	final String img = escanObject.getString("img_p");
-	            	final String comments_count = escanObject.getString("comments_count");
-	            	String latitude = escanObject.getString("latitude");
-	            	String longitude = escanObject.getString("longitude");
-	            	final String resource_uri = escanObject.getString("resource_uri");	        
-	            	final String title = escanObject.getString("title");
-	            	String user = escanObject.getString("user");
-	            	String visits_count = escanObject.getString("visits_count");
-	            	final String sound = escanObject.getString("sound");
-            	
-		        	getActivity().runOnUiThread(new Runnable() {
+			        getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-				            // Añadimos el escandalo al ArrayList
-				        	escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/"+img, sound));
-							escanAdapter.notifyDataSetChanged();					        	
+					        // Añadimos el escandalo al ArrayList
+					        escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound));
+							escanAdapter.notifyDataSetChanged();	
 						}
-		        	});	
-		        	        	
-	    	    }             
-	        }
-	        catch(Exception ex){
-	                Log.e("ServicioRest","Error!", ex);
-	        }
-	        	 
-	        // Devolvemos el código resultado
-	        return (response.getStatusLine().getStatusCode());
+			        });		        	
+		    	 }
+		     }
+		     catch(Exception ex){
+		            Log.e("ServicioRest","Error!", ex);
+		     }
+		        	 
+		     // Devolvemos el código resultado
+		     return (response.getStatusLine().getStatusCode());    	
 	    }
 
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
+	
 			
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
@@ -432,19 +461,111 @@ public class ListEscandalosFragmentAngry extends SherlockFragment implements onA
 		        }
 		        else{
 		        	Log.v("WE","escandalos NO recibidos");
-		        }   	   
+		        }        
 			}
-	        lView.onRefreshComplete();
+			// Abrimos la llave
+			getting_escandalos = false;
 	    }
 	}
 	
 	
 	
 	
-	private void cancelGetEscandalos(){
+	
+
+
+	/**
+	 * Obtiene (si hay) nuevos escandalos
+	 *
+	 */
+	private class GetNewEscandalos extends AsyncTask<Void,Integer,Integer> {
+		
+		@Override
+		protected void onPreExecute(){
+		}
+		
+		@Override
+	    protected Integer doInBackground(Void... params) {
+			
+			// A partir del id más nuevo obtenido (el primero del array)
+			String url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
+				
+			HttpClient httpClient = new DefaultHttpClient();
+        
+		    HttpGet getEscandalos = new HttpGet(url);
+		    getEscandalos.setHeader("content-type", "application/json");        
+		        
+		    HttpResponse response = null;
+		    try{
+				// Hacemos la petición al servidor
+		        response = httpClient.execute(getEscandalos);
+		        String respStr = EntityUtils.toString(response.getEntity());
+		        Log.i("WE",respStr);
+		        
+		        JSONArray escandalosObject = new JSONArray(respStr);
+           
+		        for (int i = escandalosObject.length()-1; i>=0; i--){
+		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		            	
+		            final String category = escanObject.getString("category");
+		            String date = escanObject.getString("date");
+		            final String id = escanObject.getString("id");
+		            final String img = escanObject.getString("img_p");
+		            final String comments_count = escanObject.getString("comments_count");
+		            String latitude = escanObject.getString("latitude");
+		            String longitude = escanObject.getString("longitude");
+		            final String resource_uri = escanObject.getString("resource_uri");	        
+		            final String title = escanObject.getString("title");
+		            String user = escanObject.getString("user");
+		            String visits_count = escanObject.getString("visits_count");
+		            final String sound = escanObject.getString("sound");
+	            		            
+			        getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+					        // Añadimos el escandalo al comienzo
+					        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound));
+							escanAdapter.notifyDataSetChanged();	
+						}
+			        });		
+			               	
+		    	 }
+		     }
+		     catch(Exception ex){
+		            Log.e("ServicioRest","Error!", ex);
+		     }
+		        	 
+		     // Devolvemos el código resultado
+		     return (response.getStatusLine().getStatusCode());    	
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Integer result) {
+	
+			
+			if (!isCancelled()){
+				// Si es codigo 2xx --> OK
+		        if (result >= 200 && result <300){
+		        	Log.v("WE","escandalos recibidos");
+		        }
+		        else{
+		        	Log.v("WE","escandalos NO recibidos");
+		        }        
+			}
+	        lView.onRefreshComplete();
+	    }
+	}
+	
+
+
+
+	
+	private void cancelGetEscandalos(){	
 		if (escandalos_asyn != null){
 			escandalos_asyn.cancel(true);
 		}
 	}
-
 }
+
