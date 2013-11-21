@@ -1,6 +1,8 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -8,23 +10,28 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v4.content.CursorLoader;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
@@ -34,7 +41,7 @@ import com.bizeu.escandaloh.util.Connectivity;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
-public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener {
+public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, OnClickListener {
 
 	public static final String ANGRY = "Enfadado";
 	public static final String HAPPY = "Feliz";
@@ -56,6 +63,10 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private FragmentTabHost mTabHost;
 	private Context context;
 	
+	private ImageView img_logout;
+	private ImageView img_update_list;
+	private ImageView img_take_photo;
+	
 	/**
 	 * onCreate
 	 */
@@ -64,6 +75,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main);
+			
+		context = this;
 		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
 		if (!MyApplication.logged_user){
@@ -71,11 +84,29 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	        startActivity(i);
 		}
 	
-		context = this;
+		// Action Bar
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
+		getSupportActionBar().setCustomView(view);
+			
+		// Listeners del action bar
+		img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
+		img_logout.setOnClickListener(this);
+		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
+		img_update_list.setOnClickListener(this);
+		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
+		img_take_photo.setOnClickListener(this);
+		
+
+		
 		
 		// Tab Host (FragmentTabHost)
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
+       
+        mTabHost.setBackgroundColor(getResources().getColor(R.color.gris_claro));
 
         // Añadimos los tabs para cada uno de los 3 fragmentos
         mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragmentHappy.class, null);  
@@ -96,13 +127,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	public void onStart(){
 		super.onStart();
-		
-		// Action bar
-		getSupportActionBar().setTitle(R.string.app_name);
-		getSupportActionBar().setLogo(R.drawable.corte_manga);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayShowHomeEnabled(true);	
-		
+
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	}
 
@@ -116,8 +141,13 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 	   // AdsSessionController.enableTracking();
 		
-		// Refrescamos el action bar
-		this.supportInvalidateOptionsMenu();
+		if (MyApplication.logged_user){
+			img_logout.setVisibility(View.VISIBLE);
+			img_take_photo.setImageResource(R.drawable.camara);
+		}
+		else{
+			img_logout.setVisibility(View.INVISIBLE);
+		}
 	}
 	
 	
@@ -193,186 +223,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	    //AdsSessionController.detectHomeButtonEvent();
 	}
 	
-	
-	
-	
-	/**
-	 * onCreateOptionsMenu
-	 */
-	@Override
-	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.menu_action_bar, menu);
-		
-		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
-		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
-		
-		if (MyApplication.logged_user){
-			mi_photo.setIcon(R.drawable.camara_azul);
-			mi_logout.setVisible(true);
-		}
-		else{
-			mi_photo.setIcon(R.drawable.mas);
-			mi_logout.setVisible(false);
-			mi_logout.setEnabled(false);
-		}
-
-		return true;
-	}
-
-	
-	
-	@Override
-	public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-
-		com.actionbarsherlock.view.MenuItem mi_photo = menu.findItem(R.id.menu_action_bar_take_photo);
-		com.actionbarsherlock.view.MenuItem mi_logout = menu.findItem(R.id.menu_action_bar_logout);
-		
-		if (MyApplication.logged_user){
-			mi_photo.setIcon(R.drawable.camara_azul);
-			mi_logout.setVisible(true);
-		}
-		else{
-			mi_photo.setIcon(R.drawable.mas);
-			mi_logout.setVisible(false);
-		}
-
-	    return super.onPrepareOptionsMenu(menu);
-	}
-	
-	
-	/**
-	 * onOptionsItemSelected
-	 */
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		super.onOptionsItemSelected(item);
-
-		switch (item.getItemId()) {
-
-			case R.id.menu_action_bar_take_photo:	
-				
-				// Si dispone de conexión
-				if (Connectivity.isOnline(context)){
-					// Si está logueado iniciamos la cámara
-					if (MyApplication.logged_user){ 
-						
-						// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-						final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
-						 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-					        builder.setTitle("Añadir foto");
-					        builder.setItems(items, new DialogInterface.OnClickListener() {
-					            @Override
-					            public void onClick(DialogInterface dialog, int item) {
-					                if (items[item].equals("Tomar desde la cámara")) {
-					                	if (checkCameraHardware(context)){
-											Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-											File photo = null;
-											try{
-										        photo = createFile("picture", ".png");
-										        photo.delete();
-										    }
-										    catch(Exception e){
-										        Log.v("WE", "Can't create file to take picture!");
-										    }
-											
-										    mImageUri = Uri.fromFile(photo);
-										    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-											startActivityForResult(takePictureIntent, SHOW_CAMERA);
-										}
-										// El dispositivo no dispone de camara
-										else{
-											Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
-											toast.show();
-										}
-					                } 
-					                else if (items[item].equals("Cogerla desde la galería")) {
-										Intent intent = new Intent();
-				                        intent.setType("image/*");
-				                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
-				                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
-					                } 
-					            }
-					        });
-					        builder.show();                 
-					}
-					// Si no, iniciamos la pantalla de login
-					else{
-						Intent i = new Intent(this, MainLoginActivity.class);
-						startActivity(i);
-					}
-				}
-				else{
-					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
-					toast.show();
-				}
-				break;
-				
-			case R.id.menu_action_bar_logout:
-				if (MyApplication.logged_user){
-					AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
-					alert_logout.setTitle("Cerrar sesión usuario");
-					alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
-					alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
-				            public void onClick(DialogInterface dialogo1, int id) {  
-								// Deslogueamos al usuario
-								prefs.edit().putString(MyApplication.USER_URI, null).commit();
-								MyApplication.logged_user = false;
-								// Refrescamos el action bar
-								supportInvalidateOptionsMenu();
-				            }  
-				        });  
-					alert_logout.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {  
-				        	public void onClick(DialogInterface dialogo1, int id) {  
-				            }  
-				        });            
-				     alert_logout.show(); 
-				}
-				
-				break;
-				
-			case R.id.menu_action_bar_update_list:
-				
-				/*
-				Bundle arguments = new Bundle();
-				
-				// Obtenemos cuál es el tab activo
-				String current_tab = mTabHost.getCurrentTabTag();
-				
-				// Volvemos a mostrar los escandalos según el tab en el que estemos
-				if (current_tab.equals(HAPPY)){
-					ListEscandalosFragmentHappy fragment = new ListEscandalosFragmentHappy();
-					fragment.setArguments(arguments);
-		            getSupportFragmentManager().beginTransaction()
-		                    .replace(R.id.tabcontent, fragment)
-		                    .commit(); 
-				}
-				else if (current_tab.equals(ANGRY)){
-					ListEscandalosFragmentAngry fragment = new ListEscandalosFragmentAngry();
-					fragment.setArguments(arguments);
-		            getSupportFragmentManager().beginTransaction()
-		                    .replace(R.id.tabcontent, fragment)
-		                    .commit(); 
-				}
-				else if (current_tab.equals(BOTH)){
-					ListEscandalosFragmentBoth fragment = new ListEscandalosFragmentBoth();
-					fragment.setArguments(arguments);
-		            getSupportFragmentManager().beginTransaction()
-		                    .replace(R.id.tabcontent, fragment)
-		                    .commit(); 
-				}
-		        Log.v("WE","es: " + mTabHost.getCurrentTabTag());
-		        break;
-		        */
-		}
-		
-		return true;
-	}
-	
-	
-
-	
 
 	/**
 	 * onActivityResult
@@ -391,11 +241,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		}
 			
 		else if (requestCode == FROM_GALLERY) {
-            Uri selectedImageUri = data.getData();
-            Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
-            i.putExtra("photo_from", FROM_GALLERY);
-            i.putExtra("photoUri", selectedImageUri.toString());
-            startActivityForResult(i, CREATE_ESCANDALO);
+			if (data != null){
+	            Uri selectedImageUri = data.getData();
+	            Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
+	            i.putExtra("photo_from", FROM_GALLERY);
+	            i.putExtra("photoUri", selectedImageUri.toString());
+	            startActivityForResult(i, CREATE_ESCANDALO);
+			}
+
         }
 		
 		else if (requestCode == CREATE_ESCANDALO){
@@ -436,6 +289,134 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	    } else {
 	        return false;
 	    }
+	}
+
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()){
+		case R.id.img_actionbar_takephoto:
+			
+			Log.v("WE","Take photo");
+			
+		
+			
+			// Si dispone de conexión
+			if (Connectivity.isOnline(context)){
+				// Si está logueado iniciamos la cámara
+				if (MyApplication.logged_user){ 
+					
+					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+					final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
+					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				        builder.setTitle("Añadir foto");
+				        builder.setItems(items, new DialogInterface.OnClickListener() {
+				            @Override
+				            public void onClick(DialogInterface dialog, int item) {
+				                if (items[item].equals("Tomar desde la cámara")) {
+				                	if (checkCameraHardware(context)){
+										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+										File photo = null;
+										try{
+									        photo = createFile("picture", ".png");
+									        photo.delete();
+									    }
+									    catch(Exception e){
+									        Log.v("WE", "Can't create file to take picture!");
+									    }
+										
+									    mImageUri = Uri.fromFile(photo);
+									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+										startActivityForResult(takePictureIntent, SHOW_CAMERA);
+									}
+									// El dispositivo no dispone de camara
+									else{
+										Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+										toast.show();
+									}
+				                } 
+				                else if (items[item].equals("Cogerla desde la galería")) {
+									Intent intent = new Intent();
+			                        intent.setType("image/*");
+			                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
+			                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
+				                } 
+				            }
+				        });
+				        builder.show();                 
+				}
+				// Si no, iniciamos la pantalla de login
+				else{
+					Intent i = new Intent(this, MainLoginActivity.class);
+					startActivity(i);
+				}
+			}
+			else{
+				Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+				toast.show();
+			}
+			
+			break;
+			
+		case R.id.img_actionbar_logout:
+			if (MyApplication.logged_user){
+				AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
+				alert_logout.setTitle("Cerrar sesión usuario");
+				alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
+				alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
+			            public void onClick(DialogInterface dialogo1, int id) {  
+							// Deslogueamos al usuario
+							prefs.edit().putString(MyApplication.USER_URI, null).commit();
+							MyApplication.logged_user = false;
+							// Cabiamos el icono de la cámara
+							img_take_photo.setImageResource(R.drawable.mas);
+			            }  
+			        });  
+				alert_logout.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {  
+			        	public void onClick(DialogInterface dialogo1, int id) {  
+			            }  
+			        });            
+			     alert_logout.show(); 
+			}
+			break;
+			
+		case R.id.img_actionbar_updatelist:
+			Intent ic = new Intent(MainActivity.this, LoginActivity.class);
+			startActivity(ic);
+			/*
+			Bundle arguments = new Bundle();
+			
+			// Obtenemos cuál es el tab activo
+			String current_tab = mTabHost.getCurrentTabTag();
+			
+			// Volvemos a mostrar los escandalos según el tab en el que estemos
+			if (current_tab.equals(HAPPY)){
+				ListEscandalosFragmentHappy fragment = new ListEscandalosFragmentHappy();
+				fragment.setArguments(arguments);
+	            getSupportFragmentManager().beginTransaction()
+	                    .replace(R.id.tabcontent, fragment)
+	                    .commit(); 
+			}
+			else if (current_tab.equals(ANGRY)){
+				ListEscandalosFragmentAngry fragment = new ListEscandalosFragmentAngry();
+				fragment.setArguments(arguments);
+	            getSupportFragmentManager().beginTransaction()
+	                    .replace(R.id.tabcontent, fragment)
+	                    .commit(); 
+			}
+			else if (current_tab.equals(BOTH)){
+				ListEscandalosFragmentBoth fragment = new ListEscandalosFragmentBoth();
+				fragment.setArguments(arguments);
+	            getSupportFragmentManager().beginTransaction()
+	                    .replace(R.id.tabcontent, fragment)
+	                    .commit(); 
+			}
+	        Log.v("WE","es: " + mTabHost.getCurrentTabTag());
+	        break;
+	        */
+			
+		}
+		
 	}
 	
 

@@ -385,7 +385,9 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 			}
 			else{
 				// A partir del último ID obtenido
-				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
+				url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/?category__id=1";
+				//url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
+
 			}
 				
 			HttpClient httpClient = new DefaultHttpClient();
@@ -419,7 +421,7 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
 		            final String category = escanObject.getString("category");
-		            String date = escanObject.getString("date");
+		            final String date = escanObject.getString("date");
 		            final String id = escanObject.getString("id");
 		            final String img = escanObject.getString("img_p");
 		            final String comments_count = escanObject.getString("comments_count");
@@ -427,16 +429,17 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		            String longitude = escanObject.getString("longitude");
 		            final String resource_uri = escanObject.getString("resource_uri");	        
 		            final String title = escanObject.getString("title");
-		            String user = escanObject.getString("user");
+		            final String user = escanObject.getString("user");
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
+		            final String username = escanObject.getString("username");
 	            	
 			        getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 					        // Añadimos el escandalo al ArrayList
 					        escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound));
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));
 							escanAdapter.notifyDataSetChanged();	
 						}
 			        });		        	
@@ -489,8 +492,10 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 	    protected Integer doInBackground(Void... params) {
 			
 			// A partir del id más nuevo obtenido (el primero del array)
-			String url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
-				
+			String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/?category__id=1";
+			//String url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
+	
+			
 			HttpClient httpClient = new DefaultHttpClient();
         
 		    HttpGet getEscandalos = new HttpGet(url);
@@ -509,7 +514,7 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
 		            final String category = escanObject.getString("category");
-		            String date = escanObject.getString("date");
+		            final String date = escanObject.getString("date");
 		            final String id = escanObject.getString("id");
 		            final String img = escanObject.getString("img_p");
 		            final String comments_count = escanObject.getString("comments_count");
@@ -517,16 +522,17 @@ public class ListEscandalosFragmentHappy extends SherlockFragment implements onA
 		            String longitude = escanObject.getString("longitude");
 		            final String resource_uri = escanObject.getString("resource_uri");	        
 		            final String title = escanObject.getString("title");
-		            String user = escanObject.getString("user");
+		            final String user = escanObject.getString("user");
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
+		            final String username = escanObject.getString("username");
 	            		            
 			        getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 					        // Añadimos el escandalo al comienzo
 					        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound));
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));
 							escanAdapter.notifyDataSetChanged();	
 						}
 			        });		

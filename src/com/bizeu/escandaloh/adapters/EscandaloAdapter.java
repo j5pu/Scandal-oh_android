@@ -70,11 +70,11 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	                        
 	            holder = new EscandaloHolder();
 	            holder.txtTitle = (TextView)mView.findViewById(R.id.txt_titulo);
-	            holder.imgCategory = (ImageView)mView.findViewById(R.id.img_categoria);
 	            holder.imgPicture = (FetchableImageView) mView.findViewById(R.id.img_foto);
 	            holder.txtNumComments = (TextView)mView.findViewById(R.id.txt_numero_comentarios); 
-	            holder.imgNumComments = (ImageView)mView.findViewById(R.id.img_num_comentarios);
 	            holder.imgMicro = (ImageView)mView.findViewById(R.id.img_escandalo_microfono);
+	            holder.txtNameUser = (TextView)mView.findViewById(R.id.txt_escandalo_name_user);
+	            holder.txtDate = (TextView)mView.findViewById(R.id.txt_escandalo_date);
 	            				  
 	            mView.setTag(holder);
 	        }
@@ -102,19 +102,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        else{
 	        	holder.imgMicro.setVisibility(View.GONE);
 	        }
-
-	        if (escanda.getCategory().equals(Escandalo.HAPPY)){
-	        	holder.imgCategory.setImageResource(R.drawable.cara_riendose);
-	        }
-	        else{
-	        	holder.imgCategory.setImageResource(R.drawable.cara_enfadado);
-	        }
+	        
+	        holder.txtNameUser.setText(escanda.getUser());
+	        holder.txtDate.setText(escanda.getDate());
 	        
 	        // Guardamos los datos necesarios en las vistas para luego recuperarlos al hacer click
 	        holder.txtNumComments.setTag(R.string.id, escanda.getId());
 	        holder.txtNumComments.setTag(R.string.url_foto, (String) escanda.getRouteImg());
-	        holder.imgNumComments.setTag(R.string.id, escanda.getId());
-	        holder.imgNumComments.setTag(R.string.url_foto,(String) escanda.getRouteImg());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());        
 	        
@@ -126,8 +120,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					// Paramos si hubiera algún audio reproduciéndose
 					Audio.getInstance().closeAudio();
 					// Lo reproducimos				
-					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));
-					
+					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));		
 				}
 			});
 	        	        
@@ -145,9 +138,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 					context.startActivity(i);
 				}
-			});
-            
-            		
+			});           		
      
             // Listeners para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
@@ -162,17 +153,6 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				}
 			});
             
-            holder.imgNumComments.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {					
-					Intent i = new Intent(context, DetailCommentsActivity.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					i.putExtra("id", v.getTag(R.string.id).toString());
-					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
-					context.startActivity(i);				
-				}
-			});
 	                         
 	        return mView;
 	    }
@@ -187,14 +167,14 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	     */
 	    static class EscandaloHolder{
 	        TextView txtTitle;
-	        ImageView imgCategory;
 	        FetchableImageView imgPicture;
 	       //ImageView imgPicture;
-	        ImageView imgNumComments;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
 	        ImageView imgMicro;
 	        ProgressBar loading;
+	        TextView txtNameUser;
+	        TextView txtDate;
 	        
 	        
 	        public ImageView getPicture(){

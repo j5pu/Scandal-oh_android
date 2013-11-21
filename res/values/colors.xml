@@ -3,5 +3,9 @@
     <color name="blanco">#FFFFFF</color>
     <color name="negro">#000000</color>
     <color name="rojo">#FF0000</color>
+    <color name="gris_claro">#eeeeee</color>
+    <color name="gris_oscuro">#5b5b5b</color>
+    <color name="morado">#b21b72 </color>
+    <color name="azul">#359ce3</color>
     
 </resources>

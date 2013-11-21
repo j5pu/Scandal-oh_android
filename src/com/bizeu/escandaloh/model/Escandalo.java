@@ -19,6 +19,8 @@ public class Escandalo {
 	private String route_img; // Ruta de la foto
 	private String resource_audio; // Uri del audio. Null es que la imagen no tiene audio
 	private boolean has_audio;
+	private String date;
+	private String user;
 
 	
 	
@@ -35,7 +37,7 @@ public class Escandalo {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String uri_audio){
+	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String uri_audio, String user, String date){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -50,6 +52,8 @@ public class Escandalo {
 		this.route_img = route_img;
 		this.resource_audio = uri_audio;
 		this.has_audio = uri_audio.equals("null") ? false : true;
+		this.user = user;
+		this.date = date;
 	}
 	
 	public void setId(String id){
@@ -132,4 +136,21 @@ public class Escandalo {
 	public String getPictureUrl(){
 		return this.picture_url;
 	}
+	
+	public void setUser(String new_user){
+		this.user = new_user;
+	}
+	
+	public String getUser(){
+		return this.user;
+	}
+	
+	public void setDate(String new_date){
+		
+	}
+	
+	public String getDate(){
+		return this.date;
+	}
+	
 }
