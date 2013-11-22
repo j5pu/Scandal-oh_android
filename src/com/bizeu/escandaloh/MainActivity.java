@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -104,13 +106,27 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
        
-        mTabHost.setBackgroundColor(getResources().getColor(R.color.gris_claro));
+      //  mTabHost.getTabWidget().setBackgroundColor(getResources().getColor(R.color.gris_claro));
+      //  mTabHost.setBackgroundColor(getResources().getColor(R.color.gris_claro));
+
 
         // Añadimos los tabs para cada uno de los 3 fragmentos
         mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragmentHappy.class, null);  
         mTabHost.addTab(mTabHost.newTabSpec(ANGRY).setIndicator(ANGRY),ListEscandalosFragmentAngry.class, null);
         mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragmentBoth.class, null);
  
+        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++) 
+        {
+            TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+            tv.setTextColor(getResources().getColor(R.color.rojo));
+        } 
+        
+        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++)
+        {
+            mTabHost.getTabWidget().getChildAt(i).setBackgroundColor(getResources().getColor(R.color.gris_claro)); //unselected
+        }
+        //mTabHost.getTabWidget().getChildAt(mTabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#0000FF")); // se
+        
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
         mTabHost.measure(display.getWidth(), display.getHeight());
