@@ -36,7 +36,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
-import com.bizeu.escandaloh.users.LoginFacebook;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.zed.adserver.BannerView;
@@ -101,8 +100,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		img_take_photo.setOnClickListener(this);
 		
 
-		
-		
 		// Tab Host (FragmentTabHost)
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
@@ -367,6 +364,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
+							img_logout.setVisibility(View.INVISIBLE);
 							// Cabiamos el icono de la cámara
 							img_take_photo.setImageResource(R.drawable.mas);
 			            }  

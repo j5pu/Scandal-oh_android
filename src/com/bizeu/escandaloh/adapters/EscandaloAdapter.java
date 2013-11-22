@@ -152,8 +152,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					context.startActivity(i);	
 				}
 			});
-            
-	                         
+                       
 	        return mView;
 	    }
 	    
@@ -168,7 +167,6 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    static class EscandaloHolder{
 	        TextView txtTitle;
 	        FetchableImageView imgPicture;
-	       //ImageView imgPicture;
 	        TextView txtNumComments;
 	        LinearLayout lheight;
 	        ImageView imgMicro;
