@@ -10,6 +10,12 @@
         android:layout_height="wrap_content"
         android:text="Pasar" />
 
+    <Button
+        android:id="@+id/but_enra_facebook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Entra con facebook" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

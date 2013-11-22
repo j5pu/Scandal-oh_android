@@ -36,6 +36,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.users.LoginFacebook;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.zed.adserver.BannerView;
@@ -298,9 +299,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		case R.id.img_actionbar_takephoto:
 			
 			Log.v("WE","Take photo");
-			
-		
-			
+
 			// Si dispone de conexión
 			if (Connectivity.isOnline(context)){
 				// Si está logueado iniciamos la cámara
@@ -381,8 +380,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			break;
 			
 		case R.id.img_actionbar_updatelist:
-			Intent ic = new Intent(MainActivity.this, LoginActivity.class);
-			startActivity(ic);
 			/*
 			Bundle arguments = new Bundle();
 			

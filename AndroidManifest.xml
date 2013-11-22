@@ -71,7 +71,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity 
-            android:name="com.bizeu.escandaloh.LoginActivity"
+            android:name="com.bizeu.escandaloh.users.LoginFacebook"
             android:screenOrientation="portrait" >
         </activity>
                 <activity 
