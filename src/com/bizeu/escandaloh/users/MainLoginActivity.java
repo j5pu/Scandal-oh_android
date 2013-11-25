@@ -364,7 +364,6 @@ public class MainLoginActivity extends Activity{
 	 * @return String con un tamaño máximo de 25 caracteres
 	 */
 	private String limitaCaracteres(String completo){
-		Log.v("WE", "completo es: " + completo);
 		String acortado = null;
 		if (completo.length() > 25){
 			acortado = completo.substring(0,22) + "...";		
@@ -372,8 +371,7 @@ public class MainLoginActivity extends Activity{
 		else{
 			acortado = completo;
 		}
-		
-		Log.v("WE","acortado es: " + acortado);
+
 		return acortado;
 	}
 	

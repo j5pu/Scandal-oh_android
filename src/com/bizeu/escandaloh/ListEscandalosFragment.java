@@ -609,9 +609,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
 	            	
-		            
-		            escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	
+		            getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                        // Añadimos el escandalo al ArrayList
+                        	  escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	       
+                        }
+		            }); 
+		          
 		    	 }
 		     }
 		     catch(Exception ex){
@@ -718,8 +724,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						public void run() {
 					        // Añadimos el escandalo al comienzo
 					        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));
-							escanAdapter.notifyDataSetChanged();	
+									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));		
 						}
 			        });		
 			               	
@@ -742,10 +747,11 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
-		        	Log.v("WE","escandalos recibidos");
+		        	Log.v("WE","escandalos actualizados");
+		        	escanAdapter.notifyDataSetChanged();
 		        }
 		        else{
-		        	Log.v("WE","escandalos NO recibidos");
+		        	Log.v("WE","escandalos NO actualizados");
 		        }        
 			}
 			// Abrimos la llave
