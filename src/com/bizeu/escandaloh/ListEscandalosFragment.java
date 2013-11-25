@@ -36,7 +36,7 @@ import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
 
-public class ListEscandalosFragmentBoth extends SherlockFragment implements onAdsReadyListener{
+public class ListEscandalosFragment extends SherlockFragment implements onAdsReadyListener{
 
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
@@ -51,17 +51,30 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
-	private PullToRefreshListView lView;
-	private GetEscandalos escandalos_asyn ;
+	private PullToRefreshListView  lView;
 	private boolean getting_escandalos = true;
+	private String category;
+	
+	private GetEscandalos getEscandalosAsync;
+	private GetNewEscandalos getNewEscandalosAsync;
 
 	
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
-	      	escandalos = new ArrayList<Escandalo>();
-	 
-	      	escandalos_asyn = null;
+	      	
+	      	Log.v("WE","oncreate listescandalosfragment");
+      	
+	      	// Obtenemos el tipo de categoria
+	      	if (getArguments() != null) {
+				try {
+					category = getArguments().getString(MainActivity.CATEGORY);
+					Log.v("WE","La categoria es: " + category);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 	 }
 	
 
@@ -69,37 +82,70 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
-	
-		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
-				escandalos);
 		
-		lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
-		lView.setAdapter(escanAdapter); 
-	
+	    // Indicamos a las otras categorias que serán su primera vez la próxima vez que se les pulse
+	    if (category.equals(MainActivity.HAPPY)){
+	      	Log.v("WE","oncreateview HAPPY");
+	    	MyApplication.FIRST_TIME_ANGRY = true;
+	    	MyApplication.FIRST_TIME_BOTH = true;
+	    }
+	    else if (category.equals(MainActivity.ANGRY)){
+	      	Log.v("WE","oncreateview ANGRY");
+	    	MyApplication.FIRST_TIME_HAPPY = true;
+	    	MyApplication.FIRST_TIME_BOTH = true;
+	    }
+	    if (category.equals(MainActivity.BOTH)){
+	      	Log.v("WE","oncreateview BOTH");
+	    	MyApplication.FIRST_TIME_HAPPY = true;
+	    	MyApplication.FIRST_TIME_ANGRY = true;
+	    }
+		
+      	getting_escandalos = true;
+      	
+      	lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
+
 		lView.setOnRefreshListener(new OnRefreshListener() {
 			
 		    @Override
 		    public void onRefresh() {
-				if (Connectivity.isOnline(getActivity().getApplicationContext())){
-			    	// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
-			    	new GetNewEscandalos().execute();
-				}
-				else{
-					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
-					toast.show();
-				}  		
+		    	
+		    	// Si no se están obteniendo otros escándalos
+		    	if (!getting_escandalos){
+			    	// Si hay conexión
+					if (Connectivity.isOnline(getActivity().getApplicationContext())){
+						// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
+						getting_escandalos = true;
+						getNewEscandalosAsync = new GetNewEscandalos();
+						getNewEscandalosAsync.execute();
+					}
+
+					else{
+						Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+						toast.show();
+					} 
+		    	}
+		    	// Si se están obteniendo otros indicamos que ha terminado el pull to push
+		    	else{
+		    		Log.v("WE","ENTRA EN ELSE WIIIII :DDDDD");
+		    	}			
 		    }
 		});
 		
 		
-	
+		
+      	escandalos = new ArrayList<Escandalo>();    	
+		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
+				escandalos);
+				
+		lView.setAdapter(escanAdapter); 
+	    		
 		lView.setOnScrollListener(new OnScrollListener() {
 			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-							
+			public void onScrollStateChanged(AbsListView view, int scrollState) {		
+				
 				// Comprobamos cuando el scroll termina de moverse
 				if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-					
+
 					// Si no es el último (tiene uno detrás)
 					if (lView.getChildAt(1) != null){
 
@@ -134,14 +180,16 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 			
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {			
-	            
+					int visibleItemCount, int totalItemCount) {		
+				
 				// Si quedan 5 escándalos para llegar al último, obtenemos los 10 siguientes
 	            if (firstVisibleItem == escanAdapter.getCount() - 1){
 	            	// Usamos el booleano como llave de paso (sólo la primera vez entrará). Cuando se obtengan los 10 escándalos se volverá a abrir
-	            	if (!getting_escandalos){
-		            	new GetEscandalos().execute();
+	            	if (!getting_escandalos && escandalos.size() >0){
+	            		Log.v("WE","Activado!!!");
 		            	getting_escandalos = true;
+		            	getEscandalosAsync = new GetEscandalos();
+	            		getEscandalosAsync.execute();
 	            	}
 	            }
 	            
@@ -153,6 +201,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 			}
 		});
 		
+		
 		return v;
 	}
 	
@@ -160,6 +209,18 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+	
+		lView.onRefreshComplete();
+	    if (category.equals(MainActivity.HAPPY)){
+	      	Log.v("WE","onviewcreated HAPPY");
+	    }
+	    else if (category.equals(MainActivity.ANGRY)){
+	      	Log.v("WE","onviewcreated ANGRY");
+	    }
+	    if (category.equals(MainActivity.BOTH)){
+	      	Log.v("WE","onviewcreated BOTH");
+	    }
+	    
 		
 		if (savedInstanceState != null && savedInstanceState
 				.containsKey(STATE_ACTIVATED_POSITION)) {
@@ -172,8 +233,8 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
         //AdsSessionController.registerAdsReadyListener(this);       		
 		
 		if (Connectivity.isOnline(getActivity().getApplicationContext())){
-	    	escandalos_asyn = new GetEscandalos();
-	    	escandalos_asyn.execute();	
+			getEscandalosAsync = new GetEscandalos();
+	    	getEscandalosAsync.execute();	
 		}
 		else{
 			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
@@ -188,14 +249,27 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 	 */
 	@Override
 	public void onPause() {
-	    super.onPause();
-	   
+	    super.onPause();   
 	    //AdsSessionController.pauseTracking();
-	    cancelGetEscandalos();
 	}
 	
 	
+	@Override
+	public void onStop(){
+		super.onStop();
+	}
 	
+	@Override
+	public void onDestroyView(){
+		super.onDestroyView();
+	    cancelGetEscandalos();
+		Log.v("WE","Entra en ondestroyview");
+		escanAdapter.clear();
+		//escanAdapter = null;
+		//escandalos.clear();
+	}
+	
+
 	
     /**
      * 
@@ -370,22 +444,74 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		
 		@Override
 		protected void onPreExecute(){
+			Log.v("WE","Entra en getescandalos");
 		}
 		
 		@Override
 	    protected Integer doInBackground(Void... params) {
 			
 			String url = null;
+
+			// HAPPY
+			if (category.equals(MainActivity.HAPPY)){
+				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
+				if (MyApplication.FIRST_TIME_HAPPY){
+					Log.v("WE","primera vez happy");
+					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
+				}
+				else{
+					// A partir del último ID obtenido
+					Log.v("WE","ultimo id obtenido happy");
+					// Si no hay escándalos consideramos que es la primera vez (BUG: si se pulsa muy rápido en las pestañas)
+					if (escandalos.size() == 0){
+						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
+
+					}
+					else{
+						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/?category__id=1";
+					}
+				}
+			}
 			
-			// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
-			if (MyApplication.FIRST_TIME_BOTH){
-				Log.v("WE","primera vez both");
-				url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&country=" + MyApplication.code_selected_country;
+			// ANGRY
+			else if (category.equals(MainActivity.ANGRY)){
+				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
+				if (MyApplication.FIRST_TIME_ANGRY){
+					Log.v("WE","primera vez angry");
+					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
+				}
+				else{
+					Log.v("WE","ultimo id obtenido happy");
+					if (escandalos.size() == 0){
+						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
+
+					}
+					else{
+						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/?category__id=2";
+					}
+				}
 			}
-			else{
-				// A partir del último ID obtenido
-				url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
+			
+			// BOTH
+			else if (category.equals(MainActivity.BOTH)){
+				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
+				if (MyApplication.FIRST_TIME_BOTH){
+					Log.v("WE","primera vez both");
+					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&country=" + MyApplication.code_selected_country;
+				}
+				else{
+					Log.v("WE","ultimo id obtenido happy");
+					if (escandalos.size() == 0){
+						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
+
+					}
+					else{
+                        url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
+					}
+				}
 			}
+			
+
 				
 			HttpClient httpClient = new DefaultHttpClient();
         
@@ -402,18 +528,70 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		        JSONArray escandalosObject = null;
 		        
 		        // Si es la primera vez obtenemos los escandalos a partir de un JSONObject, sino obtenemos directamente el JSONArray
-		        if (MyApplication.FIRST_TIME_BOTH){
-		        	MyApplication.FIRST_TIME_BOTH = false;
-		        	// Obtenemos el json
-			        JSONObject respJson = new JSONObject(respStr);	                       
-			            
-			        escandalosObject = respJson.getJSONArray("objects");
-		        }
-		        else{
-		        	escandalosObject = new JSONArray(respStr);
+		       	        
+		        // HAPPY
+		        if (category.equals(MainActivity.HAPPY)) {
+			        if (MyApplication.FIRST_TIME_HAPPY){
+			        	MyApplication.FIRST_TIME_HAPPY = false;
+			        	// Obtenemos el json
+				        JSONObject respJson = new JSONObject(respStr);	                       			            
+				        escandalosObject = respJson.getJSONArray("objects");
+			        }
+			        else{
+			        	// Si no hay escándalos obtenemos los primeros
+			        	if (escandalos.size() == 0){
+					        JSONObject respJson = new JSONObject(respStr);	                       			            
+					        escandalosObject = respJson.getJSONArray("objects");
+			        	}
+			        	else{
+				        	escandalosObject = new JSONArray(respStr);
+			        	}
+			        }
 		        }
 		        
-		            
+		        // ANGRY
+		        else if (category.equals(MainActivity.ANGRY)) {
+			        if (MyApplication.FIRST_TIME_ANGRY){
+			        	MyApplication.FIRST_TIME_ANGRY = false;
+			        	// Obtenemos el json
+				        JSONObject respJson = new JSONObject(respStr);	                       
+				            
+				        escandalosObject = respJson.getJSONArray("objects");
+			        }
+			        else{
+			        	if (escandalos.size() == 0){
+					        JSONObject respJson = new JSONObject(respStr);	                       			            
+					        escandalosObject = respJson.getJSONArray("objects");
+			        	}
+			        	else{
+				        	escandalosObject = new JSONArray(respStr);
+			        	}
+			        }
+		        }
+		        
+		        // BOTH
+		        else if (category.equals(MainActivity.BOTH)) {
+			        if (MyApplication.FIRST_TIME_BOTH){
+			        	MyApplication.FIRST_TIME_BOTH = false;
+			        	// Obtenemos el json
+				        JSONObject respJson = new JSONObject(respStr);	                       
+				            
+				        escandalosObject = respJson.getJSONArray("objects");
+			        }
+			        else{
+			        	if (escandalos.size() == 0){
+					        JSONObject respJson = new JSONObject(respStr);	                       			            
+					        escandalosObject = respJson.getJSONArray("objects");
+			        	}
+			        	else{
+				        	escandalosObject = new JSONArray(respStr);
+			        	}
+			        }
+		        }
+		        
+		      
+		        
+		        // Obtenemos los datos de los escándalos
 		        for (int i=0 ; i < escandalosObject.length(); i++){
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
@@ -431,19 +609,13 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
 	            	
-			        getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-					        // Añadimos el escandalo al ArrayList
-					        escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));
-							escanAdapter.notifyDataSetChanged();	
-						}
-			        });		        	
+		            
+		            escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	
 		    	 }
 		     }
 		     catch(Exception ex){
-		            Log.e("ServicioRest","Error!", ex);
+		            Log.e("ServicioRest","Error obteniendo escándalos", ex);
 		     }
 		        	 
 		     // Devolvemos el código resultado
@@ -453,12 +625,12 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
-	
 			
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
 		        	Log.v("WE","escandalos recibidos");
+		        	escanAdapter.notifyDataSetChanged();
 		        }
 		        else{
 		        	Log.v("WE","escandalos NO recibidos");
@@ -466,6 +638,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 			}
 			// Abrimos la llave
 			getting_escandalos = false;
+			lView.onRefreshComplete();
 	    }
 	}
 	
@@ -483,14 +656,32 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		
 		@Override
 		protected void onPreExecute(){
+			Log.v("WE","Entra en getNewescandalos");
 		}
 		
 		@Override
 	    protected Integer doInBackground(Void... params) {
 			
 			// A partir del id más nuevo obtenido (el primero del array)
-			String url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
+			String url = null;
+			// HAPPY
+			if (category.equals(MainActivity.HAPPY)){
+				Log.v("WE","nuevos happy");
+				url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/?category__id=1";
+			}
+			// ANGRY
+			if (category.equals(MainActivity.ANGRY)){
+				Log.v("WE","nuevos angry");
 				
+				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/?category__id=2";
+			}
+			// BOTH
+			if (category.equals(MainActivity.BOTH)){
+				Log.v("WE","nuevos both");			
+				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
+			}
+	
+			
 			HttpClient httpClient = new DefaultHttpClient();
         
 		    HttpGet getEscandalos = new HttpGet(url);
@@ -538,6 +729,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		            Log.e("ServicioRest","Error!", ex);
 		     }
 		        	 
+		    Log.v("WE","antes del return");
 		     // Devolvemos el código resultado
 		     return (response.getStatusLine().getStatusCode());    	
 	    }
@@ -546,7 +738,7 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		@Override
 	    protected void onPostExecute(Integer result) {
 	
-			
+			Log.v("WE","onPostExecute");
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
@@ -556,6 +748,10 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 		        	Log.v("WE","escandalos NO recibidos");
 		        }        
 			}
+			// Abrimos la llave
+			getting_escandalos = false;
+			Log.v("WE","llama a onRefreshComplete");
+			escanAdapter.notifyDataSetChanged();
 	        lView.onRefreshComplete();
 	    }
 	}
@@ -563,10 +759,21 @@ public class ListEscandalosFragmentBoth extends SherlockFragment implements onAd
 
 
 
-	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo escándalos
+	 */
 	private void cancelGetEscandalos(){	
-		if (escandalos_asyn != null){
-			escandalos_asyn.cancel(true);
-		}
+			
+		if (getEscandalosAsync != null){
+			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
+				getEscandalosAsync.cancel(true);
+			}
+		} 
+		
+		if (getNewEscandalosAsync != null){
+			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
+				getNewEscandalosAsync.cancel(true);
+			}
+		} 		
 	}
 }

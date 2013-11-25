@@ -313,6 +313,7 @@ public class MainLoginActivity extends Activity{
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             login_error = true;
 	        }
 			return null;
 	      

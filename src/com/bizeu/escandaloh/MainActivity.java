@@ -45,6 +45,7 @@ import com.zed.adserver.onAdsReadyListener;
 
 public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, OnClickListener {
 
+	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Enfadado";
 	public static final String HAPPY = "Feliz";
 	public static final String BOTH = "Ambos";
@@ -111,9 +112,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 
         // Añadimos los tabs para cada uno de los 3 fragmentos
-        mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragmentHappy.class, null);  
-        mTabHost.addTab(mTabHost.newTabSpec(ANGRY).setIndicator(ANGRY),ListEscandalosFragmentAngry.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragmentBoth.class, null);
+        Bundle b = new Bundle();
+        b.putString(CATEGORY, HAPPY);
+        mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragment.class, b);  
+        
+        b = new Bundle();
+        b.putString(CATEGORY, ANGRY);
+        mTabHost.addTab(mTabHost.newTabSpec(ANGRY).setIndicator(ANGRY),ListEscandalosFragment.class, b);
+        
+        b = new Bundle();
+        b.putString(CATEGORY, BOTH);
+        mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragment.class, b);
+
+
  
         for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++) 
         {
@@ -121,10 +132,12 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
             tv.setTextColor(getResources().getColor(R.color.rojo));
         } 
         
+        /*
         for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++)
         {
             mTabHost.getTabWidget().getChildAt(i).setBackgroundColor(getResources().getColor(R.color.gris_claro)); //unselected
         }
+        */
         //mTabHost.getTabWidget().getChildAt(mTabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#0000FF")); // se
         
         // Almacenamos el alto del FragmentTabHost
@@ -183,10 +196,11 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	/**
 	 * It will be called when the ads are ready to be shown
 	 */
+	
 	@Override
 	public void onAdsReady(){ 
-		/*
-	       //The banner will be show inside this view.
+		
+	    //The banner will be show inside this view.
         banner = (FrameLayout) findViewById(R.id.banner);
      
         //BannerView initialization
@@ -199,8 +213,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
  
         //Set the visibility to VISIBLE.
         banner.setVisibility( FrameLayout.VISIBLE );	
-        */	
+        	
 	}
+	 
 	 
 
 	
@@ -208,6 +223,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	/**
 	 * It will be called when any errors ocurred.
 	 */
+	
 	@Override
 	public void onAdsReadyFailed(){
 		Log.e("ZedAdServerLog","Error loading ads");
@@ -217,6 +233,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	/**
 	 * onKeyDown
 	 */
+	/*
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    // TODO Auto-generated method stub
@@ -225,17 +242,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
-	 
+	 */
 	
 	/**
 	 * onUserLeaveHint
 	 */
+	/*
 	@Override
 	protected void onUserLeaveHint() {
 	    // TODO Auto-generated method stub
 	    super.onUserLeaveHint();
 	    //AdsSessionController.detectHomeButtonEvent();
 	}
+	*/
 	
 
 	/**
@@ -245,12 +264,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 		if (requestCode == SHOW_CAMERA) {
 			if (resultCode == RESULT_OK) {
-				Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
-				i.putExtra("photo_from", SHOW_CAMERA);
-				i.putExtra("photoUri", mImageUri.toString());
-				startActivityForResult(i, CREATE_ESCANDALO);					
+				if (mImageUri != null){
+					Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
+					i.putExtra("photo_from", SHOW_CAMERA);
+					i.putExtra("photoUri", mImageUri.toString());
+					startActivityForResult(i, CREATE_ESCANDALO);
+				}
+				else{
+					Toast toast = Toast.makeText(context, "Hubo algún error con la cámara", Toast.LENGTH_LONG);
+					toast.show();
+				}			
 			}
-			else if (resultCode == RESULT_CANCELED) {	           
+			else if (resultCode == RESULT_CANCELED) {	
+				Log.v("WE","Result canceled");
 	        }	
 		}
 			
@@ -428,6 +454,20 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			
 		}
 		
+	}
+
+	
+	public void desactivaTabs(){
+        mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(false);
+        mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(false);
+        mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(false);
+	}
+
+	
+	public void activaTabs(){
+        mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
+        mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(true);
+        mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(true);
 	}
 	
 
