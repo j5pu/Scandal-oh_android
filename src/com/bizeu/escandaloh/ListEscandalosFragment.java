@@ -398,6 +398,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		if (resourceId > 0) {
 			status_bar_height = getResources().getDimensionPixelSize(resourceId);
 		}
+		
+		Log.v("WE","status bar: " + status_bar_height);
 		return status_bar_height;
 	}
 	
@@ -419,6 +421,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
         else if(getActivity().getApplicationContext().getTheme().resolveAttribute(com.actionbarsherlock.R.attr.actionBarSize, tv, true)){
         	action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
+        
+		Log.v("action bar", "el action es bar: " + action_bar_height);
 		return action_bar_height;
 	}
 	

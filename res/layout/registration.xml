@@ -2,84 +2,191 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@drawable/registro_login"
+		 >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1.2"
         android:gravity="center_vertical"
         android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/edit_registro_nombre"
+        <TextView
+            android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Nombre de usuario" >
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Crea tu cuenta"
+            android:textColor="@color/morado"
+            android:textSize="25sp" />
 
-            <requestFocus />
-        </EditText>
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/txt_registro_nombre"
-            android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="3"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textColor="@color/rojo"
-            android:visibility="gone" />
+            android:layout_weight="2" >
 
-        <EditText
-            android:id="@+id/edit_registro_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Email"
-            android:inputType="textEmailAddress" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txt_registro_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textColor="@color/rojo"
-            android:visibility="gone" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/edit_registro_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Password" />
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="Nombre de usuario:"
+                android:textColor="@color/morado"
+                android:textSize="20dp"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:paddingBottom="5dp" />
 
-        <TextView
-            android:id="@+id/txt_registro_password"
-            android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/edit_registro_nombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="@color/blanco"
+                android:ems="10"
+                android:hint="user56"
+                android:textColorHint="@color/azul"
+                android:textColor="@color/azul"
+                android:paddingLeft="5dp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="Email:"
+                android:textColor="@color/morado"
+                android:textSize="20dp"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:paddingBottom="5dp" />
+
+            <EditText
+                android:id="@+id/edit_registro_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="@color/blanco"
+                android:ems="10"
+                android:hint="mail98@users.com"
+                android:inputType="textEmailAddress"
+                android:textColorHint="@color/azul"
+                android:textColor="@color/azul"
+                android:paddingLeft="5dp"  >
+            </EditText>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="Contraseña"
+                android:textColor="@color/morado"
+                android:textSize="20dp"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:paddingBottom="5dp" />
+
+            <EditText
+                android:id="@+id/edit_registro_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="@color/blanco"
+                android:ems="10"
+                android:hint="********"
+                android:inputType="textPassword"
+                android:textColorHint="@color/azul"
+                android:paddingLeft="5dp" 
+                android:textColor="@color/azul"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textColor="@color/rojo"
-            android:visibility="gone" />
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="5"
+        android:layout_weight="3"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/but_confirmar_registro"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Registrar" />
+            android:layout_weight="2"
+            android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/but_cancelar_registro"
-            android:layout_width="wrap_content"
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2.5"
+                android:orientation="vertical" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/but_confirmar_registro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:background="@drawable/blue_button_selector"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="Crear" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Cancelar" />
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+        </LinearLayout>
 
     </LinearLayout>
 

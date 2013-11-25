@@ -22,17 +22,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.util.Connectivity;
 
-public class RegistrationActivity extends Activity {
+public class RegistrationActivity extends SherlockActivity {
 
 	private EditText edit_nombre_usuario;
 	private EditText edit_password_usuario;
 	private EditText edit_email_usuario;
 	private Button aceptar;
-	private Button cancelar;
 	
 	private boolean has_name_error;
 	private boolean has_password_error;
@@ -58,20 +59,13 @@ public class RegistrationActivity extends Activity {
 		setContentView(R.layout.registration);
 		
 		context = this;
+		// Ocultamos el action bar
+		getSupportActionBar().hide();
 		
 		edit_nombre_usuario = (EditText) findViewById(R.id.edit_registro_nombre);
 		edit_password_usuario = (EditText) findViewById(R.id.edit_registro_password);
 		edit_email_usuario = (EditText) findViewById(R.id.edit_registro_email);
 		aceptar = (Button) findViewById(R.id.but_confirmar_registro);
-		cancelar = (Button) findViewById(R.id.but_cancelar_registro);
-		
-		cancelar.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				finish();	
-			}
-		});
 		
 		aceptar.setOnClickListener(new View.OnClickListener() {
 			
