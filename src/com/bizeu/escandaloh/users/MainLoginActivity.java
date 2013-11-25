@@ -48,6 +48,7 @@ public class MainLoginActivity extends Activity{
 	private String user_uri;
 	private String username;
 	private String email;
+	private boolean login_facebook_pulsado ;
 	
 	private Activity acti;
 	
@@ -60,6 +61,7 @@ public class MainLoginActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_login);
 		
+		login_facebook_pulsado = false;
 		acti = this;
 		
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
@@ -91,82 +93,86 @@ public class MainLoginActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-				 Session currentSession = Session.getActiveSession();
-			        if (currentSession == null || currentSession.getState().isClosed()) {
-			        	Log.v("WE","nula os isClosed");
-			            Session session = new Session.Builder(acti).build();
-			            Session.setActiveSession(session);
-			            currentSession = session;
-			            
-			            Session.OpenRequest or = new Session.OpenRequest(acti);
-				        or.setPermissions("email");
-				        
-				        Session se = new Session(acti);
-				        se.addCallback(new Session.StatusCallback() {
+				if (!login_facebook_pulsado){
+					login_facebook_pulsado = true;
+					 Session currentSession = Session.getActiveSession();
+				        if (currentSession == null || currentSession.getState().isClosed()) {
+				        	Log.v("WE","nula os isClosed");
+				            Session session = new Session.Builder(acti).build();
+				            Session.setActiveSession(session);
+				            currentSession = session;
+				            
+				            Session.OpenRequest or = new Session.OpenRequest(acti);
+					        or.setPermissions("email");
+					        
+					        Session se = new Session(acti);
+					        se.addCallback(new Session.StatusCallback() {
 
-					          // Callback when session changes state
-					          @Override
-					          public void call(Session session, SessionState state, Exception exception) {
-					            if (session.isOpened()) {
-					            	 Request re = Request.newMeRequest(session, new Request.GraphUserCallback(){
-					     	        	
-					     				@Override
-					     				public void onCompleted(GraphUser user, Response response) {
-					     					if (user != null){
-		                                        username = limitaCaracteres(user.getUsername());
-						     					email = user.getProperty("email").toString();
+						          // Callback when session changes state
+						          @Override
+						          public void call(Session session, SessionState state, Exception exception) {
+						            if (session.isOpened()) {
+						            	 Request re = Request.newMeRequest(session, new Request.GraphUserCallback(){
+						     	        	
+						     				@Override
+						     				public void onCompleted(GraphUser user, Response response) {
+						     					if (user != null){
+			                                        username = limitaCaracteres(user.getUsername());
+							     					email = user.getProperty("email").toString();
+							     					
+							     					 new LogInUserFacebook().execute();
+						     					}
+						     					else{
+						     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
+						     					}
+
 						     					
-						     					 new LogInUserFacebook().execute();
-					     					}
-					     					else{
-					     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
-					     					}
+						     				}
+						     	        });
+						     	        
+						     	        re.executeAsync();
+						              }
+						            }
+						        });
+					        Session.setActiveSession(se);
+					        se.openForRead(or);
+				            
+				        }
+				        
+				        if (currentSession.isOpened()) {
+				            Session.openActiveSession(acti, true, new Session.StatusCallback() {
 
-					     					
-					     				}
-					     	        });
-					     	        
-					     	        re.executeAsync();
-					              }
+					            @Override
+					            public void call(final Session session, SessionState state,
+					                    Exception exception) {
+
+					                if (session.isOpened()) {
+					                	
+					                	Request re = Request.newMeRequest(session, new Request.GraphUserCallback(){
+						     	        	
+						     				@Override
+						     				public void onCompleted(GraphUser user, Response response) {
+						     					if (user != null) {
+			                                        email = user.getProperty("email").toString();
+			                                        username = limitaCaracteres(user.getUsername());
+			                                       
+			                                        new LogInUserFacebook().execute();
+			                                    }
+						     					else{
+						     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
+						     					}
+						     				}
+					                	});
+					                	re.executeAsync();        
+					                }
 					            }
 					        });
-				        Session.setActiveSession(se);
-				        se.openForRead(or);
-			            
-			        }
-			        
-			        if (currentSession.isOpened()) {
-			            Session.openActiveSession(acti, true, new Session.StatusCallback() {
 
-				            @Override
-				            public void call(final Session session, SessionState state,
-				                    Exception exception) {
-
-				                if (session.isOpened()) {
-				                	
-				                	Request re = Request.newMeRequest(session, new Request.GraphUserCallback(){
-					     	        	
-					     				@Override
-					     				public void onCompleted(GraphUser user, Response response) {
-					     					if (user != null) {
-		                                        email = user.getProperty("email").toString();
-		                                        username = limitaCaracteres(user.getUsername());
-		                                       
-		                                        new LogInUserFacebook().execute();
-		                                    }
-					     					else{
-					     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
-					     					}
-					     				}
-				                	});
-				                	re.executeAsync();        
-				                }
-				            }
-				        });
-
-			        } 
-			        
-					progress = new ProgressDialog(acti);		
+				        } 
+				        
+						progress = new ProgressDialog(acti);
+				}
+				 		
 			}
 		});
 		
