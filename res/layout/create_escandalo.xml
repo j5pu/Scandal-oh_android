@@ -3,12 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@color/gris_claro" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:gravity="right"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/img_new_escandalo_subir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/nube"
+            android:paddingRight="5dp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_weight="3"
         android:gravity="center" >
 
         <ImageView
@@ -22,94 +39,122 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:gravity="center_vertical" >
+        android:layout_weight="3.5"
+        android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/txt_pasar_registro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Categoria:" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical" >
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:gravity="center" >
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:paddingTop="30dp" >
 
-        <RadioGroup
-            android:id="@+id/rg_create_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
- 
-        <RadioButton
-            android:id="@+id/rb_create_category_happy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:drawableRight="@drawable/cara_riendose" />
- 
-        <RadioButton
-            android:id="@+id/rb_create_category_angry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/cara_enfadado" />
- 
-    </RadioGroup>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:orientation="vertical" >
+                    <TextView
+                        android:id="@+id/txt_comment_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp"
+                        android:text="Título:"
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="20dp" />
 
-        <TextView
-            android:id="@+id/txt_comment_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Título:" />
+                    <TextView
+                        android:id="@+id/txt_contador_caracteres_titulo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="right|center_vertical"
+                        android:gravity="right|center_vertical"
+                        android:text="0/75"
+                        android:textColor="@color/gris_medio" />
 
-    </LinearLayout>
+                </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:orientation="vertical" >
+                <EditText
+                    android:id="@+id/edit_create_escandalo_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blanco"
+                    android:ems="10"
+                    android:paddingLeft="5dp"
+                    android:textColor="@color/azul"
+                    android:textSize="20dp"
+                    android:maxLength="75"
+                    android:minLines="4">
+                </EditText>
 
-        <EditText
-            android:id="@+id/edit_create_escandalo_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10" >
+            </LinearLayout>
 
-            <requestFocus />
-        </EditText>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:gravity="center_vertical"
+                android:orientation="vertical" >
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/txt_pasar_registro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categoría:"
+                    android:textColor="@color/gris_oscuro"
+                    android:textSize="20dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:gravity="center" >
+                <RadioGroup
+                    android:id="@+id/rg_create_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal" >
 
-        <Button
-            android:id="@+id/but_new_escandalo_accept"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Subir " />
+                    <RadioButton
+                        android:id="@+id/rb_create_category_happy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Humor"
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="20dp"
+                        android:layout_marginRight="10dp" />
 
-        <Button
-            android:id="@+id/but_new_escandalo_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancelar" />
+                    <RadioButton
+                        android:id="@+id/rb_create_category_angry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Denuncia"
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="20dp" 
+                        android:layout_marginLeft="10dp"
+                        android:shadowColor="@color/blanco"/>
+                </RadioGroup>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical" >
+
+        </LinearLayout>
 
     </LinearLayout>
 

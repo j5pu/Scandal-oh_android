@@ -1,31 +1,31 @@
 package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import com.bizeu.escandaloh.adapters.CommentAdapter.CommentHolder;
-import com.bizeu.escandaloh.model.Comment;
-import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
+import com.bizeu.escandaloh.util.Audio;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SelectCountryActivity extends Activity {
 
 	private ListView list_countries;
+	
+	private Context context;
 	
 
 	/**
@@ -36,6 +36,8 @@ public class SelectCountryActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_countries);
 
+		context = this;
+		
 		list_countries = (ListView) findViewById(R.id.list_select_countries);
 		
 		final ArrayList<Country> countries = new ArrayList<Country>();
@@ -51,18 +53,38 @@ public class SelectCountryActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, final View view,
 					int position, long id) {
 
-				String code_selected_country = countries.get(position).getCode();
+				final String code_selected_country = countries.get(position).getCode();
+				String name_selected_country = countries.get(position).getName();
 				
-				// Guardamos el código del pais seleccionado
-				SharedPreferences prefs = getBaseContext().getSharedPreferences(
-	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        	prefs.edit().putString(MyApplication.CODE_COUNTRY, code_selected_country).commit();
-	        	MyApplication.code_selected_country = code_selected_country;
-				
-	        	// Mostramos la pantalla del carrusel
-				Intent i = new Intent(SelectCountryActivity.this, MainActivity.class);
-				startActivity(i);
-				finish();
+				// Mostramos un mensaje indicando que el país no se podrá cambiar en el futuro
+				AlertDialog.Builder alert_country = new AlertDialog.Builder(context);
+				alert_country.setTitle("País elegido: " + name_selected_country);
+				alert_country
+						.setMessage("Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?");
+				alert_country.setPositiveButton("Si",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1,
+									int id) {
+								// Guardamos el código del pais seleccionado
+								SharedPreferences prefs = getBaseContext().getSharedPreferences(
+					        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+					        	prefs.edit().putString(MyApplication.CODE_COUNTRY, code_selected_country).commit();
+					        	MyApplication.code_selected_country = code_selected_country;
+								
+					        	// Mostramos la pantalla del carrusel
+								Intent i = new Intent(SelectCountryActivity.this, MainActivity.class);
+								startActivity(i);
+								finish();						
+							}
+						});
+				alert_country.setNegativeButton("No",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1,
+									int id) {
+								dialogo1.cancel();
+							}
+						});
+				alert_country.show();
 			}
 		});
 	}
@@ -70,6 +92,7 @@ public class SelectCountryActivity extends Activity {
 	
 	private void addCountries(ArrayList<Country> countries){
 		
+		countries.add(new Country(getResources().getString(R.string.espania), "ES"));
 		countries.add(new Country(getResources().getString(R.string.argentina), "AR"));
 		countries.add(new Country(getResources().getString(R.string.bolivia), "BO"));
 		countries.add(new Country(getResources().getString(R.string.chile), "CL"));
@@ -78,7 +101,6 @@ public class SelectCountryActivity extends Activity {
 		countries.add(new Country(getResources().getString(R.string.cuba), "CU"));
 		countries.add(new Country(getResources().getString(R.string.ecuador), "EC"));
 		countries.add(new Country(getResources().getString(R.string.el_salvador), "SV"));
-		countries.add(new Country(getResources().getString(R.string.espania), "ES"));
 		countries.add(new Country(getResources().getString(R.string.guatemala), "GT"));
 		countries.add(new Country(getResources().getString(R.string.guinea_ecuatorial), "GQ"));
 		countries.add(new Country(getResources().getString(R.string.honduras), "HN"));
@@ -117,14 +139,25 @@ public class SelectCountryActivity extends Activity {
 	        View mView = convertView;
 	        
 	        TextView country_name;
+	        ImageView country_flag;
 
 	        country = data.get(position);
 	        
 	        LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 	        mView = inflater.inflate(layoutResourceId, parent, false);
 	                                   
+	        // Nombre 
 	        country_name = (TextView)mView.findViewById(R.id.txt_list_country);
 	        country_name.setText(country.getName());
+	        
+	        // Bandera
+	        country_flag = (ImageView)mView.findViewById(R.id.img_list_country_flag);
+	        String code = country.getCode();
+	        if (code.equals("DO")){
+	        	code = "do_republica"; // Es así porque eclipse no me deja meter una foto como "do.png"
+	        }
+	        int resource_id_flag = getResources().getIdentifier(code.toLowerCase(), "drawable", getPackageName());
+	        country_flag.setImageResource(resource_id_flag);
         
 	        return mView;
 	    }

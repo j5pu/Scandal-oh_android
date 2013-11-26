@@ -1,9 +1,6 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,31 +23,33 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 
-public class CreateEscandaloActivity extends Activity {
+public class CreateEscandaloActivity extends SherlockActivity {
 
 	public static final String HAPPY_CATEGORY = "/api/v1/category/1/";
 	public static final String ANGRY_CATEGORY = "/api/v1/category/2/";
 	public static final int REQUESTCODE_RECORDING = 50;
 
 	private ImageView picture;
-	private Button but_accept;
-	private Button but_cancel;
+	private ImageView subir_escandalo;
 	private EditText edit_title;
 	private RadioGroup radio_category;
+	private TextView txt_contador_titulo;
 
 	private String selected_category;
 	private String written_title;
@@ -77,6 +76,8 @@ public class CreateEscandaloActivity extends Activity {
 		setContentView(R.layout.create_escandalo);
 		
 		context = this;
+		// Quitamos el action bar
+		getSupportActionBar().hide();
 
 		if (getIntent() != null) {
 			Intent data = getIntent();
@@ -103,16 +104,46 @@ public class CreateEscandaloActivity extends Activity {
 		progress.setTitle("Subiendo escándalo ...");
 		progress.setMessage("Espere, por favor");
 		progress.setCancelable(false);
+		
+		txt_contador_titulo = (TextView) findViewById(R.id.txt_contador_caracteres_titulo);
 
+		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
+		edit_title.addTextChangedListener(new TextWatcher() {          
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {                                   
+                   
+            	txt_contador_titulo.setText(s.length() + "/75");
+            	//here is your code
+            		Log.v("WE","S: " + s.length());
+            		/*
+                   Log.v("WE","count: " + count); 
+                   Log.v("WE","before: " + before);
+                   Log.v("WE","start: " + start);
+                   */
+
+            }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub		
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub		
+			} 
+		});
+		
 		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
 
 		picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
-		picture.setImageBitmap(taken_photo);
+		picture.setImageBitmap(taken_photo);		
 
-		but_accept = (Button) findViewById(R.id.but_new_escandalo_accept);
-		but_accept.setOnClickListener(new OnClickListener() {
-
+		subir_escandalo = (ImageView) findViewById(R.id.img_new_escandalo_subir);
+		subir_escandalo.setOnClickListener(new OnClickListener() {
+			
 			@Override
 			public void onClick(View v) {
 				String introducido = edit_title.getText().toString();
@@ -156,14 +187,6 @@ public class CreateEscandaloActivity extends Activity {
 			}		
 		});
 
-		but_cancel = (Button) findViewById(R.id.but_new_escandalo_cancel);
-		but_cancel.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
 	}
 
 

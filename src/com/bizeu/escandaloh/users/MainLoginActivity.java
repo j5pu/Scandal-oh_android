@@ -20,10 +20,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.facebook.Request;
@@ -32,7 +35,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 
-public class MainLoginActivity extends Activity{
+public class MainLoginActivity extends SherlockActivity{
 	
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
@@ -63,6 +66,10 @@ public class MainLoginActivity extends Activity{
 		
 		login_facebook_pulsado = false;
 		acti = this;
+		
+		
+		// Ocultamos el action bar
+		getSupportActionBar().hide();
 		
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);

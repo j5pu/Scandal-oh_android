@@ -24,16 +24,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.util.Connectivity;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends SherlockActivity {
 	
 	private EditText edit_nombre_email;
 	private EditText edit_password;
 	private Button boton_aceptar;
-	private Button boton_cancelar;
 	private ProgressDialog progress;
 	
 	private String name_error;
@@ -61,19 +61,12 @@ public class LoginActivity extends Activity {
 		setContentView(R.layout.login);
 		
 		context = this;
+		// Ocultamos el action bar
+		getSupportActionBar().hide();
 		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
-		boton_cancelar = (Button) findViewById(R.id.but_cancelar_login);		
-		
-		boton_cancelar.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				finish();			
-			}
-		});
 		
 		boton_aceptar.setOnClickListener(new View.OnClickListener() {
 			
