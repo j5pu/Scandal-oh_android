@@ -21,13 +21,14 @@ public class Audio{
 	private static boolean yaCreado = false; // Este atributo nos dice si ya fue creada o no una instancia de esta clase
 	
 	
-	public void setDataDownloadListener(PlayListener dataDownloadListener) {
-        this.playListener = dataDownloadListener;
+	public void setOnPlayListener(PlayListener playListener) {
+        this.playListener = playListener;
     }
 	
 	public static interface PlayListener {
         void onPlayFinished();
     }
+
 	
 	/**
 	 * Constructor
@@ -125,6 +126,7 @@ public class Audio{
 	 */
 	public void startPlaying() {
         if (path != null){
+        	Log.v("WE","Entra en if");
             try {
                 mPlayer.setDataSource(path);
                 mPlayer.prepare();
@@ -133,6 +135,7 @@ public class Audio{
 					
 					@Override
 					public void onCompletion(MediaPlayer mp) {
+						Log.v("WE","Entar en oncompletion");
 						mp.stop();
 						mp.reset();	
 						if (playListener != null){

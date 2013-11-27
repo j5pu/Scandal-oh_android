@@ -111,17 +111,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
 		edit_title.addTextChangedListener(new TextWatcher() {          
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {                                   
-                   
+            public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
             	txt_contador_titulo.setText(s.length() + "/75");
-            	//here is your code
-            		Log.v("WE","S: " + s.length());
-            		/*
-                   Log.v("WE","count: " + count); 
-                   Log.v("WE","before: " + before);
-                   Log.v("WE","start: " + start);
-                   */
-
             }
 
 			@Override
@@ -154,10 +145,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					toast.show();
 				} else {
 					AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
-					alert_audio.setTitle("Añadir audio");
-					alert_audio
-							.setMessage("¿Desea añadir una grabación de audio?");
-					alert_audio.setPositiveButton("Si",
+					alert_audio.setMessage("¿Deseas agregar audio?");
+					alert_audio.setPositiveButton("OK",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogo1,
 										int id) {
@@ -165,20 +154,24 @@ public class CreateEscandaloActivity extends SherlockActivity {
 									record.setDialogResult(new OnMyDialogResult(){
 									    public void finish(String result){
 									       if (result.equals("OK")){
-									    	   con_audio = true;
-									    	   new SendScandalo().execute();
-									       }						       
+									    	   con_audio = true;									       
+									       }	
+									       else if (result.equals("CANCELED")){
+									    	   con_audio = false;
+									       }
+									       new SendScandalo().execute();
 									    }
 									});
 									record.setCancelable(false);
 									record.show(); 								
 								}
 							});
-					alert_audio.setNegativeButton("No",
+					alert_audio.setNegativeButton("Cancelar",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogo1,
 										int id) {
 									// Enviamos el escandalo sin audio
+									con_audio = false;
 									new SendScandalo().execute();
 								}
 							});
