@@ -46,11 +46,11 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	public static final int REQUESTCODE_RECORDING = 50;
 
 	private ImageView picture;
-	private ImageView subir_escandalo;
+	private ImageView img_subir_escandalo;
+	private TextView txt_subir_escandalo;
 	private EditText edit_title;
 	private RadioGroup radio_category;
 	private TextView txt_contador_titulo;
-
 	private String selected_category;
 	private String written_title;
 	private Bitmap taken_photo;
@@ -130,10 +130,58 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
 
 		picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
-		picture.setImageBitmap(taken_photo);		
+		picture.setImageBitmap(taken_photo);	
+		
+		txt_subir_escandalo = (TextView) findViewById(R.id.txt_new_escandalo_subir);
+		txt_subir_escandalo.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				String introducido = edit_title.getText().toString();
+				if (introducido.equals("")) {
+					Toast toast = Toast.makeText(getBaseContext(),
+							"Debe introducir primero un título",
+							Toast.LENGTH_SHORT);
+					toast.show();
+				} else {
+					AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
+					alert_audio.setMessage("¿Deseas agregar audio?");
+					alert_audio.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1,
+										int id) {
+									RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
+									record.setDialogResult(new OnMyDialogResult(){
+									    public void finish(String result){
+									       if (result.equals("OK")){
+									    	   con_audio = true;									       
+									       }	
+									       else if (result.equals("CANCELED")){
+									    	   con_audio = false;
+									       }
+									       new SendScandalo().execute();
+									    }
+									});
+									record.setCancelable(false);
+									record.show(); 								
+								}
+							});
+					alert_audio.setNegativeButton("Cancelar",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1,
+										int id) {
+									// Enviamos el escandalo sin audio
+									con_audio = false;
+									new SendScandalo().execute();
+								}
+							});
+					alert_audio.show();
+				}
+			}		
+		});
 
-		subir_escandalo = (ImageView) findViewById(R.id.img_new_escandalo_subir);
-		subir_escandalo.setOnClickListener(new OnClickListener() {
+		img_subir_escandalo = (ImageView) findViewById(R.id.img_new_escandalo_subir);
+		img_subir_escandalo.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
