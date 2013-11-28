@@ -250,6 +250,7 @@ public class RecordAudioDialog extends Dialog{
 						   Audio.getInstance().stopPlaying();
 						   
 							// Cambios IU
+						   /*
 							ll_espacio_botones.setVisibility(View.VISIBLE);
 							txt_description.setText("Audio grabado:");
 							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
@@ -267,6 +268,8 @@ public class RecordAudioDialog extends Dialog{
 							
 							// Reseteamos contador play
 							contador_play = 0;
+							*/
+						   changeIUPlayFinised();
 					   }
 				   }
 			   }
@@ -341,6 +344,9 @@ public class RecordAudioDialog extends Dialog{
 		
 		// El botón de abajo indicará Grabar
 		but_abajo.setText("Grabar");
+		
+		// Reseteamos contador de reproducción
+		contador_play = 0;
     }
     
   
