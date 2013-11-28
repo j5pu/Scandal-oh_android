@@ -14,34 +14,36 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
-import com.bizeu.escandaloh.util.Audio;
-import com.bizeu.escandaloh.util.ImageUtils;
 
-public class DetailCommentsActivity extends Activity {
+public class DetailCommentsActivity extends SherlockActivity {
 
 	private ListView list_comments;
 	private EditText edit_new_comment;
+	private TextView txt_title;
+	private TextView txt_user;
+	private TextView txt_send;
+	private TextView txt_count_characteres;
 	private FetchableImageView img_photo;
-	private Button but_send;
 	private LinearLayout layout_write_comment;
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
@@ -49,6 +51,9 @@ public class DetailCommentsActivity extends Activity {
 	private String photo_id;
 	private ProgressDialog progress;
 	private String route_image;
+	private String user;
+	private String title;
+
 	
 	/**
 	 * onCreate
@@ -61,22 +66,47 @@ public class DetailCommentsActivity extends Activity {
 		if (getIntent() != null){
 			photo_id = getIntent().getExtras().getString("id");
 			route_image = getIntent().getExtras().getString("route_image");	
+			user = getIntent().getExtras().getString("user");
+			title = getIntent().getExtras().getString("title");
 		}
+		
+		// Quitamos el action bar
+		getSupportActionBar().hide();
 		
 		final Context context = this.getApplicationContext();
 		
 		list_comments = (ListView) findViewById(R.id.list_comments);
-		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		img_photo = (FetchableImageView) findViewById(R.id.img_photo_list_comments);
 		img_photo.setImage(route_image, R.drawable.previsualizacion_foto);
-		layout_write_comment = (LinearLayout) findViewById(R.id.ll_write_comment);
-		but_send = (Button) findViewById(R.id.but_send_new_comment);
+		layout_write_comment = (LinearLayout) findViewById(R.id.ll_comments_write);
 		
 		comments = new ArrayList<Comment>();
 		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments);
 		list_comments.setAdapter(commentsAdapter);
 		
-		but_send.setOnClickListener(new View.OnClickListener() {
+		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
+		// Cada vez que se modifique el titulo actualizamos el contador: x/75
+		edit_new_comment.addTextChangedListener(new TextWatcher() {          
+		            @Override
+		            public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
+		            	txt_count_characteres.setText(s.length() + "/500");
+		            }
+
+					@Override
+					public void afterTextChanged(Editable arg0) {
+						// TODO Auto-generated method stub		
+					}
+
+					@Override
+					public void beforeTextChanged(CharSequence s, int start, int count,
+							int after) {
+						// TODO Auto-generated method stub		
+					} 
+				});
+		
+		
+		txt_send = (TextView) findViewById(R.id.txt_send_new_comment);
+		txt_send.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -85,9 +115,21 @@ public class DetailCommentsActivity extends Activity {
 				if (!written_comment.equals("") && written_comment.length() < 501){
 					Log.v("WE","Longitud comentario: " + written_comment.length());
 					new SendComment(context).execute();
-				}		
+				}	
 			}
 		});
+		
+	
+		
+		// Mostramos el usuario
+		txt_user = (TextView) findViewById(R.id.txt_comments_user);
+		txt_user.setText(user);
+		
+		// Mostramos el titulo entre comillas dobles (quotation mark)
+		txt_title = (TextView) findViewById(R.id.txt_comments_title);
+		String title_quotation_mark = "\"" + title + "\"";
+		Log.v("WE","title quoation mark: " + title_quotation_mark);
+		txt_title.setText(title_quotation_mark);
 		
 		progress = new ProgressDialog(this);
 		

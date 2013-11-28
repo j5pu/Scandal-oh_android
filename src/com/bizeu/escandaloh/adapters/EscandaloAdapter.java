@@ -109,6 +109,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        // Guardamos los datos necesarios en las vistas para luego recuperarlos al hacer click
 	        holder.txtNumComments.setTag(R.string.id, escanda.getId());
 	        holder.txtNumComments.setTag(R.string.url_foto, (String) escanda.getRouteImg());
+	        holder.txtNumComments.setTag(R.string.user, (String) escanda.getUser());
+	        holder.txtNumComments.setTag(R.string.title, (String) escanda.getTitle());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());        
 	        
@@ -140,7 +142,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				}
 			});           		
      
-            // Listeners para los comentarios  
+            // Listener para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
@@ -149,6 +151,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					i.putExtra("id", v.getTag(R.string.id).toString());
 					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
+					i.putExtra("user", (String) v.getTag(R.string.user));
+					i.putExtra("title", (String) v.getTag(R.string.title));
 					context.startActivity(i);	
 				}
 			});

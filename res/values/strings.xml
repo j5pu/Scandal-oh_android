@@ -30,5 +30,7 @@
     <string name="uri_audio">uri audio</string>
     <string name="app_id">1382800011966060</string>
     <string name="atras">&lt; Atrás</string>
+    <string name="user">user</string>
+    <string name="title">tite</string>
 
 </resources>
