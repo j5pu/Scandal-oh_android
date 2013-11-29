@@ -216,8 +216,7 @@ public class LoginActivity extends SherlockActivity {
 		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 		        	MyApplication.resource_uri = user_uri;
 		        	MyApplication.logged_user = true;
-		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT)
-					.show();
+		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT).show();
 		        	
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
 		        	setResult(Activity.RESULT_OK);

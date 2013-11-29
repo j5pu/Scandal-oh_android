@@ -74,7 +74,7 @@ public class RegistrationActivity extends SherlockActivity {
 				
 				if (Connectivity.isOnline(context)){
 					// Comprobamos si el nombre de usuario tiene como máximo 10 caracteres
-					if (edit_nombre_usuario.getText().toString().length() < 11){
+					if (edit_nombre_usuario.getText().toString().length() < 26){
 						new SignInUser().execute();
 					}	
 					else{

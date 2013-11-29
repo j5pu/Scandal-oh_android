@@ -19,11 +19,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -81,9 +81,10 @@ public class DetailCommentsActivity extends SherlockActivity {
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_comments_write);
 		
 		comments = new ArrayList<Comment>();
-		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments);
+		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
 		list_comments.setAdapter(commentsAdapter);
 		
+		txt_count_characteres = (TextView) findViewById(R.id.txt_count_characteres);
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_new_comment.addTextChangedListener(new TextWatcher() {          
@@ -127,10 +128,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 		// Mostramos el titulo entre comillas dobles (quotation mark)
 		txt_title = (TextView) findViewById(R.id.txt_comments_title);
-		String title_quotation_mark = "\"" + title + "\"";
-		Log.v("WE","title quoation mark: " + title_quotation_mark);
-		txt_title.setText(title_quotation_mark);
-		
+		txt_title.setText(title);
+
 		progress = new ProgressDialog(this);
 		
 		new GetComments(context).execute();
@@ -307,11 +306,12 @@ public class DetailCommentsActivity extends SherlockActivity {
 		            	 String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 		            	 String username = escanObject.getString("username");
 		            	 String date = escanObject.getString("date");
+		            	 String resource_uri = escanObject.getString("user");
 		            	// SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 		            	// Date date = formatter.parse(date_string);
 		            	 
 					     // Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
-					     comments.add(new Comment(comment, username, date));					 
+					     comments.add(new Comment(comment, username, date, resource_uri));					 
 		            }		            
 			}
 			catch(Exception ex){

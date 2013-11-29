@@ -1,39 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingRight="10dp"
+    android:paddingLeft="10dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:orientation="vertical"
+        android:background="@color/gris_claro" >
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:background="@color/blanco"
+        android:layout_gravity="top"
+        android:gravity="top"
+        android:paddingTop="4dp" >
 
         <TextView
             android:id="@+id/txt_comment_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@color/gris_oscuro"
+            android:layout_gravity="top"
+            android:gravity="top"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:gravity="right|center_vertical"
+        android:background="@color/blanco" >
+
+        <ImageView
+            android:id="@+id/img_comment_user"
+            android:layout_width="10dp"
+            android:layout_height="22dp"
+            android:src="@drawable/user"
+            android:paddingRight="2dp" />
 
         <TextView
             android:id="@+id/txt_comment_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@color/gris_oscuro"
+            android:paddingRight="10dp"
+            android:textSize="9dp" />
+
+        <ImageView
+            android:id="@+id/img_comment_clock"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:src="@drawable/reloj"
+            android:paddingRight="2dp" />
 
         <TextView
             android:id="@+id/txt_comment_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
             android:gravity="right"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@color/gris_oscuro"
+            android:textSize="9dp"
+            android:paddingRight="10dp" />
 
     </LinearLayout>
 

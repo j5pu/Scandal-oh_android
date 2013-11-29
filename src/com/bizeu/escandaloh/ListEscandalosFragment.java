@@ -183,7 +183,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 					int visibleItemCount, int totalItemCount) {		
 				
 				// Si quedan 5 escándalos para llegar al último, obtenemos los 10 siguientes
-	            if (firstVisibleItem == escanAdapter.getCount() - 1){
+	            if (firstVisibleItem == escanAdapter.getCount() - 5){
 	            	// Usamos el booleano como llave de paso (sólo la primera vez entrará). Cuando se obtengan los 10 escándalos se volverá a abrir
 	            	if (!getting_escandalos && escandalos.size() >0){
 	            		Log.v("WE","Activado!!!");

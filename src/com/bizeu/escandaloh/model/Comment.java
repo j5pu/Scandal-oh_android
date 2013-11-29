@@ -7,11 +7,13 @@ public class Comment {
 	private String text;
 	private String username;
 	private String date;
+	private String resource_uri;
 	
-	public Comment(String text, String username, String date){
+	public Comment(String text, String username, String date, String resource_uri){
 		this.text = text;
 		this.username = username;
 		this.date = date;
+		this.resource_uri = resource_uri;
 	}
 	
 	public String getText(){
@@ -36,5 +38,13 @@ public class Comment {
 	
 	public void setDate(String new_date){
 		this.date = new_date;
+	}
+	
+	public String getResourceuri(){
+		return this.resource_uri;
+	}
+	
+	public void setResourceUri(String new_resource_uri){
+		this.resource_uri = new_resource_uri;
 	}
 }
