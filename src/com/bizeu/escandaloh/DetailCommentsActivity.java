@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -48,6 +49,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private TextView txt_count_characteres;
 	private FetchableImageView img_photo;
 	private LinearLayout layout_write_comment;
+	private LinearLayout ll_list_comments;
 	private ProgressBar progress_list_comments;
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
@@ -79,7 +81,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		acti = this;
 		
 		// Quitamos el action bar
-		//getSupportActionBar().hide();
+		getSupportActionBar().hide();
 		
 		final Context context = this.getApplicationContext();
 		
@@ -87,6 +89,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		img_photo = (FetchableImageView) findViewById(R.id.img_photo_list_comments);
 		img_photo.setImage(route_image, R.drawable.previsualizacion_foto);
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_comments_write);
+		ll_list_comments = (LinearLayout) findViewById(R.id.ll_comments_comments);
 		progress_list_comments = (ProgressBar) findViewById(R.id.prog_list_comments);
 		
 		comments = new ArrayList<Comment>();
@@ -392,6 +395,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			else{			
 				progress_list_comments.setVisibility(View.GONE);
 				list_comments.setVisibility(View.VISIBLE);
+				ll_list_comments.setGravity(Gravity.TOP);
 			}
 				
 			// Si hubo algún error 
