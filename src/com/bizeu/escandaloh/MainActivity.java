@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -290,17 +292,20 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	            Uri selectedImageUri = data.getData();
 	            Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
 	            i.putExtra("photo_from", FROM_GALLERY);
-	            i.putExtra("photoUri", selectedImageUri.toString());
+	            i.putExtra("photoUri", ImageUtils.getRealPathFromURI(context,selectedImageUri));
 	            startActivityForResult(i, CREATE_ESCANDALO);
 			}
-
         }
 		
 		else if (requestCode == CREATE_ESCANDALO){
 		}
 	}
+	
 
 
+
+	
+	
 
 	/**
 	 * Crea un archivo en una ruta con un formato específico
@@ -341,8 +346,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.img_actionbar_takephoto:
-			
-			Log.v("WE","Take photo");
 
 			// Si dispone de conexión
 			if (Connectivity.isOnline(context)){
@@ -350,7 +353,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				if (MyApplication.logged_user){ 
 					
 					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = { "Tomar desde la cámara", "Cogerla desde la galería"};
+					final CharSequence[] items = {"Tomar desde la cámara", "Cogerla de la galería"};
 					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				        builder.setTitle("Añadir foto");
 				        builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -378,11 +381,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 										toast.show();
 									}
 				                } 
-				                else if (items[item].equals("Cogerla desde la galería")) {
-									Intent intent = new Intent();
-			                        intent.setType("image/*");
-			                        intent.setAction(Intent.ACTION_GET_CONTENT);                   
-			                        startActivityForResult(Intent.createChooser(intent,"Select Picture"), FROM_GALLERY);
+				                else if (items[item].equals("Cogerla de la galería")) {
+				                	Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				                	startActivityForResult(i, FROM_GALLERY);
 				                } 
 				            }
 				        });

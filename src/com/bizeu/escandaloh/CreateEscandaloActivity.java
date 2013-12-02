@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,6 +67,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	private boolean con_audio = false;
 	private int photo_from;
 	private boolean any_error;
+	private String photo_string;
 
 	
 	/**
@@ -83,22 +85,35 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 		if (getIntent() != null) {
 			Intent data = getIntent();
+			
+			// Obtenemos de donde se ha tomado la foto
+			photo_from = data.getExtras().getInt("photo_from");
 
+			picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
+		
 			if (data != null) {
-
-				mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
-				this.getContentResolver().notifyChange(mImageUri, null);
-				ContentResolver cr = this.getContentResolver();
-				try {
-					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
-				} catch (Exception e) {
-					Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
-							.show();
-					Log.d("WE", "Failed to load", e);
-				}
 				
-				// Obtenemos de donde se ha tomado la foto
-				photo_from = data.getExtras().getInt("photo_from");
+				photo_string = data.getExtras().getString("photoUri");
+				
+				// Si se ha tomado de la cámara
+				if (photo_from == MainActivity.SHOW_CAMERA){
+					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
+					this.getContentResolver().notifyChange(mImageUri, null);
+					ContentResolver cr = this.getContentResolver();
+					try {
+						taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
+						// Mostramos la foto
+						picture.setImageBitmap(taken_photo);
+					} catch (Exception e) {
+						Toast.makeText(this, "Hubo algún error obteniendo la foto", Toast.LENGTH_SHORT)
+								.show();
+						Log.d("WE", "Failed to load", e);
+					}
+				}
+				// Se ha cogido de la galería
+				else if (photo_from == MainActivity.FROM_GALLERY){
+					picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
+				}
 			}
 		}
 
@@ -129,10 +144,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			} 
 		});
 		
-		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
-
-		picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
-		picture.setImageBitmap(taken_photo);	
+		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);	
 		
 		txt_subir_escandalo = (TextView) findViewById(R.id.txt_new_escandalo_subir);
 		txt_subir_escandalo.setOnClickListener(new OnClickListener() {
@@ -291,7 +303,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			}
 			// Desde la galería
 			else if (photo_from == MainActivity.FROM_GALLERY){
-				photo_file = ImageUtils.bitmapToFile(taken_photo);		
+				photo_file = ImageUtils.bitmapToFile(BitmapFactory.decodeFile(photo_string));		
 			}
 
 			HttpResponse response = null;
