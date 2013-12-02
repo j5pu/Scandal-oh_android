@@ -19,14 +19,15 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +42,11 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private EditText edit_new_comment;
 	private TextView txt_title;
 	private TextView txt_user;
-	private TextView txt_send;
+	private ImageView img_send;
 	private TextView txt_count_characteres;
 	private FetchableImageView img_photo;
 	private LinearLayout layout_write_comment;
+	private ProgressBar progress_list_comments;
 	private String written_comment;	
 	private ArrayAdapter<Comment> commentsAdapter;
 	private ArrayList<Comment> comments;
@@ -53,6 +55,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private String route_image;
 	private String user;
 	private String title;
+	private boolean add_comment; // Este booleano nos indicará si estamos obteniendo comentarios por haber añadido uno nuevo o no
 
 	
 	/**
@@ -71,7 +74,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		}
 		
 		// Quitamos el action bar
-		getSupportActionBar().hide();
+		//getSupportActionBar().hide();
 		
 		final Context context = this.getApplicationContext();
 		
@@ -79,6 +82,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		img_photo = (FetchableImageView) findViewById(R.id.img_photo_list_comments);
 		img_photo.setImage(route_image, R.drawable.previsualizacion_foto);
 		layout_write_comment = (LinearLayout) findViewById(R.id.ll_comments_write);
+		progress_list_comments = (ProgressBar) findViewById(R.id.prog_list_comments);
 		
 		comments = new ArrayList<Comment>();
 		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
@@ -106,8 +110,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 				});
 		
 		
-		txt_send = (TextView) findViewById(R.id.txt_send_new_comment);
-		txt_send.setOnClickListener(new View.OnClickListener() {
+		img_send = (ImageView) findViewById(R.id.img_send_new_comment);
+		img_send.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -132,7 +136,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 
 		progress = new ProgressDialog(this);
 		
-		new GetComments(context).execute();
+		add_comment = false; // No hemos añadido un nuevo comentario
+		new GetComments(context, add_comment).execute();
 	}
 	
 	
@@ -228,25 +233,24 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        progress.dismiss();
 		    }
 			
-			Toast toast; 
-			
 			// Si es codigo 2xx --> OK
 			if (result >= 200 && result <300){
 	        	Log.v("WE","comentario enviado");
-	        	toast = Toast.makeText(mContext, "Comentario enviado", Toast.LENGTH_LONG);
 	        	
 	        	// Vaciamos el editext
 	        	edit_new_comment.setText("");
+	            	
+	        	// Mostramos de nuevo los comentarios (indicamos que si hemos enviado un comentario)
+	        	add_comment = true;
+	        	new GetComments(mContext, add_comment).execute();
 	        	
-	        	// Mostramos de nuevo los comentarios
-	        	new GetComments(mContext).execute();
 	        }
 	        else{
 	        	Log.v("WE","comentario no enviado");
+	        	Toast toast;
 	        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
-	        	
+	        	toast.show();        	
 	        }
-			toast.show();
 	    }
 	}
 	
@@ -261,18 +265,22 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private class GetComments extends AsyncTask<Void,Integer,Integer> {
 		 	
 		private Context mContext;
-	    public GetComments(Context context){
+		private boolean add_comm;
+		
+	    public GetComments(Context context, boolean add_comment){
 	         mContext = context;
+	         add_comm = add_comment;
 	    }
 		
 		@Override
 		protected void onPreExecute(){
 
-			// Mostramos el ProgressDialog
-			progress.setTitle("Obteniendo comentarios ...");
-			progress.setMessage("Espere, por favor");
-			progress.setCancelable(false);
-			progress.show();
+			// Si estamos obteniendo comntarios sin haber enviado uno mostramos el progress bar
+			if (!add_comm){
+				progress_list_comments.setVisibility(View.VISIBLE);
+				list_comments.setVisibility(View.GONE);		
+			}
+
 		}
 		
 		@Override
@@ -325,18 +333,26 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
-			
-			// Quitamos el ProgressDialog
-			if (progress.isShowing()) {
-		        progress.dismiss();
-		    }
+
+			// Si estamos obteniéndolos porque hemos enviado uno
+			if (add_comm){
+				// Quitamos el ProgressDialog
+				if (progress.isShowing()) {
+			        progress.dismiss();
+			    }
+			}
+			// Si no, mostramos los comentarios y quitamos el progress bar
+			else{			
+				progress_list_comments.setVisibility(View.GONE);
+				list_comments.setVisibility(View.VISIBLE);
+			}
+
 			
 			
 			
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
 	        	Log.v("WE","comentarios listados");
-	        	//toast = Toast.makeText(mContext, "Comentarios listados", Toast.LENGTH_LONG);
 	        	commentsAdapter.notifyDataSetChanged();
 	        }
 	        else{

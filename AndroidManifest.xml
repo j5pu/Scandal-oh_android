@@ -25,7 +25,7 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:theme="@style/MyTheme" >
         <activity
@@ -55,7 +55,7 @@
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.DetailCommentsActivity"
-            android:windowSoftInputMode="stateHidden"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:screenOrientation="portrait" >
         </activity>
         <activity 

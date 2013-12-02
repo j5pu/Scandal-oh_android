@@ -124,31 +124,27 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:background="@color/gris_claro"
-        android:orientation="vertical" >
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/ll_comments_comments"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical" >
+
+        <ProgressBar
+            android:id="@+id/prog_list_comments"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
 
         <ListView
             android:id="@+id/list_comments"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:visibility="gone" >
         </ListView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:orientation="vertical" >
-
     </LinearLayout>
 
     <LinearLayout
@@ -158,7 +154,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="0.2dp"
+            android:layout_height="0.5dp"
             android:background="@color/gris_oscuro" />
     </LinearLayout>
 
@@ -174,7 +170,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_weight="1.2"
+        android:layout_weight="0.8"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal" >
 
@@ -203,16 +199,15 @@
             android:paddingLeft="5dp" >
         </EditText>
 
-        <TextView
-            android:id="@+id/txt_send_new_comment"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:layout_weight="1"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="Enviar"
-            android:textColor="@color/azul"
-            android:textSize="20dp" />
+        <ImageView
+            android:id="@+id/img_send_new_comment"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/flecha_selector"
+            android:paddingLeft="5dp" />
+
     </LinearLayout>
 
     <LinearLayout
