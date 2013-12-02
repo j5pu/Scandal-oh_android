@@ -105,6 +105,7 @@ public class MainLoginActivity extends SherlockActivity{
 			@Override
 			public void onClick(View v) {
 				if (!login_facebook_pulsado){
+					// Mostramos el progress bar (sólo desaparecerá en algún caso de error o al tener éxito con el login)
 					progress.show();
 					login_facebook_pulsado = true;
 					 Session currentSession = Session.getActiveSession();
@@ -278,14 +279,6 @@ public class MainLoginActivity extends SherlockActivity{
 		@Override
 		protected void onPreExecute(){
 			login_error = false;
-			
-			/*
-			// Mostramos el ProgressDialog		
-			progress.setTitle("Logueando ...");
-			progress.setMessage("Espere, por favor");
-			progress.setCancelable(false);
-			progress.show();
-			*/
 		}
 		
 		@Override
@@ -356,7 +349,7 @@ public class MainLoginActivity extends SherlockActivity{
 		        prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 		        MyApplication.resource_uri = user_uri;
 		        MyApplication.logged_user = true;
-		        Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT).show();
+		        Toast.makeText(getBaseContext(), "Logueado correctamente", Toast.LENGTH_SHORT).show();
 		        	
 		        // Le indicamos a la anterior actividad que ha habido éxito en el log in
 		        setResult(Activity.RESULT_OK);

@@ -395,7 +395,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				}
 			}
 			else{
-				Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+				Toast toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
 				toast.show();
 			}
 			

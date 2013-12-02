@@ -248,27 +248,8 @@ public class RecordAudioDialog extends Dialog{
 					   else{
 						   Log.v("WE","Entra en else malo y contador_play vale: " + contador_play + "y ultimo_tiemop: " + ultimo_tiempo_guardado);
 						   Audio.getInstance().stopPlaying();
-						   
-							// Cambios IU
-						   /*
-							ll_espacio_botones.setVisibility(View.VISIBLE);
-							txt_description.setText("Audio grabado:");
-							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
-							txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
-							String recorded_seconds_string;
-							if (ultimo_tiempo_guardado < 10){
-								recorded_seconds_string = "00:0" + ultimo_tiempo_guardado;
-							}
-							else{
-								recorded_seconds_string = "00:" + ultimo_tiempo_guardado;
-							}
-							txt_meter.setText(recorded_seconds_string);
-							but_reproducir.setText("Reproducir");
-							but_abajo.setVisibility(View.VISIBLE);	
-							
-							// Reseteamos contador play
-							contador_play = 0;
-							*/
+
+						   // Cambios IU
 						   changeIUPlayFinised();
 					   }
 				   }

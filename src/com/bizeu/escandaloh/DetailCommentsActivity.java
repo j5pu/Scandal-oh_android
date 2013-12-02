@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -35,6 +36,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.util.Connectivity;
 
 public class DetailCommentsActivity extends SherlockActivity {
 
@@ -56,7 +58,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private String user;
 	private String title;
 	private boolean add_comment; // Este booleano nos indicará si estamos obteniendo comentarios por haber añadido uno nuevo o no
-
+	private boolean any_error;
+	private Activity acti;
 	
 	/**
 	 * onCreate
@@ -72,6 +75,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 			user = getIntent().getExtras().getString("user");
 			title = getIntent().getExtras().getString("title");
 		}
+		
+		acti = this;
 		
 		// Quitamos el action bar
 		//getSupportActionBar().hide();
@@ -115,12 +120,22 @@ public class DetailCommentsActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				written_comment = edit_new_comment.getText().toString();
-				// Si ha escrito algo y la longitud es menor de 500 caracteres lo intentamos enviar
-				if (!written_comment.equals("") && written_comment.length() < 501){
-					Log.v("WE","Longitud comentario: " + written_comment.length());
-					new SendComment(context).execute();
-				}	
+				
+				// Si hay conexión
+				if (Connectivity.isOnline(acti)){
+					written_comment = edit_new_comment.getText().toString();
+					// Si ha escrito algo y la longitud es menor de 500 caracteres lo intentamos enviar
+					if (!written_comment.equals("") && written_comment.length() < 501){
+						Log.v("WE","Longitud comentario: " + written_comment.length());
+						new SendComment(context).execute();
+					}	
+				}
+				else{
+		        	Toast toast;
+		        	toast = Toast.makeText(acti, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+		        	toast.show();
+				}
+
 			}
 		});
 		
@@ -137,7 +152,16 @@ public class DetailCommentsActivity extends SherlockActivity {
 		progress = new ProgressDialog(this);
 		
 		add_comment = false; // No hemos añadido un nuevo comentario
-		new GetComments(context, add_comment).execute();
+		
+		// Si hay conexión
+		if (Connectivity.isOnline(this)){
+			new GetComments(context, add_comment).execute();
+		}
+		else{
+        	Toast toast;
+        	toast = Toast.makeText(this, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+        	toast.show();
+		}
 	}
 	
 	
@@ -172,6 +196,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 	    public SendComment (Context context){
 	         mContext = context;
+	         any_error = false;
 	    }
 		
 		@Override
@@ -218,10 +243,16 @@ public class DetailCommentsActivity extends SherlockActivity {
 	        
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             any_error = true; // Indicamos que hubo algún error
 	        }
 	        
-	        // Devolvemos el resultado 
-	        return (response.getStatusLine().getStatusCode());
+	        if (any_error){
+	        	return 666;
+	        }
+	        else{
+		        // Devolvemos el resultado 
+		        return (response.getStatusLine().getStatusCode());
+	        }
 	    }
 
 		
@@ -233,24 +264,31 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        progress.dismiss();
 		    }
 			
-			// Si es codigo 2xx --> OK
-			if (result >= 200 && result <300){
-	        	Log.v("WE","comentario enviado");
-	        	
-	        	// Vaciamos el editext
-	        	edit_new_comment.setText("");
-	            	
-	        	// Mostramos de nuevo los comentarios (indicamos que si hemos enviado un comentario)
-	        	add_comment = true;
-	        	new GetComments(mContext, add_comment).execute();
-	        	
-	        }
-	        else{
-	        	Log.v("WE","comentario no enviado");
-	        	Toast toast;
-	        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
-	        	toast.show();        	
-	        }
+			// Si hubo algún error mostramos un mensaje
+			if (any_error){
+				Toast toast = Toast.makeText(acti, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			else{
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result <300){
+		        	Log.v("WE","comentario enviado");
+		        	
+		        	// Vaciamos el editext
+		        	edit_new_comment.setText("");
+		            	
+		        	// Mostramos de nuevo los comentarios (indicamos que si hemos enviado un comentario)
+		        	add_comment = true;
+		        	new GetComments(mContext, add_comment).execute();
+		        	
+		        }
+		        else{
+		        	Log.v("WE","comentario no enviado");
+		        	Toast toast;
+		        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
+		        	toast.show();        	
+		        }	
+			}
 	    }
 	}
 	
@@ -280,7 +318,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 				progress_list_comments.setVisibility(View.VISIBLE);
 				list_comments.setVisibility(View.GONE);		
 			}
-
+			
+			any_error = false;
 		}
 		
 		@Override
@@ -295,7 +334,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 			del.setHeader("content-type", "application/json");
 			
 			HttpResponse response = null ;
-			try{
+			
+			try{				
 					response = httpClient.execute(del);
 			        String respStr = EntityUtils.toString(response.getEntity());
 			        
@@ -324,10 +364,17 @@ public class DetailCommentsActivity extends SherlockActivity {
 			}
 			catch(Exception ex){
 				Log.e("ServicioRest","Error!", ex);
+				any_error = true; // Indicamos que hubo un error
 			}
 			
-			// Devolvemos el código de respuesta
-	        return (response.getStatusLine().getStatusCode());
+			// Si hubo algún error devolvemos 666
+			if (any_error){
+				return 666;
+			}
+			else{			
+				// Devolvemos el código de respuesta
+		        return (response.getStatusLine().getStatusCode());
+			}
 	    }
 
 		
@@ -341,23 +388,32 @@ public class DetailCommentsActivity extends SherlockActivity {
 			        progress.dismiss();
 			    }
 			}
-			// Si no, mostramos los comentarios y quitamos el progress bar
+			// Si no, mostramos el listview y quitamos el progress bar
 			else{			
 				progress_list_comments.setVisibility(View.GONE);
 				list_comments.setVisibility(View.VISIBLE);
 			}
-		
-			// Si es codigo 2xx --> OK
-	        if (result >= 200 && result <300){
-	        	Log.v("WE","comentarios listados");
-	        	commentsAdapter.notifyDataSetChanged();
-	        }
-	        else{
-	        	Log.v("WE","comentarios no listados");
-	        	Toast toast;
-	        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
-	        	toast.show();
-	        }        
+				
+			// Si hubo algún error 
+			if (result == 666){
+				Toast toast = Toast.makeText(acti, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			// No hubo ningún error extraño
+			else{
+				// Si es codigo 2xx --> OK
+		        if (result >= 200 && result <300){
+		        	Log.v("WE","comentarios listados");
+		        	commentsAdapter.notifyDataSetChanged();
+		        }
+		        else{
+		        	Log.v("WE","comentarios no listados");
+		        	Toast toast;
+		        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
+		        	toast.show();
+		        } 
+			}
+       
 	    }
 	}
 	

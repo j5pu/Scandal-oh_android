@@ -47,6 +47,7 @@ public class RegistrationActivity extends SherlockActivity {
 	private String user_uri ;
 	private ProgressDialog progress;
 	private Context context;
+	private boolean any_error;
 
 	
 	
@@ -82,10 +83,9 @@ public class RegistrationActivity extends SherlockActivity {
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
 					toast.show();
 				}
-
 			}
 		});
 		
@@ -113,7 +113,10 @@ public class RegistrationActivity extends SherlockActivity {
 			progress.setTitle("Registrando usuario ...");
 			progress.setMessage("Espere, por favor");
 			progress.setCancelable(false);
-			progress.show();		
+			progress.show();	
+			
+			// Reseteamos
+			any_error = false;
 		}
 		
 		@Override
@@ -180,6 +183,7 @@ public class RegistrationActivity extends SherlockActivity {
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             any_error = true;
 	        }
 	        
 	        return null;
@@ -194,32 +198,40 @@ public class RegistrationActivity extends SherlockActivity {
 		        progress.dismiss();
 		    }
 			
-			if (has_name_error){
-				edit_nombre_usuario.setError(name_error);
+			// Si hubo algún error mostramos un mensaje
+			if (any_error){
+				Toast toast = Toast.makeText(context, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
 			}
-			
-			if (has_password_error){
-				edit_password_usuario.setError(password_error);
-			}
-			
-			if (has_email_error){
-				edit_email_usuario.setError(email_error);
-			}
-			
-			// Se ha registrado correctamente
-			if (!has_name_error && !has_password_error && !has_email_error){
-				SharedPreferences prefs = getBaseContext().getSharedPreferences(
-	        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-	        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-	        	MyApplication.logged_user = true;
-	        	Toast.makeText(getBaseContext(), "Registro ok", Toast.LENGTH_SHORT).show();
-	        	
-	        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
-	        	setResult(Activity.RESULT_OK);
-	        	finish();
+			// Si no hubo ningún error
+			else{
+				if (has_name_error){
+					edit_nombre_usuario.setError(name_error);
+				}
+				
+				if (has_password_error){
+					edit_password_usuario.setError(password_error);
+				}
+				
+				if (has_email_error){
+					edit_email_usuario.setError(email_error);
+				}
+				
+				// Se ha registrado correctamente
+				if (!has_name_error && !has_password_error && !has_email_error){
+					SharedPreferences prefs = getBaseContext().getSharedPreferences(
+		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+		        	MyApplication.logged_user = true;
+		        	Toast.makeText(getBaseContext(), "Registro realizado correctamente", Toast.LENGTH_SHORT).show();
+		        	
+		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
+		        	setResult(Activity.RESULT_OK);
+		        	finish();
 
-				Log.e("WE","Registro ok");
-			}	
+					Log.e("WE","Registro ok");
+				}	
+			}				
 	    }
 	}
 	

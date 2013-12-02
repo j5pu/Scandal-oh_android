@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 
 public class CreateEscandaloActivity extends SherlockActivity {
@@ -64,6 +65,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	private File audio_file;
 	private boolean con_audio = false;
 	private int photo_from;
+	private boolean any_error;
 
 	
 	/**
@@ -137,45 +139,53 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				String introducido = edit_title.getText().toString();
-				if (introducido.equals("")) {
-					Toast toast = Toast.makeText(getBaseContext(),
-							"Debe introducir primero un título",
-							Toast.LENGTH_SHORT);
-					toast.show();
-				} else {
-					AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
-					alert_audio.setMessage("¿Deseas agregar audio?");
-					alert_audio.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialogo1,
-										int id) {
-									RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
-									record.setDialogResult(new OnMyDialogResult(){
-									    public void finish(String result){
-									       if (result.equals("OK")){
-									    	   con_audio = true;									       
-									       }	
-									       else if (result.equals("CANCELED")){
-									    	   con_audio = false;
-									       }
-									       new SendScandalo().execute();
-									    }
-									});
-									record.setCancelable(false);
-									record.show(); 								
-								}
-							});
-					alert_audio.setNegativeButton("Cancelar",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialogo1,
-										int id) {
-									// Enviamos el escandalo sin audio
-									con_audio = false;
-									new SendScandalo().execute();
-								}
-							});
-					alert_audio.show();
+				// Si hay conexión
+				if (Connectivity.isOnline(context)){
+					String introducido = edit_title.getText().toString();
+					if (introducido.equals("")) {
+						Toast toast = Toast.makeText(getBaseContext(),
+								"Debe introducir primero un título",
+								Toast.LENGTH_SHORT);
+						toast.show();
+					} else {
+						AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
+						alert_audio.setMessage("¿Deseas agregar audio?");
+						alert_audio.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialogo1,
+											int id) {
+										RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
+										record.setDialogResult(new OnMyDialogResult(){
+										    public void finish(String result){
+										       if (result.equals("OK")){
+										    	   con_audio = true;									       
+										       }	
+										       else if (result.equals("CANCELED")){
+										    	   con_audio = false;
+										       }
+										       new SendScandalo().execute();
+										    }
+										});
+										record.setCancelable(false);
+										record.show(); 								
+									}
+								});
+						alert_audio.setNegativeButton("Cancelar",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialogo1,
+											int id) {
+										// Enviamos el escandalo sin audio
+										con_audio = false;
+										new SendScandalo().execute();
+									}
+								});
+						alert_audio.show();
+					}
+				}
+				else{
+		        	Toast toast;
+		        	toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+		        	toast.show();
 				}
 			}		
 		});
@@ -185,46 +195,55 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				String introducido = edit_title.getText().toString();
-				if (introducido.equals("")) {
-					Toast toast = Toast.makeText(getBaseContext(),
-							"Debe introducir primero un título",
-							Toast.LENGTH_SHORT);
-					toast.show();
-				} else {
-					AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
-					alert_audio.setMessage("¿Deseas agregar audio?");
-					alert_audio.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialogo1,
-										int id) {
-									RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
-									record.setDialogResult(new OnMyDialogResult(){
-									    public void finish(String result){
-									       if (result.equals("OK")){
-									    	   con_audio = true;									       
-									       }	
-									       else if (result.equals("CANCELED")){
-									    	   con_audio = false;
-									       }
-									       new SendScandalo().execute();
-									    }
-									});
-									record.setCancelable(false);
-									record.show(); 								
-								}
-							});
-					alert_audio.setNegativeButton("Cancelar",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialogo1,
-										int id) {
-									// Enviamos el escandalo sin audio
-									con_audio = false;
-									new SendScandalo().execute();
-								}
-							});
-					alert_audio.show();
+				// Si hay conexión
+				if (Connectivity.isOnline(context)){
+					String introducido = edit_title.getText().toString();
+					if (introducido.equals("")) {
+						Toast toast = Toast.makeText(getBaseContext(),
+								"Debe introducir primero un título",
+								Toast.LENGTH_SHORT);
+						toast.show();
+					} else {
+						AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
+						alert_audio.setMessage("¿Deseas agregar audio?");
+						alert_audio.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialogo1,
+											int id) {
+										RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
+										record.setDialogResult(new OnMyDialogResult(){
+										    public void finish(String result){
+										       if (result.equals("OK")){
+										    	   con_audio = true;									       
+										       }	
+										       else if (result.equals("CANCELED")){
+										    	   con_audio = false;
+										       }
+										       new SendScandalo().execute();
+										    }
+										});
+										record.setCancelable(false);
+										record.show(); 								
+									}
+								});
+						alert_audio.setNegativeButton("Cancelar",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialogo1,
+											int id) {
+										// Enviamos el escandalo sin audio
+										con_audio = false;
+										new SendScandalo().execute();
+									}
+								});
+						alert_audio.show();
+					}
 				}
+				else{
+		        	Toast toast;
+		        	toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+		        	toast.show();
+				}
+				
 			}		
 		});
 
@@ -257,6 +276,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		protected void onPreExecute() {
 			// Mostramos el ProgressDialog
 			progress.show();
+			any_error = false;
 		}
 
 		@Override
@@ -264,7 +284,6 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 			HttpEntity resEntity;
 			String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photo/";
-
 			
 			// Se ha tomado desde la camara
 			if (photo_from == MainActivity.SHOW_CAMERA){
@@ -321,9 +340,16 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				
 			} catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
+				// Hubo algún error
+				any_error = true;
 			}
 
-			return (response.getStatusLine().getStatusCode());
+			if (any_error){
+				return 666;
+			}
+			else{
+				return (response.getStatusLine().getStatusCode());	
+			}
 		}
 
 		@Override
@@ -333,28 +359,37 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			if (progress.isShowing()) {
 				progress.dismiss();
 			}
-
-			// Si es codigo 2xx --> OK
-			if (result >= 200 && result < 300) {
-				Intent resultIntent = new Intent();
-				resultIntent.putExtra("title", written_title);
-				resultIntent.putExtra("category", selected_category);
-				Toast toast = Toast.makeText(context, "Escándalo subido con éxito", Toast.LENGTH_LONG);
-				toast.show();
-				Log.v("WE", "foto enviada");
-				setResult(Activity.RESULT_OK, resultIntent);
-				finish();
-			} else {
-				Toast toast = Toast.makeText(context, "Error subiendo el escándalo", Toast.LENGTH_LONG);
-				toast.show();
-				Log.v("WE", "foto no enviada");
-				finish();
-			}
 			
-			// Si la foto se tomó de la galería borramos el archivo
-			if (photo_from == MainActivity.FROM_GALLERY && photo_file.exists()){
-				photo_file.delete();
+			// Si hubo algún error mostramos un mensaje
+			if (result == 666){
+	        	Toast toast;
+	        	toast = Toast.makeText(context, "Lo sentimos, hubo algún error inesperado", Toast.LENGTH_LONG);
+	        	toast.show();
 			}
+			// No hubo ningún error extraño
+			else{
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result < 300) {
+					Intent resultIntent = new Intent();
+					resultIntent.putExtra("title", written_title);
+					resultIntent.putExtra("category", selected_category);
+					Toast toast = Toast.makeText(context, "Escándalo subido con éxito", Toast.LENGTH_LONG);
+					toast.show();
+					Log.v("WE", "foto enviada");
+					setResult(Activity.RESULT_OK, resultIntent);
+					finish();
+				} else {
+					Toast toast = Toast.makeText(context, "Error subiendo el escándalo", Toast.LENGTH_LONG);
+					toast.show();
+					Log.v("WE", "foto no enviada");
+					finish();
+				}
+				
+				// Si la foto se tomó de la galería borramos el archivo
+				if (photo_from == MainActivity.FROM_GALLERY && photo_file.exists()){
+					photo_file.delete();
+				}
+			}		
 		}
 	}
 

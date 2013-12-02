@@ -55,6 +55,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	private PullToRefreshListView  lView;
 	private boolean getting_escandalos = true;
 	private String category;
+	private boolean any_error;
+	private boolean connection_checked = false;
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -81,6 +83,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
+		
+		connection_checked = false;
 		
 	    // Indicamos a las otras categorias que serán su primera vez la próxima vez que se les pulse
 	    if (category.equals(MainActivity.HAPPY)){
@@ -183,13 +187,29 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				
 				// Si quedan 5 escándalos para llegar al último, obtenemos los 10 siguientes
 	            if (firstVisibleItem == escanAdapter.getCount() - 5){
-	            	// Usamos el booleano como llave de paso (sólo la primera vez entrará). Cuando se obtengan los 10 escándalos se volverá a abrir
-	            	if (!getting_escandalos && escandalos.size() >0){
-	            		Log.v("WE","Activado!!!");
-		            	getting_escandalos = true;
-		            	getEscandalosAsync = new GetEscandalos();
-	            		getEscandalosAsync.execute();
-	            	}
+	            	
+	            	// Si no hemos comprobado ya que no disponga de conexión (para que no aparezcan 20 mil mensajes de no tiene conexión)
+	            	if (!connection_checked){
+	            		// Si hay conexión
+						if (Connectivity.isOnline(getActivity().getApplicationContext())){
+							// Abrimos la llave
+							connection_checked = false;
+			            	// Usamos el booleano como llave de paso (sólo la primera vez entrará). Cuando se obtengan los 10 escándalos se volverá a abrir
+			            	if (!getting_escandalos && escandalos.size() >0){
+			            		Log.v("WE","Activado!!!");
+				            	getting_escandalos = true;
+				            	getEscandalosAsync = new GetEscandalos();
+			            		getEscandalosAsync.execute();
+			            	}
+						}
+
+						else{
+							// Cerramos la llave
+							connection_checked = true;
+							Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+							toast.show();
+						} 
+	            	}		    	
 	            }
 	            
 				
@@ -238,6 +258,10 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		else{
 			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
+			// Habilitamos los tabs de nuevo 
+	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
+	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(true);
+	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(true);
 		}	
 	}
 	
@@ -452,6 +476,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		@Override
 		protected void onPreExecute(){
 			Log.v("WE","Entra en getescandalos");
+			any_error = false;
 		}
 		
 		@Override
@@ -518,15 +543,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				}
 			}
 			
-
-				
-			HttpClient httpClient = new DefaultHttpClient();
-        
-		    HttpGet getEscandalos = new HttpGet(url);
-		    getEscandalos.setHeader("content-type", "application/json");        
-		        
-		    HttpResponse response = null;
+	    	HttpResponse response = null;
+			
 		    try{
+				
+		    	HttpClient httpClient = new DefaultHttpClient();
+        
+		    	HttpGet getEscandalos = new HttpGet(url);
+		   		getEscandalos.setHeader("content-type", "application/json");        		    
+
 				// Hacemos la petición al servidor
 		        response = httpClient.execute(getEscandalos);
 		        String respStr = EntityUtils.toString(response.getEntity());
@@ -595,8 +620,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			        	}
 			        }
 		        }
-		        
-		      
+		        	      
 		        
 		        // Obtenemos los datos de los escándalos
 		        for (int i=0 ; i < escandalosObject.length(); i++){
@@ -629,16 +653,32 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		     }
 		     catch(Exception ex){
 		            Log.e("ServicioRest","Error obteniendo escándalos", ex);
+		            // Hubo algún error inesperado
+		            any_error = true;
 		     }
-		        	 
-		     // Devolvemos el código resultado
-		     return (response.getStatusLine().getStatusCode());    	
+		       
+		    // Si hubo algún error devolvemos 666
+		    if (any_error){
+		    	return 666;
+		    }
+		    else{
+			     // Devolvemos el código resultado
+			     return (response.getStatusLine().getStatusCode());   
+		    }
+
 	    }
 
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
 			
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666){
+				Toast toast = Toast.makeText(getActivity().getBaseContext(), "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			
+			// No hubo ningún error inesperado
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
@@ -675,6 +715,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		@Override
 		protected void onPreExecute(){
 			Log.v("WE","Entra en getNewescandalos");
+			any_error = false;
 		}
 		
 		@Override
@@ -699,14 +740,14 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + escandalos.get(0).getId() + "/" + MyApplication.code_selected_country+ "/new/";
 			}
 	
+			HttpResponse response = null;
 			
-			HttpClient httpClient = new DefaultHttpClient();
+			try{
+				 HttpClient httpClient = new DefaultHttpClient();
         
-		    HttpGet getEscandalos = new HttpGet(url);
-		    getEscandalos.setHeader("content-type", "application/json");        
-		        
-		    HttpResponse response = null;
-		    try{
+				 HttpGet getEscandalos = new HttpGet(url);
+				 getEscandalos.setHeader("content-type", "application/json");        
+		           
 				// Hacemos la petición al servidor
 		        response = httpClient.execute(getEscandalos);
 		        String respStr = EntityUtils.toString(response.getEntity());
@@ -744,11 +785,18 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		     }
 		     catch(Exception ex){
 		            Log.e("ServicioRest","Error!", ex);
-		     }
-		        	 
-		    Log.v("WE","antes del return");
-		     // Devolvemos el código resultado
-		     return (response.getStatusLine().getStatusCode());    	
+		            // Hubo algún error inesperado
+		            any_error = true;
+		     }		        	 
+		    
+	    	// Si hubo algún error devolvemos 666
+		    if (any_error){
+		    	return 666;
+		    }
+		    else{
+		    	// Devolvemos el código resultado
+		    	return (response.getStatusLine().getStatusCode());   	
+		    }
 	    }
 
 		
@@ -756,16 +804,26 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    protected void onPostExecute(Integer result) {
 	
 			Log.v("WE","onPostExecute");
-			if (!isCancelled()){
-				// Si es codigo 2xx --> OK
-		        if (result >= 200 && result <300){
-		        	Log.v("WE","escandalos actualizados");
-		        	escanAdapter.notifyDataSetChanged();
-		        }
-		        else{
-		        	Log.v("WE","escandalos NO actualizados");
-		        }        
+			
+			// Si hubo algún error inesperado
+			if (result == 666){
+				Toast toast = Toast.makeText(getActivity().getBaseContext(), "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
 			}
+			
+			else{
+				if (!isCancelled()){
+					// Si es codigo 2xx --> OK
+			        if (result >= 200 && result <300){
+			        	Log.v("WE","escandalos actualizados");
+			        	escanAdapter.notifyDataSetChanged();
+			        }
+			        else{
+			        	Log.v("WE","escandalos NO actualizados");
+			        }        
+				}
+			}
+
 			// Abrimos la llave
 			getting_escandalos = false;
 			Log.v("WE","llama a onRefreshComplete");

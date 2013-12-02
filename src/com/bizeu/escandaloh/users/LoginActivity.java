@@ -49,7 +49,7 @@ public class LoginActivity extends SherlockActivity {
 	private boolean login_error = false;
 	private String loginMessageError;
 	private Context context;
-	private boolean strange_error;
+	private boolean any_error;
 	
 	
 	
@@ -103,7 +103,7 @@ public class LoginActivity extends SherlockActivity {
 			has_name_error = false;
 			has_password_error = false;
 			login_error = false;
-			strange_error = false;
+			any_error = false;
 			edit_nombre_email.setError(null);
 			edit_password.setError(null);
 			
@@ -189,7 +189,7 @@ public class LoginActivity extends SherlockActivity {
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
-	             strange_error = true;
+	             any_error = true;
 	        }
 			return null;
 	      
@@ -204,39 +204,40 @@ public class LoginActivity extends SherlockActivity {
 		        progress.dismiss();
 		    }
 			
-			if (strange_error){
-				Toast.makeText(getBaseContext(), "Lo sentimos , se ha producido un error", Toast.LENGTH_SHORT).show();
+			// Si hubo algún error mostramos un mensaje
+			if (any_error){
+				Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT).show();
 			}
-			
-			// Si no ha habido algún error extraño 
-			else if (!login_error){
-				if (has_name_error){
-					edit_nombre_email.setError(name_error);
-				}
-				if (has_password_error){
-					edit_password.setError(password_error);
-				}
-				// Se ha logueado correctamente
-				if (!has_name_error && !has_password_error){
-					SharedPreferences prefs = getBaseContext().getSharedPreferences(
-		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-		        	MyApplication.resource_uri = user_uri;
-		        	MyApplication.logged_user = true;
-		        	Toast.makeText(getBaseContext(), "Login ok", Toast.LENGTH_SHORT).show();
-		        	
-		        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
-		        	setResult(Activity.RESULT_OK);
-		        	finish();
-				}	
-			}
-			
-			// Ha habido algún error extraño: mostramos el mensaje
 			else{
-	        	Toast.makeText(getBaseContext(), loginMessageError, Toast.LENGTH_SHORT)
-				.show();
-			}
-						
+				// Si no ha habido algún error extraño 
+				 if (!login_error){
+					if (has_name_error){
+						edit_nombre_email.setError(name_error);
+					}
+					if (has_password_error){
+						edit_password.setError(password_error);
+					}
+					// Se ha logueado correctamente
+					if (!has_name_error && !has_password_error){
+						SharedPreferences prefs = getBaseContext().getSharedPreferences(
+			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+			        	MyApplication.resource_uri = user_uri;
+			        	MyApplication.logged_user = true;
+			        	Toast.makeText(getBaseContext(), "Logueado correctamente", Toast.LENGTH_SHORT).show();
+			        	
+			        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
+			        	setResult(Activity.RESULT_OK);
+			        	finish();
+					}	
+				}
+				
+				// Ha habido algún error extraño: mostramos el mensaje
+				else{
+		        	Toast.makeText(getBaseContext(), loginMessageError, Toast.LENGTH_SHORT)
+					.show();
+				}
+			}								
 	    }
 	}
 }
