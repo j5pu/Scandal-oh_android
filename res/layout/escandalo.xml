@@ -111,10 +111,11 @@
                     <ImageView
                         android:id="@+id/img_escandalo_microfono"
                         android:layout_width="22dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/sonido" />
+                        android:background="@drawable/sonido_selector"
+                        android:scaleType="centerInside" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -130,7 +131,7 @@
                         android:layout_width="22dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:background="@drawable/comentario"
+                        android:background="@drawable/comentario_selector"
                         android:gravity="center_vertical|center_horizontal"
                         android:text="1"
                         android:textColor="@color/blanco"
@@ -150,9 +151,9 @@
                     <ImageView
                         android:id="@+id/img_list_country_flag"
                         android:layout_width="22dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:src="@drawable/compartir" />
+                        android:background="@drawable/compartir_selector" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

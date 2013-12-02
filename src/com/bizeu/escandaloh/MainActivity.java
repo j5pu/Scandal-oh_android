@@ -1,8 +1,6 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -10,22 +8,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.Signature;
 import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
@@ -34,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
@@ -46,9 +37,9 @@ import com.zed.adserver.onAdsReadyListener;
 public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, OnClickListener {
 
 	public static final String CATEGORY = "Category";
-	public static final String ANGRY = "Enfadado";
-	public static final String HAPPY = "Feliz";
-	public static final String BOTH = "Ambos";
+	public static final String ANGRY = "Denuncia";
+	public static final String HAPPY = "Humor";
+	public static final String BOTH = "Todas";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	
 	public static final int SHOW_CAMERA = 10;
@@ -63,7 +54,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private FrameLayout banner;
 	private BannerView adM;
 	private SharedPreferences prefs;
-	private FragmentTabHost mTabHost;
+	public static FragmentTabHost mTabHost;
 	private Context context;
 	
 	private ImageView img_logout;
@@ -105,12 +96,11 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 		// Tab Host (FragmentTabHost)
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
-        mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
-       
-      //  mTabHost.getTabWidget().setBackgroundColor(getResources().getColor(R.color.gris_claro));
-      //  mTabHost.setBackgroundColor(getResources().getColor(R.color.gris_claro));
+        mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);       
 
-
+        // Separadores de los tabs
+        mTabHost.getTabWidget().setDividerDrawable(R.drawable.prueba_separador); //id of your drawble resource here
+        
         // Añadimos los tabs para cada uno de los 3 fragmentos
         Bundle b = new Bundle();
         b.putString(CATEGORY, HAPPY);
@@ -125,20 +115,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragment.class, b);
 
 
- 
-        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++) 
-        {
+        // Cambiamos el color del texto y le añadimos el selector (para la barrita de abajo)
+        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++){
             TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
-            tv.setTextColor(getResources().getColor(R.color.rojo));
+            tv.setTextColor(getResources().getColor(R.color.gris_oscuro));
+
+           mTabHost.getTabWidget().getChildAt(i).setBackgroundResource(R.drawable.tab_selector);           
         } 
-        
-        /*
-        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++)
-        {
-            mTabHost.getTabWidget().getChildAt(i).setBackgroundColor(getResources().getColor(R.color.gris_claro)); //unselected
-        }
-        */
-        //mTabHost.getTabWidget().getChildAt(mTabHost.getCurrentTab()).setBackgroundColor(Color.parseColor("#0000FF")); // se
+
         
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
@@ -168,12 +152,33 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 	   // AdsSessionController.enableTracking();
 		
+		// Si está logueado quitamos el botón de logout y añadimos la cámara (con su selector)
 		if (MyApplication.logged_user){
 			img_logout.setVisibility(View.VISIBLE);
-			img_take_photo.setImageResource(R.drawable.camara);
+			
+			StateListDrawable states = new StateListDrawable();
+
+			states.addState(new int[] {android.R.attr.state_pressed},
+			    getResources().getDrawable(R.drawable.camara_pressed));
+			states.addState(new int[] {android.R.attr.state_focused},
+			    getResources().getDrawable(R.drawable.camara_pressed));
+			states.addState(new int[] { },
+			    getResources().getDrawable(R.drawable.camara));
+			img_take_photo.setImageDrawable(states);
+			
 		}
-		else{
+		// Si no está logueado mostramos el botón de logout y añadimos el más (con su selector)
+		else{			
 			img_logout.setVisibility(View.INVISIBLE);
+			
+			StateListDrawable states = new StateListDrawable();
+			states.addState(new int[] {android.R.attr.state_pressed},
+				    getResources().getDrawable(R.drawable.mas_pressed));
+				states.addState(new int[] {android.R.attr.state_focused},
+				    getResources().getDrawable(R.drawable.mas_pressed));
+				states.addState(new int[] { },
+				    getResources().getDrawable(R.drawable.mas));
+				img_take_photo.setImageDrawable(states);
 		}
 	}
 	
@@ -407,8 +412,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
 							img_logout.setVisibility(View.INVISIBLE);
-							// Cabiamos el icono de la cámara
-							img_take_photo.setImageResource(R.drawable.mas);
+							// Cabiamos el icono de la cámara al más (con su selector)
+							StateListDrawable states = new StateListDrawable();
+							states.addState(new int[] {android.R.attr.state_pressed},
+								    getResources().getDrawable(R.drawable.mas_pressed));
+								states.addState(new int[] {android.R.attr.state_focused},
+								    getResources().getDrawable(R.drawable.mas_pressed));
+								states.addState(new int[] { },
+								    getResources().getDrawable(R.drawable.mas));
+								img_take_photo.setImageDrawable(states);
 			            }  
 			        });  
 				alert_logout.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {  
@@ -456,19 +468,5 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 	}
 
-	
-	public void desactivaTabs(){
-        mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(false);
-        mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(false);
-        mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(false);
-	}
-
-	
-	public void activaTabs(){
-        mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
-        mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(true);
-        mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(true);
-	}
-	
 
 }

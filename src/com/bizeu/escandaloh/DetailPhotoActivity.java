@@ -10,11 +10,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 
 
-public class DetailPhotoActivity extends Activity {
+public class DetailPhotoActivity extends SherlockActivity {
 
 	private ImageViewTouch mImage;
 	private Bitmap photo;
@@ -34,6 +35,9 @@ public class DetailPhotoActivity extends Activity {
 		setContentView(R.layout.photo_detail);
 		
 		played_already = false;
+		
+		// Quitamos el action bar
+		getSupportActionBar().hide();
 			
 		if (getIntent() != null){
 			

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill_horizontal"
     android:background="@color/gris_claro" >
@@ -27,7 +27,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_gravity="center_vertical"
-                    android:src="@drawable/logout" />
+                    android:background="@drawable/logout_selector" />
 
             </LinearLayout>
 
@@ -63,7 +63,7 @@
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="right"
-                        android:src="@drawable/recarga" />
+                        android:background="@drawable/recarga_selector" />
 
                 </LinearLayout>
 
@@ -72,7 +72,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:orientation="vertical"
-                                        android:layout_gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
                     android:gravity="center_vertical" >
 
                     <ImageView
@@ -84,6 +84,21 @@
 
                 </LinearLayout>
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+            
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="1dp"
+                        android:background="@color/gris_oscuro" />
+
         </LinearLayout>
 
     </LinearLayout>

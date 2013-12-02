@@ -49,6 +49,7 @@ public class LoginActivity extends SherlockActivity {
 	private boolean login_error = false;
 	private String loginMessageError;
 	private Context context;
+	private boolean strange_error;
 	
 	
 	
@@ -102,6 +103,7 @@ public class LoginActivity extends SherlockActivity {
 			has_name_error = false;
 			has_password_error = false;
 			login_error = false;
+			strange_error = false;
 			edit_nombre_email.setError(null);
 			edit_password.setError(null);
 			
@@ -187,6 +189,7 @@ public class LoginActivity extends SherlockActivity {
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             strange_error = true;
 	        }
 			return null;
 	      
@@ -201,8 +204,12 @@ public class LoginActivity extends SherlockActivity {
 		        progress.dismiss();
 		    }
 			
+			if (strange_error){
+				Toast.makeText(getBaseContext(), "Lo sentimos , se ha producido un error", Toast.LENGTH_SHORT).show();
+			}
+			
 			// Si no ha habido algún error extraño 
-			if (!login_error){
+			else if (!login_error){
 				if (has_name_error){
 					edit_nombre_email.setError(name_error);
 				}
