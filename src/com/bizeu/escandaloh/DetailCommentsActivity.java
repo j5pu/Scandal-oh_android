@@ -346,10 +346,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				progress_list_comments.setVisibility(View.GONE);
 				list_comments.setVisibility(View.VISIBLE);
 			}
-
-			
-			
-			
+		
 			// Si es codigo 2xx --> OK
 	        if (result >= 200 && result <300){
 	        	Log.v("WE","comentarios listados");

@@ -52,7 +52,6 @@ public class MainLoginActivity extends SherlockActivity{
 	private String username;
 	private String email;
 	private boolean login_facebook_pulsado ;
-	
 	private Activity acti;
 	
 	
@@ -67,7 +66,12 @@ public class MainLoginActivity extends SherlockActivity{
 		login_facebook_pulsado = false;
 		acti = this;
 		
+		progress = new ProgressDialog(this);
+		progress.setTitle("Logueando ...");
+		progress.setMessage("Espere, por favor");
+		progress.setCancelable(false);
 		
+			
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
 		
@@ -101,6 +105,7 @@ public class MainLoginActivity extends SherlockActivity{
 			@Override
 			public void onClick(View v) {
 				if (!login_facebook_pulsado){
+					progress.show();
 					login_facebook_pulsado = true;
 					 Session currentSession = Session.getActiveSession();
 				        if (currentSession == null || currentSession.getState().isClosed()) {
@@ -130,7 +135,8 @@ public class MainLoginActivity extends SherlockActivity{
 							     					 new LogInUserFacebook().execute();
 						     					}
 						     					else{
-						     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
+						     						progress.dismiss();
+						     				        Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT).show();
 						     					}
 
 						     					
@@ -166,7 +172,8 @@ public class MainLoginActivity extends SherlockActivity{
 			                                        new LogInUserFacebook().execute();
 			                                    }
 						     					else{
-						     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
+						     						progress.dismiss();
+						     				        Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT).show();
 						     					}
 						     				}
 					                	});
@@ -175,9 +182,7 @@ public class MainLoginActivity extends SherlockActivity{
 					            }
 					        });
 
-				        } 
-				        
-						progress = new ProgressDialog(acti);
+				        } 				     
 				}
 				 		
 			}
@@ -246,7 +251,8 @@ public class MainLoginActivity extends SherlockActivity{
                                         new LogInUserFacebook().execute();
                                     }
 			     					else{
-			     				        Toast.makeText(getBaseContext(), "Hubo algún problema. Compruebe la conexión", Toast.LENGTH_SHORT).show();
+			     						progress.dismiss();
+			     				        Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT).show();
 			     					}
 			     				}
 		                	});
@@ -273,11 +279,13 @@ public class MainLoginActivity extends SherlockActivity{
 		protected void onPreExecute(){
 			login_error = false;
 			
-			// Mostramos el ProgressDialog
+			/*
+			// Mostramos el ProgressDialog		
 			progress.setTitle("Logueando ...");
 			progress.setMessage("Espere, por favor");
 			progress.setCancelable(false);
 			progress.show();
+			*/
 		}
 		
 		@Override
@@ -357,7 +365,7 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			// Ha habido algún error extraño: mostramos el mensaje
 			else{
-	        	Toast.makeText(getBaseContext(), "Hubo algún error conectando con facebook. Inténtelo más tarde", Toast.LENGTH_SHORT)
+	        	Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT)
 				.show();
 			}
 						
