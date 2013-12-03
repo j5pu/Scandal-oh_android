@@ -96,7 +96,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.previsualizacion_foto); 
             
 	        holder.txtTitle.setText(escanda.getTitle());
-	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
+	       // holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
 	        if (escanda.hasAudio()){
 	        	holder.imgMicro.setVisibility(View.VISIBLE);
@@ -177,6 +177,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        TextView txtNumComments;
 	        LinearLayout lheight;
 	        ImageView imgMicro;
+	        ImageView imgNumComments;
 	        ProgressBar loading;
 	        TextView txtNameUser;
 	        TextView txtDate;

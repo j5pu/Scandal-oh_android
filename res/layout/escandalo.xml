@@ -128,16 +128,16 @@
 
                     <TextView
                         android:id="@+id/txt_numero_comentarios"
-                        android:layout_width="22dp"
+                        android:layout_width="24dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|center_vertical"
                         android:background="@drawable/comentario_selector"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="1"
+                        android:paddingBottom="2dp"
                         android:textColor="@color/blanco"
                         android:textSize="10dp"
-                        android:textStyle="bold"
-                        android:paddingBottom="2dp" />
+                        android:textStyle="bold" />
+
                 </LinearLayout>
 
                 <LinearLayout

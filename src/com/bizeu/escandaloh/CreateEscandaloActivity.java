@@ -204,9 +204,6 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 	}
 
-
-	
-	
 	
 	/**
 	 * onPause Detiene y elimina si había algún audio activo

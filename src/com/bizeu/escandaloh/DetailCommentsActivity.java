@@ -47,6 +47,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private TextView txt_user;
 	private ImageView img_send;
 	private TextView txt_count_characteres;
+	private TextView txt_num_comments;
 	private FetchableImageView img_photo;
 	private LinearLayout layout_write_comment;
 	private LinearLayout ll_list_comments;
@@ -96,7 +97,10 @@ public class DetailCommentsActivity extends SherlockActivity {
 		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
 		list_comments.setAdapter(commentsAdapter);
 		
+		txt_num_comments = (TextView) findViewById(R.id.txt_comments_num_comments);
+		
 		txt_count_characteres = (TextView) findViewById(R.id.txt_count_characteres);
+		
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_new_comment.addTextChangedListener(new TextWatcher() {          
@@ -135,14 +139,12 @@ public class DetailCommentsActivity extends SherlockActivity {
 				}
 				else{
 		        	Toast toast;
-		        	toast = Toast.makeText(acti, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(acti, "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 		        	toast.show();
 				}
-
 			}
 		});
 		
-	
 		
 		// Mostramos el usuario
 		txt_user = (TextView) findViewById(R.id.txt_comments_user);
@@ -409,6 +411,14 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        if (result >= 200 && result <300){
 		        	Log.v("WE","comentarios listados");
 		        	commentsAdapter.notifyDataSetChanged();
+		        	
+		        	// Actualizamos el indicador de número de comentarios
+		        	if (comments.size() == 1){
+		        		txt_num_comments.setText(comments.size() + " comentario");
+		        	}
+		        	else{
+			        	txt_num_comments.setText(comments.size() + " comentarios");
+		        	}
 		        }
 		        else{
 		        	Log.v("WE","comentarios no listados");
