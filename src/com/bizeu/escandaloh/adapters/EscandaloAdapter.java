@@ -10,6 +10,8 @@ import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -153,7 +155,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 					i.putExtra("user", (String) v.getTag(R.string.user));
 					i.putExtra("title", (String) v.getTag(R.string.title));
-					context.startActivity(i);	
+					((Activity) context).startActivityForResult(i, 50);	
 				}
 			});
                        

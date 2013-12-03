@@ -3,6 +3,7 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
 import android.view.Display;
@@ -432,42 +434,26 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			}
 			break;
 			
+		// Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.img_actionbar_updatelist:
-			/*
-			Bundle arguments = new Bundle();
-			
+		
 			// Obtenemos cuál es el tab activo
 			String current_tab = mTabHost.getCurrentTabTag();
-			
-			// Volvemos a mostrar los escandalos según el tab en el que estemos
+
+			ListEscandalosFragment lef = null;
 			if (current_tab.equals(HAPPY)){
-				ListEscandalosFragmentHappy fragment = new ListEscandalosFragmentHappy();
-				fragment.setArguments(arguments);
-	            getSupportFragmentManager().beginTransaction()
-	                    .replace(R.id.tabcontent, fragment)
-	                    .commit(); 
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(HAPPY);		
 			}
+			
 			else if (current_tab.equals(ANGRY)){
-				ListEscandalosFragmentAngry fragment = new ListEscandalosFragmentAngry();
-				fragment.setArguments(arguments);
-	            getSupportFragmentManager().beginTransaction()
-	                    .replace(R.id.tabcontent, fragment)
-	                    .commit(); 
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(ANGRY);				
 			}
 			else if (current_tab.equals(BOTH)){
-				ListEscandalosFragmentBoth fragment = new ListEscandalosFragmentBoth();
-				fragment.setArguments(arguments);
-	            getSupportFragmentManager().beginTransaction()
-	                    .replace(R.id.tabcontent, fragment)
-	                    .commit(); 
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(BOTH);
 			}
-	        Log.v("WE","es: " + mTabHost.getCurrentTabTag());
-	        break;
-	        */
 			
-		}
-		
+			lef.updateList();
+	        break;		
+		}		
 	}
-
-
 }

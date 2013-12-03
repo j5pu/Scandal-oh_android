@@ -24,12 +24,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <com.markupartist.android.widget.PullToRefreshListView
+        <ListView
             android:id="@+id/list_escandalos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
-        </com.markupartist.android.widget.PullToRefreshListView>
+        </ListView>
 
     </LinearLayout>
 

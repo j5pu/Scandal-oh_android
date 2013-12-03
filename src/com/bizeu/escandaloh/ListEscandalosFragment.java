@@ -52,7 +52,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	Escandalo escan_aux;
-	private PullToRefreshListView  lView;
+	//private PullToRefreshListView  lView;
+	private ListView lView;
 	private boolean getting_escandalos = true;
 	private String category;
 	private boolean any_error;
@@ -105,8 +106,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
       	getting_escandalos = true;
       	
-      	lView = (PullToRefreshListView) v.findViewById(R.id.list_escandalos);
+      	lView = (ListView) v.findViewById(R.id.list_escandalos);
 
+      	/*
 		lView.setOnRefreshListener(new OnRefreshListener() {
 			
 		    @Override
@@ -133,6 +135,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    	}			
 		    }
 		});
+		*/
 		
 		
 		
@@ -229,7 +232,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	
-		lView.onRefreshComplete();
+		//lView.onRefreshComplete();
 	    if (category.equals(MainActivity.HAPPY)){
 	      	Log.v("WE","onviewcreated HAPPY");
 	    }
@@ -691,7 +694,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			}
 			// Abrimos la llave
 			getting_escandalos = false;
-			lView.onRefreshComplete();
+			//lView.onRefreshComplete();
 			
 			// Habilitamos los tabs de nuevo (una vez que los escándalos se han mostrado se puede pulsar otro tab)
 	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
@@ -828,7 +831,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			getting_escandalos = false;
 			Log.v("WE","llama a onRefreshComplete");
 			escanAdapter.notifyDataSetChanged();
-	        lView.onRefreshComplete();
+	        //lView.onRefreshComplete();
 	    }
 	}
 	
@@ -851,5 +854,31 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				getNewEscandalosAsync.cancel(true);
 			}
 		} 		
+	}
+	
+	
+	/**
+	 * Comprueba y obtiene si hay nuevos escándalos
+	 */
+	public void updateList(){
+		
+		// Colocamos el carrusel en el primer escándalo
+		lView.setSelection(0);
+		
+		// Si no se están obteniendo otros escándalos
+    	if (!getting_escandalos){
+	    	// Si hay conexión
+			if (Connectivity.isOnline(getActivity().getApplicationContext())){
+				// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
+				getting_escandalos = true;
+				getNewEscandalosAsync = new GetNewEscandalos();
+				getNewEscandalosAsync.execute();
+			}
+
+			else{
+				Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
+				toast.show();
+			} 
+    	}	
 	}
 }
