@@ -66,7 +66,8 @@
                 android:hint="user56"
                 android:paddingLeft="5dp"
                 android:textColor="@color/azul"
-                android:textColorHint="@color/azul" />
+                android:textColorHint="@color/azul"
+                android:maxLength="25" />
 
             <TextView
                 android:id="@+id/txt_comments_user"

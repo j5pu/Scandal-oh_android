@@ -531,11 +531,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			else if (category.equals(MainActivity.BOTH)){
 				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
 				if (MyApplication.FIRST_TIME_BOTH){
-					Log.v("WE","primera vez both");
 					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&country=" + MyApplication.code_selected_country;
 				}
 				else{
-					Log.v("WE","ultimo id obtenido happy");
 					if (escandalos.size() == 0){
 						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
 
@@ -668,7 +666,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			     // Devolvemos el código resultado
 			     return (response.getStatusLine().getStatusCode());   
 		    }
-
 	    }
 
 		
@@ -685,11 +682,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			if (!isCancelled()){
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
-		        	Log.v("WE","escandalos recibidos");
 		        	escanAdapter.notifyDataSetChanged();
 		        }
 		        else{
-		        	Log.v("WE","escandalos NO recibidos");
 		        }        
 			}
 			// Abrimos la llave
@@ -717,7 +712,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
 		@Override
 		protected void onPreExecute(){
-			Log.v("WE","Entra en getNewescandalos");
 			any_error = false;
 		}
 		
@@ -805,8 +799,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
-	
-			Log.v("WE","onPostExecute");
 			
 			// Si hubo algún error inesperado
 			if (result == 666){
@@ -818,18 +810,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				if (!isCancelled()){
 					// Si es codigo 2xx --> OK
 			        if (result >= 200 && result <300){
-			        	Log.v("WE","escandalos actualizados");
 			        	escanAdapter.notifyDataSetChanged();
 			        }
 			        else{
-			        	Log.v("WE","escandalos NO actualizados");
 			        }        
 				}
 			}
 
 			// Abrimos la llave
 			getting_escandalos = false;
-			Log.v("WE","llama a onRefreshComplete");
 			escanAdapter.notifyDataSetChanged();
 	        //lView.onRefreshComplete();
 	    }

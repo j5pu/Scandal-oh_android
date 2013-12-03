@@ -72,7 +72,6 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             Log.v("WE","user name Owene: " + user_name_owner);
             Log.v("WE","user name: " + comment.getUsername());
             if (user_name_owner.equals(comment.getUsername())){
-            	Log.v("WE","Entra en if");
             	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.azul));
             	holder.txtDate.setTextColor(context.getResources().getColor(R.color.azul));
             	holder.imgUser.setImageResource(R.drawable.user_azul);
@@ -82,7 +81,9 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
-        holder.txtDate.setText(comment.getDate()); 
+        String date_without_time = (comment.getDate().split("T",2))[0];    
+        holder.txtDate.setText(date_without_time); 
+        
         
         // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha
         if (MyApplication.resource_uri.equals(comment.getResourceuri())){

@@ -161,7 +161,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					} else {
 						AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
 						alert_audio.setMessage("¿Deseas agregar audio?");
-						alert_audio.setPositiveButton("OK",
+						alert_audio.setPositiveButton("Sí",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
@@ -181,7 +181,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 										record.show(); 								
 									}
 								});
-						alert_audio.setNegativeButton("Cancelar",
+						alert_audio.setNegativeButton("No",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {

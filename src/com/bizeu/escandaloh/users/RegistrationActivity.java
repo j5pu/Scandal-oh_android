@@ -1,5 +1,8 @@
 package com.bizeu.escandaloh.users;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,6 +20,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -60,6 +65,7 @@ public class RegistrationActivity extends SherlockActivity {
 		setContentView(R.layout.registration);
 		
 		context = this;
+		
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
 		
@@ -74,12 +80,9 @@ public class RegistrationActivity extends SherlockActivity {
 			public void onClick(View v) {
 				
 				if (Connectivity.isOnline(context)){
-					// Comprobamos si el nombre de usuario tiene como máximo 10 caracteres
-					if (edit_nombre_usuario.getText().toString().length() < 26){
+					// Si todos los campos son correctos hacemos la petición de registro
+					if (checkFields()){
 						new SignInUser().execute();
-					}	
-					else{
-						edit_nombre_usuario.setError("El nombre de usuario debe contener como máximo 10 caracteres");
 					}
 				}
 				else{
@@ -89,8 +92,133 @@ public class RegistrationActivity extends SherlockActivity {
 			}
 		});
 		
+		
+		// Cuando escriban algo que desaparezca el mensaje de error (en caso de que exista)
+		edit_nombre_usuario.addTextChangedListener(new TextWatcher() {          
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
+				edit_nombre_usuario.setError(null);
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub		
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+				// TODO Auto-generated method stub		
+			} 	
+			});
+				
+				
+		// Cuando escriban algo que desaparezca el mensaje de error (en caso de que exista)	
+		edit_email_usuario.addTextChangedListener(new TextWatcher() {          
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
+				edit_email_usuario.setError(null);
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub		
+			}
+
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+					// TODO Auto-generated method stub		
+				} 
+		});
+				
+				
+		// Cuando escriban algo que desaparezca el mensaje de error (en caso de que exista)
+		edit_password_usuario.addTextChangedListener(new TextWatcher() {          
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
+				edit_password_usuario.setError(null);
+		    }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub		
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+				// TODO Auto-generated method stub		
+			} 
+		});
+		
 		progress = new ProgressDialog(this);
 	}
+	
+	
+	
+	
+	/**
+	 * Comprueba si todos los campos son correctos
+	 * @return True si todos los campos son correctos. False si alguno no lo es.
+	 */
+	private boolean checkFields(){
+		boolean all_correct = true ;
+		
+		edit_nombre_usuario.setError(null);
+		edit_password_usuario.setError(null);
+		edit_email_usuario.setError(null);
+		
+		// Nombre menos de 4 caracteres
+		if (edit_nombre_usuario.getText().toString().length() < 4){
+			edit_nombre_usuario.setError("Este campo debe tener al menos 4 caracteres");
+			all_correct = false;
+		}
+		// Nombre vacío
+		if (edit_nombre_usuario.getText().toString().length() == 0){
+			edit_nombre_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Email incorrecto
+		if (!isEmailValid(edit_email_usuario.getText().toString())){
+			edit_email_usuario.setError("Introduzca una dirección de email válida");
+			all_correct = false;
+		}	
+		// Email vacío
+		if (edit_email_usuario.getText().toString().length() == 0){
+			edit_email_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Password menos de 4 caracteres
+		if (edit_password_usuario.getText().toString().length() < 6){
+			edit_password_usuario.setError("Este campo debe tener al menos 6 caracteres");
+			all_correct = false;
+		}
+		// Password vacío
+		if (edit_password_usuario.getText().toString().length() == 0){
+			edit_password_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		return all_correct;
+	}
+	
+	
+	/**
+	 * Comprueba si un string tiene formato de email
+	 * @param email
+	 * @return
+	 */
+	public static boolean isEmailValid(String email) {
+	    boolean isValid = false;
+
+	    String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+	    CharSequence inputStr = email;
+
+	    Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+	    Matcher matcher = pattern.matcher(inputStr);
+	    if (matcher.matches()) {
+	        isValid = true;
+	    }
+	    return isValid;
+	}
+	
 	
 	
 	/**
@@ -222,7 +350,7 @@ public class RegistrationActivity extends SherlockActivity {
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 		        	MyApplication.logged_user = true;
-		        	Toast.makeText(getBaseContext(), "Registro realizado correctamente", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(getBaseContext(), "Usuario registrado correctamente", Toast.LENGTH_SHORT).show();
 		        	
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
 		        	setResult(Activity.RESULT_OK);

@@ -17,6 +17,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -80,7 +82,9 @@ public class LoginActivity extends SherlockActivity {
 			@Override
 			public void onClick(View v) {
 				if (Connectivity.isOnline(context)){
-					new LogInUser().execute();
+					if (checkFields()){
+						new LogInUser().execute();	
+					}		
 				}
 				else{
 					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
@@ -100,11 +104,85 @@ public class LoginActivity extends SherlockActivity {
 			}
 		});
 		
+		// Cuando escriban algo que desaparezca el mensaje de error (en caso de que exista)
+		edit_nombre_email.addTextChangedListener(new TextWatcher() {          
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
+            	edit_nombre_email.setError(null);
+            }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub		
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub		
+			} 
+		});
+		
+		// Cuando escriban algo que desaparezca el mensaje de error (en caso de que exista)
+		edit_password.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				edit_password.setError(null);				
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		progress = new ProgressDialog(this);
 	}
 	
 	
 	
+	/**
+	 * Comprueba si todos los campos son correctos
+	 * @return True si todos los campos son correctos. False si alguno no lo es.
+	 */
+	private boolean checkFields(){
+		boolean all_correct = true ;
+		
+		edit_nombre_email.setError(null);
+		edit_password.setError(null);
+		
+		// Nombre/Email vacío
+		if (edit_nombre_email.getText().toString().length() == 0){
+			edit_nombre_email.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Nombre/Email menos de 4 caracteres
+		if (edit_nombre_email.getText().toString().length() < 4){
+			edit_nombre_email.setError("Este campo debe tener al menos 4 caracteres");
+			all_correct = false;
+		}
+		// Password vacío
+		if (edit_password.getText().toString().length() == 0){
+			edit_password.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Password menos de 4 caracteres
+		if (edit_password.getText().toString().length() < 6){
+			edit_password.setError("Este campo debe tener al menos 6 caracteres");
+			all_correct = false;
+		}
+
+		return all_correct;
+	}
 	
 	
 	/**
@@ -121,8 +199,6 @@ public class LoginActivity extends SherlockActivity {
 			has_password_error = false;
 			login_error = false;
 			any_error = false;
-			edit_nombre_email.setError(null);
-			edit_password.setError(null);
 			
 			// Mostramos el ProgressDialog
 			progress.setTitle("Logueando ...");

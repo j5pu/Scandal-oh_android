@@ -106,7 +106,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        }
 	        
 	        holder.txtNameUser.setText(escanda.getUser());
-	        holder.txtDate.setText(escanda.getDate());
+	        String date_without_time = (escanda.getDate().split("T",2))[0]; 
+	        holder.txtDate.setText(date_without_time);
 	        
 	        // Guardamos los datos necesarios en las vistas para luego recuperarlos al hacer click
 	        holder.txtNumComments.setTag(R.string.id, escanda.getId());

@@ -201,8 +201,7 @@ public class RememberPasswordDialog extends Dialog{
 					else if (reason_code == 2){ // Error al enviar email
 						txt_mensaje.setText("Hubo algún error en la petición");
 					}
-				}
-				
+				}	
 			}				
 	    }
 	}
