@@ -155,7 +155,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 					i.putExtra("user", (String) v.getTag(R.string.user));
 					i.putExtra("title", (String) v.getTag(R.string.title));
-					((Activity) context).startActivityForResult(i, 50);	
+					context.startActivity(i);	
 				}
 			});
                        

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="280dp"
+    android:background="@color/gris_claro"
+    android:orientation="vertical"
+    android:paddingBottom="23dp"
+    android:paddingLeft="23dp"
+    android:paddingRight="23dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_horizontal|center_vertical"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/txt_recordar_descripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:text="Introduce el email con el que te registraste para recibir una nueva contraseña:"
+                android:textColor="@color/gris_oscuro"
+                android:textSize="19sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/edit_recordar_email"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/blanco"
+                android:ems="10"
+                android:hint="mail98@users.com"
+                android:inputType="textEmailAddress"
+                android:textColorHint="@color/azul"
+                android:textColor="@color/azul"
+                android:paddingLeft="5dp" >
+
+                <requestFocus />
+            </EditText>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.02"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/but_recordar_cancelar"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@drawable/blue_button_selector"
+                android:text="Cancelar"
+                android:textSize="22dp" />
+
+            <Button
+                android:id="@+id/but_recordar_enviar"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="2"
+                android:background="@drawable/blue_button_selector"
+                android:clickable="true"
+                android:text="Enviar"
+                android:textAlignment="center"
+                android:textSize="22dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

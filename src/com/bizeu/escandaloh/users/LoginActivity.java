@@ -27,6 +27,10 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
+import com.bizeu.escandaloh.RecordAudioDialog;
+import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
+import com.bizeu.escandaloh.RememberPasswordDialog;
+import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 
 public class LoginActivity extends SherlockActivity {
@@ -34,6 +38,7 @@ public class LoginActivity extends SherlockActivity {
 	private EditText edit_nombre_email;
 	private EditText edit_password;
 	private Button boton_aceptar;
+	private TextView txt_recordar_contrasenia;
 	private ProgressDialog progress;
 	
 	private String name_error;
@@ -68,6 +73,7 @@ public class LoginActivity extends SherlockActivity {
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
+		txt_recordar_contrasenia = (TextView) findViewById(R.id.txt_recordar_contrasenia);
 		
 		boton_aceptar.setOnClickListener(new View.OnClickListener() {
 			
@@ -81,6 +87,17 @@ public class LoginActivity extends SherlockActivity {
 					toast.show();
 				}	
 			}			
+		});
+		
+		txt_recordar_contrasenia.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Mostramos el dialog de pedir email para reenvío de la contraseña
+				RememberPasswordDialog rememberPass = new RememberPasswordDialog(context);
+				rememberPass.setCancelable(false);
+				rememberPass.show(); 		
+			}
 		});
 		
 		progress = new ProgressDialog(this);

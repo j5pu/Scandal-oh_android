@@ -158,7 +158,6 @@ public class RegistrationActivity extends SherlockActivity {
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
 	                	 JSONObject jsonReason = new JSONObject(respJSON.getString("reason"));
-	                	 //JSONObject jsonUser = new JSONObject(jsonReason.getString("user"));
 	                	 if (jsonReason.has("username")){
 	                		 name_error = jsonReason.getString("username");
 	                		 has_name_error = true;

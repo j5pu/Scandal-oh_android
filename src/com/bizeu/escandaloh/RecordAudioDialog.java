@@ -49,7 +49,7 @@ public class RecordAudioDialog extends Dialog{
 		setContentView(R.layout.record_audio);
 		
 		ll_espacio_botones = (LinearLayout) findViewById(R.id.LL_record_audio_espacio_botones);
-		txt_description = (TextView) findViewById(R.id.txt_record_audio_description);
+		txt_description = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		txt_seg = (TextView) findViewById(R.id.txt_seg);
 		txt_subir_sin_audio = (TextView) findViewById(R.id.txt_cancelar_foto_audio);
 		txt_subir_sin_audio.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +84,7 @@ public class RecordAudioDialog extends Dialog{
 			}
 		});
 		
-		but_abajo = (Button) findViewById(R.id.but_record);
+		but_abajo = (Button) findViewById(R.id.but_recordar_enviar);
 		but_abajo.setOnClickListener(new View.OnClickListener() {
 
 			@Override
