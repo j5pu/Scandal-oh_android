@@ -16,9 +16,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +81,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.imgMicro = (ImageView)mView.findViewById(R.id.img_escandalo_microfono);
 	            holder.txtNameUser = (TextView)mView.findViewById(R.id.txt_escandalo_name_user);
 	            holder.txtDate = (TextView)mView.findViewById(R.id.txt_escandalo_date);
+	            holder.imgShare = (ImageView)mView.findViewById(R.id.img_escandalo_compartir);
 	            				  
 	            mView.setTag(holder);
 	        }
@@ -93,7 +98,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.lheight.setLayoutParams(params4);
 	        	
             // Pide la imagen por url y la muestra cuando la obtenga. Mientras tanto muestra otra
-            holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.previsualizacion_foto); 
+            holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.foto_cargando); 
             
 	        holder.txtTitle.setText(escanda.getTitle());
 	       // holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
@@ -115,7 +120,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setTag(R.string.user, (String) escanda.getUser());
 	        holder.txtNumComments.setTag(R.string.title, (String) escanda.getTitle());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
-	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());        
+	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
+	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());
 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +135,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				}
 			});
 	        	        
-            // Listener para la foto
+            // Listeners para la foto
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
@@ -143,7 +149,19 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 					context.startActivity(i);
 				}
-			});           		
+			});   
+            
+            holder.imgPicture.setOnLongClickListener(new View.OnLongClickListener() {
+				
+				@Override
+				public boolean onLongClick(View v) {
+					Log.v("WE","Entra en long click");
+					ImageView imView = (ImageView) v;
+					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
+					MediaStore.Images.Media.insertImage(context.getContentResolver(), bitm, "foto ejemplo scan" , "foto descripcion escandalo");
+					return true;
+				}
+			});
      
             // Listener para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
@@ -157,6 +175,23 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					i.putExtra("user", (String) v.getTag(R.string.user));
 					i.putExtra("title", (String) v.getTag(R.string.title));
 					context.startActivity(i);	
+				}
+			});
+            
+            // Listener para compartir
+            holder.imgShare.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+			
+					Uri screenshotUri = Uri.parse((String)v.getTag(R.string.url_foto));	
+					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+					shareIntent.setType("text/plain");		       
+					shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+					shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post");
+					shareIntent.putExtra(Intent.EXTRA_TEXT, screenshotUri.toString());
+
+				    context.startActivity(Intent.createChooser(shareIntent, "Compartir scandaloh con..."));		        
 				}
 			});
                        
@@ -178,6 +213,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        LinearLayout lheight;
 	        ImageView imgMicro;
 	        ImageView imgNumComments;
+	        ImageView imgShare;
 	        ProgressBar loading;
 	        TextView txtNameUser;
 	        TextView txtDate;
@@ -189,6 +225,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        
 	        public TextView getNumComments(){
 	        	return txtNumComments;
+	        }
+	        
+	        public ImageView getShare(){
+	        	return imgShare;
 	        }
 	        
 	        public ProgressBar getProgressBar(){

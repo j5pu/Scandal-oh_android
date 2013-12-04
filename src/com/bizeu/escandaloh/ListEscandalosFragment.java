@@ -140,7 +140,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
 		
       	escandalos = new ArrayList<Escandalo>();    	
-		escanAdapter = new EscandaloAdapter(getActivity().getBaseContext(), R.layout.escandalo,
+		escanAdapter = new EscandaloAdapter(getActivity(), R.layout.escandalo,
 				escandalos);
 				
 		lView.setAdapter(escanAdapter); 

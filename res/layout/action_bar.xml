@@ -37,7 +37,7 @@
                 android:layout_weight="3" >
 
                 <ImageView
-                    android:id="@+id/img_list_country_flag"
+                    android:id="@+id/img_escandalo_compartir"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:src="@drawable/logo"
