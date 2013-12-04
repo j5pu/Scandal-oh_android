@@ -316,12 +316,11 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 * @return
 	 * @throws Exception
 	 */
-	private File createFile(String part, String ext) throws Exception
-	{
+	private File createFile(String part, String ext) throws Exception{
 	    File scandaloh_dir= Environment.getExternalStorageDirectory();
 	    scandaloh_dir=new File(scandaloh_dir.getAbsolutePath()+"/Scandaloh/");
-	    if(!scandaloh_dir.exists())
-	    {
+	    Log.v("WE","scandaloh_dir: " + scandaloh_dir.toString());
+	    if(!scandaloh_dir.exists()){
 	    	scandaloh_dir.mkdir();
 	    }
 	    return File.createTempFile(part, ext, scandaloh_dir);

@@ -1,17 +1,8 @@
 package com.bizeu.escandaloh.adapters;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import com.applidium.shutterbug.FetchableImageView;
-import com.bizeu.escandaloh.DetailCommentsActivity;
-import com.bizeu.escandaloh.DetailPhotoActivity;
-import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
-import com.bizeu.escandaloh.model.Escandalo;
-import com.bizeu.escandaloh.util.Audio;
-import com.bizeu.escandaloh.util.ImageUtils;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,7 +11,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -33,6 +23,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.applidium.shutterbug.FetchableImageView;
+import com.bizeu.escandaloh.DetailCommentsActivity;
+import com.bizeu.escandaloh.DetailPhotoActivity;
+import com.bizeu.escandaloh.MyApplication;
+import com.bizeu.escandaloh.R;
+import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
 
 public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 
@@ -156,9 +156,23 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public boolean onLongClick(View v) {
 					Log.v("WE","Entra en long click");
+					
+					// GUARDAR EN GALERIA
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					MediaStore.Images.Media.insertImage(context.getContentResolver(), bitm, "foto ejemplo scan" , "foto descripcion escandalo");
+									
+				    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+				    File f = ImageUtils.bitmapToFile(bitm);
+				    Uri contentUri = Uri.fromFile(f);
+				   // File f2 = new File(contentUri);
+				    mediaScanIntent.setData(contentUri);
+				    context.sendBroadcast(mediaScanIntent);
+				    
+					/*
+					MediaStore.Images.Media.insertImage(context.getContentResolver(), bitm, "escándaloh" , "Foto obtenida de Scándaloh!");
+					Toast toast = Toast.makeText(context, "Foto guardada con éxito", Toast.LENGTH_SHORT);
+					toast.show();
+					*/
 					return true;
 				}
 			});
