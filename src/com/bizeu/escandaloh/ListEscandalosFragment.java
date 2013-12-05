@@ -37,6 +37,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
@@ -65,6 +66,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	private boolean any_error;
 	private boolean connection_checked = false;
 	private View img_view;
+	private boolean there_are_more_escandalos;
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -93,7 +95,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
 		
-		connection_checked = false;
+		connection_checked = false;	
+		there_are_more_escandalos = true;
 		
 	    // Indicamos a las otras categorias que serán su primera vez la próxima vez que se les pulse
 	    if (category.equals(MainActivity.HAPPY)){
@@ -196,8 +199,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {		
 				
-				// Si quedan 5 escándalos para llegar al último, obtenemos los 10 siguientes
-	            if (firstVisibleItem == escanAdapter.getCount() - 5){
+				// Si quedan 5 escándalos para llegar al último y hay más escandalos: obtenemos los siguientes 10
+	            if (firstVisibleItem == escanAdapter.getCount() - 5 && there_are_more_escandalos){
 	            	
 	            	// Si no hemos comprobado ya que no disponga de conexión (para que no aparezcan 20 mil mensajes de no tiene conexión)
 	            	if (!connection_checked){
@@ -299,7 +302,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		super.onDestroyView();
 	    cancelGetEscandalos();
 		Log.v("WE","Entra en ondestroyview");
-		escanAdapter.clear();
 		
 		// Deshabilitamos los tabs (hasta que se hayan mostrado los escandalos del otro tab pulsado)
         MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(false);
@@ -589,6 +591,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			        	}
 			        	else{
 				        	escandalosObject = new JSONArray(respStr);
+				        	
+				        	// Si no hay más escandalos,lo indicamos
+				        	if (escandalosObject.length() == 0){
+				        		Log.v("WE","No hay mas happys");
+				        		there_are_more_escandalos = false;
+				        	}
 			        	}
 			        }
 		        }
@@ -609,6 +617,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			        	}
 			        	else{
 				        	escandalosObject = new JSONArray(respStr);
+				        	
+				        	// Si no hay más escandalos,lo indicamos
+				        	if (escandalosObject.length() == 0){
+				        		Log.v("WE","No hay mas angrys");
+				        		there_are_more_escandalos = false;
+				        	}
 			        	}
 			        }
 		        }
@@ -629,6 +643,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			        	}
 			        	else{
 				        	escandalosObject = new JSONArray(respStr);
+				        	
+				        	// Si no hay más escandalos,lo indicamos
+				        	if (escandalosObject.length() == 0){
+				        		Log.v("WE","No hay mas boths");
+				        		there_are_more_escandalos = false;
+				        	}
 			        	}
 			        }
 		        }

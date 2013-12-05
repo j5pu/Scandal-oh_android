@@ -107,7 +107,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.lheight.setLayoutParams(params4);
 	        	
             // Pide la imagen por url y la muestra cuando la obtenga. Mientras tanto muestra otra
-            holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.foto_cargando); 
+            holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.cargando); 
             
 	        holder.txtTitle.setText(escanda.getTitle());
 	       // holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
@@ -148,7 +148,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.imgPicture.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {	            
+				public void onClick(View v) {
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance().closeAudio();
+					
 					Intent i = new Intent(context, DetailPhotoActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					ImageView imView = (ImageView) v;
@@ -156,6 +159,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
 					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
+
+					Log.v("WE","Antes del startactiv");
 					context.startActivity(i);
 				}
 			});   

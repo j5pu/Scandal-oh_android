@@ -325,13 +325,13 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("title", written_title);
 					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(context, "Escándalo subido con éxito", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "EscándalOh subido con éxito", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto enviada");
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
 				} else {
-					Toast toast = Toast.makeText(context, "Error subiendo el escándalo", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "Error subiendo el EscándalOh", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto no enviada");
 					finish();

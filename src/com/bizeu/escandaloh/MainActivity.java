@@ -34,6 +34,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
@@ -194,8 +195,12 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	protected void onPause() {
 	    super.onPause();
+	    
 	   // AdsSessionController.pauseTracking();
 	}
+	
+	
+	
 	
 	
 	

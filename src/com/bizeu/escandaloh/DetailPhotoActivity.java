@@ -34,6 +34,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo_detail);
 		
+		Log.v("WE","entra en oncreate");
 		played_already = false;
 		
 		// Quitamos el action bar
@@ -116,6 +117,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	 */
 	private class PlayAudio extends AsyncTask<String,Integer,Boolean> {
 		 
+		
 		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
