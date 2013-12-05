@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -134,4 +136,45 @@ public class ImageUtils {
 		    }
 		 }
 	}
+	
+	
+	
+	
+	/**
+	 * Guarda un bitmap como una foto en la galería del dispositivo
+	 * @param bmp Bitmap de la foto a guardar
+	 * @param context Contexto
+	 */
+    public static void saveBitmapIntoGallery(Bitmap bmp, Context context){
+    	File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"ScándalOh");
+    	imageFileFolder.mkdir();
+    	FileOutputStream out = null;
+    	
+    	// El nombre de la foto se obtiene a partir de la fecha y hora exacta actual
+    	Calendar c = Calendar.getInstance();
+    	String date = String.valueOf(c.get(Calendar.MONTH))
+                + String.valueOf(c.get(Calendar.DAY_OF_MONTH))
+                + String.valueOf(c.get(Calendar.YEAR))
+                + String.valueOf(c.get(Calendar.HOUR_OF_DAY))
+                + String.valueOf(c.get(Calendar.MINUTE))
+                + String.valueOf(c.get(Calendar.SECOND));
+    	File imageFileName = new File(imageFileFolder, "IMG-" + date.toString() + ".jpg");
+    	
+    	try{
+    		out = new FileOutputStream(imageFileName);
+    		bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+    		out.flush();
+    		out.close();
+     
+    		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    		Uri contentUri = Uri.fromFile(imageFileName);
+    		mediaScanIntent.setData(contentUri);
+    		context.sendBroadcast(mediaScanIntent);
+        
+    		out = null;
+    	} catch (Exception e){
+    		e.printStackTrace();
+    	}
+    }
+
 }

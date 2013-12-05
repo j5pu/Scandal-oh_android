@@ -10,19 +10,26 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,8 +38,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.Connectivity;
-import com.markupartist.android.widget.PullToRefreshListView;
-import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
+import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -58,6 +64,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	private String category;
 	private boolean any_error;
 	private boolean connection_checked = false;
+	private View img_view;
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -77,6 +84,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 					e.printStackTrace();
 				}
 			}
+	      	
 	 }
 	
 
@@ -144,7 +152,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				escandalos);
 				
 		lView.setAdapter(escanAdapter); 
-	    		
+
 		lView.setOnScrollListener(new OnScrollListener() {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {		
@@ -270,6 +278,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	
 
 	
+	
 	/**
 	 * onPause
 	 */
@@ -302,6 +311,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	}
 	
 
+
+	
 	
     /**
      * 

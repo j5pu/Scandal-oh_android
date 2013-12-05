@@ -1,8 +1,8 @@
 package com.bizeu.escandaloh.adapters;
 
-import java.io.File;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,14 +10,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +44,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		public static int ROUTE_IMAGE = 5;
 		
 	    Context context; 
+	    Activity acti;
 	    int layoutResourceId;    
 	    ArrayList<Escandalo> data;
 	    private int available_height;	    
@@ -56,6 +62,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        this.layoutResourceId = layoutResourceId;
 	        this.context = context;
 	        this.data = data;
+	        this.acti = (Activity)context;
 	    }
 
 	    
@@ -65,12 +72,13 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    @Override
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        View mView = convertView;
-	        
+	       
 	        EscandaloHolder holder = null;
 
 	        escanda = data.get(position);
 	        
 	        if(mView == null){
+	        	
 	            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	            mView = inflater.inflate(layoutResourceId, parent, false);       
 	                        
@@ -82,13 +90,14 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	            holder.txtNameUser = (TextView)mView.findViewById(R.id.txt_escandalo_name_user);
 	            holder.txtDate = (TextView)mView.findViewById(R.id.txt_escandalo_date);
 	            holder.imgShare = (ImageView)mView.findViewById(R.id.img_escandalo_compartir);
-	            				  
+	            
 	            mView.setTag(holder);
 	        }
 	        
 	        else{
 	            holder = (EscandaloHolder)mView.getTag();
 	        }
+	       
 	                
 	        // Cambiamos el alto por código
             available_height = getAvailableHeightScreen();   
@@ -121,7 +130,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setTag(R.string.title, (String) escanda.getTitle());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
-	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());
+	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());	   
 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
@@ -155,27 +164,18 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				
 				@Override
 				public boolean onLongClick(View v) {
-					Log.v("WE","Entra en long click");
 					
-					// GUARDAR EN GALERIA
+					// Guardamos la foto en la galería				
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-									
-				    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-				    File f = ImageUtils.bitmapToFile(bitm);
-				    Uri contentUri = Uri.fromFile(f);
-				   // File f2 = new File(contentUri);
-				    mediaScanIntent.setData(contentUri);
-				    context.sendBroadcast(mediaScanIntent);
-				    
-					/*
-					MediaStore.Images.Media.insertImage(context.getContentResolver(), bitm, "escándaloh" , "Foto obtenida de Scándaloh!");
-					Toast toast = Toast.makeText(context, "Foto guardada con éxito", Toast.LENGTH_SHORT);
+					ImageUtils.saveBitmapIntoGallery(bitm, context);
+					
+					Toast toast = Toast.makeText(context, "foto guardada en la galería", Toast.LENGTH_LONG);
 					toast.show();
-					*/
 					return true;
 				}
 			});
+            
      
             // Listener para los comentarios  
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
@@ -211,8 +211,6 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
                        
 	        return mView;
 	    }
-	    
-	    
 	    
 	    
 	    /**
@@ -306,5 +304,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		    }
 			
 		}
+
+
+
+
 		
 }

@@ -3,26 +3,27 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Display;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,15 +46,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static final String HAPPY = "Humor";
 	public static final String BOTH = "Todas";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
-	
 	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
     public static final int FROM_GALLERY = 12;
+    
 	private File photo;
 	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
 	private Uri mImageUri;
-	Bitmap taken_photo;
 	AmazonS3Client s3Client;
 	private FrameLayout banner;
 	private BannerView adM;
@@ -199,6 +199,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	
 	
 	
+	
+	
 
 
 	
@@ -274,6 +276,10 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		if (requestCode == SHOW_CAMERA) {
 			if (resultCode == RESULT_OK) {
 				if (mImageUri != null){
+					// Guardamos la foto en la galería
+					Bitmap bitAux = ImageUtils.uriToBitmap(mImageUri, context);
+					ImageUtils.saveBitmapIntoGallery(bitAux, context);
+					
 					Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
 					i.putExtra("photo_from", SHOW_CAMERA);
 					i.putExtra("photoUri", mImageUri.toString());
@@ -306,43 +312,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 
 
-	
-	
-
-	/**
-	 * Crea un archivo en una ruta con un formato específico
-	 * @param part
-	 * @param ext
-	 * @return
-	 * @throws Exception
-	 */
-	private File createFile(String part, String ext) throws Exception{
-	    File scandaloh_dir= Environment.getExternalStorageDirectory();
-	    scandaloh_dir=new File(scandaloh_dir.getAbsolutePath()+"/Scandaloh/");
-	    Log.v("WE","scandaloh_dir: " + scandaloh_dir.toString());
-	    if(!scandaloh_dir.exists()){
-	    	scandaloh_dir.mkdir();
-	    }
-	    return File.createTempFile(part, ext, scandaloh_dir);
-	}
-	
-	
-	
-	
-	/**
-	 * Comprueba si el dispositivo dispone de cámara
-	 * @param context
-	 * @return
-	 */
-	private boolean checkCameraHardware(Context context) {
-	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-	        return true;
-	    } else {
-	        return false;
-	    }
-	}
-
-
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
@@ -365,7 +334,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 										File photo = null;
 										try{
-									        photo = createFile("picture", ".png");
+									        photo = createFileTemporary("picture", ".png");
 									        photo.delete();
 									    }
 									    catch(Exception e){
@@ -454,5 +423,41 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			lef.updateList();
 	        break;		
 		}		
+	}
+	
+	
+	
+	
+	/**
+	 * Crea un archivo temporal en una ruta con un formato específico
+	 * @param part
+	 * @param ext
+	 * @return
+	 * @throws Exception
+	 */
+	private File createFileTemporary(String part, String ext) throws Exception{
+	    File scandaloh_dir= Environment.getExternalStorageDirectory();
+	    scandaloh_dir=new File(scandaloh_dir.getAbsolutePath()+"/Scandaloh/");
+	    Log.v("WE","scandaloh_dir: " + scandaloh_dir.toString());
+	    if(!scandaloh_dir.exists()){
+	    	scandaloh_dir.mkdir();
+	    }
+	    return File.createTempFile(part, ext, scandaloh_dir);
+	}
+	
+	
+	
+	
+	/**
+	 * Comprueba si el dispositivo dispone de cámara
+	 * @param context
+	 * @return
+	 */
+	private boolean checkCameraHardware(Context context) {
+	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+	        return true;
+	    } else {
+	        return false;
+	    }
 	}
 }
