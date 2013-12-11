@@ -51,51 +51,64 @@ public class RecordAudioDialog extends Dialog{
 		setContentView(R.layout.record_audio);
 		
 		// Cambiamos la fuente de la pantalla
-		//Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_record_audio));
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_record_audio));
 		
 		ll_espacio_botones = (LinearLayout) findViewById(R.id.lay_pantalla_record_audio);
 		txt_description = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		txt_seg = (TextView) findViewById(R.id.txt_seg);
-		
-		
+			
+		// Botón de subir sin audio
 		txt_subir_sin_audio = (TextView) findViewById(R.id.txt_cancelar_foto_audio);
 		txt_subir_sin_audio.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				
+				// Si estamos reproduciendo audio: lo paramos
 				if (Audio.getInstance().isPlaying()){
 					Audio.getInstance().stopPlaying();
 				}
+				
+				// Indicamos a la actividad que queremos subir sin audio
 				if( mDialogResult != null ){
 	                mDialogResult.finish("CANCELED");
 	            }
+				
+				// Cerramos el dialog
 	            RecordAudioDialog.this.dismiss();
 			}
 		});
 		
+		// Imagen de subir foto (con audio)
 		img_subir_foto = (ImageView) findViewById(R.id.img_subir_foto_audio);
 		img_subir_foto.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+				
+				// Si estamos reproduciendo audio: lo paramos
 				if (Audio.getInstance().isPlaying()){
 					Audio.getInstance().stopPlaying();
 				}
+				
+				// Indicamos a la actividad que queremos subir con audio
 				if( mDialogResult != null ){
 	                mDialogResult.finish("OK");
 	            }
+				
+				// Cerramos el dialog
 	            RecordAudioDialog.this.dismiss();			
 			}
 		});
 		
+		// Botón inferior de grabar/parar
 		but_abajo = (Button) findViewById(R.id.but_recordar_enviar);
 		but_abajo.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				
-				// Si está reproduciendo: paramos de reproducir
+				// Si está reproduciendo, indica PARAR: paramos de reproducir
 				if (Audio.getInstance().isPlaying()){				
 					Audio.getInstance().stopPlaying();
 					
@@ -103,22 +116,19 @@ public class RecordAudioDialog extends Dialog{
 					changeIUPlayFinised();
 				}
 				
-				// Si no está reproduciendo, comprobamos si está grabando o no
+				// Si no está reproduciendo: comprobamos si está grabando o no
 				else if(!Audio.getInstance().isPlaying()){
 					
-					// Si está grabando: parar de grabar
-					if (Audio.getInstance().isRecording()){
-						try {
-							Audio.getInstance().stop_recording();
-						} catch (IOException e) {
-							Log.e("WE","Error parando el audio");
-							e.printStackTrace();
-						}		
+					// Si está grabando, indica PARAR: paramos de grabar
+					if (Audio.getInstance().isRecording()){	
+						
+						Audio.getInstance().stopRecording();
 											
 						// Actualizamos la IU para mostrar el tiempo de grabación y el botón de reproducir
 						ll_espacio_botones.setVisibility(View.VISIBLE);
 						but_abajo.setText("Grabar");
 						img_subir_foto.setVisibility(View.VISIBLE);	
+						txt_subir_sin_audio.setVisibility(View.VISIBLE);
 						but_reproducir.setVisibility(View.VISIBLE);
 						txt_description.setText("Audio grabado:");
 						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
@@ -138,12 +148,17 @@ public class RecordAudioDialog extends Dialog{
 						contador_play = 0;
 					}
 					
-					// No está grabando: comienza a grabar
-					else{				
-						Log.v("WE","No esta grabando");
+					// No está grabando, indica GRABAR: comienza a grabar
+					else{	
 						
-						// Actualizamos la IU para mostrar el tiempo más grande y quitar el botón de reproducir
+						try {
+							Audio.getInstance().startRecording();
+						} catch (IOException e) {
+							Log.e("WE","error grabando audio");
+							e.printStackTrace();
+						}
 						
+						// Actualizamos la IU para mostrar el tiempo más grande y quitar el botón de reproducir		
 						//ll_espacio_botones.setVisibility(View.GONE);
 						txt_description.setText("Grabando audio...");
 						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP , 41F);
@@ -152,27 +167,19 @@ public class RecordAudioDialog extends Dialog{
 						but_abajo.setText("Parar");	
 						but_reproducir.setVisibility(View.GONE);
 						img_subir_foto.setVisibility(View.GONE);
-						
-						try {
-							Audio.getInstance().start_recording();
-						} catch (IOException e) {
-							Log.e("WE","error grabando audio");
-							e.printStackTrace();
-						}
-						
-						
-
-						
+						txt_subir_sin_audio.setVisibility(View.GONE);			
 					}
 				}
 			}
 		});
 		
+		// Botón de reproducir audio (sólo aparece si se ha grabado antes)
 		but_reproducir = (Button) findViewById(R.id.but_reproducir);
 		but_reproducir.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+				
 				// Reseteamos el contador de reproducción
 				contador_play = 0;
 					
@@ -187,6 +194,7 @@ public class RecordAudioDialog extends Dialog{
 				// El boton de abajo ahora pondrá Parar
 				but_abajo.setText("Parar");
 					
+				// Comenzamos a reproducir
 				Audio.getInstance().startPlaying();	
 			}
 		});
@@ -210,16 +218,13 @@ public class RecordAudioDialog extends Dialog{
 						   }   					   
 					   }
 					   else if (contador == 0){
-				    	   try {
-								Audio.getInstance().stop_recording();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+						   
+							Audio.getInstance().stopRecording();
 							// Hacemos los cambios necesarios a la IU
 							ll_espacio_botones.setVisibility(View.VISIBLE);
 							but_abajo.setText("Grabar");
 							img_subir_foto.setVisibility(View.VISIBLE);	
+							txt_subir_sin_audio.setVisibility(View.VISIBLE);
 							but_reproducir.setVisibility(View.VISIBLE);
 							txt_description.setText("Audio grabado:");
 							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
@@ -243,23 +248,11 @@ public class RecordAudioDialog extends Dialog{
 				   else if (Audio.getInstance().isPlaying()){
 					   contador_play++;
 					   
-					   // Si aún hay más que reproducir
-					   if (contador_play < ultimo_tiempo_guardado + 1){
-						   if (contador_play < 10){
-							   txt_meter.setText("00:0" + contador_play);
-						   }
-						   else{
-							   txt_meter.setText("00:" + contador_play);
-						   }
+					   if (contador_play < 10){
+						   txt_meter.setText("00:0" + contador_play);
 					   }
-					   
-					   // Fin de la reproducción
 					   else{
-						   Log.v("WE","Entra en else malo y contador_play vale: " + contador_play + "y ultimo_tiemop: " + ultimo_tiempo_guardado);
-						   Audio.getInstance().stopPlaying();
-
-						   // Cambios IU
-						   changeIUPlayFinised();
+						   txt_meter.setText("00:" + contador_play);
 					   }
 				   }
 			   }

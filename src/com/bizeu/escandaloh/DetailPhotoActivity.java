@@ -21,8 +21,6 @@ public class DetailPhotoActivity extends SherlockActivity {
 	private Bitmap photo;
 	private String route_img;
 	private String uri_audio;
-	
-	private Audio audio_recorder;
 	private boolean played_already ;
 	private boolean orientation_changed ;
 	
@@ -80,15 +78,14 @@ public class DetailPhotoActivity extends SherlockActivity {
 	protected void onPause(){
 		super.onPause();
 		if (!orientation_changed){
-			Audio.getInstance().closeAudio();
+			Audio.getInstance().releaseResources();
 		}
 	}
 	
 	
 
 	public void onConfigurationChanged(Configuration newConfig) {
-	    super.onConfigurationChanged(newConfig);
-	    
+	    super.onConfigurationChanged(newConfig);	    
 	    // Ha cambiado la orientación del dispositivo
         orientation_changed = true;
 	  }

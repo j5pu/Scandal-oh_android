@@ -88,8 +88,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		// Quitamos el action bar
 		getSupportActionBar().hide();
 		
-		
-
+		// Mostramos la foto 
 		if (getIntent() != null) {
 			Intent data = getIntent();
 			
@@ -98,8 +97,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 			picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
 		
-			if (data != null) {
-				
+			if (data != null) {		
 				photo_string = data.getExtras().getString("photoUri");
 				
 				// Si se ha tomado de la cámara
@@ -225,6 +223,21 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		super.onPause();
 		Log.v("WE","Entra en onpause");
 		//Audio.getInstance().closeAudio();
+	}
+	
+	/**
+	 * Liberamos los recursos del audio
+	 */
+	@Override
+	protected void onStop(){
+		super.onStop();
+		Audio.getInstance().releaseResources();
+	}
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		Log.v("WE","Entra en ondestroy");
 	}
 
 

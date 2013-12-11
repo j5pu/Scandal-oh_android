@@ -131,14 +131,17 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());	   
+	 
 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
+					
 					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().closeAudio();
+					Audio.getInstance().releaseResources();
+					
 					// Lo reproducimos				
 					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));		
 				}
@@ -149,8 +152,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				
 				@Override
 				public void onClick(View v) {
+					
 					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().closeAudio();
+					Audio.getInstance().releaseResources();
 					
 					Intent i = new Intent(context, DetailPhotoActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -170,6 +174,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public boolean onLongClick(View v) {
 					
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance().releaseResources();
+					
 					// Guardamos la foto en la galería				
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
@@ -186,7 +193,11 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
             holder.txtNumComments.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {			
+				public void onClick(View v) {
+					
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance().releaseResources();
+					
 					Intent i = new Intent(context, DetailCommentsActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					i.putExtra("id", v.getTag(R.string.id).toString());
@@ -203,6 +214,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {
 			
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance().releaseResources();
+					
 					Uri screenshotUri = Uri.parse((String)v.getTag(R.string.url_foto));	
 					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
 					shareIntent.setType("text/plain");		       

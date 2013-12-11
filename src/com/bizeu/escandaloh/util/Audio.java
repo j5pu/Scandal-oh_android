@@ -65,11 +65,11 @@ public class Audio{
 	 * Comienza una grabación
 	 * @throws IOException
 	 */
-	public void start_recording() throws IOException {	
+	public void startRecording() throws IOException {	
 		
 		mRecord = new MediaRecorder();
 		
-		// Inicializamos el grabador
+		// ESTADO Initial: Inicializamos el grabador	
 		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio_record_scandaloh.3gp";
 		String state = android.os.Environment.getExternalStorageState();
 		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
@@ -77,7 +77,7 @@ public class Audio{
 				throw new IOException("SD Card is not mounted.  It is " + state
 						+ ".");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				Log.e("Audio.java","Error intentando montar el sistema de archivos");
 				e.printStackTrace();
 			}
 		}
@@ -87,79 +87,94 @@ public class Audio{
 			try {
 				throw new IOException("Path to file could not be created.");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				Log.e("Audio.java","Error creando el archivo de audio");
 				e.printStackTrace();
 			}
 		}
-		//recorder.setMaxDuration(20000);
-
+		
 		mRecord.setAudioSource(MediaRecorder.AudioSource.MIC);
+		
+		// ESTADO Initialized: Indiamos el formato
 		mRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		
+		// ESTADO DataSourceConfigured
 		mRecord.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		mRecord.setOutputFile(path);
 
 		try {
-			mRecord.prepare();;
+			mRecord.prepare();
+			
+			// ESTADO Prepared: comenzamos a grabar
 			mRecord.start();
 			is_recording = true;
-        } catch (IOException e) {
-            Log.e("WE", "Error grabando audio");
-        }
-		
+
+        } 
+		catch (IOException e) {
+            Log.e("WE", "Error MediaRecorder en prepare() o start()");
+        }		
 	}
 
 	
 	
 	/**
 	 * Para de grabar
-	 * @throws IOException
 	 */
-	public void stop_recording() throws IOException {
+	public void stopRecording() {
+		// Estado RECORDING: paramos de grabar
 		mRecord.stop();
-		mRecord.reset();
-		mRecord.release();
 		is_recording = false;
 	}
 	
 	
+	
+	/**
+	 * Indica si está grabando
+	 * @return booleano indicando si está trabando (true) o no (false)
+	 */
 	public boolean isRecording(){
 		return is_recording;
 	}
 	
+	
+
 	
 	
 	/**
 	 * Reproduce el audio recién grabado
 	 */
 	public void startPlaying() {
-        if (path != null){
-        	Log.v("WE","Entra en if");
-            try {
-                mPlayer.setDataSource(path);
-                mPlayer.prepare();
-                mPlayer.start();
-                mPlayer.setOnCompletionListener(new OnCompletionListener() {
+		
+		try {		
+			// Estado Idle: indicamos el recurso
+			mPlayer.setDataSource(path);
+			
+			// Estado Initialized: preparamos el reproductor
+			mPlayer.prepare();
+			
+			// Estado Prepared: comenzamos la reproducción
+			mPlayer.start();
+			
+			
+			mPlayer.setOnCompletionListener(new OnCompletionListener() {
 					
-					@Override
-					public void onCompletion(MediaPlayer mp) {
-						Log.v("WE","Entar en oncompletion");
-						mp.stop();
-						mp.reset();	
-						if (playListener != null){
-							playListener.onPlayFinished();
-						}
-						
-					}
-				});
+				@Override
+				public void onCompletion(MediaPlayer mp) {
+					// Estado Started: paramos la reproducción
+					mp.stop();
+					mp.reset();	
+					
+					// Indicamos al dialog que se ha terminado de reproducción
+					if (playListener != null){
+						playListener.onPlayFinished();
+					}			
+				}
+			});
             
-            } catch (IOException e) {
-                Log.e("WE", "Error al reproducir el audio");
-            }
-        }
-        else{
-        	Log.e("WE","Debes usar start_recording antes de usar este método");
-        }
+		} catch (IOException e) {
+			Log.e("WE", "Error preparando para reproducir el audio");
+		}
     }
+
 
 	
 	
@@ -171,41 +186,32 @@ public class Audio{
 	public void startPlaying(String uri_audio) {
         
         		try {
-        			if (mPlayer.isPlaying()){
-        				mPlayer.reset();
-        				mPlayer.release();
-        			}
+        			// Estado Idle: indicamos el recurso
         			mPlayer.setDataSource(uri_audio);
-        			 mPlayer.setOnPreparedListener(new OnPreparedListener() {
+        			
+        			mPlayer.setOnPreparedListener(new OnPreparedListener() {
          				
          				@Override
          				public void onPrepared(MediaPlayer mp) {
+         					// Estado Prepared: comenzamos la reproducción
          					mp.start();	
          					mp.setOnCompletionListener(new OnCompletionListener() {
          						
          						@Override
          						public void onCompletion(MediaPlayer mp) {
-         							Log.v("WE","Ha terminado");
-         							//mp.stop();
-         							mp.reset();
-         							if (playListener != null){
-         								playListener.onPlayFinished();
-         							}
-         							
+         							// Estado Started: paramos la reproducción
+         							mp.stop();
+         							mp.reset();								
          						}
          					});					
          				}
         			 }); 
+        			// Estado Initialized: preparamos el reproductor
                     mPlayer.prepareAsync();
-                   
-        			                
-    
+ 
                  } catch (IOException e) {
                     Log.e("WE", "error al reproducir el audio");
-                 }
-        		
-            
-            
+                 }       
     }
 	
 	
@@ -213,10 +219,8 @@ public class Audio{
 	 * Para de reproducir un audio
 	 */
 	public void stopPlaying(){
-		if (mPlayer.isPlaying()){
 			mPlayer.stop();
 			mPlayer.reset();
-		}
 	}
 	
 	
@@ -224,9 +228,7 @@ public class Audio{
 		return mPlayer.isPlaying();
 	}
 	
-	
-	
-	
+
 	/**
 	 * Obtiene la ruta del archivo con el audio
 	 * @return
@@ -238,15 +240,21 @@ public class Audio{
 	
 	
 	/**
-	 * Cierra y libera el audio
+	 * Cierra y libera los recursos
 	 */
-	public void closeAudio(){
+	public void releaseResources(){
+		
+		// Liberamos el grabador
 		if (mRecord != null){
+			if (isRecording()){
+				stopRecording();
+			}
 			mRecord.reset();
 			mRecord.release();
 			mRecord = null;
 		}
 		
+		// Liberamos el reproductor
 		if (mPlayer != null){
 			mPlayer.reset();
 			mPlayer.release();
@@ -258,8 +266,7 @@ public class Audio{
 		if (path != null){
 			File file = new File(path);
 			file.delete();
-		}
-		
+		}	
 		yaCreado = false;
 	}
 	

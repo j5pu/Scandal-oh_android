@@ -328,6 +328,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.img_actionbar_takephoto:
+			
+			// Paramos si hubiera algún audio reproduciéndose
+			Audio.getInstance().releaseResources();
 
 			// Si dispone de conexión
 			if (Connectivity.isOnline(context)){
@@ -386,6 +389,10 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			break;
 			
 		case R.id.img_actionbar_logout:
+			
+			// Paramos si hubiera algún audio reproduciéndose
+			Audio.getInstance().releaseResources();
+			
 			if (MyApplication.logged_user){
 				AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
 				alert_logout.setTitle("Cerrar sesión usuario");
