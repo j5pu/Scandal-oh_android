@@ -221,8 +221,6 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	@Override
 	protected void onPause(){
 		super.onPause();
-		Log.v("WE","Entra en onpause");
-		//Audio.getInstance().closeAudio();
 	}
 	
 	/**
@@ -237,7 +235,12 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		Log.v("WE","Entra en ondestroy");
+		// Se ha tomado desde la camara
+		if (photo_from == MainActivity.SHOW_CAMERA){
+			// Borramos la foto
+			photo_file = new File(mImageUri.getPath());
+			photo_file.delete();
+		}
 	}
 
 
@@ -279,8 +282,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 				// Obtenemos los datos y comprimimos en Multipart para su envío
 				written_title = edit_title.getText().toString();
-				int id_category_selected = radio_category
-						.getCheckedRadioButtonId();
+				int id_category_selected = radio_category.getCheckedRadioButtonId();
 				switch (id_category_selected) {
 					case R.id.rb_create_category_happy:
 						selected_category = HAPPY_CATEGORY;	

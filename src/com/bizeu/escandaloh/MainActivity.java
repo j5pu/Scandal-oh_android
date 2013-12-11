@@ -162,7 +162,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public void onResume(){
 		super.onResume();
 		
-		Log.v("WE","Entra onresume");
 		// Abrimos la llave para el caso de error del tiemout al obtener fotos
 		MyApplication.TIMEOUT_PHOTO_SHOWN = false;
 		
@@ -183,7 +182,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			img_take_photo.setImageDrawable(states);
 			
 		}
-		// Si no está logueado mostramos el botón de logout y añadimos el más (con su selector)
+		// Si no está logueado mostramos el botón de logout y añadimos el "+" (con su selector)
 		else{			
 			img_logout.setVisibility(View.INVISIBLE);
 			
@@ -307,7 +306,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				}			
 			}
 			else if (resultCode == RESULT_CANCELED) {	
-				Log.v("WE","Result canceled");
 	        }	
 		}
 			
@@ -342,7 +340,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				if (MyApplication.logged_user){ 
 					
 					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = {"Tomar desde la cámara", "Cogerla de la galería"};
+					final CharSequence[] items = {"Tomar desde la cámara", "Coger de la galería"};
 					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				        builder.setTitle("Añadir foto");
 				        builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -364,13 +362,13 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 										startActivityForResult(takePictureIntent, SHOW_CAMERA);
 									}
-									// El dispositivo no dispone de camara
+									// El dispositivo no dispone de cámara
 									else{
 										Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
 										toast.show();
 									}
 				                } 
-				                else if (items[item].equals("Cogerla de la galería")) {
+				                else if (items[item].equals("Coger de la galería")) {
 				                	Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				                	startActivityForResult(i, FROM_GALLERY);
 				                } 
@@ -460,9 +458,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 * @throws Exception
 	 */
 	private File createFileTemporary(String part, String ext) throws Exception{
-	    File scandaloh_dir= Environment.getExternalStorageDirectory();
-	    scandaloh_dir=new File(scandaloh_dir.getAbsolutePath()+"/Scandaloh/");
-	    Log.v("WE","scandaloh_dir: " + scandaloh_dir.toString());
+	    File scandaloh_dir = Environment.getExternalStorageDirectory();
+	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/");
 	    if(!scandaloh_dir.exists()){
 	    	scandaloh_dir.mkdir();
 	    }
