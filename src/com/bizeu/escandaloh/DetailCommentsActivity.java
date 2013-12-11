@@ -1,4 +1,4 @@
-package com.bizeu.escandaloh;
+ package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
 
@@ -153,8 +153,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				}
 			}
 		});
-		
-		
+			
 		// Mostramos el usuario
 		txt_user = (TextView) findViewById(R.id.txt_comments_user);
 		txt_user.setText(user);

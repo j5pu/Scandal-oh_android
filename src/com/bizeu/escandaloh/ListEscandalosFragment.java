@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -665,8 +666,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String comments_count = escanObject.getString("comments_count");
 		            String latitude = escanObject.getString("latitude");
 		            String longitude = escanObject.getString("longitude");
-		            final String resource_uri = escanObject.getString("resource_uri");	        
-		            final String title = escanObject.getString("title");
+		            final String resource_uri = escanObject.getString("resource_uri");	       
+		            final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
 		            final String user = escanObject.getString("user");
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
