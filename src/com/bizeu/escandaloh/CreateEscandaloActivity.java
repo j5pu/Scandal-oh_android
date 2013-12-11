@@ -28,6 +28,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +40,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
 
 public class CreateEscandaloActivity extends SherlockActivity {
@@ -78,9 +80,15 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 		setContentView(R.layout.create_escandalo);
 		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_create_escandalo));
+		
 		context = this;
+		
 		// Quitamos el action bar
 		getSupportActionBar().hide();
+		
+		
 
 		if (getIntent() != null) {
 			Intent data = getIntent();
@@ -117,8 +125,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		}
 
 		progress = new ProgressDialog(this);
-		progress.setTitle("Subiendo escándalo ...");
-		progress.setMessage("Espere, por favor");
+		progress.setTitle("Subiendo scándalOh! ...");
+		progress.setMessage("Espera, por favor");
 		progress.setCancelable(false);
 		
 		txt_contador_titulo = (TextView) findViewById(R.id.txt_contador_caracteres_titulo);
@@ -159,12 +167,14 @@ public class CreateEscandaloActivity extends SherlockActivity {
 								Toast.LENGTH_SHORT);
 						toast.show();
 					} else {
-						AlertDialog.Builder alert_audio = new AlertDialog.Builder(context);
-						alert_audio.setMessage("¿Deseas agregar audio?");
-						alert_audio.setPositiveButton("Sí",
+						// Inicializamos el alert dialog
+						AlertDialog.Builder dialog_audio = new AlertDialog.Builder(context);
+						dialog_audio.setMessage("¿Deseas agregar audio?");
+						dialog_audio.setPositiveButton("Sí",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
+										// Mostramos el dialog del audio
 										RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
 										record.setDialogResult(new OnMyDialogResult(){
 										    public void finish(String result){
@@ -181,7 +191,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 										record.show(); 								
 									}
 								});
-						alert_audio.setNegativeButton("No",
+						dialog_audio.setNegativeButton("No",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
@@ -190,7 +200,9 @@ public class CreateEscandaloActivity extends SherlockActivity {
 										new SendScandalo().execute();
 									}
 								});
-						alert_audio.show();
+						
+						// Mostramos el dialog del audio
+						dialog_audio.show();
 					}
 				}
 				else{
@@ -211,7 +223,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	@Override
 	protected void onPause(){
 		super.onPause();
-		Audio.getInstance().closeAudio();
+		Log.v("WE","Entra en onpause");
+		//Audio.getInstance().closeAudio();
 	}
 
 
@@ -325,13 +338,13 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("title", written_title);
 					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(context, "EscándalOh subido con éxito", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "scándalOh! subido con éxito", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto enviada");
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
 				} else {
-					Toast toast = Toast.makeText(context, "Error subiendo el EscándalOh", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "Error subiendo el scándalOh!", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto no enviada");
 					finish();

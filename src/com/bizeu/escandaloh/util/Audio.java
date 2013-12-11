@@ -34,30 +34,8 @@ public class Audio{
 	 * Constructor
 	 */
 	private Audio() {
-		
+
 		// Inicializamos el grabador
-		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio_record_scandaloh.3gp";
-		String state = android.os.Environment.getExternalStorageState();
-		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
-			try {
-				throw new IOException("SD Card is not mounted.  It is " + state
-						+ ".");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		File directory = new File(path).getParentFile();
-		if (!directory.exists() && !directory.mkdirs()) {
-			try {
-				throw new IOException("Path to file could not be created.");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
 		mRecord = new MediaRecorder();
 		
 		// Inicializamos el reproductor 
@@ -88,19 +66,46 @@ public class Audio{
 	 * @throws IOException
 	 */
 	public void start_recording() throws IOException {	
+		
+		mRecord = new MediaRecorder();
+		
+		// Inicializamos el grabador
+		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio_record_scandaloh.3gp";
+		String state = android.os.Environment.getExternalStorageState();
+		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
+			try {
+				throw new IOException("SD Card is not mounted.  It is " + state
+						+ ".");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		File directory = new File(path).getParentFile();
+		if (!directory.exists() && !directory.mkdirs()) {
+			try {
+				throw new IOException("Path to file could not be created.");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		//recorder.setMaxDuration(20000);
+
 		mRecord.setAudioSource(MediaRecorder.AudioSource.MIC);
 		mRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		mRecord.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		mRecord.setOutputFile(path);
-		try {
-			mRecord.prepare();
-        } catch (IOException e) {
-            Log.e("WE", "prepare() record audio failed");
-        }
 
-		mRecord.start();
-		is_recording = true;
+		try {
+			mRecord.prepare();;
+			mRecord.start();
+			is_recording = true;
+        } catch (IOException e) {
+            Log.e("WE", "Error grabando audio");
+        }
+		
 	}
 
 	
@@ -111,6 +116,8 @@ public class Audio{
 	 */
 	public void stop_recording() throws IOException {
 		mRecord.stop();
+		mRecord.reset();
+		mRecord.release();
 		is_recording = false;
 	}
 	

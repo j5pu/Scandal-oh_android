@@ -24,6 +24,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,6 +39,7 @@ import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 
 public class DetailCommentsActivity extends SherlockActivity {
 
@@ -72,6 +74,10 @@ public class DetailCommentsActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.comments);
 		
+
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_comentarios));
+		
 		if (getIntent() != null){
 			photo_id = getIntent().getExtras().getString("id");
 			route_image = getIntent().getExtras().getString("route_image");	
@@ -82,7 +88,10 @@ public class DetailCommentsActivity extends SherlockActivity {
 		acti = this;
 		
 		// Quitamos el action bar
-		getSupportActionBar().hide();
+		//getSupportActionBar().hide();
+		
+		// Quitamos el texto del action bar
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		
 		final Context context = this.getApplicationContext();
 		
@@ -386,6 +395,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		@Override
 	    protected void onPostExecute(Integer result) {
 
+			
 			// Si estamos obteniéndolos porque hemos enviado uno
 			if (add_comm){
 				// Quitamos el ProgressDialog
@@ -399,6 +409,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				list_comments.setVisibility(View.VISIBLE);
 				ll_list_comments.setGravity(Gravity.TOP);
 			}
+			
 				
 			// Si hubo algún error 
 			if (result == 666){

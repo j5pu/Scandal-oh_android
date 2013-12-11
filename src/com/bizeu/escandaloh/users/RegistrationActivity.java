@@ -24,6 +24,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 
 public class RegistrationActivity extends SherlockActivity {
 
@@ -63,6 +65,9 @@ public class RegistrationActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.registration);
+		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_registration));
 		
 		context = this;
 		

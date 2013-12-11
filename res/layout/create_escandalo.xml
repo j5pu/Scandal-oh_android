@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lay_pantalla_create_escandalo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gris_claro"
     android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:background="@color/gris_claro" >
+    android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -54,13 +55,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="3.5"
         android:orientation="horizontal" >
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.5"
+            android:layout_weight="1.1"
             android:orientation="vertical" >
 
         </LinearLayout>
@@ -108,11 +109,13 @@
                     android:layout_height="wrap_content"
                     android:background="@color/blanco"
                     android:ems="10"
+                    android:maxLength="75"
+                    android:minLines="4"
                     android:paddingLeft="5dp"
                     android:textColor="@color/azul"
-                    android:textSize="20dp"
-                    android:maxLength="75"
-                    android:minLines="4">
+                    android:textSize="20dp" >
+
+                    <requestFocus />
                 </EditText>
 
             </LinearLayout>
@@ -123,7 +126,8 @@
                 android:layout_weight="3"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:paddingBottom="10dp" >
+                android:paddingBottom="10dp"
+                android:paddingTop="5dp" >
 
                 <TextView
                     android:id="@+id/txt_pasar_registro"
@@ -145,21 +149,22 @@
                         android:id="@+id/rb_create_category_happy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
                         android:checked="true"
                         android:text="Humor"
                         android:textColor="@color/gris_oscuro"
-                        android:textSize="20dp"
-                        android:layout_marginRight="10dp" />
+                        android:textSize="18sp" />
 
                     <RadioButton
                         android:id="@+id/rb_create_category_angry"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:shadowColor="@color/blanco"
                         android:text="Denuncia"
                         android:textColor="@color/gris_oscuro"
-                        android:textSize="20dp" 
-                        android:layout_marginLeft="10dp"
-                        android:shadowColor="@color/blanco"/>
+                        android:textSize="18sp" />
+
                 </RadioGroup>
             </LinearLayout>
 
@@ -168,7 +173,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.5"
+            android:layout_weight="1.1"
             android:orientation="vertical" >
 
         </LinearLayout>

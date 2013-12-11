@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.Fuente;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,6 +37,9 @@ public class SelectCountryActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_countries);
 
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_select_country));
+		
 		context = this;
 		
 		list_countries = (ListView) findViewById(R.id.list_select_countries);

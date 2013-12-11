@@ -8,8 +8,8 @@
         android:bottom="15dp" />
     <stroke
         android:width="1dip"
-        android:color="#3b5998" />
+        android:color="@color/azul_facebook" />
     <corners android:radius="8dp" />
    	<solid 
-	    android:color="#3b5998"/>
+	    android:color="@color/azul_facebook" />
 </shape>

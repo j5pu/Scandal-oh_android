@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.Audio.PlayListener;
 
 public class RememberPasswordDialog extends Dialog{
@@ -63,6 +65,9 @@ public class RememberPasswordDialog extends Dialog{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.recordar_contrasenia);
 		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_recordar));
+		
 		txt_mensaje = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		but_cancelar = (Button) findViewById(R.id.but_recordar_cancelar);
 		but_enviar = (Button) findViewById(R.id.but_recordar_enviar);
@@ -86,7 +91,7 @@ public class RememberPasswordDialog extends Dialog{
 						new RememberPassUser().execute();
 					}	
 					else{
-						edit_email.setError("Introduzca un email");
+						edit_email.setError("Introduce un email válido");
 					}
 				}
 				else{

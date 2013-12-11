@@ -1,6 +1,4 @@
 package com.bizeu.escandaloh.users;
-
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -10,25 +8,28 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
+import com.bizeu.escandaloh.util.Fuente;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -41,6 +42,7 @@ public class MainLoginActivity extends SherlockActivity{
 	public static int REGISTRATION = 2;
 	public static int LOG_FACEBOOK = 3;
 	
+	private ViewGroup vg_pantalla;
 	private TextView txt_pasar;
 	private Button but_registro;
 	private Button but_login;
@@ -61,13 +63,30 @@ public class MainLoginActivity extends SherlockActivity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.main_login);
+		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main_login));
 		
 		login_facebook_pulsado = false;
 		acti = this;
 		
+		boolean first_time = false;
+		
+		if (getIntent() != null) {
+			first_time = getIntent().getBooleanExtra(MainActivity.FIRST_TIME, false);
+		}
+		
+		// Si estamos en esta pantalla porque el usuario pulsó "+": mostramos un mensaje
+		if (!first_time){ 
+			Toast toast = Toast.makeText(acti, "Regístrate o inicia sesión para agregar contenidos", Toast.LENGTH_LONG);
+			toast.show();
+		}
+		
+		
 		progress = new ProgressDialog(this);
-		progress.setTitle("Logueando ...");
+		progress.setTitle("Iniciando sesión ...");
 		progress.setMessage("Espere, por favor");
 		progress.setCancelable(false);
 		
@@ -78,7 +97,15 @@ public class MainLoginActivity extends SherlockActivity{
 		txt_pasar = (TextView) findViewById(R.id.txt_pasar_registro);
 		but_registro = (Button) findViewById(R.id.but_registro_usuario);
 		but_login = (Button) findViewById(R.id.but_log_in);
+	
 		but_entra_facebook = (Button) findViewById(R.id.but_enra_facebook);
+		
+		// Ponemos el icono de facebook en el botón
+		Drawable drawable = getResources().getDrawable(R.drawable.logo_facebook);
+		drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.8), 
+		                         (int)(drawable.getIntrinsicHeight()*0.8));
+		ScaleDrawable sd = new ScaleDrawable(drawable, 0, 30, 30);
+		but_entra_facebook.setCompoundDrawables(sd.getDrawable(), null, null, null); //set drawableLeft for example
 		
 		but_registro.setOnClickListener(new View.OnClickListener() {
 			
@@ -197,6 +224,8 @@ public class MainLoginActivity extends SherlockActivity{
 				finish();	
 			}
 		});
+		
+
 	
 	}
 	

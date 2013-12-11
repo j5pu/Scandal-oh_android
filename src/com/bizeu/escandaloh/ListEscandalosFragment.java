@@ -882,23 +882,27 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 */
 	public void updateList(){
 		
-		// Colocamos el carrusel en el primer escándalo
-		lView.setSelection(0);
-		
-		// Si no se están obteniendo otros escándalos
-    	if (!getting_escandalos){
-	    	// Si hay conexión
-			if (Connectivity.isOnline(getActivity().getApplicationContext())){
-				// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
-				getting_escandalos = true;
-				getNewEscandalosAsync = new GetNewEscandalos();
-				getNewEscandalosAsync.execute();
-			}
+		// Si hay algún escándalo en la lista
+		if (escandalos.size() > 0){
+			// Colocamos el carrusel en el primer escándalo
+			lView.setSelection(0);
+			
+			// Si no se están obteniendo otros escándalos
+	    	if (!getting_escandalos){
+		    	// Si hay conexión
+				if (Connectivity.isOnline(getActivity().getApplicationContext())){
+					// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
+					getting_escandalos = true;
+					getNewEscandalosAsync = new GetNewEscandalos();
+					getNewEscandalosAsync.execute();
+				}
 
-			else{
-				Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
-				toast.show();
-			} 
-    	}	
+				else{
+					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
+					toast.show();
+				} 
+	    	}
+		}
+	
 	}
 }

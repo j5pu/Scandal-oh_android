@@ -69,8 +69,6 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             holder = (CommentHolder)mView.getTag();
             
             // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha
-            Log.v("WE","user name Owene: " + user_name_owner);
-            Log.v("WE","user name: " + comment.getUsername());
             if (user_name_owner.equals(comment.getUsername())){
             	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.azul));
             	holder.txtDate.setTextColor(context.getResources().getColor(R.color.azul));
@@ -81,8 +79,14 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
-        String date_without_time = (comment.getDate().split("T",2))[0];    
-        holder.txtDate.setText(date_without_time); 
+        
+        // La fecha tendrá el formato: dd-mm-aaaa
+        String date_without_time = (comment.getDate().split("T",2))[0];   
+        String year = date_without_time.split("-",3)[0];
+        String month = date_without_time.split("-",3)[1];
+        String day = date_without_time.split("-",3)[2];
+        String final_date = day + "-" + month + "-" + year;
+        holder.txtDate.setText(final_date); 
         
         
         // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha

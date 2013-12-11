@@ -22,6 +22,7 @@ import android.view.Display;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -36,6 +37,7 @@ import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
@@ -50,6 +52,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
     public static final int FROM_GALLERY = 12;
+    public static final String FIRST_TIME = "First_time"; // Nos indica si pulsó el + para hacer una foto
     
 	private File photo;
 	public static ArrayList<Escandalo> escandalos;
@@ -74,12 +77,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main);
+		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main));
 			
 		context = this;
 		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
 		if (!MyApplication.logged_user){
 	        Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
+	        i.putExtra(FIRST_TIME, true);
 	        startActivity(i);
 		}
 	
@@ -104,7 +111,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);       
 
         // Separadores de los tabs
-        mTabHost.getTabWidget().setDividerDrawable(R.drawable.prueba_separador); //id of your drawble resource here
+        //mTabHost.getTabWidget().setDividerDrawable(R.drawable.prueba_separador); //id of your drawble resource here
         
         // Añadimos los tabs para cada uno de los 3 fragmentos
         Bundle b = new Bundle();
@@ -119,15 +126,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         b.putString(CATEGORY, BOTH);
         mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragment.class, b);
 
-
+        
         // Cambiamos el color del texto y le añadimos el selector (para la barrita de abajo)
         for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++){
-            TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
-            tv.setTextColor(getResources().getColor(R.color.gris_oscuro));
+            //TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+           // tv.setTextColor(getResources().getColor(R.color.gris_oscuro));
 
            mTabHost.getTabWidget().getChildAt(i).setBackgroundResource(R.drawable.tab_selector);           
         } 
-
+        
         
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
@@ -367,6 +374,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				// Si no, iniciamos la pantalla de login
 				else{
 					Intent i = new Intent(this, MainLoginActivity.class);
+			        i.putExtra(FIRST_TIME, false); // Indicamos que no es la primera vez que saldrá esta pantalla (ha pulsado "+")
 					startActivity(i);
 				}
 			}

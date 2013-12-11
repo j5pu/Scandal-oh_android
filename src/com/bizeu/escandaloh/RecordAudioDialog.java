@@ -11,12 +11,14 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.Audio.PlayListener;
 
 public class RecordAudioDialog extends Dialog{
@@ -48,16 +50,19 @@ public class RecordAudioDialog extends Dialog{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.record_audio);
 		
-		ll_espacio_botones = (LinearLayout) findViewById(R.id.LL_record_audio_espacio_botones);
+		// Cambiamos la fuente de la pantalla
+		//Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_record_audio));
+		
+		ll_espacio_botones = (LinearLayout) findViewById(R.id.lay_pantalla_record_audio);
 		txt_description = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		txt_seg = (TextView) findViewById(R.id.txt_seg);
+		
+		
 		txt_subir_sin_audio = (TextView) findViewById(R.id.txt_cancelar_foto_audio);
 		txt_subir_sin_audio.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				dismiss();
-				Audio.getInstance().closeAudio();	
 				
 				if (Audio.getInstance().isPlaying()){
 					Audio.getInstance().stopPlaying();
@@ -91,8 +96,7 @@ public class RecordAudioDialog extends Dialog{
 			public void onClick(View v) {
 				
 				// Si está reproduciendo: paramos de reproducir
-				if (Audio.getInstance().isPlaying()){
-					
+				if (Audio.getInstance().isPlaying()){				
 					Audio.getInstance().stopPlaying();
 					
 					// Acualizamos la interfaz
@@ -117,8 +121,8 @@ public class RecordAudioDialog extends Dialog{
 						img_subir_foto.setVisibility(View.VISIBLE);	
 						but_reproducir.setVisibility(View.VISIBLE);
 						txt_description.setText("Audio grabado:");
-						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
-						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
+						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
+						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 						int recorded_seconds = 20 - contador;
 						String recorded_seconds_string;
 						if (recorded_seconds < 10){
@@ -139,21 +143,26 @@ public class RecordAudioDialog extends Dialog{
 						Log.v("WE","No esta grabando");
 						
 						// Actualizamos la IU para mostrar el tiempo más grande y quitar el botón de reproducir
-						ll_espacio_botones.setVisibility(View.GONE);
+						
+						//ll_espacio_botones.setVisibility(View.GONE);
 						txt_description.setText("Grabando audio...");
-						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 41F);
-						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 61f);
+						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP , 41F);
+						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 61f);
 						txt_meter.setText("00:" + Integer.toString(contador));
 						but_abajo.setText("Parar");	
-
+						but_reproducir.setVisibility(View.GONE);
+						img_subir_foto.setVisibility(View.GONE);
+						
 						try {
 							Audio.getInstance().start_recording();
 						} catch (IOException e) {
 							Log.e("WE","error grabando audio");
 							e.printStackTrace();
 						}
-						but_reproducir.setVisibility(View.GONE);
-						img_subir_foto.setVisibility(View.GONE);
+						
+						
+
+						
 					}
 				}
 			}
@@ -170,8 +179,8 @@ public class RecordAudioDialog extends Dialog{
 				// Cambios IU
 				ll_espacio_botones.setVisibility(View.VISIBLE);
 				txt_description.setText("Reproduciendo...");
-				txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 41F);
-				txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 61f);
+				txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 41F);
+				txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 61f);
 				txt_meter.setText("00:00");	
 				// Quitamos el botón de reproducir
 				but_reproducir.setVisibility(View.GONE);
@@ -213,8 +222,8 @@ public class RecordAudioDialog extends Dialog{
 							img_subir_foto.setVisibility(View.VISIBLE);	
 							but_reproducir.setVisibility(View.VISIBLE);
 							txt_description.setText("Audio grabado:");
-							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
-							txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
+							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
+							txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 							int recorded_seconds = 20 - contador;
 							String recorded_seconds_string;
 							if (recorded_seconds < 10){
@@ -301,14 +310,14 @@ public class RecordAudioDialog extends Dialog{
     private void changeIUPlayFinised(){
     	
     	// Quitamos el hueco en medio
-		ll_espacio_botones.setVisibility(View.GONE);
+		//ll_espacio_botones.setVisibility(View.GONE);
 		
 		// Actualizamos descripción
 		txt_description.setText("Audio grabado:");
 		
 		// Disminuimos tamaño del tiempo
-		txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
-		txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 35F);
+		txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
+		txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 		
 		// Indicamos el tiempo de grabación total en el tiempo
 		String recorded_seconds_string;

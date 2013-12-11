@@ -21,6 +21,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Fuente;
 
 public class LoginActivity extends SherlockActivity {
 	
@@ -67,6 +69,9 @@ public class LoginActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		
+		// Cambiamos la fuente de la pantalla
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_login));
 		
 		context = this;
 		// Ocultamos el action bar
@@ -201,8 +206,8 @@ public class LoginActivity extends SherlockActivity {
 			any_error = false;
 			
 			// Mostramos el ProgressDialog
-			progress.setTitle("Logueando ...");
-			progress.setMessage("Espere, por favor");
+			progress.setTitle("Iniciando sesión ...");
+			progress.setMessage("Espera, por favor");
 			progress.setCancelable(false);
 			progress.show();
 		}

@@ -288,7 +288,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			}
 
 			// Available height
-			available_height = height - action_bar_height - status_bar_height - MyApplication.ALTO_TABS;
+			available_height = height - (action_bar_height*2) - status_bar_height ;// - MyApplication.ALTO_TABS;
 			
 			return available_height;
 		}
