@@ -162,6 +162,10 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public void onResume(){
 		super.onResume();
 		
+		Log.v("WE","Entra onresume");
+		// Abrimos la llave para el caso de error del tiemout al obtener fotos
+		MyApplication.TIMEOUT_PHOTO_SHOWN = false;
+		
 	   // AdsSessionController.enableTracking();
 		
 		// Si está logueado quitamos el botón de logout y añadimos la cámara (con su selector)

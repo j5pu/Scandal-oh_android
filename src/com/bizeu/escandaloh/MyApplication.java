@@ -16,6 +16,7 @@ public class MyApplication extends Application {
 	public static boolean FIRST_TIME_HAPPY = true;
 	public static boolean FIRST_TIME_ANGRY = true;
 	public static boolean FIRST_TIME_BOTH = true;
+	public static boolean TIMEOUT_PHOTO_SHOWN = false;
 	
 	
 	@Override

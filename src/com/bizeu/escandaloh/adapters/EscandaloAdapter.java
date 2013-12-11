@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.applidium.shutterbug.FetchableImageView;
+import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
 import com.bizeu.escandaloh.MyApplication;
@@ -108,6 +109,25 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        	
             // Pide la imagen por url y la muestra cuando la obtenga. Mientras tanto muestra otra
             holder.imgPicture.setImage(escanda.getRouteImg(), R.drawable.cargando); 
+            holder.imgPicture.setListener(new FetchableImageViewListener() {
+				
+				@Override
+				public void onImageFetched(Bitmap bitmap, String url) {
+					// TODO Auto-generated method stub				
+				}
+				
+				@Override
+				public void onImageFailure(String url) {
+					// si aún no hemos mostrado ningún mensaje, indicamos que hubo un error (sólo una vez)
+					if (!MyApplication.TIMEOUT_PHOTO_SHOWN){
+						Toast toast = Toast.makeText(context, "Hubo algún error obteniendo las fotos. Compruebe su conexión", Toast.LENGTH_LONG);
+						toast.show();
+						MyApplication.TIMEOUT_PHOTO_SHOWN = true;
+						Log.v("WE","Error obteniendo foto (listener del shuterbug --> ¿timeout?");
+					}
+
+				}
+			});
             
 	        holder.txtTitle.setText(escanda.getTitle());
 	       // holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
