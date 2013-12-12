@@ -44,6 +44,7 @@ public class LoginActivity extends SherlockActivity {
 	private Button boton_aceptar;
 	private TextView txt_recordar_contrasenia;
 	private ProgressDialog progress;
+	private ViewGroup pantalla;
 	
 	private String name_error;
 	private String password_error;
@@ -71,7 +72,8 @@ public class LoginActivity extends SherlockActivity {
 		setContentView(R.layout.login);
 		
 		// Cambiamos la fuente de la pantalla
-		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_login));
+		pantalla = (ViewGroup)findViewById(R.id.lay_pantalla_login);
+		Fuente.cambiaFuente(pantalla);
 		
 		context = this;
 		// Ocultamos el action bar
@@ -154,6 +156,16 @@ public class LoginActivity extends SherlockActivity {
 	}
 	
 	
+	/**
+	 * onDestroy
+	 */
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		Log.v("WE","Entra en ondestroy");
+	}
+	
+
 	
 	/**
 	 * Comprueba si todos los campos son correctos
@@ -338,4 +350,6 @@ public class LoginActivity extends SherlockActivity {
 			}								
 	    }
 	}
+	
+
 }
