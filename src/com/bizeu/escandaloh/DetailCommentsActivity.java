@@ -74,7 +74,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.comments);
 		
-
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_comentarios));
 		
@@ -113,7 +112,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
 		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_new_comment.addTextChangedListener(new TextWatcher() {          
-		            @Override
+					@Override
 		            public void onTextChanged(CharSequence s, int start, int before, int count) {                                                
 		            	txt_count_characteres.setText(s.length() + "/500");
 		            }

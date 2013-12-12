@@ -80,7 +80,7 @@ public class MainLoginActivity extends SherlockActivity{
 		
 		// Si estamos en esta pantalla porque el usuario pulsó "+": mostramos un mensaje
 		if (!first_time){ 
-			Toast toast = Toast.makeText(acti, "Regístrate o inicia sesión para agregar contenidos", Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(acti, "Regístrate o inicia sesión para agregar contenidos", 2600);
 			toast.show();
 		}
 		
