@@ -17,18 +17,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Display;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -67,6 +63,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static FragmentTabHost mTabHost;
 	private Context context;
 	
+	private LinearLayout ll_logout;
+	private LinearLayout ll_refresh;
+	private LinearLayout ll_take_photo;
 	private ImageView img_logout;
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
@@ -100,13 +99,17 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		getSupportActionBar().setCustomView(view);
 			
+		ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
+		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
+		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
+		
 		// Listeners del action bar
 		img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		img_logout.setOnClickListener(this);
+		ll_logout.setOnClickListener(this);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
-		img_update_list.setOnClickListener(this);
+		ll_refresh.setOnClickListener(this);
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
-		img_take_photo.setOnClickListener(this);
+		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		
 
@@ -173,7 +176,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 		// Si está logueado quitamos el botón de logout y añadimos la cámara (con su selector)
 		if (MyApplication.logged_user){
-			img_logout.setVisibility(View.VISIBLE);
+			ll_logout.setVisibility(View.VISIBLE);
 			
 			StateListDrawable states = new StateListDrawable();
 
@@ -188,7 +191,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		}
 		// Si no está logueado mostramos el botón de logout y añadimos el "+" (con su selector)
 		else{			
-			img_logout.setVisibility(View.INVISIBLE);
+			ll_logout.setVisibility(View.INVISIBLE);
 			
 			StateListDrawable states = new StateListDrawable();
 			states.addState(new int[] {android.R.attr.state_pressed},
@@ -333,7 +336,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-		case R.id.img_actionbar_takephoto:
+		
+		// Login/Subir escandalo
+		case R.id.ll_main_take_photo:
 			
 			// Paramos si hubiera algún audio reproduciéndose
 			Audio.getInstance().releaseResources();
@@ -394,7 +399,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			
 			break;
 			
-		case R.id.img_actionbar_logout:
+		// Logout
+		case R.id.ll_main_logout:
 			
 			// Paramos si hubiera algún audio reproduciéndose
 			Audio.getInstance().releaseResources();
@@ -408,7 +414,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
-							img_logout.setVisibility(View.INVISIBLE);
+							ll_logout.setVisibility(View.INVISIBLE);
 							// Cabiamos el icono de la cámara al más (con su selector)
 							StateListDrawable states = new StateListDrawable();
 							states.addState(new int[] {android.R.attr.state_pressed},
@@ -428,8 +434,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			}
 			break;
 			
-		// Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
-		case R.id.img_actionbar_updatelist:
+			
+		// Actualizar carrusel: Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
+		case R.id.ll_main_refresh:
 		
 			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
 			progress_refresh.setVisibility(View.VISIBLE);
