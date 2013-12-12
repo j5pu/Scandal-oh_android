@@ -32,8 +32,8 @@ public class DetailPhotoActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo_detail);
 		
-		Log.v("WE","entra en oncreate");
 		played_already = false;
+
 		
 		// Quitamos el action bar
 		getSupportActionBar().hide();
@@ -65,6 +65,8 @@ public class DetailPhotoActivity extends SherlockActivity {
 			played_already = true;	
 			new PlayAudio().execute();	
 		}
+		
+		Log.v("WE","ponemos photo clicked a false");
 	}
 	
 	
@@ -80,6 +82,18 @@ public class DetailPhotoActivity extends SherlockActivity {
 		if (!orientation_changed){
 			Audio.getInstance().releaseResources();
 		}
+	}
+	
+	
+	/**
+	 * onDestroy
+	 */
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		// Volvemos a permitir que se pulse en las fotos del carruse
+		MyApplication.PHOTO_CLICKED = false; 
+		
 	}
 	
 	

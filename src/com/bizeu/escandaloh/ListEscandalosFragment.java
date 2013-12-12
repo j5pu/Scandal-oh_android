@@ -221,7 +221,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						else{
 							// Cerramos la llave
 							connection_checked = true;
-							Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+							Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 							toast.show();
 						} 
 	            	}		    	
@@ -271,7 +271,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    	getEscandalosAsync.execute();	
 		}
 		else{
-			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de una conexión a internet", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
 			// Habilitamos los tabs de nuevo 
 	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);

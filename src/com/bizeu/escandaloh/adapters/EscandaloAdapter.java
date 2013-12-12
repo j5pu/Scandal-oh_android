@@ -173,19 +173,28 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {
 					
-					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().releaseResources();
-					
-					Intent i = new Intent(context, DetailPhotoActivity.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					ImageView imView = (ImageView) v;
-					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
-					i.putExtra("bytes", bytes);
-					i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
+					// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
+					if (!MyApplication.PHOTO_CLICKED){
+						MyApplication.PHOTO_CLICKED = true;
+						
+						// Paramos si hubiera algún audio reproduciéndose
+						Audio.getInstance().releaseResources();
+						
+						Intent i = new Intent(context, DetailPhotoActivity.class);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						ImageView imView = (ImageView) v;
+						Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
+						byte[] bytes = ImageUtils.bitmapToBytes(bitm);
+						i.putExtra("bytes", bytes);
+						i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 
-					Log.v("WE","Antes del startactiv");
-					context.startActivity(i);
+						Log.v("WE","Antes del startactiv");
+						context.startActivity(i);
+					}
+					else{
+						Log.v("WE","Ya has clickeado!");
+					}
+
 				}
 			});   
             
