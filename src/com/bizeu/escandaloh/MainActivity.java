@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +43,8 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
-public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, OnClickListener {
+public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, 
+															OnClickListener, ListEscandalosFragment.Callbacks {
 
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
@@ -68,6 +70,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private ImageView img_logout;
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
+	private ProgressBar progress_refresh;
 	
 	/**
 	 * onCreate
@@ -104,6 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		img_update_list.setOnClickListener(this);
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 		img_take_photo.setOnClickListener(this);
+		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		
 
 		// Tab Host (FragmentTabHost)
@@ -427,6 +431,11 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		// Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.img_actionbar_updatelist:
 		
+			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
+			progress_refresh.setVisibility(View.VISIBLE);
+			img_update_list.setVisibility(View.GONE);
+			
+			
 			// Obtenemos cuál es el tab activo
 			String current_tab = mTabHost.getCurrentTabTag();
 
@@ -480,5 +489,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	    } else {
 	        return false;
 	    }
+	}
+
+
+	/**
+	 * Se llama cuando se ha terminado de refrescar el carrusel
+	 */
+	@Override
+	public void onRefreshFinished() {
+		// Ocultamos el progress bar (loading) y mostramos el botón de refrescar
+		progress_refresh.setVisibility(View.GONE);
+		img_update_list.setVisibility(View.VISIBLE);
 	}
 }

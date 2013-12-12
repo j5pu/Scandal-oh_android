@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -68,11 +69,36 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	private boolean connection_checked = false;
 	private View img_view;
 	private boolean there_are_more_escandalos;
+    private Callbacks tCallbacks = null;  
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
 
 	
+	public interface Callbacks {
+		public void onRefreshFinished(); // Indica que se ha terminado de actualizar el carrusel para nuevos escandalos
+	}
+	  
+	  
+	  
+	 /**
+	  * onAttach
+	 */
+	 @Override
+	 public void onAttach(Activity activity) {
+		 super.onAttach(activity);
+		 if (!(activity instanceof Callbacks)) {
+			 throw new IllegalStateException("La actividad debe implementar los callbacks de los fragmentos");
+		 }
+		 else {
+			 tCallbacks = (Callbacks) activity;
+		 }
+	 }
+	
+	 
+	 /**
+	  * onCreate
+	  */
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      	super.onCreate(savedInstanceState);
@@ -92,6 +118,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	
 
 	 
+	 /**
+	  * onCreateView
+	  */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.list_escandalos, container, false);
@@ -853,6 +882,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			getting_escandalos = false;
 			escanAdapter.notifyDataSetChanged();
 	        //lView.onRefreshComplete();
+			
+			// Indicamos a la actividad que ha terminado de actualizar
+			tCallbacks.onRefreshFinished();
 	    }
 	}
 	
@@ -897,13 +929,21 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 					getNewEscandalosAsync = new GetNewEscandalos();
 					getNewEscandalosAsync.execute();
 				}
-
 				else{
 					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 					toast.show();
+					// Indicamos a la actividad que ha terminado de actualizar
+					tCallbacks.onRefreshFinished();	
 				} 
 	    	}
+	    	else{
+				// Indicamos a la actividad que ha terminado de actualizar
+				tCallbacks.onRefreshFinished();	
+	    	}
 		}
-	
+		else{
+			// Indicamos a la actividad que ha terminado de actualizar
+			tCallbacks.onRefreshFinished();	
+		}
 	}
 }

@@ -56,7 +56,9 @@ public class DetailPhotoActivity extends SherlockActivity {
 	
 	
 
-	
+	/**
+	 * onResume
+	 */
 	@Override
 	protected void onResume(){
 		super.onResume();
@@ -65,8 +67,6 @@ public class DetailPhotoActivity extends SherlockActivity {
 			played_already = true;	
 			new PlayAudio().execute();	
 		}
-		
-		Log.v("WE","ponemos photo clicked a false");
 	}
 	
 	

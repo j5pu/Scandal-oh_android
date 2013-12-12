@@ -188,13 +188,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 						i.putExtra("bytes", bytes);
 						i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 
-						Log.v("WE","Antes del startactiv");
 						context.startActivity(i);
 					}
-					else{
-						Log.v("WE","Ya has clickeado!");
-					}
-
 				}
 			});   
             

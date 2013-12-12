@@ -60,12 +60,22 @@
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical" >
 
+                    <ProgressBar
+                        android:id="@+id/prog_refresh_action_bar"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_gravity="right"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:visibility="gone"
+                         />
+
                     <ImageView
                         android:id="@+id/img_actionbar_updatelist"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="right"
-                        android:background="@drawable/recarga_selector" />
+                        android:background="@drawable/recarga_selector"
+                        android:visibility="visible" />
 
                 </LinearLayout>
 
