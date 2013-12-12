@@ -57,11 +57,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	private String selected_category;
 	private String written_title;
 	private Bitmap taken_photo;
-	private Uri photoUri;
-	private Bitmap bitmap;
 	private File photo_file;
 	private Uri mImageUri;
-	private Uri audioUri = null;
 	private ProgressDialog progress;
 	private Context context;
 	private File audio_file;

@@ -54,8 +54,9 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private LinearLayout layout_write_comment;
 	private LinearLayout ll_list_comments;
 	private ProgressBar progress_list_comments;
+	
 	private String written_comment;	
-	private ArrayAdapter<Comment> commentsAdapter;
+	private CommentAdapter commentsAdapter;
 	private ArrayList<Comment> comments;
 	private String photo_id;
 	private ProgressDialog progress;
@@ -192,6 +193,14 @@ public class DetailCommentsActivity extends SherlockActivity {
 		if (!MyApplication.logged_user){
 			layout_write_comment.setVisibility(View.GONE);
 		}
+	}
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		list_comments.setAdapter(null);
+		comments.clear();
+		comments = null;
 	}
 	
 	

@@ -48,27 +48,28 @@ import com.zed.adserver.onAdsReadyListener;
 
 public class ListEscandalosFragment extends SherlockFragment implements onAdsReadyListener{
 
-	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
 	public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 	public final static String ID_VINO_SELECCIONADO = "Vino_seleccionado";
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
+    
+	private ListView lView;
+	//private PullToRefreshListView  lView;
+	private FrameLayout banner;
+	private View img_view;
+	
     private int mActivatedPosition = ListView.INVALID_POSITION;
 	private int first_visible_item_count;
-	EscandaloAdapter escanAdapter;
 	public static ArrayList<Escandalo> escandalos;
-	private FrameLayout banner;
 	private BannerView adM;
 	AmazonS3Client s3Client;
 	int mCurrentPage;
-	Escandalo escan_aux;
-	//private PullToRefreshListView  lView;
-	private ListView lView;
 	private boolean getting_escandalos = true;
 	private String category;
 	private boolean any_error;
 	private boolean connection_checked = false;
-	private View img_view;
 	private boolean there_are_more_escandalos;
+	Escandalo escan_aux;
+	EscandaloAdapter escanAdapter;
     private Callbacks tCallbacks = null;  
 	
 	private GetEscandalos getEscandalosAsync;
@@ -258,9 +259,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	            
 				
 				// Guardamos en que posición está el primer escandalo visible (actualmente) en la pantalla
-				first_visible_item_count = firstVisibleItem;
-	            
-	            
+				first_visible_item_count = firstVisibleItem;                
 			}
 		});
 		
@@ -331,15 +330,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	public void onDestroyView(){
 		super.onDestroyView();
 	    cancelGetEscandalos();
-		Log.v("WE","Entra en ondestroyview");
 		
 		// Deshabilitamos los tabs (hasta que se hayan mostrado los escandalos del otro tab pulsado)
         MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(false);
         MainActivity.mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(false);
         MainActivity.mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(false);
 
-		//escanAdapter = null;
-		//escandalos.clear();
+        lView.setAdapter(null);
+        escandalos.clear();
+        escandalos = null;
 	}
 	
 

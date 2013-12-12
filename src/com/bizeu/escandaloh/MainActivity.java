@@ -42,17 +42,24 @@ import com.zed.adserver.onAdsReadyListener;
 public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, 
 															OnClickListener, ListEscandalosFragment.Callbacks {
 
+	public static final int SHOW_CAMERA = 10;
+    private static final int CREATE_ESCANDALO = 11;
+    public static final int FROM_GALLERY = 12;
+    public static final String FIRST_TIME = "First_time"; // Nos indica si pulsó el + para hacer una foto
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
 	public static final String BOTH = "Todas";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
-	public static final int SHOW_CAMERA = 10;
-    private static final int CREATE_ESCANDALO = 11;
-    public static final int FROM_GALLERY = 12;
-    public static final String FIRST_TIME = "First_time"; // Nos indica si pulsó el + para hacer una foto
-    
-	private File photo;
+	
+	private LinearLayout ll_logout;
+	private LinearLayout ll_refresh;
+	private LinearLayout ll_take_photo;
+	private ImageView img_logout;
+	private ImageView img_update_list;
+	private ImageView img_take_photo;
+	private ProgressBar progress_refresh;
+  
 	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
 	private Uri mImageUri;
@@ -63,13 +70,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static FragmentTabHost mTabHost;
 	private Context context;
 	
-	private LinearLayout ll_logout;
-	private LinearLayout ll_refresh;
-	private LinearLayout ll_take_photo;
-	private ImageView img_logout;
-	private ImageView img_update_list;
-	private ImageView img_take_photo;
-	private ProgressBar progress_refresh;
+
 	
 	/**
 	 * onCreate
@@ -152,12 +153,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
        // AdsSessionController.registerAdsReadyListener(this);	
 	}
+
 	
 	
+	/**
+	 * onStart
+	 */
 	@Override
 	public void onStart(){
 		super.onStart();
-
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 	}
 
@@ -211,25 +215,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 */
 	@Override
 	protected void onPause() {
-	    super.onPause();
-	    
+	    super.onPause();    
 	   // AdsSessionController.pauseTracking();
 	}
 	
 	
 	
 	
-	
-	
-	
-	
-
-
-	
 	/**
 	 * It will be called when the ads are ready to be shown
 	 */
-	
 	@Override
 	public void onAdsReady(){ 
 		

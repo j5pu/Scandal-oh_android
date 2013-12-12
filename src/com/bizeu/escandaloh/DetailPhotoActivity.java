@@ -2,13 +2,10 @@ package com.bizeu.escandaloh;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
@@ -18,8 +15,8 @@ import com.bizeu.escandaloh.util.ImageUtils;
 public class DetailPhotoActivity extends SherlockActivity {
 
 	private ImageViewTouch mImage;
+	
 	private Bitmap photo;
-	private String route_img;
 	private String uri_audio;
 	private boolean played_already ;
 	private boolean orientation_changed ;

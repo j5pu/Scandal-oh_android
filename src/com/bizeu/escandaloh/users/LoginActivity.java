@@ -54,7 +54,6 @@ public class LoginActivity extends SherlockActivity {
 	
 	private boolean has_name_error;
 	private boolean has_password_error;
-	
 	private String status = null;
 	private boolean login_error = false;
 	private String loginMessageError;

@@ -45,11 +45,9 @@ public class RegistrationActivity extends SherlockActivity {
 	private boolean has_name_error;
 	private boolean has_password_error;
 	private boolean has_email_error;
-	
 	private String name_error;
 	private String password_error;
 	private String email_error; 
-	
 	private String status = null;
 	private String user_uri ;
 	private ProgressDialog progress;

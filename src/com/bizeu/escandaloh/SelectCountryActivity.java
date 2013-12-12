@@ -1,11 +1,7 @@
 package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
-
-import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
-import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Fuente;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +23,7 @@ public class SelectCountryActivity extends Activity {
 
 	private ListView list_countries;
 	
+	private ArrayList<Country> countries;
 	private Context context;
 	
 
@@ -44,7 +42,7 @@ public class SelectCountryActivity extends Activity {
 		
 		list_countries = (ListView) findViewById(R.id.list_select_countries);
 		
-		final ArrayList<Country> countries = new ArrayList<Country>();
+		countries = new ArrayList<Country>();
 		addCountries(countries);	
 
 		final CountryArrayAdapter adapter = new CountryArrayAdapter(this,
@@ -91,6 +89,16 @@ public class SelectCountryActivity extends Activity {
 				alert_country.show();
 			}
 		});
+	}
+	
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		list_countries.setAdapter(null);
+		countries.clear();
+		countries = null;
+		
 	}
 	
 	
