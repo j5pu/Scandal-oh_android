@@ -1,12 +1,22 @@
+
+<!-- API 14 theme customizations -->
 <resources>
 
-    <!--
-        Base application theme for API 14+. This theme completely replaces
-        AppBaseTheme from BOTH res/values/styles.xml and
-        res/values-v11/styles.xml on API 14+ devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- API 14 theme customizations can go here. -->
+    <!-- the theme applied to the application or activity -->
+    <style name="Theme.app" parent="@style/Theme.Sherlock.Light">
+        <item name="android:actionBarTabStyle">@style/MyActionBarTabs</item>
+        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>             
+    </style>
+
+    <!-- ActionBar tabs styles -->
+    <style name="MyActionBarTabs" parent="@style/Widget.Sherlock.ActionBar.TabView">
+        <!-- tab indicator -->
+        <item name="android:background">@drawable/tab_indicator_ab_mytabsstyle</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
+    </style>
+    
+       <style name="CustomTabTextStyle" parent="@android:style/TextAppearance.Holo">
+        <item name="android:textColor">@color/gris_oscuro</item>
     </style>
 
 </resources>

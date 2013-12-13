@@ -1,32 +1,6 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
-    </style>
+   <style name="Theme.app" parent="@style/Theme.Sherlock.Light">        <!-- Support library compatibility -->        <item name="actionBarTabStyle">@style/MyActionBarTabs</item></style> <!-- ActionBar tabs styles -->    <style name="MyActionBarTabs"           parent="@style/Widget.Sherlock.ActionBar.TabView">        <!-- tab indicator -->        <item name="android:background">@drawable/tab_indicator_ab_mytabsstyle</item>        <!-- Support library compatibility -->        <item name="background">@drawable/tab_indicator_ab_mytabsstyle</item>    </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
-
-    <style name="tabtextcolor" parent="@style/Widget.Sherlock.Light.ActionBar.TabText">
-        <item name="android:textColor">@color/gris_oscuro</item>
-    </style>
-
-    <style name="MyTheme" parent="@style/Theme.Sherlock.Light">
-        <item name="android:windowBackground">@color/gris_claro</item>
-        
-        <item name="android:colorBackground">@color/gris_claro</item>
-        <item name="android:textColor">@color/morado</item>
-        <item name="actionBarTabTextStyle">@style/tabtextcolor</item>
-    </style>
 
 </resources>

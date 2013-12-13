@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -26,7 +28,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
@@ -67,10 +70,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private FrameLayout banner;
 	private BannerView adM;
 	private SharedPreferences prefs;
-	public static FragmentTabHost mTabHost;
 	private Context context;
-	
-
 	
 	/**
 	 * onCreate
@@ -92,18 +92,67 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	        i.putExtra(FIRST_TIME, true);
 	        startActivity(i);
 		}
-	
+				
 		// Action Bar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		getSupportActionBar().setCustomView(view);
-			
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
 		ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
 		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		
+		// Action Bar Tabs
+	    ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+
+			@Override
+			public void onTabSelected(Tab tab, FragmentTransaction ft) {
+				
+				if (MyApplication.TABS_ENABLED){
+		            Bundle b = new Bundle();
+					ListEscandalosFragment lef = new ListEscandalosFragment();
+					
+					switch(tab.getPosition()){
+						case 0:
+							b.putString(CATEGORY, HAPPY);
+							lef.setArguments(b);
+							ft.replace(R.id.frag_list_escandalos, lef, HAPPY);
+							break;
+						case 1:
+							b.putString(CATEGORY, ANGRY);
+							lef.setArguments(b);
+							ft.replace(R.id.frag_list_escandalos, lef, ANGRY);
+							break;
+						case 2:
+							b.putString(CATEGORY, BOTH);
+							lef.setArguments(b);
+							ft.replace(R.id.frag_list_escandalos, lef, BOTH);
+							break;
+					}
+				}
+
+			}
+
+			@Override
+			public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onTabReselected(Tab tab, FragmentTransaction ft) {
+				// TODO Auto-generated method stub
+				
+			}
+	    };
+	    
+	    getSupportActionBar().addTab(getSupportActionBar().newTab().setText(HAPPY).setTabListener(tabListener), 0, true);
+	    getSupportActionBar().addTab(getSupportActionBar().newTab().setText(ANGRY).setTabListener(tabListener), 1, false);
+	    getSupportActionBar().addTab(getSupportActionBar().newTab().setText(BOTH).setTabListener(tabListener), 2, false);
+	    
 		// Listeners del action bar
 		img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
 		ll_logout.setOnClickListener(this);
@@ -112,43 +161,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-		
-
-		// Tab Host (FragmentTabHost)
-        mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
-        mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);       
-
-        // Separadores de los tabs
-        //mTabHost.getTabWidget().setDividerDrawable(R.drawable.prueba_separador); //id of your drawble resource here
         
-        // Añadimos los tabs para cada uno de los 3 fragmentos
-        Bundle b = new Bundle();
-        b.putString(CATEGORY, HAPPY);
-        mTabHost.addTab(mTabHost.newTabSpec(HAPPY).setIndicator(HAPPY),ListEscandalosFragment.class, b);  
-        
-        b = new Bundle();
-        b.putString(CATEGORY, ANGRY);
-        mTabHost.addTab(mTabHost.newTabSpec(ANGRY).setIndicator(ANGRY),ListEscandalosFragment.class, b);
-        
-        b = new Bundle();
-        b.putString(CATEGORY, BOTH);
-        mTabHost.addTab(mTabHost.newTabSpec(BOTH).setIndicator(BOTH),ListEscandalosFragment.class, b);
-
-        
-        // Cambiamos el color del texto y le añadimos el selector (para la barrita de abajo)
-        for(int i=0;i<mTabHost.getTabWidget().getChildCount();i++){
-            //TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
-           // tv.setTextColor(getResources().getColor(R.color.gris_oscuro));
-
-           mTabHost.getTabWidget().getChildAt(i).setBackgroundResource(R.drawable.tab_selector);           
-        } 
-        
-        
+		/*
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
         mTabHost.measure(display.getWidth(), display.getHeight());
-        MyApplication.ALTO_TABS = mTabHost.getMeasuredHeight();
-	             
+        MyApplication.ALTO_TABS = mTabHost.getMeasuredHeight();	             
+	    */
+		
 		// Ten
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
        // AdsSessionController.registerAdsReadyListener(this);	
@@ -410,7 +430,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
 							ll_logout.setVisibility(View.INVISIBLE);
-							// Cabiamos el icono de la cámara al más (con su selector)
+							// Cambiamos el icono de la cámara al más (con su selector)
 							StateListDrawable states = new StateListDrawable();
 							states.addState(new int[] {android.R.attr.state_pressed},
 								    getResources().getDrawable(R.drawable.mas_pressed));
@@ -436,11 +456,10 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
 			progress_refresh.setVisibility(View.VISIBLE);
 			img_update_list.setVisibility(View.GONE);
-			
-			
+					
 			// Obtenemos cuál es el tab activo
-			String current_tab = mTabHost.getCurrentTabTag();
-
+			String current_tab = getSupportActionBar().getSelectedTab().getText().toString();
+			
 			ListEscandalosFragment lef = null;
 			if (current_tab.equals(HAPPY)){
 				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(HAPPY);		
@@ -449,6 +468,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			else if (current_tab.equals(ANGRY)){
 				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(ANGRY);				
 			}
+			
 			else if (current_tab.equals(BOTH)){
 				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(BOTH);
 			}
@@ -503,4 +523,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		progress_refresh.setVisibility(View.GONE);
 		img_update_list.setVisibility(View.VISIBLE);
 	}
+	
+	
+	
+
 }

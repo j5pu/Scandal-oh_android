@@ -18,6 +18,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -113,9 +114,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				Log.v("WE","La categoria es: " + category);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}      	
+			}	
+		  } 
+	      else{
+	    	  // Primera vez que aparecen escándalos, el primero es HAPPY
+	    	  category = MainActivity.HAPPY;
+	      }
 	 }
 	
 
@@ -288,7 +292,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
-
 			
 		
 		// Ten
@@ -303,9 +306,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
 			// Habilitamos los tabs de nuevo 
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(true);
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(true);
+			MyApplication.TABS_ENABLED = true;
 		}	
 	}
 	
@@ -331,11 +332,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	public void onDestroyView(){
 		super.onDestroyView();
 	    cancelGetEscandalos();
-		
+
 		// Deshabilitamos los tabs (hasta que se hayan mostrado los escandalos del otro tab pulsado)
-        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(false);
-        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(false);
-        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(false);
+	    MyApplication.TABS_ENABLED = false;
 
         lView.setAdapter(null);
         escandalos.clear();
@@ -757,9 +756,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			//lView.onRefreshComplete();
 			
 			// Habilitamos los tabs de nuevo (una vez que los escándalos se han mostrado se puede pulsar otro tab)
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(0).setEnabled(true);
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(1).setEnabled(true);
-	        MainActivity.mTabHost.getTabWidget().getChildTabViewAt(2).setEnabled(true);
+			MyApplication.TABS_ENABLED = true;
 	    }
 	}
 	
