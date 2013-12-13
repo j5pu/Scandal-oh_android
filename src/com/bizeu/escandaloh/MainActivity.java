@@ -147,7 +147,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
         // Almacenamos el alto del FragmentTabHost
         Display display = getWindowManager().getDefaultDisplay();
         mTabHost.measure(display.getWidth(), display.getHeight());
-        MyApplication.ALTO_TABS = mTabHost.getMeasuredHeight();
+        MyApplication.TABS_HEIGHT = mTabHost.getMeasuredHeight();
 	             
 		// Ten
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);

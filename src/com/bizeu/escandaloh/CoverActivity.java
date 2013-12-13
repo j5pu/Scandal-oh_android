@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh;
 
+import com.bizeu.escandaloh.util.Screen;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
