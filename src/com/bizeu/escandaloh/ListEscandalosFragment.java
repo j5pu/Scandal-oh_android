@@ -33,6 +33,7 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -56,6 +57,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	//private PullToRefreshListView  lView;
 	private FrameLayout banner;
 	private View img_view;
+	private ProgressBar loading;
 	
     private int mActivatedPosition = ListView.INVALID_POSITION;
 	private int first_visible_item_count;
@@ -102,19 +104,18 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	  */
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
-	      	super.onCreate(savedInstanceState);
+	      super.onCreate(savedInstanceState);
 
-	      	// Obtenemos el tipo de categoria
-	      	if (getArguments() != null) {
-				try {
-					category = getArguments().getString(MainActivity.CATEGORY);
-					Log.v("WE","La categoria es: " + category);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+	      // Obtenemos el tipo de categoria
+	      if (getArguments() != null) {
+			try {
+				category = getArguments().getString(MainActivity.CATEGORY);
+				Log.v("WE","La categoria es: " + category);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-	      	
+		}      	
 	 }
 	
 
@@ -149,6 +150,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
       	getting_escandalos = true;
       	
       	lView = (ListView) v.findViewById(R.id.list_escandalos);
+      	loading = (ProgressBar) v.findViewById(R.id.prog_list_escandalos);
 
       	/*
 		lView.setOnRefreshListener(new OnRefreshListener() {
@@ -177,9 +179,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    	}			
 		    }
 		});
-		*/
-		
-		
+		*/	
 		
       	escandalos = new ArrayList<Escandalo>();    	
 		escanAdapter = new EscandaloAdapter(getActivity(), R.layout.escandalo,
@@ -256,18 +256,19 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						} 
 	            	}		    	
 	            }
-	            
-				
+	            				
 				// Guardamos en que posición está el primer escandalo visible (actualmente) en la pantalla
 				first_visible_item_count = firstVisibleItem;                
 			}
 		});
-		
-		
+			
 		return v;
 	}
 	
 	
+	/**
+	 * onViewCreated
+	 */
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -731,6 +732,10 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
+			
+			// Quitamos el progresbar y mostramos la lista de escandalos
+			loading.setVisibility(View.GONE);
+			lView.setVisibility(View.VISIBLE);
 			
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666){
