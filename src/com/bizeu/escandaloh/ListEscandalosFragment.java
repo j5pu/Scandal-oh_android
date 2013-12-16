@@ -33,6 +33,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -219,7 +220,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 						}
 						// Para versión 11+: tenemos en cuenta el status bar
 						else{
-							if ((location[1] - (getActionBarHeight() + getStatusBarHeight() + MyApplication.ALTO_TABS)) >= getAvailableHeightScreen() / 2) {
+							if ((location[1] - (getActionBarHeight() + getStatusBarWithTabsHeight() + MyApplication.ALTO_TABS)) >= getAvailableHeightScreen() / 2) {
 								lView.setSelection(first_visible_item_count);
 							} 
 							else {
@@ -453,7 +454,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
         screen_height = display.heightPixels;
 
         // Available height
-		available_height = screen_height - getActionBarHeight() - getStatusBarHeight() - MyApplication.ALTO_TABS ;
+		available_height = screen_height - getActionBarHeight() - getStatusBarWithTabsHeight() ;
 		
 		return available_height;
 	}
@@ -464,7 +465,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 * Devuelve el alto del status bar
 	 * @return
 	 */
-	private int getStatusBarHeight(){
+	private int getStatusBarWithTabsHeight(){
 		int status_bar_height = 0;
 		
 		int resourceId = getResources().getIdentifier("status_bar_height",
@@ -483,7 +484,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 * Devuelve el alto del action bar
 	 * @return
 	 */
-	private int getActionBarHeight(){
+	private int getActionBarHeight(){		
+				
+		LinearLayout linear_action_bar = (LinearLayout) getActivity().findViewById(R.id.ll_main_action_bar_1);
+		return linear_action_bar.getHeight() * 2;	
+		/*
+		 
 		TypedValue tv = new TypedValue();
 		int action_bar_height = 0;
 		
@@ -492,10 +498,13 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
         	   action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
         else if(getActivity().getApplicationContext().getTheme().resolveAttribute(com.actionbarsherlock.R.attr.actionBarSize, tv, true)){
-        	action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        	Log.v("WE","Entra else action bar");
+
+        	//action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
         }
-        
-		return action_bar_height;
+        */
+     
+		//return action_bar_height;
 	}
 	
 	

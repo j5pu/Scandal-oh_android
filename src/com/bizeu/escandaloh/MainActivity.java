@@ -9,20 +9,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -92,15 +96,22 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	        i.putExtra(FIRST_TIME, true);
 	        startActivity(i);
 		}
-				
-		// Action Bar
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+	    getSupportActionBar().setDisplayShowTitleEnabled(false);
+	    
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
+			getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+	    }
+	    else{
+		    getSupportActionBar().setIcon(R.drawable.noimage);
+	    }
+	    
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		getSupportActionBar().setCustomView(view);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
+	    
 		ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
 		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
@@ -174,6 +185,13 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
        // AdsSessionController.registerAdsReadyListener(this);	
 	}
 
+	
+	public static float convertPixelsToDp(float px, Context context){
+	    Resources resources = context.getResources();
+	    DisplayMetrics metrics = resources.getDisplayMetrics();
+	    float dp = px / (metrics.densityDpi / 160f);
+	    return dp;
+	}
 	
 	
 	/**
