@@ -114,7 +114,7 @@
                         android:layout_width="22dp"
                         android:layout_height="25dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:background="@drawable/sonido_selector"
+                        android:background="@drawable/sonido"
                         android:scaleType="centerInside" />
 
                 </LinearLayout>
@@ -132,7 +132,7 @@
                         android:layout_width="24dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:background="@drawable/comentario_selector"
+                        android:background="@drawable/comentario"
                         android:gravity="center_vertical|center_horizontal"
                         android:paddingBottom="2dp"
                         android:textColor="@color/blanco"
@@ -154,7 +154,7 @@
                         android:layout_width="22dp"
                         android:layout_height="25dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:background="@drawable/compartir_selector" />
+                        android:background="@drawable/compartir" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

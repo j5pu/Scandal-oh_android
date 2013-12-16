@@ -20,8 +20,10 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
@@ -233,6 +235,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					context.startActivity(i);	
 				}
 			});
+
             
             // Listener para compartir
             holder.imgShare.setOnClickListener(new View.OnClickListener() {
