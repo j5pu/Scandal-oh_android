@@ -320,11 +320,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					Log.i("WE",response_str);
 					 // Obtenemos el json devuelto
 	                 JSONObject respJSON = new JSONObject(response_str);
-	                 
-	                 // Comprobamos el campo status del json
-	                 String status = respJSON.getString("status");  
 
-	                 if (status.equals("error")){
+	                 if (respJSON.has("error")){ 
 	                	 any_error = true;
 	                 }
 				}
@@ -354,7 +351,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			// Si hubo algún error mostramos un mensaje
 			if (result == 666){
 	        	Toast toast;
-	        	toast = Toast.makeText(context, "Hubo algún error enviando el scándalOh! Inténtalo más tarde", Toast.LENGTH_LONG);
+	        	toast = Toast.makeText(context, "Hubo algún error enviando el scándalOh!", Toast.LENGTH_LONG);
 	        	toast.show();
 			}
 			// No hubo ningún error extraño
