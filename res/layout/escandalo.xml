@@ -48,17 +48,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom|right"
-                    android:layout_weight="2"
+                    android:layout_weight="1.8"
                     android:gravity="bottom"
-                    android:paddingTop="10dp"
-                     >
+                    android:paddingTop="5dp" >
 
                     <ImageView
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:gravity="bottom"
                         android:src="@drawable/user"
-                        android:paddingRight="3dp" />
+                        android:paddingRight="5dp" />
 
                     <TextView
                         android:id="@+id/txt_escandalo_name_user"
@@ -66,22 +65,23 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="bottom"
                         android:gravity="center_vertical"
-                        android:text="TextView"
-                        android:textColor="@color/gris_oscuro" />
+                        android:text="alejandro.leonrodriguez.7"
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="13dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:paddingBottom="10dp" >
+                    android:layout_weight="2.5"
+                    android:paddingBottom="5dp" >
 
                     <ImageView
                         android:layout_width="15dp"
                         android:layout_height="wrap_content"
                         android:scaleType="centerInside"
                         android:src="@drawable/reloj"
-                        android:paddingRight="3dp" />
+                        android:paddingRight="5dp" />
 
                     <TextView
                         android:id="@+id/txt_escandalo_date"
@@ -89,7 +89,8 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="TextView"
-                        android:textColor="@color/gris_oscuro" />
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="13dp" />
                 </LinearLayout>
             </LinearLayout>
 

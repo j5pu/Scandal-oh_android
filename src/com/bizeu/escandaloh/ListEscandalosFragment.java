@@ -705,15 +705,17 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
 	            	
-		            getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        // Añadimos el escandalo al ArrayList
-                        	  escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	       
-                        }
-		            }); 
-		          
+		           
+		            if (escandalos != null){
+			            getActivity().runOnUiThread(new Runnable() {
+	                        @Override
+	                        public void run() {
+	                        // Añadimos el escandalo al ArrayList
+	                        	  escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+	          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	       
+	                        }
+			            }); 
+		            }          
 		    	 }
 		     }
 		     catch(Exception ex){
@@ -831,16 +833,17 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
-	            		            
-			        getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-					        // Añadimos el escandalo al comienzo
-					        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-									R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));		
-						}
-			        });		
-			               	
+	            		         
+		            if (escandalos != null){
+				        getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+						        // Añadimos el escandalo al comienzo
+						        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
+										R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));		
+							}
+				        });
+		            }		               	
 		    	 }
 		     }
 		     catch(Exception ex){
