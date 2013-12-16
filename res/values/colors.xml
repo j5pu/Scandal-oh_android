@@ -5,6 +5,7 @@
     <color name="rojo">#FF0000</color>
     <color name="gris_claro">#eeeeee</color>  
     <color name="gris_action_bar">#DDDDDD</color>
+    <color name="gris_action_bar_2">#cdcdcd</color>
     <color name="gris_medio">#6f6f6f</color>
     <color name="gris_oscuro">#5b5b5b</color>
     <color name="morado">#b21b72 </color>

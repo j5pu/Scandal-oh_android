@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill_horizontal"
-    android:background="@color/gris_action_bar" >
+    android:background="#cdcdcd" >
 
     <LinearLayout
         android:id="@+id/ll_main_action_bar_1"

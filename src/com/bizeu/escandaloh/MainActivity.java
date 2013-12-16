@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -97,19 +98,21 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	        startActivity(i);
 		}
 
-	    getSupportActionBar().setDisplayShowTitleEnabled(false);
+		// Action bar
+		ActionBar actBar = getSupportActionBar();
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 	    
+		// Si es 4.2+ deshabilitamos el botón home
 	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
-			getSupportActionBar().setDisplayShowHomeEnabled(false);
-
+	    	actBar.setDisplayShowHomeEnabled(false);
 	    }
+	    // Si no, le ponemos una imagen invisible (fallan los tabs si quitamos el home en estas versiones)
 	    else{
-		    getSupportActionBar().setIcon(R.drawable.noimage);
+	    	actBar.setIcon(R.drawable.noimage);
 	    }
 	    
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		getSupportActionBar().setCustomView(view);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	    
 		ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
@@ -172,13 +175,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-        
-		/*
-        // Almacenamos el alto del FragmentTabHost
-        Display display = getWindowManager().getDefaultDisplay();
-        mTabHost.measure(display.getWidth(), display.getHeight());
-        MyApplication.ALTO_TABS = mTabHost.getMeasuredHeight();	             
-	    */
 		
 		// Ten
 		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);

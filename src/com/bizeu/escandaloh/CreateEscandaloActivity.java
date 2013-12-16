@@ -11,6 +11,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -120,7 +121,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		}
 
 		progress = new ProgressDialog(this);
-		progress.setTitle("Subiendo scándalOh! ...");
+		progress.setTitle("Subiendo scándalOh!...");
 		progress.setMessage("Espera, por favor");
 		progress.setCancelable(false);
 		
@@ -313,7 +314,20 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				response = client.execute(post);
 				resEntity = response.getEntity();
 				final String response_str = EntityUtils.toString(resEntity);
-				Log.i("WE",response_str);
+				
+				// Comprobamos si ha habido algún error
+				if (response_str != null){
+					Log.i("WE",response_str);
+					 // Obtenemos el json devuelto
+	                 JSONObject respJSON = new JSONObject(response_str);
+	                 
+	                 // Comprobamos el campo status del json
+	                 String status = respJSON.getString("status");  
+
+	                 if (status.equals("error")){
+	                	 any_error = true;
+	                 }
+				}
 				
 			} catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
@@ -340,7 +354,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			// Si hubo algún error mostramos un mensaje
 			if (result == 666){
 	        	Toast toast;
-	        	toast = Toast.makeText(context, "Lo sentimos, hubo algún error inesperado", Toast.LENGTH_LONG);
+	        	toast = Toast.makeText(context, "Hubo algún error enviando el scándalOh! Inténtalo más tarde", Toast.LENGTH_LONG);
 	        	toast.show();
 			}
 			// No hubo ningún error extraño
@@ -350,7 +364,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("title", written_title);
 					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(context, "scándalOh! subido con éxito", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(context, "scándalOh! enviado con éxito", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto enviada");
 					setResult(Activity.RESULT_OK, resultIntent);

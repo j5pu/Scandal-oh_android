@@ -10,14 +10,11 @@
 
     <!-- ActionBar tabs styles -->
     <style name="MyActionBarTabs" parent="@style/Widget.Sherlock.ActionBar.TabView">
-
-        <!-- tab indicator -->
         <item name="android:background">@drawable/tab_indicator_ab_mytabsstyle</item>
         <item name="background">@drawable/tab_indicator_ab_mytabsstyle</item>
     </style>
 
     <style name="CustomTabTextStyle" parent="@android:style/TextAppearance.Holo">
-        <item name="android:textColor">@color/gris_oscuro</item>
         <item name="android:textColor">@color/gris_oscuro</item>
         <item name="android:gravity">center</item>
     </style>
@@ -25,6 +22,7 @@
     <style name="MyActionBarStyle" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
+        <item name="android:background">@color/gris_action_bar_2</item>
     </style>
-
+    
 </resources>
