@@ -124,30 +124,27 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 			@Override
 			public void onTabSelected(Tab tab, FragmentTransaction ft) {
-				
-				if (MyApplication.TABS_ENABLED){
-		            Bundle b = new Bundle();
-					ListEscandalosFragment lef = new ListEscandalosFragment();
-					
-					switch(tab.getPosition()){
-						case 0:
-							b.putString(CATEGORY, HAPPY);
-							lef.setArguments(b);
-							ft.replace(R.id.frag_list_escandalos, lef, HAPPY);
-							break;
-						case 1:
-							b.putString(CATEGORY, ANGRY);
-							lef.setArguments(b);
-							ft.replace(R.id.frag_list_escandalos, lef, ANGRY);
-							break;
-						case 2:
-							b.putString(CATEGORY, BOTH);
-							lef.setArguments(b);
-							ft.replace(R.id.frag_list_escandalos, lef, BOTH);
-							break;
-					}
-				}
 
+		        Bundle b = new Bundle();
+				ListEscandalosFragment lef = new ListEscandalosFragment();
+					
+				switch(tab.getPosition()){
+					case 0:
+						b.putString(CATEGORY, HAPPY);
+						lef.setArguments(b);
+						ft.replace(R.id.frag_list_escandalos, lef, HAPPY);
+						break;
+					case 1:
+						b.putString(CATEGORY, ANGRY);
+						lef.setArguments(b);
+						ft.replace(R.id.frag_list_escandalos, lef, ANGRY);
+						break;
+					case 2:
+						b.putString(CATEGORY, BOTH);
+						lef.setArguments(b);
+						ft.replace(R.id.frag_list_escandalos, lef, BOTH);
+						break;
+				}
 			}
 
 			@Override

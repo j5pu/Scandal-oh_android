@@ -199,8 +199,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 	protected void onDestroy(){
 		super.onDestroy();
 		list_comments.setAdapter(null);
-		comments.clear();
-		comments = null;
 	}
 	
 	

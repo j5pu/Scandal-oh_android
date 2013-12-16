@@ -306,8 +306,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		else{
 			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
-			// Habilitamos los tabs de nuevo 
-			MyApplication.TABS_ENABLED = true;
 		}	
 	}
 	
@@ -333,9 +331,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	public void onDestroyView(){
 		super.onDestroyView();
 	    cancelGetEscandalos();
-
-		// Deshabilitamos los tabs (hasta que se hayan mostrado los escandalos del otro tab pulsado)
-	    MyApplication.TABS_ENABLED = false;
 
         lView.setAdapter(null);
         escandalos.clear();
@@ -763,9 +758,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			// Abrimos la llave
 			getting_escandalos = false;
 			//lView.onRefreshComplete();
-			
-			// Habilitamos los tabs de nuevo (una vez que los escándalos se han mostrado se puede pulsar otro tab)
-			MyApplication.TABS_ENABLED = true;
 	    }
 	}
 	

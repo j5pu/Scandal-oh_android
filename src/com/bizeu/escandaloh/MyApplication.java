@@ -18,7 +18,6 @@ public class MyApplication extends Application {
 	public static boolean FIRST_TIME_BOTH = true;
 	public static boolean TIMEOUT_PHOTO_SHOWN = false;
 	public static boolean PHOTO_CLICKED = false;
-	public static boolean TABS_ENABLED = true;
 	
 	
 	@Override
