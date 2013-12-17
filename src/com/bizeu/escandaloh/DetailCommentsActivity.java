@@ -175,11 +175,15 @@ public class DetailCommentsActivity extends SherlockActivity {
         	Toast toast;
         	toast = Toast.makeText(this, "No dispone de conexión a internet", Toast.LENGTH_LONG);
         	toast.show();
+        	
+        	// Quitamos el loading
+			progress_list_comments.setVisibility(View.GONE);
+			list_comments.setVisibility(View.VISIBLE);
+			ll_list_comments.setGravity(Gravity.TOP);
 		}
 	}
 	
-	
-	
+		
 	
 	/**
 	 * onStart
