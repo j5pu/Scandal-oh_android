@@ -24,6 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class RememberPasswordDialog extends Dialog{
 
@@ -33,7 +36,7 @@ public class RememberPasswordDialog extends Dialog{
 	private EditText edit_email;
 	private ProgressDialog progress;
 	private boolean any_error;
-	private Context context;
+	private Context mContext;
 	private String status = null;
 	private String msg = null;
 	private String reason = null;
@@ -42,7 +45,7 @@ public class RememberPasswordDialog extends Dialog{
 
 	public RememberPasswordDialog(Context con) {
 		super(con);
-		this.context = con;
+		this.mContext = con;
 	}
 
 	@Override
@@ -71,7 +74,7 @@ public class RememberPasswordDialog extends Dialog{
 			
 			@Override
 			public void onClick(View v) {
-				if (Connectivity.isOnline(context)){
+				if (Connectivity.isOnline(mContext)){
 					// Comprobamos si el email tiene al menos un carácter
 					if (edit_email.getText().toString().length() > 0){
 						new RememberPassUser().execute();
@@ -81,13 +84,13 @@ public class RememberPasswordDialog extends Dialog{
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "No dispone de conexión a internet", Toast.LENGTH_LONG);
 					toast.show();
 				}			
 			}
 		});
 		
-		progress = new ProgressDialog(context);
+		progress = new ProgressDialog(mContext);
 		progress.setTitle("Solicitando contraseña ...");
 		progress.setMessage("Espere, por favor");
 	}
@@ -159,6 +162,12 @@ public class RememberPasswordDialog extends Dialog{
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
+				 // Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+						                       ex),                                                             // The exception.
+						                       false).build());
 	        }
 	        
 	        return null;
@@ -175,14 +184,14 @@ public class RememberPasswordDialog extends Dialog{
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(context, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			// Si no hubo ningún error extraño
 			else{
 				// Comprobamos si se hizo correctamente la petición
 				if (result_ok){
-		        	Toast.makeText(context, "Se ha enviado un email con la contraseña", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(mContext, "Se ha enviado un email con la contraseña", Toast.LENGTH_SHORT).show();
 				    dismiss();
 				}
 				else{

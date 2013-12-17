@@ -40,6 +40,9 @@ import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class DetailCommentsActivity extends SherlockActivity {
 
@@ -54,7 +57,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private LinearLayout layout_write_comment;
 	private LinearLayout ll_list_comments;
 	private ProgressBar progress_list_comments;
-	
 	private String written_comment;	
 	private CommentAdapter commentsAdapter;
 	private ArrayList<Comment> comments;
@@ -65,7 +67,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	private String title;
 	private boolean add_comment; // Este booleano nos indicará si estamos obteniendo comentarios por haber añadido uno nuevo o no
 	private boolean any_error;
-	private Activity acti;
+	private Context mContext;
 	
 	/**
 	 * onCreate
@@ -85,7 +87,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			title = getIntent().getExtras().getString("title");
 		}
 		
-		acti = this;
+		mContext = this;
 		
 		// Quitamos el action bar
 		//getSupportActionBar().hide();
@@ -106,8 +108,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
 		list_comments.setAdapter(commentsAdapter);
 		
-		txt_num_comments = (TextView) findViewById(R.id.txt_comments_num_comments);
-		
+		txt_num_comments = (TextView) findViewById(R.id.txt_comments_num_comments);	
 		txt_count_characteres = (TextView) findViewById(R.id.txt_count_characteres);
 		
 		edit_new_comment = (EditText) findViewById(R.id.edit_new_comment);
@@ -138,7 +139,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			public void onClick(View v) {
 				
 				// Si hay conexión
-				if (Connectivity.isOnline(acti)){
+				if (Connectivity.isOnline(mContext)){
 					written_comment = edit_new_comment.getText().toString();
 					// Si ha escrito algo y la longitud es menor de 500 caracteres lo intentamos enviar
 					if (!written_comment.equals("") && written_comment.length() < 501){
@@ -148,7 +149,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				}
 				else{
 		        	Toast toast;
-		        	toast = Toast.makeText(acti, "No dispone de conexión a internet", Toast.LENGTH_SHORT);
+		        	toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
 		        	toast.show();
 				}
 			}
@@ -180,6 +181,15 @@ public class DetailCommentsActivity extends SherlockActivity {
 	
 	
 	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart(){
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this);  
+	}
+	
 	
 	
 	/**
@@ -195,6 +205,20 @@ public class DetailCommentsActivity extends SherlockActivity {
 		}
 	}
 	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop(){
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this);
+	}
+	
+	
+	/**
+	 * onDesroy
+	 */
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
@@ -206,7 +230,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 
 	/**
 	 * Sube un comentario
-	 * @author Alejandro
 	 *
 	 */
 	private class SendComment extends AsyncTask<Void,Integer,Integer> {
@@ -223,7 +246,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 			// Mostramos el ProgressDialog
 			progress.setTitle("Enviando comentario ...");
-			progress.setMessage("Espere, por favor");
+			progress.setMessage("Espera, por favor");
 			progress.setCancelable(false);
 			progress.show();
 		}
@@ -235,6 +258,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";        
 
 	        HttpResponse response = null;
+	        
 	        try{
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
@@ -263,6 +287,13 @@ public class DetailCommentsActivity extends SherlockActivity {
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true; // Indicamos que hubo algún error
+	             
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());  
 	        }
 	        
 	        if (any_error){
@@ -285,7 +316,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(acti, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			else{
@@ -384,6 +415,13 @@ public class DetailCommentsActivity extends SherlockActivity {
 			catch(Exception ex){
 				Log.e("ServicioRest","Error!", ex);
 				any_error = true; // Indicamos que hubo un error
+
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       ex),                                                             // The exception.
+				                       false).build());  
 			}
 			
 			// Si hubo algún error devolvemos 666
@@ -399,8 +437,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 		@Override
 	    protected void onPostExecute(Integer result) {
-
-			
+		
 			// Si estamos obteniéndolos porque hemos enviado uno
 			if (add_comm){
 				// Quitamos el ProgressDialog
@@ -418,9 +455,10 @@ public class DetailCommentsActivity extends SherlockActivity {
 				
 			// Si hubo algún error 
 			if (result == 666){
-				Toast toast = Toast.makeText(acti, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
 				toast.show();
 			}
+			
 			// No hubo ningún error extraño
 			else{
 				// Si es codigo 2xx --> OK
@@ -442,13 +480,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
 		        	toast.show();
 		        } 
-			}
-       
+			}   
 	    }
 	}
-	
-	
-	
-
 	
 }

@@ -44,6 +44,9 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -75,7 +78,9 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private FrameLayout banner;
 	private BannerView adM;
 	private SharedPreferences prefs;
-	private Context context;
+	private Context mContext;
+	
+	
 	
 	/**
 	 * onCreate
@@ -89,7 +94,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main));
 			
-		context = this;
+		mContext = this;
 		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
 		if (!MyApplication.logged_user){
@@ -128,21 +133,56 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		        Bundle b = new Bundle();
 				ListEscandalosFragment lef = new ListEscandalosFragment();
 					
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				
 				switch(tab.getPosition()){
+				
 					case 0:
 						b.putString(CATEGORY, HAPPY);
 						lef.setArguments(b);
 						ft.replace(R.id.frag_list_escandalos, lef, HAPPY);
+						
+						 // Mandamos el evento a Google Analytics
+						 easyTracker.send(MapBuilder
+						      .createEvent("Acción UI",     // Event category (required)
+						                   "Tab seleccionado",  // Event action (required)
+						                   "Escandalos categoría Humor",   // Event label
+						                   null)            // Event value
+						      .build()
+						  );
+						 
 						break;
+						
 					case 1:
 						b.putString(CATEGORY, ANGRY);
 						lef.setArguments(b);
 						ft.replace(R.id.frag_list_escandalos, lef, ANGRY);
+						
+						  // Mandamos el evento a Google Analytics
+						  easyTracker.send(MapBuilder
+						      .createEvent("Acción UI",     // Event category (required)
+						                   "Tab seleccionado",  // Event action (required)
+						                   "Escandalos categoría Denuncia",   // Event label
+						                   null)            // Event value
+						      .build()
+						  );
+						  
 						break;
+						
 					case 2:
 						b.putString(CATEGORY, BOTH);
 						lef.setArguments(b);
 						ft.replace(R.id.frag_list_escandalos, lef, BOTH);
+						
+						  // Mandamos el evento a Google Analytics
+						  easyTracker.send(MapBuilder
+						      .createEvent("Acción UI",     // Event category (required)
+						                   "Tab seleccionado",  // Event action (required)
+						                   "Escandalos categoría Todas",   // Event label
+						                   null)            // Event value
+						      .build()
+						  );
+						  
 						break;
 				}
 			}
@@ -194,6 +234,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public void onStart(){
 		super.onStart();
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		// Activamos google analytics
+		EasyTracker.getInstance(this).activityStart(this);  
 	}
 
 	
@@ -250,6 +292,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	   // AdsSessionController.pauseTracking();
 	}
 	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop(){
+		super.onStop();
+		// Paramos google analytics
+		EasyTracker.getInstance(this).activityStop(this);
+	}
 	
 	
 	
@@ -325,8 +377,8 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			if (resultCode == RESULT_OK) {
 				if (mImageUri != null){
 					// Guardamos la foto en la galería
-					Bitmap bitAux = ImageUtils.uriToBitmap(mImageUri, context);
-					ImageUtils.saveBitmapIntoGallery(bitAux, context);
+					Bitmap bitAux = ImageUtils.uriToBitmap(mImageUri, mContext);
+					ImageUtils.saveBitmapIntoGallery(bitAux, mContext);
 					
 					Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
 					i.putExtra("photo_from", SHOW_CAMERA);
@@ -334,7 +386,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 					startActivityForResult(i, CREATE_ESCANDALO);
 				}
 				else{
-					Toast toast = Toast.makeText(context, "Hubo algún error con la cámara", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "Hubo algún error con la cámara", Toast.LENGTH_LONG);
 					toast.show();
 				}			
 			}
@@ -347,7 +399,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	            Uri selectedImageUri = data.getData();
 	            Intent i = new Intent(MainActivity.this, CreateEscandaloActivity.class);
 	            i.putExtra("photo_from", FROM_GALLERY);
-	            i.putExtra("photoUri", ImageUtils.getRealPathFromURI(context,selectedImageUri));
+	            i.putExtra("photoUri", ImageUtils.getRealPathFromURI(mContext,selectedImageUri));
 	            startActivityForResult(i, CREATE_ESCANDALO);
 			}
         }
@@ -361,16 +413,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 
 	@Override
 	public void onClick(View v) {
+		
+		EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+		  
 		switch(v.getId()){
 		
 		// Login/Subir escandalo
 		case R.id.ll_main_take_photo:
 			
 			// Paramos si hubiera algún audio reproduciéndose
-			Audio.getInstance().releaseResources();
+			Audio.getInstance(mContext).releaseResources();
 
 			// Si dispone de conexión
-			if (Connectivity.isOnline(context)){
+			if (Connectivity.isOnline(mContext)){
 				// Si está logueado iniciamos la cámara
 				if (MyApplication.logged_user){ 
 					
@@ -381,8 +436,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				        builder.setItems(items, new DialogInterface.OnClickListener() {
 				            @Override
 				            public void onClick(DialogInterface dialog, int item) {
+				            	
 				                if (items[item].equals("Tomar desde la cámara")) {
-				                	if (checkCameraHardware(context)){
+				                	
+				      			     // Mandamos el evento a Google Analytics
+				            		 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				      			     easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+				      			                     "Selección realizada",  // Event action (required)
+				      			                     "Hacer foto desde la cámara",   // Event label
+				      			                     null)            // Event value
+				      			        .build()
+				      			     );
+				                	
+				                     if (checkCameraHardware(mContext)){
 										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 										File photo = null;
 										try{
@@ -391,19 +457,36 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 									    }
 									    catch(Exception e){
 									        Log.v("WE", "Can't create file to take picture!");
+											// Mandamos la excepcion a Google Analytics
+											easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+											                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+											                       e),                                                             // The exception.
+											                       false).build()); 
 									    }
 										
 									    mImageUri = Uri.fromFile(photo);
 									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 										startActivityForResult(takePictureIntent, SHOW_CAMERA);
 									}
+				                     
 									// El dispositivo no dispone de cámara
 									else{
-										Toast toast = Toast.makeText(context, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+										Toast toast = Toast.makeText(mContext, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
 										toast.show();
 									}
 				                } 
+				                
 				                else if (items[item].equals("Coger de la galería")) {
+				                	
+				      			     // Mandamos el evento a Google Analytics
+				            	     EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				      			     easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+				      			                     "Selección realizada",  // Event action (required)
+				      			                     "Hacer foto desde la cámara",   // Event label
+				      			                     null)            // Event value
+				      			        .build()
+				      			     );
+				      			     
 				                	Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				                	startActivityForResult(i, FROM_GALLERY);
 				                } 
@@ -419,17 +502,18 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				}
 			}
 			else{
-				Toast toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+				Toast toast = Toast.makeText(mContext, "No dispone de conexión a internet", Toast.LENGTH_LONG);
 				toast.show();
 			}
 			
 			break;
 			
+			
 		// Logout
 		case R.id.ll_main_logout:
 			
 			// Paramos si hubiera algún audio reproduciéndose
-			Audio.getInstance().releaseResources();
+			Audio.getInstance(mContext).releaseResources();
 			
 			if (MyApplication.logged_user){
 				AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
@@ -437,6 +521,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
 				alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialogo1, int id) {  
+			            	
+			  			  // Mandamos el evento a Google Analytics
+			        	  EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+			  			  easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+			  			                   "Boton clickeado",  // Event action (required)
+			  			                   "Acepta log out",   // Event label
+			  			                   null)            // Event value
+			  			      .build()
+			  			  );
+			            	
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
@@ -453,7 +547,16 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			            }  
 			        });  
 				alert_logout.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {  
-			        	public void onClick(DialogInterface dialogo1, int id) {  
+			        	public void onClick(DialogInterface dialogo1, int id) { 
+			        		
+			  			  // Mandamos el evento a Google Analytics
+			        	  EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+			  			  easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+			  			                   "Boton clickeado",  // Event action (required)
+			  			                   "Rechaza Log out",   // Event label
+			  			                   null)            // Event value
+			  			      .build()
+			  			  );
 			            }  
 			        });            
 			     alert_logout.show(); 
@@ -464,6 +567,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		// Actualizar carrusel: Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.ll_main_refresh:
 		
+			  // Mandamos el evento a Google Analytics
+			  easyTracker.send(MapBuilder
+			      .createEvent("Acción UI",     // Event category (required)
+			                   "Boton clickeado",  // Event action (required)
+			                   "Actualizar lista escándalos",   // Event label
+			                   null)            // Event value
+			      .build()
+			  );
+			
 			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
 			progress_refresh.setVisibility(View.VISIBLE);
 			img_update_list.setVisibility(View.GONE);
@@ -473,15 +585,15 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			
 			ListEscandalosFragment lef = null;
 			if (current_tab.equals(HAPPY)){
-				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(HAPPY);		
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(HAPPY);		
 			}
 			
 			else if (current_tab.equals(ANGRY)){
-				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(ANGRY);				
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(ANGRY);				
 			}
 			
 			else if (current_tab.equals(BOTH)){
-				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)context).getSupportFragmentManager().findFragmentByTag(BOTH);
+				lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(BOTH);
 			}
 			
 			lef.updateList();

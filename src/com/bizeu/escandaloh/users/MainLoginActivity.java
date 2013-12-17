@@ -35,14 +35,16 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class MainLoginActivity extends SherlockActivity{
 	
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
 	public static int LOG_FACEBOOK = 3;
-	
-	private ViewGroup vg_pantalla;
+
 	private TextView txt_pasar;
 	private Button but_registro;
 	private Button but_login;
@@ -55,6 +57,7 @@ public class MainLoginActivity extends SherlockActivity{
 	private String email;
 	private boolean login_facebook_pulsado ;
 	private Activity acti;
+	private Context mContext;
 	
 	
 	/**
@@ -71,6 +74,7 @@ public class MainLoginActivity extends SherlockActivity{
 		
 		login_facebook_pulsado = false;
 		acti = this;
+		mContext = this;
 		
 		boolean first_time = false;
 		
@@ -111,6 +115,7 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			@Override
 			public void onClick(View v) {
+				
 				Intent i = new Intent(getBaseContext(), RegistrationActivity.class);
 				startActivityForResult(i, REGISTRATION);		
 			}
@@ -120,6 +125,17 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			@Override
 			public void onClick(View v) {
+				
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Iniciar sesión con la aplicación",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				
 				// Mostramos la pantalla de log in
 				Intent i = new Intent(getBaseContext(), LoginActivity.class);
 				startActivityForResult(i, LOG_IN);	
@@ -131,6 +147,17 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			@Override
 			public void onClick(View v) {
+				
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Iniciar sesión con Facebook",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				
 				if (!login_facebook_pulsado){
 					// Mostramos el progress bar (sólo desaparecerá en algún caso de error o al tener éxito con el login)
 					progress.show();
@@ -220,17 +247,42 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			@Override
 			public void onClick(View v) {
+				
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Saltar desde pantalla de login",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				
 				// Cerramos esta pantalla
 				finish();	
 			}
 		});
-		
-
-	
 	}
 	
 	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+	    EasyTracker.getInstance(this).activityStart(this); 
+	}
+
 	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+	    EasyTracker.getInstance(this).activityStop(this); 
+	}
 	 
 
 	
@@ -300,9 +352,7 @@ public class MainLoginActivity extends SherlockActivity{
 	/**
 	 * Loguea un usuario (a partir de datos de facebook)
 	 *
-	 */
-	
-	
+	 */	
 	private class LogInUserFacebook extends AsyncTask<Void,Integer,Void> {
 		 
 		@Override
@@ -357,6 +407,12 @@ public class MainLoginActivity extends SherlockActivity{
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             login_error = true;
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+						                       ex),                                                             // The exception.
+						                       false).build()); 
 	        }
 			return null;
 	      
@@ -373,7 +429,6 @@ public class MainLoginActivity extends SherlockActivity{
 			
 			// Si no ha habido algún error extraño 
 			if (!login_error){
-				Log.v("WE","El user uri es: " + user_uri);
 				SharedPreferences prefs = getBaseContext().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		        prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 		        MyApplication.resource_uri = user_uri;

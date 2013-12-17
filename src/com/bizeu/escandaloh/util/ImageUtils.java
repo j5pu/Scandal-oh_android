@@ -7,6 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -64,6 +68,12 @@ public class ImageUtils {
 					selectedImage, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			// Mandamos la excepcion a Google Analytics
+			EasyTracker easyTracker = EasyTracker.getInstance(context);
+			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build()); 
 		} finally {
 			try {
 				bm = BitmapFactory.decodeFileDescriptor(
@@ -71,6 +81,12 @@ public class ImageUtils {
 				fileDescriptor.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(context);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       e),                                                             // The exception.
+					                       false).build()); 
 			}
 		}
 		return bm;
@@ -85,29 +101,35 @@ public class ImageUtils {
 	 * @param bitm
 	 * @return
 	 */
-	public static File bitmapToFile(Bitmap bitm){
+	public static File bitmapToFile(Bitmap bitm, Context context){
 		String file_path = Environment.getExternalStorageDirectory().getAbsolutePath();
 		File return_file = new File(file_path, "tmp.png");
 		FileOutputStream fOut = null;
 		try {
 			fOut = new FileOutputStream(return_file);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			// Mandamos la excepcion a Google Analytics
+			EasyTracker easyTracker = EasyTracker.getInstance(context);
+			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build()); 		
 		}
 		
 		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+		
 		try {
 			fOut.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
 			fOut.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			// Mandamos la excepcion a Google Analytics
+			EasyTracker easyTracker = EasyTracker.getInstance(context);
+			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build()); 
 		}
 		
 		return return_file;

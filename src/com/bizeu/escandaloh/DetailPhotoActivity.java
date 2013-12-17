@@ -2,6 +2,7 @@ package com.bizeu.escandaloh;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
 
 
 public class DetailPhotoActivity extends SherlockActivity {
@@ -20,6 +22,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	private String uri_audio;
 	private boolean played_already ;
 	private boolean orientation_changed ;
+	private Context mContext;
 	
 	/**
 	 * onCreate
@@ -31,6 +34,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 		
 		played_already = false;
 
+		mContext = this;
 		
 		// Quitamos el action bar
 		getSupportActionBar().hide();
@@ -67,6 +71,14 @@ public class DetailPhotoActivity extends SherlockActivity {
 	}
 	
 	
+	/**
+	 * onStart
+	 */
+	@Override 
+	public void onStart(){
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this);
+	}
 	
 	
 	
@@ -77,8 +89,18 @@ public class DetailPhotoActivity extends SherlockActivity {
 	protected void onPause(){
 		super.onPause();
 		if (!orientation_changed){
-			Audio.getInstance().releaseResources();
+			Audio.getInstance(mContext).releaseResources();
 		}
+	}
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop(){
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this);
 	}
 	
 	
@@ -129,7 +151,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
-	    	Audio.getInstance().startPlaying("http://scandaloh.s3.amazonaws.com/" + uri_audio);							
+	    	Audio.getInstance(mContext).startPlaying("http://scandaloh.s3.amazonaws.com/" + uri_audio);							
 	        return false;
 	    }
 		

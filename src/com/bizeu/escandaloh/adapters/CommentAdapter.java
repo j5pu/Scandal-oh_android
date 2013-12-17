@@ -102,9 +102,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	holder.imgUser.setImageResource(R.drawable.user);
         	holder.imgClock.setImageResource(R.drawable.reloj);
         }
-        
-
-        
+             
         return mView;
     }
     
@@ -133,8 +131,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         
         public TextView getDate(){
         	return txtDate;
-        }
-        
+        }     
     }
     
 }

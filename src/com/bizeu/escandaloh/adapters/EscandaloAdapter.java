@@ -43,12 +43,14 @@ import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 
 		public static int ROUTE_IMAGE = 5;
 		
-	    Context context; 
+	    Context mContext; 
 	    Activity acti;
 	    int layoutResourceId;    
 	    ArrayList<Escandalo> data;
@@ -65,7 +67,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    public EscandaloAdapter(Context context, int layoutResourceId, ArrayList<Escandalo> data) {
 	        super(context, layoutResourceId, data);
 	        this.layoutResourceId = layoutResourceId;
-	        this.context = context;
+	        this.mContext = context;
 	        this.data = data;
 	        this.acti = (Activity)context;
 	    }
@@ -84,7 +86,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        
 	        if(mView == null){
 	        	
-	            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	            mView = inflater.inflate(layoutResourceId, parent, false);       
 	                        
 	            holder = new EscandaloHolder();
@@ -124,12 +126,11 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				public void onImageFailure(String url) {
 					// si aún no hemos mostrado ningún mensaje, indicamos que hubo un error (sólo una vez)
 					if (!MyApplication.TIMEOUT_PHOTO_SHOWN){
-						Toast toast = Toast.makeText(context, "Hubo algún error obteniendo las fotos. Compruebe su conexión", Toast.LENGTH_LONG);
+						Toast toast = Toast.makeText(mContext, "Hubo algún error obteniendo las fotos. Compruebe su conexión", Toast.LENGTH_LONG);
 						toast.show();
 						MyApplication.TIMEOUT_PHOTO_SHOWN = true;
 						Log.v("WE","Error obteniendo foto (listener del shuterbug --> ¿timeout?");
 					}
-
 				}
 			});
             
@@ -155,16 +156,25 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());	   
-	 
-	        
+	 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
 					
+					 // Mandamos el evento a Google Analytics
+					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					 easyTracker.send(MapBuilder
+					      .createEvent("Acción UI",     // Event category (required)
+					                   "Boton clickeado",  // Event action (required)
+					                   "Escuchar audio desde carrusel",   // Event label
+					                   null)            // Event value
+					      .build()
+					  );
+					
 					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().releaseResources();
+					Audio.getInstance(mContext).releaseResources();
 					
 					// Lo reproducimos				
 					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));		
@@ -177,14 +187,24 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {
 					
+					 // Mandamos el evento a Google Analytics
+					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					 easyTracker.send(MapBuilder
+					      .createEvent("Acción UI",     // Event category (required)
+					                   "Boton clickeado",  // Event action (required)
+					                   "Ver foto en detalle desde carrusel",   // Event label
+					                   null)            // Event value
+					      .build()
+					  );
+					
 					// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
 					if (!MyApplication.PHOTO_CLICKED){
 						MyApplication.PHOTO_CLICKED = true;
 						
 						// Paramos si hubiera algún audio reproduciéndose
-						Audio.getInstance().releaseResources();
+						Audio.getInstance(mContext).releaseResources();
 						
-						Intent i = new Intent(context, DetailPhotoActivity.class);
+						Intent i = new Intent(mContext, DetailPhotoActivity.class);
 						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						ImageView imView = (ImageView) v;
 						Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
@@ -192,7 +212,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 						i.putExtra("bytes", bytes);
 						i.putExtra("uri_audio", v.getTag(R.string.uri_audio).toString());
 
-						context.startActivity(i);
+						mContext.startActivity(i);
 					}
 				}
 			});   
@@ -202,15 +222,25 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public boolean onLongClick(View v) {
 					
+					 // Mandamos el evento a Google Analytics
+					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					 easyTracker.send(MapBuilder
+					      .createEvent("Acción UI",     // Event category (required)
+					                   "Boton clickeado prolongadamente",  // Event action (required)
+					                   "Guardar foto en galería desde carrusel",   // Event label
+					                   null)            // Event value
+					      .build()
+					  );
+					
 					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().releaseResources();
+					Audio.getInstance(mContext).releaseResources();
 					
 					// Guardamos la foto en la galería				
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					ImageUtils.saveBitmapIntoGallery(bitm, context);
+					ImageUtils.saveBitmapIntoGallery(bitm, mContext);
 					
-					Toast toast = Toast.makeText(context, "foto guardada en la galería", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "foto guardada en la galería", Toast.LENGTH_LONG);
 					toast.show();
 					return true;
 				}
@@ -223,16 +253,26 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public void onClick(View v) {
 					
-					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().releaseResources();
+					 // Mandamos el evento a Google Analytics
+					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					 easyTracker.send(MapBuilder
+					      .createEvent("Acción UI",     // Event category (required)
+					                   "Boton clickeado",  // Event action (required)
+					                   "Ver comentarios desde carrusel",   // Event label
+					                   null)            // Event value
+					      .build()
+					  );
 					
-					Intent i = new Intent(context, DetailCommentsActivity.class);
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance(mContext).releaseResources();
+					
+					Intent i = new Intent(mContext, DetailCommentsActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					i.putExtra("id", v.getTag(R.string.id).toString());
 					i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 					i.putExtra("user", (String) v.getTag(R.string.user));
 					i.putExtra("title", (String) v.getTag(R.string.title));
-					context.startActivity(i);	
+					mContext.startActivity(i);	
 				}
 			});
 
@@ -242,9 +282,19 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				
 				@Override
 				public void onClick(View v) {
+					
+					 // Mandamos el evento a Google Analytics
+					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					 easyTracker.send(MapBuilder
+					      .createEvent("Acción UI",     // Event category (required)
+					                   "Boton clickeado",  // Event action (required)
+					                   "Compartir escándalo desde carrusel",   // Event label
+					                   null)            // Event value
+					      .build()
+					  );
 			
 					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance().releaseResources();
+					Audio.getInstance(mContext).releaseResources();
 					
 					Uri screenshotUri = Uri.parse((String)v.getTag(R.string.url_foto));	
 					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -253,7 +303,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post");
 					shareIntent.putExtra(Intent.EXTRA_TEXT, screenshotUri.toString());
 
-				    context.startActivity(Intent.createChooser(shareIntent, "Compartir scandaloh con..."));		        
+					mContext.startActivity(Intent.createChooser(shareIntent, "Compartir scandaloh con..."));		        
 				}
 			});
                        
@@ -309,25 +359,25 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			int available_height = 0;
 			
 			// Screen height
-			DisplayMetrics display = context.getResources().getDisplayMetrics();
+			DisplayMetrics display = mContext.getResources().getDisplayMetrics();
 
 	        int height = display.heightPixels;
 			
 			// Action bar height
 	        TypedValue tv = new TypedValue();
 	        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB){
-	           if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-	        	   action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,context.getResources().getDisplayMetrics());
+	           if (mContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+	        	   action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,mContext.getResources().getDisplayMetrics());
 	        }
-	        else if(context.getTheme().resolveAttribute(com.actionbarsherlock.R.attr.actionBarSize, tv, true)){
-	        	action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,context.getResources().getDisplayMetrics());
+	        else if(mContext.getTheme().resolveAttribute(com.actionbarsherlock.R.attr.actionBarSize, tv, true)){
+	        	action_bar_height = TypedValue.complexToDimensionPixelSize(tv.data,mContext.getResources().getDisplayMetrics());
 	        }
 			
 			// Status bar height
-			int resourceId = context.getResources().getIdentifier("status_bar_height",
+			int resourceId = mContext.getResources().getIdentifier("status_bar_height",
 					"dimen", "android");	
 			if (resourceId > 0) {
-				status_bar_height = context.getResources().getDimensionPixelSize(resourceId);
+				status_bar_height = mContext.getResources().getDimensionPixelSize(resourceId);
 			}
 
 			// Available height
@@ -347,7 +397,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			@Override
 		    protected Boolean doInBackground(String... params) {
 		    	
-		    	Audio.getInstance().startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
+		    	Audio.getInstance(mContext).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
 		        return false;
 		    }
 			

@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -45,6 +46,9 @@ import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.zed.adserver.BannerView;
 import com.zed.adserver.onAdsReadyListener;
 
@@ -75,6 +79,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	Escandalo escan_aux;
 	EscandaloAdapter escanAdapter;
     private Callbacks tCallbacks = null;  
+    private Context mContext;
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -107,7 +112,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) {
 	      super.onCreate(savedInstanceState);
-
+	      
+	      mContext = getActivity().getBaseContext();
+	      
 	      // Obtenemos el tipo de categoria
 	      if (getArguments() != null) {
 			try {
@@ -596,6 +603,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				
 		    	HttpClient httpClient = new DefaultHttpClient();
         
+		    	Log.v("WE","url: " + url);
 		    	HttpGet getEscandalos = new HttpGet(url);
 		   		getEscandalos.setHeader("content-type", "application/json");        		    
 
@@ -704,8 +712,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
-	            	
-		           
+	            			           
 		            if (escandalos != null){
 			            getActivity().runOnUiThread(new Runnable() {
 	                        @Override
@@ -722,6 +729,13 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            Log.e("ServicioRest","Error obteniendo escándalos", ex);
 		            // Hubo algún error inesperado
 		            any_error = true;
+		            
+					// Mandamos la excepcion a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());                                                 // False indicates a fatal exception			                       
 		     }
 		       
 		    // Si hubo algún error devolvemos 666
@@ -850,6 +864,12 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            Log.e("ServicioRest","Error!", ex);
 		            // Hubo algún error inesperado
 		            any_error = true;
+					// Mandamos la excepcion a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());  
 		     }		        	 
 		    
 	    	// Si hubo algún error devolvemos 666
@@ -861,8 +881,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    	return (response.getStatusLine().getStatusCode());   	
 		    }
 	    }
-
-		
+	
 		@Override
 	    protected void onPostExecute(Integer result) {
 			
@@ -935,7 +954,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 					getNewEscandalosAsync.execute();
 				}
 				else{
-					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispones de conexión a internet", Toast.LENGTH_SHORT);
 					toast.show();
 					// Indicamos a la actividad que ha terminado de actualizar
 					tCallbacks.onRefreshFinished();	

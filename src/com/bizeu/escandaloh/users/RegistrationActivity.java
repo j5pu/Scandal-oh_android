@@ -34,6 +34,9 @@ import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class RegistrationActivity extends SherlockActivity {
 
@@ -51,7 +54,7 @@ public class RegistrationActivity extends SherlockActivity {
 	private String status = null;
 	private String user_uri ;
 	private ProgressDialog progress;
-	private Context context;
+	private Context mContext;
 	private boolean any_error;
 
 	
@@ -67,7 +70,7 @@ public class RegistrationActivity extends SherlockActivity {
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_registration));
 		
-		context = this;
+		mContext = this;
 		
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
@@ -82,14 +85,14 @@ public class RegistrationActivity extends SherlockActivity {
 			@Override
 			public void onClick(View v) {
 				
-				if (Connectivity.isOnline(context)){
+				if (Connectivity.isOnline(mContext)){
 					// Si todos los campos son correctos hacemos la petición de registro
 					if (checkFields()){
 						new SignInUser().execute();
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}
@@ -156,6 +159,26 @@ public class RegistrationActivity extends SherlockActivity {
 	}
 	
 	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+	    super.onStart();
+	    EasyTracker.getInstance(this).activityStart(this); 
+	}
+
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+	    super.onStop();
+	    EasyTracker.getInstance(this).activityStop(this);  
+	}
 	
 	
 	/**
@@ -314,6 +337,12 @@ public class RegistrationActivity extends SherlockActivity {
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
+				 // Mandamos la excepcion a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+			     easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+						                       ex),                                                             // The exception.
+						                       false).build()); 
 	        }
 	        
 	        return null;
@@ -330,7 +359,7 @@ public class RegistrationActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(context, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			// Si no hubo ningún error

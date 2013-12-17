@@ -2,6 +2,8 @@ package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
 import com.bizeu.escandaloh.util.Fuente;
+import com.google.analytics.tracking.android.EasyTracker;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -91,19 +93,46 @@ public class SelectCountryActivity extends Activity {
 		});
 	}
 	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart(){
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this);
+	}
 	
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+	    EasyTracker.getInstance(this).activityStop(this);  
+	}
+	
+	
+	
+	/**
+	 * onDestroy
+	 */
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
 		list_countries.setAdapter(null);
 		countries.clear();
-		countries = null;
-		
+		countries = null;		
 	}
 	
 	
-	private void addCountries(ArrayList<Country> countries){
-		
+	/**
+	 * Añade la lista de paises
+	 * @param countries
+	 */
+	private void addCountries(ArrayList<Country> countries){	
 		countries.add(new Country(getResources().getString(R.string.espania), "ES"));
 		countries.add(new Country(getResources().getString(R.string.argentina), "AR"));
 		countries.add(new Country(getResources().getString(R.string.bolivia), "BO"));

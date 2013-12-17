@@ -36,6 +36,9 @@ import com.bizeu.escandaloh.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class LoginActivity extends SherlockActivity {
 	
@@ -51,13 +54,12 @@ public class LoginActivity extends SherlockActivity {
 	private int reason_code;
 	private String user_uri;
 	private String reason;
-	
 	private boolean has_name_error;
 	private boolean has_password_error;
 	private String status = null;
 	private boolean login_error = false;
 	private String loginMessageError;
-	private Context context;
+	private Context mContext;
 	private boolean any_error;
 	
 	
@@ -74,7 +76,7 @@ public class LoginActivity extends SherlockActivity {
 		pantalla = (ViewGroup)findViewById(R.id.lay_pantalla_login);
 		Fuente.cambiaFuente(pantalla);
 		
-		context = this;
+		mContext = this;
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
 		
@@ -87,13 +89,13 @@ public class LoginActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				if (Connectivity.isOnline(context)){
+				if (Connectivity.isOnline(mContext)){
 					if (checkFields()){
 						new LogInUser().execute();	
 					}		
 				}
 				else{
-					Toast toast = Toast.makeText(context, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
 					toast.show();
 				}	
 			}			
@@ -104,7 +106,7 @@ public class LoginActivity extends SherlockActivity {
 			@Override
 			public void onClick(View v) {
 				// Mostramos el dialog de pedir email para reenvío de la contraseña
-				RememberPasswordDialog rememberPass = new RememberPasswordDialog(context);
+				RememberPasswordDialog rememberPass = new RememberPasswordDialog(mContext);
 				rememberPass.setCancelable(false);
 				rememberPass.show(); 		
 			}
@@ -124,8 +126,7 @@ public class LoginActivity extends SherlockActivity {
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub		
+					int after) {	
 			} 
 		});
 		
@@ -139,15 +140,11 @@ public class LoginActivity extends SherlockActivity {
 			
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub
-				
+					int after) {	
 			}
 			
 			@Override
-			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
-				
+			public void afterTextChanged(Editable s) {			
 			}
 		});
 		
@@ -161,10 +158,28 @@ public class LoginActivity extends SherlockActivity {
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		Log.v("WE","Entra en ondestroy");
 	}
 	
 
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+	    EasyTracker.getInstance(this).activityStart(this);  
+	}
+
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+	    EasyTracker.getInstance(this).activityStop(this);
+	}
+	  
 	
 	/**
 	 * Comprueba si todos los campos son correctos
@@ -299,6 +314,12 @@ public class LoginActivity extends SherlockActivity {
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build()); 
 	        }
 			return null;
 	      
@@ -350,5 +371,4 @@ public class LoginActivity extends SherlockActivity {
 	    }
 	}
 	
-
 }

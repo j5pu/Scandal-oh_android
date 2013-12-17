@@ -12,11 +12,9 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,6 +41,9 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class CreateEscandaloActivity extends SherlockActivity {
 
@@ -61,7 +62,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 	private File photo_file;
 	private Uri mImageUri;
 	private ProgressDialog progress;
-	private Context context;
+	private Context mContext;
 	private File audio_file;
 	private boolean con_audio = false;
 	private int photo_from;
@@ -81,16 +82,16 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_create_escandalo));
 		
-		context = this;
+		mContext = this;
 		
 		// Quitamos el action bar
 		getSupportActionBar().hide();
 		
 		// Mostramos la foto 
 		if (getIntent() != null) {
-			Intent data = getIntent();
 			
 			// Obtenemos de donde se ha tomado la foto
+			Intent data = getIntent();
 			photo_from = data.getExtras().getInt("photo_from");
 
 			picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
@@ -100,19 +101,15 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				
 				// Si se ha tomado de la cámara
 				if (photo_from == MainActivity.SHOW_CAMERA){
+					
 					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
-					this.getContentResolver().notifyChange(mImageUri, null);
-					ContentResolver cr = this.getContentResolver();
-					try {
-						taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
-						// Mostramos la foto
-						picture.setImageBitmap(taken_photo);
-					} catch (Exception e) {
-						Toast.makeText(this, "Hubo algún error obteniendo la foto", Toast.LENGTH_SHORT)
-								.show();
-						Log.d("WE", "Failed to load", e);
-					}
+					this.getContentResolver().notifyChange(mImageUri, null);				
+					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
+					
+					// Mostramos la foto
+					picture.setImageBitmap(taken_photo);
 				}
+				
 				// Se ha cogido de la galería
 				else if (photo_from == MainActivity.FROM_GALLERY){
 					picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
@@ -154,8 +151,9 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
+					      
 				// Si hay conexión
-				if (Connectivity.isOnline(context)){
+				if (Connectivity.isOnline(mContext)){
 					String introducido = edit_title.getText().toString();
 					if (introducido.equals("")) {
 						Toast toast = Toast.makeText(getBaseContext(),
@@ -164,14 +162,23 @@ public class CreateEscandaloActivity extends SherlockActivity {
 						toast.show();
 					} else {
 						// Inicializamos el alert dialog
-						AlertDialog.Builder dialog_audio = new AlertDialog.Builder(context);
+						AlertDialog.Builder dialog_audio = new AlertDialog.Builder(mContext);
 						dialog_audio.setMessage("¿Deseas agregar audio?");
 						dialog_audio.setPositiveButton("Sí",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
+										
+										// Enviamos el evento a Google Analytics
+										EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+										easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+											                   "Botón clickeado",  // Event action (required)
+											                   "Acepta agregar audio",   // Event label
+											                   null)            // Event value
+											           .build());
+										
 										// Mostramos el dialog del audio
-										RecordAudioDialog record = new RecordAudioDialog(context, Audio.getInstance());
+										RecordAudioDialog record = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
 										record.setDialogResult(new OnMyDialogResult(){
 										    public void finish(String result){
 										       if (result.equals("OK")){
@@ -191,6 +198,15 @@ public class CreateEscandaloActivity extends SherlockActivity {
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
+										
+										// Enviamos el evento a Google Analytics
+										EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+										easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+											                   "Botón clickeado",  // Event action (required)
+											                   "Rechaza agregar audio",   // Event label
+											                   null)            // Event value
+											           .build());
+										
 										// Enviamos el escandalo sin audio
 										con_audio = false;
 										new SendScandalo().execute();
@@ -203,13 +219,11 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				}
 				else{
 		        	Toast toast;
-		        	toast = Toast.makeText(context, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
 		        	toast.show();
-				}
-				
+				}		
 			}		
 		});
-
 	}
 
 	
@@ -221,21 +235,25 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		super.onPause();
 	}
 	
+	
 	/**
-	 * Liberamos los recursos del audio
+	 * onStop. Liberamos los recursos del audio
 	 */
 	@Override
 	protected void onStop(){
 		super.onStop();
-		Audio.getInstance().releaseResources();
+		Audio.getInstance(mContext).releaseResources();
 	}
 	
+	
+	/**
+	 * onDestroy
+	 */
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		// Se ha tomado desde la camara
+		// Si se ha tomado desde la cámara borramos la foto
 		if (photo_from == MainActivity.SHOW_CAMERA){
-			// Borramos la foto
 			photo_file = new File(mImageUri.getPath());
 			photo_file.delete();
 		}
@@ -244,9 +262,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 
 	
 	/**
-	 * Sube un escandalo al servidor: foto, categoría y título
-	 * 
-	 * @author Alejandro
+	 * Sube un escandalo al servidor
 	 * 
 	 */
 	private class SendScandalo extends AsyncTask<Void, Integer, Integer> {
@@ -270,7 +286,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			}
 			// Desde la galería
 			else if (photo_from == MainActivity.FROM_GALLERY){
-				photo_file = ImageUtils.bitmapToFile(BitmapFactory.decodeFile(photo_string));		
+				photo_file = ImageUtils.bitmapToFile(BitmapFactory.decodeFile(photo_string), mContext);		
 			}
 
 			HttpResponse response = null;
@@ -293,7 +309,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				MultipartEntity reqEntity = new MultipartEntity();
 				
 				if (con_audio){
-					audio_file = new File(Audio.getInstance().getPath());	
+					audio_file = new File(Audio.getInstance(mContext).getPath());	
 					FileBody audioBody = new FileBody(audio_file);
 					reqEntity.addPart("sound", audioBody);
 				}				
@@ -330,6 +346,13 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				// Hubo algún error
 				any_error = true;
+				
+				// Mandamos la excepción a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       ex),                                                             // The exception.
+				                       false).build());                                                 // False indicates a fatal exception
 			}
 
 			if (any_error){
@@ -351,9 +374,10 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			// Si hubo algún error mostramos un mensaje
 			if (result == 666){
 	        	Toast toast;
-	        	toast = Toast.makeText(context, "Hubo algún error enviando el scándalOh!", Toast.LENGTH_LONG);
+	        	toast = Toast.makeText(mContext, "Hubo algún error enviando el scándalOh!", Toast.LENGTH_LONG);
 	        	toast.show();
 			}
+			
 			// No hubo ningún error extraño
 			else{
 				// Si es codigo 2xx --> OK
@@ -361,13 +385,14 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("title", written_title);
 					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(context, "scándalOh! enviado con éxito", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "scándalOh! enviado con éxito", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto enviada");
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
+					
 				} else {
-					Toast toast = Toast.makeText(context, "Error subiendo el scándalOh!", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "Error subiendo el scándalOh!", Toast.LENGTH_LONG);
 					toast.show();
 					Log.v("WE", "foto no enviada");
 					finish();

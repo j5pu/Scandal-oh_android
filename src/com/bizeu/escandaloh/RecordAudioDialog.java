@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.Audio.PlayListener;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class RecordAudioDialog extends Dialog{
 
@@ -39,9 +41,11 @@ public class RecordAudioDialog extends Dialog{
 	private Handler myHandler ;
 	private Runnable myRunnable;
 	OnMyDialogResult mDialogResult; 
+	private Context mContext;
 
 	public RecordAudioDialog(Context con, Audio record) {
 		super(con);
+		mContext = con;
 	}
 
 	@Override
@@ -64,9 +68,17 @@ public class RecordAudioDialog extends Dialog{
 			@Override
 			public void onClick(View v) {
 				
+				// Enviamos el evento a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+					                   "Botón clickeado",  // Event action (required)
+					                   "Ha subido escándalo sin audio añadido",   // Event label
+					                   null)            // Event value
+					           .build());
+				
 				// Si estamos reproduciendo audio: lo paramos
-				if (Audio.getInstance().isPlaying()){
-					Audio.getInstance().stopPlaying();
+				if (Audio.getInstance(mContext).isPlaying()){
+					Audio.getInstance(mContext).stopPlaying();
 				}
 				
 				// Indicamos a la actividad que queremos subir sin audio
@@ -86,9 +98,17 @@ public class RecordAudioDialog extends Dialog{
 			@Override
 			public void onClick(View v) {
 				
+				// Enviamos el evento a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
+					                   "Botón clickeado",  // Event action (required)
+					                   "Ha subido escándalo con audio añadido",   // Event label
+					                   null)            // Event value
+					           .build());
+				
 				// Si estamos reproduciendo audio: lo paramos
-				if (Audio.getInstance().isPlaying()){
-					Audio.getInstance().stopPlaying();
+				if (Audio.getInstance(mContext).isPlaying()){
+					Audio.getInstance(mContext).stopPlaying();
 				}
 				
 				// Indicamos a la actividad que queremos subir con audio
@@ -109,20 +129,20 @@ public class RecordAudioDialog extends Dialog{
 			public void onClick(View v) {
 				
 				// Si está reproduciendo, indica PARAR: paramos de reproducir
-				if (Audio.getInstance().isPlaying()){				
-					Audio.getInstance().stopPlaying();
+				if (Audio.getInstance(mContext).isPlaying()){				
+					Audio.getInstance(mContext).stopPlaying();
 					
 					// Acualizamos la interfaz
 					changeIUPlayFinised();
 				}
 				
 				// Si no está reproduciendo: comprobamos si está grabando o no
-				else if(!Audio.getInstance().isPlaying()){
+				else if(!Audio.getInstance(mContext).isPlaying()){
 					
 					// Si está grabando, indica PARAR: paramos de grabar
-					if (Audio.getInstance().isRecording()){	
+					if (Audio.getInstance(mContext).isRecording()){	
 						
-						Audio.getInstance().stopRecording();
+						Audio.getInstance(mContext).stopRecording();
 											
 						// Actualizamos la IU para mostrar el tiempo de grabación y el botón de reproducir
 						ll_espacio_botones.setVisibility(View.VISIBLE);
@@ -152,7 +172,7 @@ public class RecordAudioDialog extends Dialog{
 					else{	
 						
 						try {
-							Audio.getInstance().startRecording();
+							Audio.getInstance(mContext).startRecording();
 						} catch (IOException e) {
 							Log.e("WE","error grabando audio");
 							e.printStackTrace();
@@ -195,7 +215,7 @@ public class RecordAudioDialog extends Dialog{
 				but_abajo.setText("Parar");
 					
 				// Comenzamos a reproducir
-				Audio.getInstance().startPlaying();	
+				Audio.getInstance(mContext).startPlaying();	
 			}
 		});
 		
@@ -207,7 +227,7 @@ public class RecordAudioDialog extends Dialog{
 		myRunnable = new Runnable() {
 			   public void run() {
 				   // Está grabando: decrementamos el secundero cada segundo
-				   if (Audio.getInstance().isRecording()){
+				   if (Audio.getInstance(mContext).isRecording()){
 					   contador--;
 					   if (contador > 0){
 						   if (contador < 10){
@@ -219,7 +239,7 @@ public class RecordAudioDialog extends Dialog{
 					   }
 					   else if (contador == 0){
 						   
-							Audio.getInstance().stopRecording();
+							Audio.getInstance(mContext).stopRecording();
 							// Hacemos los cambios necesarios a la IU
 							ll_espacio_botones.setVisibility(View.VISIBLE);
 							but_abajo.setText("Grabar");
@@ -245,7 +265,7 @@ public class RecordAudioDialog extends Dialog{
 				   }
 				   
 				   // Está reproduciendo: incrementamos el secundero cada segundo
-				   else if (Audio.getInstance().isPlaying()){
+				   else if (Audio.getInstance(mContext).isPlaying()){
 					   contador_play++;
 					   
 					   if (contador_play < 10){
@@ -269,16 +289,16 @@ public class RecordAudioDialog extends Dialog{
 		}, 0, 1000);
 		
 		
-		Audio.getInstance().setOnPlayListener(new PlayListener(){
+		Audio.getInstance(mContext).setOnPlayListener(new PlayListener(){
 		    @SuppressWarnings("unchecked")	   
 		    @Override
 		    public void onPlayFinished() {
 		    	// Actualizamos la interfaz
 		    	changeIUPlayFinised();
 		    }
-		});
-		
+		});		
 	}
+
 
 	
 	/**
