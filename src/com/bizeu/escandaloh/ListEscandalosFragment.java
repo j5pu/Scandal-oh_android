@@ -117,12 +117,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	      
 	      // Obtenemos el tipo de categoria
 	      if (getArguments() != null) {
-			try {
-				category = getArguments().getString(MainActivity.CATEGORY);
-				Log.v("WE","La categoria es: " + category);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			}	
+			category = getArguments().getString(MainActivity.CATEGORY);
+			Log.v("WE","La categoria es: " + category);	
 		  } 
 	      else{
 	    	  // Primera vez que aparecen escándalos, el primero es HAPPY
@@ -311,8 +307,15 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    	getEscandalosAsync.execute();	
 		}
 		else{
-			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispone de conexión a internet", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispones de conexión a internet", Toast.LENGTH_SHORT);
 			toast.show();
+			
+			// Quitamos el progressbar y mostramos la lista de escandalos
+			loading.setVisibility(View.GONE);
+			lView.setVisibility(View.VISIBLE);
+			
+			// Abrimos la llave
+			getting_escandalos = false;
 		}	
 	}
 	
@@ -329,11 +332,18 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	}
 	
 	
+	/**
+	 * onStop
+	 */
 	@Override
 	public void onStop(){
 		super.onStop();
 	}
 	
+	
+	/**
+	 * onDestroyView
+	 */
 	@Override
 	public void onDestroyView(){
 		super.onDestroyView();
@@ -359,8 +369,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
     }
     
     
+    
     /**
-     * 
+     * setActivatedPosition
      * @param position
      */
     public void setActivatedPosition(int position) {
@@ -774,6 +785,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			// Abrimos la llave
 			getting_escandalos = false;
 			//lView.onRefreshComplete();
+			
+			// Indicamos a la actividad que ha terminado de actualizar
+			tCallbacks.onRefreshFinished();
 	    }
 	}
 	
@@ -939,35 +953,40 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	 */
 	public void updateList(){
 		
-		// Si hay algún escándalo en la lista
-		if (escandalos.size() > 0){
-			// Colocamos el carrusel en el primer escándalo
-			lView.setSelection(0);
-			
-			// Si no se están obteniendo otros escándalos
-	    	if (!getting_escandalos){
-		    	// Si hay conexión
-				if (Connectivity.isOnline(getActivity().getApplicationContext())){
-					// Obtenemos si hay nuevos escandalos subidos (y los mostramos al principio)
-					getting_escandalos = true;
+		// Si no se están obteniendo otros escándalos
+	    if (!getting_escandalos){
+	    	
+		    // Si hay conexión
+			if (Connectivity.isOnline(getActivity().getApplicationContext())){
+				// Colocamos el carrusel en el primer escándalo
+				lView.setSelection(0);
+					
+				// Obtenemos los escándalos:
+				// Si no hay ninguno mostrado obtenemos los primeros, si hay alguno obtenemos si hay nuevos escándalos subidos
+				getting_escandalos = true;
+					
+				if (escandalos.size() > 0){			
 					getNewEscandalosAsync = new GetNewEscandalos();
 					getNewEscandalosAsync.execute();
 				}
 				else{
-					Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispones de conexión a internet", Toast.LENGTH_SHORT);
-					toast.show();
-					// Indicamos a la actividad que ha terminado de actualizar
-					tCallbacks.onRefreshFinished();	
-				} 
-	    	}
-	    	else{
+					getEscandalosAsync = new GetEscandalos();
+				   	getEscandalosAsync.execute();
+				}
+			}
+				
+			// No hay conexión
+			else{				
+				Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+				toast.show();
 				// Indicamos a la actividad que ha terminado de actualizar
 				tCallbacks.onRefreshFinished();	
-	    	}
-		}
-		else{
+			} 
+	    }
+	    else{
+	    	Log.v("WE","Getting_escadalos");
 			// Indicamos a la actividad que ha terminado de actualizar
 			tCallbacks.onRefreshFinished();	
-		}
+	    }
 	}
 }

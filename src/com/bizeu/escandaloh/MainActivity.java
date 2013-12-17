@@ -566,20 +566,20 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			
 		// Actualizar carrusel: Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.ll_main_refresh:
-		
-			  // Mandamos el evento a Google Analytics
-			  easyTracker.send(MapBuilder
-			      .createEvent("Acción UI",     // Event category (required)
+			
+			// Mandamos el evento a Google Analytics
+			easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
 			                   "Boton clickeado",  // Event action (required)
 			                   "Actualizar lista escándalos",   // Event label
 			                   null)            // Event value
 			      .build()
-			  );
+			);
 			
 			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
 			progress_refresh.setVisibility(View.VISIBLE);
 			img_update_list.setVisibility(View.GONE);
-					
+			
+							
 			// Obtenemos cuál es el tab activo
 			String current_tab = getSupportActionBar().getSelectedTab().getText().toString();
 			
