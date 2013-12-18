@@ -71,7 +71,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private ImageView img_take_photo;
 	private ProgressBar progress_refresh;
   
-	public static ArrayList<Escandalo> escandalos;
 	EscandaloAdapter escanAdapter;
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -233,7 +232,27 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	public void onStart(){
 		super.onStart();
+
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		
+		// Actualizamos el nº de comentarios de los escándalos
+		String current_tab = getSupportActionBar().getSelectedTab().getText().toString();
+		
+		ListEscandalosFragment lef = null;
+		if (current_tab.equals(HAPPY)){
+			lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(HAPPY);		
+		}
+		
+		else if (current_tab.equals(ANGRY)){
+			lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(ANGRY);				
+		}
+		
+		else if (current_tab.equals(BOTH)){
+			lef = (ListEscandalosFragment) ((SherlockFragmentActivity)mContext).getSupportFragmentManager().findFragmentByTag(BOTH);
+		}
+		
+		lef.updateComments();
+		
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);  
 	}
@@ -288,7 +307,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 */
 	@Override
 	protected void onPause() {
-	    super.onPause();    
+	    super.onPause();   
 	   // AdsSessionController.pauseTracking();
 	}
 	
@@ -578,8 +597,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			// Mostramos el progress bar (loading) y ocultamos el botón de refrescar
 			progress_refresh.setVisibility(View.VISIBLE);
 			img_update_list.setVisibility(View.GONE);
-			
-							
+										
 			// Obtenemos cuál es el tab activo
 			String current_tab = getSupportActionBar().getSelectedTab().getText().toString();
 			

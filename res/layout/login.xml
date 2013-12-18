@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Usuario/email:"
+                android:text="Usuario o email:"
                 android:textColor="@color/morado"
                 android:textSize="20dp"
                 android:gravity="bottom"
@@ -64,11 +64,11 @@
                 android:layout_weight="0.5"
                 android:background="@color/blanco"
                 android:ems="10"
-                android:hint="user56"
                 android:paddingLeft="5dp"
                 android:textColor="@color/azul"
-                android:textColorHint="@color/azul_hint"
-                android:maxLength="25" />
+                android:maxLength="25"
+                android:inputType="text" 
+                android:imeOptions="actionNext" />
 
             <TextView
                 android:id="@+id/txt_comments_user"
@@ -88,8 +88,8 @@
                 android:layout_weight="0.5"
                 android:background="@color/blanco"
                 android:ems="10"
-                android:hint="······"
                 android:inputType="textPassword"
+                android:imeOptions="actionDone"
                 android:paddingLeft="5dp"
                 android:textColor="@color/azul"
                 android:textColorHint="@color/azul_hint" />

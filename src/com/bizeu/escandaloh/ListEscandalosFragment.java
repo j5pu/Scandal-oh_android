@@ -83,6 +83,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
+	private UpdateNumComments updateNumCommentsAsync;
 
 	
 	public interface Callbacks {
@@ -613,8 +614,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    try{
 				
 		    	HttpClient httpClient = new DefaultHttpClient();
-        
-		    	Log.v("WE","url: " + url);
 		    	HttpGet getEscandalos = new HttpGet(url);
 		   		getEscandalos.setHeader("content-type", "application/json");        		    
 
@@ -754,8 +753,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    	return 666;
 		    }
 		    else{
-			     // Devolvemos el código resultado
-			     return (response.getStatusLine().getStatusCode());   
+		    	// Devolvemos el código resultado
+			    return (response.getStatusLine().getStatusCode());   
 		    }
 	    }
 
@@ -909,23 +908,135 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				if (!isCancelled()){
 					// Si es codigo 2xx --> OK
 			        if (result >= 200 && result <300){
-			        	escanAdapter.notifyDataSetChanged();
+			        	updateNumCommentsAsync = new UpdateNumComments();
+			        	updateNumCommentsAsync.execute();
 			        }
 			        else{
 			        }        
 				}
 			}
+	    }
+	}
+	
+	
+	
+	
+	/**
+	 * Actualiza el número de comentarios de cada escándalo
+	 *
+	 */
+	private class UpdateNumComments extends AsyncTask<Void,Integer,Integer> {
+		
+		@Override
+		protected void onPreExecute(){
+			any_error = false;
+		}
+		
+		@Override
+	    protected Integer doInBackground(Void... params) {
+			
+			// La url dependerá de si estamos en una categoria en concreta o en la de Todas
+			String url = null;
+			// HAPPY
+			if (category.equals(MainActivity.HAPPY) || category.equals(MainActivity.ANGRY)){
+				Log.v("WE","num comentarios happy");
+				url = MyApplication.SERVER_ADDRESS + "api/v1/comment/count/" + escandalos.get(escandalos.size()-1).getId() + "/" + escandalos.get(0).getId() + "/";
+			}
+			
+			// BOTH
+			if (category.equals(MainActivity.BOTH)){
+				Log.v("WE","num comentarios both");			
+				url = MyApplication.SERVER_ADDRESS + "api/v1/comment/count/" + escandalos.get(escandalos.size()-1).getId() + "/" + escandalos.get(0).getId() + "/all/";
+			}
+	
+			HttpResponse response = null;
+			
+		    try{
+			
+		    	HttpClient httpClient = new DefaultHttpClient();
+		    	HttpGet getEscandalos = new HttpGet(url);
+		   		getEscandalos.setHeader("content-type", "application/json");        		    
 
+				// Hacemos la petición al servidor
+		        response = httpClient.execute(getEscandalos);
+		        String respStr = EntityUtils.toString(response.getEntity());
+		        Log.i("WE",respStr);
+		        		        
+		        JSONArray commentsArray = new JSONArray(respStr);		        	      
+		        
+		        // Recorremos todos los escándalos y obtenemos sus nº de comentarios
+		        for (int i=0 ; i < commentsArray.length(); i++){
+		        	JSONObject numCommentObject = commentsArray.getJSONObject(i);
+		        	
+		        	final String id_escandalo = numCommentObject.getString("photo_id");
+		        	final String num_comments = numCommentObject.getString("num_comments");
+	            	
+		        	final int posicion = i;
+		        	
+		            if (escandalos != null){
+			            getActivity().runOnUiThread(new Runnable() {
+	                        @Override
+	                        public void run() {
+	                        //Modificamos el número de comentarios del escándalo
+	                         Escandalo escaAux = escandalos.get(posicion);
+	                         escaAux.setNumComments(Integer.parseInt(num_comments));
+	                         escandalos.set(posicion, escaAux);
+	                        }
+			            }); 
+		            }          
+		    	 }  	 	    	 
+		     }
+		     
+		     catch(Exception ex){
+		            Log.e("ServicioRest","Error actualizando número de comentarios", ex);
+		            // Hubo algún error inesperado
+		            any_error = true;
+		            
+					// Mandamos la excepcion a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());                                                 // False indicates a fatal exception			                       
+		     }
+		       
+		    // Si hubo algún error devolvemos 666
+		    if (any_error){
+		    	return 666;
+		    }
+		    else{
+			     // Devolvemos el código resultado
+			     return (response.getStatusLine().getStatusCode());   
+		    }
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Integer result) {
+			
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666){
+				Toast toast = Toast.makeText(getActivity().getBaseContext(), "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			
+			// No hubo ningún error inesperado
+			if (!isCancelled()){
+				// Si es codigo 2xx --> OK
+		        if (result >= 200 && result <300){
+		        	escanAdapter.notifyDataSetChanged();
+		        }
+		        else{
+		        }        
+			}
 			// Abrimos la llave
 			getting_escandalos = false;
-			escanAdapter.notifyDataSetChanged();
-	        //lView.onRefreshComplete();
+			//lView.onRefreshComplete();
 			
 			// Indicamos a la actividad que ha terminado de actualizar
 			tCallbacks.onRefreshFinished();
 	    }
 	}
-	
 
 
 
@@ -959,6 +1070,13 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		    // Si hay conexión
 			if (Connectivity.isOnline(getActivity().getApplicationContext())){
 				
+				// Paramos si se estuviesen actualizando el nº de comentarios
+				if (updateNumCommentsAsync != null){
+					if (updateNumCommentsAsync.getStatus() == AsyncTask.Status.PENDING || updateNumCommentsAsync.getStatus() == AsyncTask.Status.RUNNING){
+						updateNumCommentsAsync.cancel(true);
+					}
+				}
+				
 				// Colocamos el carrusel en el primer escándalo
 				lView.setSelection(0);
 					
@@ -985,9 +1103,27 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			} 
 	    }
 	    else{
-	    	Log.v("WE","Getting_escadalos");
 			// Indicamos a la actividad que ha terminado de actualizar
 			tCallbacks.onRefreshFinished();	
+	    }
+	}
+	
+	
+	/**
+	 * Actualiza el número de comentarios de los escándalos
+	 */
+	public void updateComments(){
+		
+		// Actualizamos nº de comentarios si no se están obteniendo otros escándalos
+	    if (!getting_escandalos){
+	    	
+		    // Si hay conexión
+			if (Connectivity.isOnline(getActivity().getApplicationContext())){							
+				if (escandalos.size() > 0){			
+					updateNumCommentsAsync = new UpdateNumComments();
+					updateNumCommentsAsync.execute();
+				}
+			}
 	    }
 	}
 }

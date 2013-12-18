@@ -135,7 +135,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 			});
             
 	        holder.txtTitle.setText(escanda.getTitle());
-	       // holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
+	        holder.txtNumComments.setText(Integer.toString(escanda.getNumComments()));
 	        
 	        if (escanda.hasAudio()){
 	        	holder.imgMicro.setVisibility(View.VISIBLE);
@@ -300,10 +300,10 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
 					shareIntent.setType("text/plain");		       
 					shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-					shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post");
+					shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Deberías ver esto. ¡Qué escándalo!");
 					shareIntent.putExtra(Intent.EXTRA_TEXT, screenshotUri.toString());
 
-					mContext.startActivity(Intent.createChooser(shareIntent, "Compartir scandaloh con..."));		        
+					mContext.startActivity(Intent.createChooser(shareIntent, "Compartir scándalOh! con..."));		        
 				}
 			});
                        

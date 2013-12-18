@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:text="Nombre de usuario:"
+                android:text="Usuario:"
                 android:textColor="@color/morado"
                 android:textSize="20dp"
                 android:layout_gravity="bottom"
@@ -66,11 +66,13 @@
                 android:layout_weight="3"
                 android:background="@color/blanco"
                 android:ems="10"
-                android:hint="user56"
-                android:textColorHint="@color/azul"
+                android:hint="4-25 caracteres"
+                android:textColorHint="@color/azul_hint"
                 android:textColor="@color/azul"
                 android:paddingLeft="5dp"
-                android:maxLength="25" />
+                android:maxLength="25"
+                android:inputType="text"
+                android:imeOptions="actionNext" />
 
             <TextView
                 android:id="@+id/txt_cancelar_foto_audio"
@@ -91,11 +93,12 @@
                 android:layout_weight="3"
                 android:background="@color/blanco"
                 android:ems="10"
-                android:hint="mail98@users.com"
+                android:hint="ejemplo@email.com"
                 android:inputType="textEmailAddress"
-                android:textColorHint="@color/azul"
+                android:textColorHint="@color/azul_hint"
                 android:textColor="@color/azul"
-                android:paddingLeft="5dp"  >
+                android:paddingLeft="5dp"
+                android:imeOptions="actionNext"  >
             </EditText>
 
             <TextView
@@ -103,7 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:text="Contraseña"
+                android:text="Contraseña:"
                 android:textColor="@color/morado"
                 android:textSize="20dp"
                 android:layout_gravity="bottom"
@@ -117,11 +120,12 @@
                 android:layout_weight="3"
                 android:background="@color/blanco"
                 android:ems="10"
-                android:hint="********"
+                android:hint="Al menos 6 caracteres"
                 android:inputType="textPassword"
-                android:textColorHint="@color/azul"
+                android:textColorHint="@color/azul_hint"
                 android:paddingLeft="5dp" 
-                android:textColor="@color/azul"/>
+                android:textColor="@color/azul"
+                android:imeOptions="actionDone"/>
 
         </LinearLayout>
 

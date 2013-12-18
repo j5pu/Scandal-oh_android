@@ -1,6 +1,9 @@
 package com.bizeu.escandaloh.users;
 
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -9,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -191,16 +195,28 @@ public class LoginActivity extends SherlockActivity {
 		edit_nombre_email.setError(null);
 		edit_password.setError(null);
 		
-		// Nombre/Email vacío
-		if (edit_nombre_email.getText().toString().length() == 0){
-			edit_nombre_email.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
+		Log.v("WE","Edit_nombre_email: " + edit_nombre_email.getText().toString());
+		
 		// Nombre/Email menos de 4 caracteres
 		if (edit_nombre_email.getText().toString().length() < 4){
 			edit_nombre_email.setError("Este campo debe tener al menos 4 caracteres");
 			all_correct = false;
 		}
+		
+		// Nombre/Email con espacio en blanco
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
+		if (m.find()){
+			edit_nombre_email.setError("Este campo no permite espacios en blanco");
+			all_correct = false;
+		}
+		
+		// Nombre/Email vacío
+		if (edit_nombre_email.getText().toString().length() == 0){
+			edit_nombre_email.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+
 		// Password vacío
 		if (edit_password.getText().toString().length() == 0){
 			edit_password.setError("Este campo es obligatorio");
@@ -293,7 +309,9 @@ public class LoginActivity extends SherlockActivity {
 		                	 if (reason_code == 3){ // Fallo de autentificación ((caracteres raros, espacio, longitud...)
 		                		 JSONObject jsonReason = new JSONObject(respJSON.getString("reason_details"));
 		                		 if (jsonReason.has("username_email")){
-		                			 name_error = jsonReason.getString("username_email");
+		                			 JSONArray name_errors = jsonReason.getJSONArray("username_email");
+		                			 name_error = name_errors.getString(0);
+		                			// name_error = jsonReason.getString("username_email");
 		                			 has_name_error = true;
 		                		 }
 		                		 if (jsonReason.has("password")){

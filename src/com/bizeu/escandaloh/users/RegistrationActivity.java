@@ -197,6 +197,16 @@ public class RegistrationActivity extends SherlockActivity {
 			edit_nombre_usuario.setError("Este campo debe tener al menos 4 caracteres");
 			all_correct = false;
 		}
+		
+		// Nombre/Email con espacio en blanco
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher m = pattern.matcher(edit_nombre_usuario.getText().toString());
+		if (m.find()){
+			edit_nombre_usuario.setError("Este campo no permite espacios en blanco");
+			all_correct = false;
+		}
+		
+		
 		// Nombre vacío
 		if (edit_nombre_usuario.getText().toString().length() == 0){
 			edit_nombre_usuario.setError("Este campo es obligatorio");
@@ -286,10 +296,15 @@ public class RegistrationActivity extends SherlockActivity {
 	             
 	             JSONObject dato = new JSONObject();	              
 	             
-	             dato.put("username", edit_nombre_usuario.getText().toString());
-	             dato.put("password", edit_password_usuario.getText().toString());
-	             dato.put("email", edit_email_usuario.getText().toString());
+	             String username = edit_nombre_usuario.getText().toString();
+	             String password = edit_password_usuario.getText().toString();
+	             String email = edit_email_usuario.getText().toString();
+	             
+	             dato.put("username", username);
+	             dato.put("password", password);
+	             dato.put("email", email);
 
+	             // Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);
 
@@ -313,7 +328,9 @@ public class RegistrationActivity extends SherlockActivity {
 	                 else if (status.equals("error")){
 	                	 JSONObject jsonReason = new JSONObject(respJSON.getString("reason"));
 	                	 if (jsonReason.has("username")){
-	                		 name_error = jsonReason.getString("username");
+	                		 JSONArray jsonUserNameErrors = new JSONArray(jsonReason.getString("username"));
+	                		 name_error = (String) jsonUserNameErrors.get(0);
+	                		// name_error = jsonReason.getString("username");
 	                		 has_name_error = true;
 	                	 }
 	                	 if (jsonReason.has("password")){
