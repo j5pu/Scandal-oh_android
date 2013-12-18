@@ -845,7 +845,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		        
 		        JSONArray escandalosObject = new JSONArray(respStr);
            
-		        for (int i = escandalosObject.length()-1; i>=0; i--){
+		        for (int i = 0; i<escandalosObject.length(); i++){
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
 		            final String category = escanObject.getString("category");
@@ -958,6 +958,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	    	
 		    // Si hay conexión
 			if (Connectivity.isOnline(getActivity().getApplicationContext())){
+				
 				// Colocamos el carrusel en el primer escándalo
 				lView.setSelection(0);
 					

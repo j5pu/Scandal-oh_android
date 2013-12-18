@@ -482,7 +482,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				            	     EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 				      			     easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
 				      			                     "Selección realizada",  // Event action (required)
-				      			                     "Hacer foto desde la cámara",   // Event label
+				      			                     "Subir foto desde la galería",   // Event label
 				      			                     null)            // Event value
 				      			        .build()
 				      			     );

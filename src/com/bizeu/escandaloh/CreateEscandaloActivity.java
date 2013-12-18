@@ -225,6 +225,19 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			}		
 		});
 	}
+	
+	
+	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart(){
+		super.onStart();
+		EasyTracker.getInstance(mContext).activityStart(this);  
+	}
+	
 
 	
 	/**
