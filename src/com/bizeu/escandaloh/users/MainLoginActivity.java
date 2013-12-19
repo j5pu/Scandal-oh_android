@@ -49,6 +49,7 @@ public class MainLoginActivity extends SherlockActivity{
 	private Button but_registro;
 	private Button but_login;
 	private Button but_entra_facebook;	
+	private Button but_entra_redes;
 	private ProgressDialog progress;
 	private String status = null;
 	private boolean login_error = false;

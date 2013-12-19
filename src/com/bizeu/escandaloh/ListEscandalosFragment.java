@@ -1055,7 +1055,13 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
 				getNewEscandalosAsync.cancel(true);
 			}
-		} 		
+		} 
+		
+		if (updateNumCommentsAsync != null){
+			if (updateNumCommentsAsync.getStatus() == AsyncTask.Status.PENDING || updateNumCommentsAsync.getStatus() == AsyncTask.Status.RUNNING){
+				updateNumCommentsAsync.cancel(true);
+			}
+		}
 	}
 	
 	
