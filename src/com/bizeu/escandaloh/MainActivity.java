@@ -428,8 +428,19 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 		else if (requestCode == SHARING){	
 			// Eliminamos la foto que se compartió
-			File photo_to_delete = new File(MyApplication.FILE_TO_DELETE);
-			photo_to_delete.delete();       
+			try{
+				File photo_to_delete = new File(MyApplication.FILE_TO_DELETE);
+				photo_to_delete.delete();
+			}catch(Exception e){
+	            e.printStackTrace();
+	             // Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build());
+			}
+       
 		}
 	}
 	
@@ -455,14 +466,14 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 				if (MyApplication.logged_user){ 
 					
 					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = {"Tomar desde la cámara", "Coger de la galería"};
+					final CharSequence[] items = {"Hacer foto con la cámara", "Seleccionar foto de la galería"};
 					 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				        builder.setTitle("Añadir foto");
 				        builder.setItems(items, new DialogInterface.OnClickListener() {
 				            @Override
 				            public void onClick(DialogInterface dialog, int item) {
 				            	
-				                if (items[item].equals("Tomar desde la cámara")) {
+				                if (items[item].equals("Hacer foto con la cámara")) {
 				                	
 				      			     // Mandamos el evento a Google Analytics
 				            		 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
@@ -501,7 +512,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 									}
 				                } 
 				                
-				                else if (items[item].equals("Coger de la galería")) {
+				                else if (items[item].equals("Seleccionar foto de la galería")) {
 				                	
 				      			     // Mandamos el evento a Google Analytics
 				            	     EasyTracker easyTracker = EasyTracker.getInstance(mContext);

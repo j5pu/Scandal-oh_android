@@ -9,8 +9,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -21,6 +23,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -55,6 +58,7 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 
@@ -66,6 +70,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	    ArrayList<Escandalo> data;
 	    private int available_height;	    
 	    private Escandalo escanda;
+	    private Bitmap bitma;
 
     
 	    /**
@@ -170,6 +175,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setTag(R.string.user, (String) escanda.getUser());
 	        holder.txtNumComments.setTag(R.string.title, (String) escanda.getTitle());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
+	        holder.imgPicture.setTag(R.string.url_foto, (String) escanda.getRouteImgBig());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImgBig());	
 	        holder.imgShare.setTag(R.string.title, (String) escanda.getTitle());
@@ -239,6 +245,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 				@Override
 				public boolean onLongClick(View v) {
 					
+					final View mView = v;
+					
 					 // Mandamos el evento a Google Analytics
 					 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 					 easyTracker.send(MapBuilder
@@ -252,13 +260,20 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					// Paramos si hubiera algún audio reproduciéndose
 					Audio.getInstance(mContext).releaseResources();
 					
-					// Guardamos la foto en la galería				
-					ImageView imView = (ImageView) v;
-					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					ImageUtils.saveBitmapIntoGallery(bitm, mContext);
-					
-					Toast toast = Toast.makeText(mContext, "foto guardada en la galería", Toast.LENGTH_LONG);
-					toast.show();
+					// Guardamos la foto en la galería	
+					final CharSequence[] items = {"Guardar foto en la galería"};
+					 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				        builder.setItems(items, new DialogInterface.OnClickListener() {
+				            @Override
+				            public void onClick(DialogInterface dialog, int item) {
+				            	
+				                if (items[item].equals("Guardar foto en la galería")) {
+				                	new SaveImageTask(mContext).execute((String) mView.getTag(R.string.url_foto));     			   
+				                } 			                
+				            }
+				        });
+				        builder.show();
+				        
 					return true;
 				}
 			});
@@ -414,6 +429,61 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		}
 		
 		
+		/**
+		 * Guarda una foto en la galería
+		 *
+		 */
+		private class SaveImageTask extends AsyncTask<String, String, String> {
+		    private Context context;
+		    private ProgressDialog pDialog;
+
+		    public SaveImageTask(Context context) {
+		        this.context = context;
+		    }
+
+		    @Override
+		    protected void onPreExecute() {
+		        super.onPreExecute();
+
+		        pDialog = new ProgressDialog(context);
+		        pDialog.setMessage("Guardando ...");
+		        pDialog.setIndeterminate(false);
+		        pDialog.setCancelable(false);
+		        pDialog.show();		     
+		    }
+
+		    @Override
+		    protected String doInBackground(String... args) {
+		    	
+		        try {
+			    	// Obtenemos la foto desde la url
+                	bitma = ImageUtils.getBitmapFromURL(args[0]);
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            e.printStackTrace();
+		             // Mandamos la excepcion a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       e),                                                             // The exception.
+					                       false).build());
+		        }
+
+		        return null;
+		    }
+
+		    @Override
+		    protected void onPostExecute(String args) {
+		    	// Quitamos el progress dialog
+		        pDialog.dismiss();  
+		        
+		        // Guardamos la foto en la galería
+				ImageUtils.saveBitmapIntoGallery(bitma, mContext);	
+		    }
+		}	
+		
+		
 		
 		/**
 		 * Comparte un escándalo
@@ -476,6 +546,12 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 
 		        } catch (Exception e) {
 		            e.printStackTrace();
+		             // Mandamos la excepcion a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       e),                                                             // The exception.
+					                       false).build());
 		        }
 
 		        return null;
@@ -484,7 +560,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		    @Override
 		    protected void onPostExecute(String args) {
 		    	// Quitamos el progress dialog
-		        pDialog.dismiss();
+		        pDialog.dismiss();  
 		        
 		        // Ejecutamos el intent de compartir
 		        share = new Intent(Intent.ACTION_SEND);		        
@@ -493,7 +569,11 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		        share.putExtra(Intent.EXTRA_TITLE, title);	        
 		        share.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
 		        share.setType("image/jpeg");
-		        acti.startActivityForResult(Intent.createChooser(share, "Share Image"), MainActivity.SHARING);
+		        acti.startActivityForResult(Intent.createChooser(share, "Compartir ScándalOh! con..."), MainActivity.SHARING);
 		    }
 		}	
+		
+		
+		
+
 }
