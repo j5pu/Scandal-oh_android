@@ -145,8 +145,14 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        }
 	        
 	        holder.txtNameUser.setText(escanda.getUser());
-	        String date_without_time = (escanda.getDate().split("T",2))[0]; 
-	        holder.txtDate.setText(date_without_time);
+	        
+	        // La fecha tendrá el formato: dd-mm-aaaa
+	        String date_without_time = (escanda.getDate().split("T",2))[0];   
+	        String year = date_without_time.split("-",3)[0];
+	        String month = date_without_time.split("-",3)[1];
+	        String day = date_without_time.split("-",3)[2];
+	        String final_date = day + "-" + month + "-" + year;
+	        holder.txtDate.setText(final_date); 
 	        
 	        // Guardamos los datos necesarios en las vistas para luego recuperarlos al hacer click
 	        holder.txtNumComments.setTag(R.string.id, escanda.getId());
