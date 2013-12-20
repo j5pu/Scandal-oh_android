@@ -56,6 +56,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
     public static final int FROM_GALLERY = 12;
+    public static final int SHARING = 13;
     public static final String FIRST_TIME = "First_time"; // Nos indica si pulsó el + para hacer una foto
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
@@ -423,7 +424,12 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 			}
         }
 		
-		else if (requestCode == CREATE_ESCANDALO){
+		else if (requestCode == CREATE_ESCANDALO){}
+		
+		else if (requestCode == SHARING){	
+			// Eliminamos la foto que se compartió
+			File photo_to_delete = new File(MyApplication.FILE_TO_DELETE);
+			photo_to_delete.delete();       
 		}
 	}
 	

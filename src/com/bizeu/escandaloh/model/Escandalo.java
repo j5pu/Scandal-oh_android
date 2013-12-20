@@ -16,7 +16,8 @@ public class Escandalo {
 	private String picture_url;
 	private int num_comments;
 	private String resource_uri; // Uri de la foto
-	private String route_img; // Ruta de la foto
+	private String route_img; // Ruta de la foto pequeña sin marca de agua
+	private String route_img_big; // Ruta de lda foto grande con marca de agua
 	private String resource_audio; // Uri del audio. Null es que la imagen no tiene audio
 	private boolean has_audio;
 	private String date;
@@ -37,7 +38,7 @@ public class Escandalo {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String uri_audio, String user, String date){
+	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String route_img_big, String uri_audio, String user, String date){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -50,6 +51,7 @@ public class Escandalo {
 		this.num_comments = num_comments;
 		this.resource_uri = resource_uri;
 		this.route_img = route_img;
+		this.route_img_big = route_img_big;
 		this.resource_audio = uri_audio;
 		this.has_audio = uri_audio.equals("null") ? false : true;
 		this.user = user;
@@ -111,6 +113,14 @@ public class Escandalo {
 	
 	public String getRouteImg(){
 		return this.route_img;
+	}
+	
+	public void setRouteImgBig(String new_route_big){
+		this.route_img_big = new_route_big;
+	}
+	
+	public String getRouteImgBig(){
+		return this.route_img_big;
 	}
 	
 	public void setUriAudio(String new_uri_audio){

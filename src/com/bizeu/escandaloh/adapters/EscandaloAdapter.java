@@ -1,17 +1,26 @@
 package com.bizeu.escandaloh.adapters;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -38,6 +47,7 @@ import com.applidium.shutterbug.FetchableImageView;
 import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.DetailCommentsActivity;
 import com.bizeu.escandaloh.DetailPhotoActivity;
+import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
 import com.bizeu.escandaloh.model.Escandalo;
@@ -161,7 +171,8 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 	        holder.txtNumComments.setTag(R.string.title, (String) escanda.getTitle());
 	        holder.imgPicture.setTag(R.string.uri_audio, escanda.getUriAudio());
 	        holder.imgMicro.setTag(R.string.uri_audio, escanda.getUriAudio());
-	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImg());	   
+	        holder.imgShare.setTag(R.string.url_foto, (String) escanda.getRouteImgBig());	
+	        holder.imgShare.setTag(R.string.title, (String) escanda.getTitle());
 	 	        
 	        // Listener para el microfono
 	        holder.imgMicro.setOnClickListener(new View.OnClickListener() {
@@ -183,7 +194,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					Audio.getInstance(mContext).releaseResources();
 					
 					// Lo reproducimos				
-					new PlayAudio().execute((String)v.getTag(R.string.uri_audio));		
+					new PlayAudioTask().execute((String)v.getTag(R.string.uri_audio));		
 				}
 			});
 	        	        
@@ -302,14 +313,9 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 					// Paramos si hubiera algún audio reproduciéndose
 					Audio.getInstance(mContext).releaseResources();
 					
+					// Compartimos la foto
 					Uri screenshotUri = Uri.parse((String)v.getTag(R.string.url_foto));	
-					Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-					shareIntent.setType("text/plain");		       
-					shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-					shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Deberías ver esto. ¡Qué escándalo!");
-					shareIntent.putExtra(Intent.EXTRA_TEXT, screenshotUri.toString());
-
-					mContext.startActivity(Intent.createChooser(shareIntent, "Compartir scándalOh! con..."));		        
+					new ShareImageTask(mContext, (String) v.getTag(R.string.title)).execute(screenshotUri.toString()); 
 				}
 			});
                        
@@ -395,18 +401,99 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		
 		/**
 		 * Reproduce el audio
-		 * @author Alejandro
 		 *
 		 */
-		private class PlayAudio extends AsyncTask<String,Integer,Boolean> {
+		private class PlayAudioTask extends AsyncTask<String,Integer,Boolean> {
 			 
 			@Override
 		    protected Boolean doInBackground(String... params) {
 		    	
 		    	Audio.getInstance(mContext).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
 		        return false;
-		    }
-			
+		    }	
 		}
-	
+		
+		
+		
+		/**
+		 * Comparte un escándalo
+		 *
+		 */
+		private class ShareImageTask extends AsyncTask<String, String, String> {
+		    private Context context;
+		    private ProgressDialog pDialog;
+		    URL myFileUrl;
+		    String title;
+		    Bitmap bmImg = null;
+		    Intent share;
+		    File file;
+
+		    public ShareImageTask(Context context, String title) {
+		        this.context = context;
+		        this.title = title;
+		    }
+
+		    @Override
+		    protected void onPreExecute() {
+		        super.onPreExecute();
+
+		        pDialog = new ProgressDialog(context);
+		        pDialog.setMessage("Preparando para compartir ...");
+		        pDialog.setIndeterminate(false);
+		        pDialog.setCancelable(false);
+		        pDialog.show();		     
+		    }
+
+		    @Override
+		    protected String doInBackground(String... args) {
+		    	
+		    	// Obtenemos la foto desde la url de amazon
+		        try {
+		            myFileUrl = new URL(args[0]);
+		            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+		            conn.setDoInput(true);
+		            conn.connect();
+		            InputStream is = conn.getInputStream();
+		            bmImg = BitmapFactory.decodeStream(is);
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        try {
+		            String path = myFileUrl.getPath();
+		            String idStr = path.substring(path.lastIndexOf('/') + 1);
+		            File filepath = Environment.getExternalStorageDirectory();
+		            File dir = new File(filepath.getAbsolutePath()+ "/ScándalOh/");
+		            dir.mkdirs();
+		            String fileName = idStr;
+		            // Guardamos la ruta de la foto para más adelante eliminarla
+		            MyApplication.FILE_TO_DELETE = filepath.getAbsolutePath() + "/ScándalOh/" + idStr;
+		            file = new File(dir, fileName);
+		            FileOutputStream fos = new FileOutputStream(file);
+		            bmImg.compress(CompressFormat.JPEG, 100, fos);
+		            fos.flush();
+		            fos.close();
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+
+		        return null;
+		    }
+
+		    @Override
+		    protected void onPostExecute(String args) {
+		    	// Quitamos el progress dialog
+		        pDialog.dismiss();
+		        
+		        // Ejecutamos el intent de compartir
+		        share = new Intent(Intent.ACTION_SEND);		        
+		        share.putExtra(Intent.EXTRA_SUBJECT, "Deberías ver esto. ¡Qué escándalo!");
+		        share.putExtra(Intent.EXTRA_TEXT, title);
+		        share.putExtra(Intent.EXTRA_TITLE, title);	        
+		        share.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
+		        share.setType("image/jpeg");
+		        acti.startActivityForResult(Intent.createChooser(share, "Share Image"), MainActivity.SHARING);
+		    }
+		}	
 }

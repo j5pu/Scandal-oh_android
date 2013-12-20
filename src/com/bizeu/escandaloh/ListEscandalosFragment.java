@@ -620,7 +620,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				// Hacemos la petición al servidor
 		        response = httpClient.execute(getEscandalos);
 		        String respStr = EntityUtils.toString(response.getEntity());
-		        //Log.i("WE",respStr);
+		        // Log.i("WE",respStr);
 		        
 		        JSONArray escandalosObject = null;
 		        
@@ -712,7 +712,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String category = escanObject.getString("category");
 		            final String date = escanObject.getString("date");
 		            final String id = escanObject.getString("id");
-		            final String img = escanObject.getString("img_p");
+		            final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
+		            final String img = escanObject.getString("img");
 		            final String comments_count = escanObject.getString("comments_count");
 		            String latitude = escanObject.getString("latitude");
 		            String longitude = escanObject.getString("longitude");
@@ -729,7 +730,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	                        public void run() {
 	                        // Añadimos el escandalo al ArrayList
 	                        	  escandalos.add(new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-	          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));	        	       
+	          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, 
+	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
+	          							sound, username, date));	        	       
 	                        }
 			            }); 
 		            }          
@@ -850,7 +853,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String category = escanObject.getString("category");
 		            final String date = escanObject.getString("date");
 		            final String id = escanObject.getString("id");
-		            final String img = escanObject.getString("img_p");
+		            final String img_p = escanObject.getString("img_p");
+		            final String img = escanObject.getString("img");
 		            final String comments_count = escanObject.getString("comments_count");
 		            String latitude = escanObject.getString("latitude");
 		            String longitude = escanObject.getString("longitude");
@@ -867,7 +871,9 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 							public void run() {
 						        // Añadimos el escandalo al comienzo
 						        escandalos.add(0,new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
-										R.drawable.loading), Integer.parseInt(comments_count), resource_uri, "http://scandaloh.s3.amazonaws.com/" + img, sound, username, date));		
+										R.drawable.loading), Integer.parseInt(comments_count), resource_uri, 
+										"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img,
+										sound, username, date));		
 							}
 				        });
 		            }		               	

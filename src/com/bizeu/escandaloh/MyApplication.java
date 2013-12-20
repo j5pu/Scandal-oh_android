@@ -19,6 +19,7 @@ public class MyApplication extends Application {
 	public static boolean TIMEOUT_PHOTO_SHOWN = false;
 	public static boolean PHOTO_CLICKED = false;
 	public static int ACTION_BAR_WITH_TABS_HEIGHT;
+	public static String FILE_TO_DELETE;
 	
 	
 	@Override
