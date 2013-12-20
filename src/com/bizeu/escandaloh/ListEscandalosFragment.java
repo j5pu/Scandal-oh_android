@@ -620,7 +620,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 				// Hacemos la petición al servidor
 		        response = httpClient.execute(getEscandalos);
 		        String respStr = EntityUtils.toString(response.getEntity());
-		        // Log.i("WE",respStr);
+		         Log.i("WE",respStr);
 		        
 		        JSONArray escandalosObject = null;
 		        
@@ -858,8 +858,8 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		            final String comments_count = escanObject.getString("comments_count");
 		            String latitude = escanObject.getString("latitude");
 		            String longitude = escanObject.getString("longitude");
-		            final String resource_uri = escanObject.getString("resource_uri");	        
-		            final String title = escanObject.getString("title");
+		            final String resource_uri = escanObject.getString("resource_uri");
+		            final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
 		            final String user = escanObject.getString("user");
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
