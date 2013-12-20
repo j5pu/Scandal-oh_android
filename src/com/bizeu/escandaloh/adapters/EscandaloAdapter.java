@@ -537,7 +537,7 @@ public class EscandaloAdapter extends ArrayAdapter<Escandalo> {
 		            dir.mkdirs();
 		            String fileName = idStr;
 		            // Guardamos la ruta de la foto para más adelante eliminarla
-		            MyApplication.FILE_TO_DELETE = filepath.getAbsolutePath() + "/ScándalOh/" + idStr;
+		            MyApplication.FILES_TO_DELETE.add(filepath.getAbsolutePath() + "/ScándalOh/" + idStr);
 		            file = new File(dir, fileName);
 		            FileOutputStream fos = new FileOutputStream(file);
 		            bmImg.compress(CompressFormat.JPEG, 100, fos);

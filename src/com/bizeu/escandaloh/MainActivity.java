@@ -321,6 +321,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		super.onStop();
 		// Paramos google analytics
 		EasyTracker.getInstance(this).activityStop(this);
+	
 	}
 	
 	
@@ -426,21 +427,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		
 		else if (requestCode == CREATE_ESCANDALO){}
 		
-		else if (requestCode == SHARING){	
-			// Eliminamos la foto que se compartió
-			try{
-				File photo_to_delete = new File(MyApplication.FILE_TO_DELETE);
-				photo_to_delete.delete();
-			}catch(Exception e){
-	            e.printStackTrace();
-	             // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build());
-			}
-       
+		else if (requestCode == SHARING){	  
 		}
 	}
 	
@@ -648,7 +635,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	 */
 	private File createFileTemporary(String part, String ext) throws Exception{
 	    File scandaloh_dir = Environment.getExternalStorageDirectory();
-	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/");
+	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/temp/");
 	    if(!scandaloh_dir.exists()){
 	    	scandaloh_dir.mkdir();
 	    }

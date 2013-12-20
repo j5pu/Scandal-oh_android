@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh;
 
+import java.util.ArrayList;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,7 +21,7 @@ public class MyApplication extends Application {
 	public static boolean TIMEOUT_PHOTO_SHOWN = false;
 	public static boolean PHOTO_CLICKED = false;
 	public static int ACTION_BAR_WITH_TABS_HEIGHT;
-	public static String FILE_TO_DELETE;
+	public static ArrayList<String> FILES_TO_DELETE = new ArrayList<String>();
 	
 	
 	@Override
