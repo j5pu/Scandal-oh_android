@@ -54,26 +54,16 @@
         android:orientation="vertical" >
 
         <Button
-            android:id="@+id/but_iniciar_redes"
+            android:id="@+id/but_log_in_redes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Iniciar con redes sociales"
             android:background="@drawable/blue_button_selector"
-            android:text="Iniciar con redes sociales" />
-
-        <Button
-            android:id="@+id/but_enra_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:background="@drawable/facebook_button_selector"
-            android:gravity="center_vertical"
-            android:text="Entra con Facebook"
-            android:textColor="@color/blanco"
-            android:drawablePadding="5dp"
-            android:padding="5dp"/>
+            android:textColor="@color/blanco" />
 
     </LinearLayout>
 
-    <LinearLayout
+   <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

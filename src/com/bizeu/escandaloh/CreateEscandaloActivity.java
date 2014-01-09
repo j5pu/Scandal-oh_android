@@ -178,8 +178,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 											           .build());
 										
 										// Mostramos el dialog del audio
-										RecordAudioDialog record = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
-										record.setDialogResult(new OnMyDialogResult(){
+										RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
+										record_audio.setDialogResult(new OnMyDialogResult(){
 										    public void finish(String result){
 										       if (result.equals("OK")){
 										    	   con_audio = true;									       
@@ -190,8 +190,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 										       new SendScandalo().execute();
 										    }
 										});
-										record.setCancelable(false);
-										record.show(); 								
+										record_audio.setCancelable(false);
+										record_audio.show(); 								
 									}
 								});
 						dialog_audio.setNegativeButton("No",

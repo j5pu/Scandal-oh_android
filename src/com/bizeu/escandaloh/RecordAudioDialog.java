@@ -52,12 +52,12 @@ public class RecordAudioDialog extends Dialog{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.record_audio);
+		setContentView(R.layout.record_audio_dialog);
 		
 		// Cambiamos la fuente de la pantalla
-		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_record_audio));
+		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_record_audio_dialog));
 		
-		ll_espacio_botones = (LinearLayout) findViewById(R.id.lay_pantalla_record_audio);
+		ll_espacio_botones = (LinearLayout) findViewById(R.id.lay_pantalla_record_audio_dialog);
 		txt_description = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		txt_seg = (TextView) findViewById(R.id.txt_seg);
 			

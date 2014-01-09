@@ -30,14 +30,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.R;
-import com.bizeu.escandaloh.RecordAudioDialog;
-import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.RememberPasswordDialog;
-import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -155,15 +151,6 @@ public class LoginActivity extends SherlockActivity {
 		progress = new ProgressDialog(this);
 	}
 	
-	
-	/**
-	 * onDestroy
-	 */
-	@Override
-	protected void onDestroy(){
-		super.onDestroy();
-	}
-	
 
 	/**
 	 * onStart
@@ -194,8 +181,6 @@ public class LoginActivity extends SherlockActivity {
 		
 		edit_nombre_email.setError(null);
 		edit_password.setError(null);
-		
-		Log.v("WE","Edit_nombre_email: " + edit_nombre_email.getText().toString());
 		
 		// Nombre/Email menos de 4 caracteres
 		if (edit_nombre_email.getText().toString().length() < 4){
@@ -372,7 +357,7 @@ public class LoginActivity extends SherlockActivity {
 			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 			        	MyApplication.resource_uri = user_uri;
 			        	MyApplication.logged_user = true;
-			        	Toast.makeText(getBaseContext(), "Logueado correctamente", Toast.LENGTH_SHORT).show();
+			        	Toast.makeText(getBaseContext(), "Sesión iniciada con éxito", Toast.LENGTH_SHORT).show();
 			        	
 			        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
 			        	setResult(Activity.RESULT_OK);
