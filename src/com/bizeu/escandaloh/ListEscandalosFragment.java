@@ -1020,24 +1020,29 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		@Override
 	    protected void onPostExecute(Integer result) {
 			
-			// Si hubo algún error inesperado mostramos un mensaje
-			if (result == 666){
-				Toast toast = Toast.makeText(getActivity().getBaseContext(), "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
-				toast.show();
+			try{
+				// Si hubo algún error inesperado mostramos un mensaje
+				if (result == 666){
+					Toast toast = Toast.makeText(getActivity().getBaseContext(), "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+					toast.show();
+				}
+				
+				// No hubo ningún error inesperado
+				if (!isCancelled()){
+					// Si es codigo 2xx --> OK
+			        if (result >= 200 && result <300){
+			        	escanAdapter.notifyDataSetChanged();
+			        }
+			        else{
+			        }        
+				}
 			}
-			
-			// No hubo ningún error inesperado
-			if (!isCancelled()){
-				// Si es codigo 2xx --> OK
-		        if (result >= 200 && result <300){
-		        	escanAdapter.notifyDataSetChanged();
-		        }
-		        else{
-		        }        
+			catch(Exception e){
+				
 			}
+
 			// Abrimos la llave
 			getting_escandalos = false;
-			//lView.onRefreshComplete();
 			
 			// Indicamos a la actividad que ha terminado de actualizar
 			tCallbacks.onRefreshFinished();

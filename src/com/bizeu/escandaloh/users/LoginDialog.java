@@ -57,6 +57,7 @@ public class LoginDialog extends Dialog {
 
 			@Override
 			public void onClick(View v) {
+				// Indicamos a la actividad que ha seleccionado "Log in con facebook"
 				mDialogResult.finish("FACEBOOK");
 				
 				// Cerramos el dialog
@@ -69,6 +70,17 @@ public class LoginDialog extends Dialog {
 
 		// Botón login con twitter
 		but_login_twitter = (Button) findViewById(R.id.but_login_twitter);
+		but_login_twitter.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Indicamos a la actividad que ha seleccionado "Log in con twitter"
+				mDialogResult.finish("TWITTER");
+				
+				//Cerramos el dialog
+				LoginDialog.this.dismiss();		
+			}
+		});
 	}
 	
     public void setDialogResult(OnMyDialogResult dialogResult){
