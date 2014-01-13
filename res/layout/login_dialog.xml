@@ -41,6 +41,8 @@
             android:textSize="20dp"
             android:layout_margin="5dp" />
 
+        
+        
         <Button
             android:id="@+id/but_login_google"
             android:layout_width="150dp"

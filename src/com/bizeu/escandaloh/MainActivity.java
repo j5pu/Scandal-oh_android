@@ -1,8 +1,6 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,23 +9,18 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentTabHost;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,7 +31,6 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.EscandaloAdapter;
-import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
@@ -47,11 +39,9 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
-import com.zed.adserver.BannerView;
-import com.zed.adserver.onAdsReadyListener;
 
-public class MainActivity extends SherlockFragmentActivity implements onAdsReadyListener, 
-															OnClickListener, ListEscandalosFragment.Callbacks {
+
+public class MainActivity extends SherlockFragmentActivity implements OnClickListener, ListEscandalosFragment.Callbacks {
 
 	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
@@ -76,7 +66,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private FrameLayout banner;
-	private BannerView adM;
+
 	private SharedPreferences prefs;
 	private Context mContext;
 	
@@ -213,9 +203,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		
-		// Ten
-		//AdsSessionController.setApplicationId(getApplicationContext(),APP_ID);
-       // AdsSessionController.registerAdsReadyListener(this);	
 	}
 
 	
@@ -309,7 +296,6 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	@Override
 	protected void onPause() {
 	    super.onPause();   
-	   // AdsSessionController.pauseTracking();
 	}
 	
 	
@@ -324,70 +310,7 @@ public class MainActivity extends SherlockFragmentActivity implements onAdsReady
 	
 	}
 	
-	
-	
-	/**
-	 * It will be called when the ads are ready to be shown
-	 */
-	@Override
-	public void onAdsReady(){ 
-		
-	    //The banner will be show inside this view.
-        banner = (FrameLayout) findViewById(R.id.banner);
-     
-        //BannerView initialization
-        adM = new BannerView( this, getApplicationContext());
- 
-        banner.removeAllViews();
- 
-        //Add the bannerView to the container view
-        banner.addView( adM );
- 
-        //Set the visibility to VISIBLE.
-        banner.setVisibility( FrameLayout.VISIBLE );	
-        	
-	}
-	 
-	 
 
-	
-	
-	/**
-	 * It will be called when any errors ocurred.
-	 */
-	
-	@Override
-	public void onAdsReadyFailed(){
-		Log.e("ZedAdServerLog","Error loading ads");
-	}
-	
-	
-	/**
-	 * onKeyDown
-	 */
-	/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    // TODO Auto-generated method stub
-	    if (keyCode == KeyEvent.KEYCODE_BACK){
-	       // AdsSessionController.stopTracking();
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
-	 */
-	
-	/**
-	 * onUserLeaveHint
-	 */
-	/*
-	@Override
-	protected void onUserLeaveHint() {
-	    // TODO Auto-generated method stub
-	    super.onUserLeaveHint();
-	    //AdsSessionController.detectHomeButtonEvent();
-	}
-	*/
-	
 
 	/**
 	 * onActivityResult

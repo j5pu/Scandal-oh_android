@@ -9,8 +9,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
-import twitter4j.AccountSettings;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -23,6 +21,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -49,7 +48,9 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 
-public class MainLoginActivity extends SherlockActivity{
+
+public class MainLoginActivity extends SherlockActivity /* implements
+ConnectionCallbacks, OnConnectionFailedListener */{
 	
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
@@ -57,17 +58,17 @@ public class MainLoginActivity extends SherlockActivity{
 	public final static int LOGGING_FACEBOOK = 101;
 	public final static int LOGGING_GOOGLE = 102;
 	public final static int LOGGING_TWITTER = 103;
+    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 	static String TWITTER_CONSUMER_KEY = "MJb4bXehocnroOE871Y6g";
 	static String TWITTER_CONSUMER_SECRET = "ENQygTJn0zldtPTdjVl15jXAQbuBvjsPwoP7a7bg";
 	static final String TWITTER_CALLBACK_URL = "twitter://scandaloh";
     static final String URL_TWITTER_AUTH = "auth_url";
     static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
     static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
-	
+
 	private static Twitter twitter;
 	private static RequestToken requestToken;
 	 
-	
 	private TextView txt_pasar;
 	private Button but_registro;
 	private Button but_login;
@@ -82,6 +83,10 @@ public class MainLoginActivity extends SherlockActivity{
 	private boolean login_error = false;
 	private String user_uri;
 	
+	private ProgressDialog mConnectionProgressDialog;
+   // private PlusClient mPlusClient;
+   // private ConnectionResult mConnectionResult;
+	
 	
 	/**
 	 * onCreate
@@ -91,8 +96,7 @@ public class MainLoginActivity extends SherlockActivity{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.main_login);
-		
-		
+			
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main_login));
 		
@@ -103,8 +107,10 @@ public class MainLoginActivity extends SherlockActivity{
 		progress.setTitle("Iniciando sesión ...");
 		progress.setMessage("Espera, por favor");
 		progress.setCancelable(false);
+		
+
 	
-		// Si estamos en esta pantalla porque el usuario pulsó "+": mostramos un mensaje
+		// Si estamos en esta pantalla porque el usuario pulsó "+": entonces mostramos un mensaje
 		boolean first_time = false;
 		
 		if (getIntent() != null) {
@@ -124,6 +130,17 @@ public class MainLoginActivity extends SherlockActivity{
 		but_login = (Button) findViewById(R.id.but_log_in);
 		but_login_redes_sociales = (Button) findViewById(R.id.but_log_in_redes);
 		
+		/*
+		// Google+
+		mPlusClient = new PlusClient.Builder(this, this, this)
+        .setActions("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
+        .setScopes(Scopes.PLUS_LOGIN)  // recommended login scope for social features
+        // .setScopes("profile")       // alternative basic login scope
+        .build();
+		// Progress bar to be displayed if the connection failure is not resolved.
+		mConnectionProgressDialog = new ProgressDialog(this);
+		mConnectionProgressDialog.setMessage("Signing in...");
+		*/
 	
 		but_registro.setOnClickListener(new View.OnClickListener() {
 			
@@ -171,10 +188,14 @@ public class MainLoginActivity extends SherlockActivity{
 				       
 				       // TWITTER
 				       else if (result.equals("TWITTER")){	  
-
 				    	   new InitiateWebViewTwitter().execute();
-	    	 
 				       }
+				       
+				       // GOOGLE+
+				       else if (result.equals("GOOGLE")){
+				    	  // mPlusClient.connect();
+				       }
+				    	 		       
 				    }
 				});
 				login_dialog.show();		
@@ -229,6 +250,7 @@ public class MainLoginActivity extends SherlockActivity{
 	public void onStart() {
 		super.onStart();
 	    EasyTracker.getInstance(this).activityStart(this); 
+	    
 	}
 	
 
@@ -241,6 +263,7 @@ public class MainLoginActivity extends SherlockActivity{
 	public void onStop() {
 		super.onStop();
 	    EasyTracker.getInstance(this).activityStop(this);
+	    //mPlusClient.disconnect();
 	}
 	
 
@@ -260,7 +283,13 @@ public class MainLoginActivity extends SherlockActivity{
 				// Cerramos directamente la pantalla
 				finish();					
 			}		 
-		}	
+		}
+		/*
+		else  if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
+	        mConnectionResult = null;
+	        mPlusClient.connect();
+	    }
+	    */
 	}
 	
 	
@@ -273,9 +302,12 @@ public class MainLoginActivity extends SherlockActivity{
     protected void onNewIntent(Intent intent) {
             super.onNewIntent(intent);
             
+            Log.v("WE","Entr aonNewIntent");
+            
             // Obtenemos la uri devuelta en el intent
             Uri uri = intent.getData();
             
+            Log.v("WE","Uri: " + uri);
             if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {     
                 // Logueamos con twitter a partir del token devuelto
                 new LogInTwitter().execute(uri);
@@ -536,5 +568,46 @@ public class MainLoginActivity extends SherlockActivity{
 
 		return acortado;
 	}
+
+
+/*
+	// Métodos Google+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+	       if (mConnectionProgressDialog.isShowing()) {
+               // The user clicked the sign-in button already. Start to resolve
+               // connection errors. Wait until onConnected() to dismiss the
+               // connection dialog.
+               if (result.hasResolution()) {
+                       try {
+                               result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
+                       } catch (SendIntentException e) {
+                               mPlusClient.connect();
+                       }
+               }
+       }
+
+       // Save the intent so that we can start an activity when the user clicks
+       // the sign-in button.
+       mConnectionResult = result;
+		
+	}
+
+
+
+	@Override
+	public void onConnected(Bundle arg0) {
+		  String accountName = mPlusClient.getAccountName();	
+		  Log.v("WE","nombre google: " + accountName);
+	}
+
+
+
+	@Override
+	public void onDisconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+	*/
 	
 }

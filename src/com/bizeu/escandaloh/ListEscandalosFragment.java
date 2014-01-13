@@ -49,11 +49,9 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
-import com.zed.adserver.BannerView;
-import com.zed.adserver.onAdsReadyListener;
 
 
-public class ListEscandalosFragment extends SherlockFragment implements onAdsReadyListener{
+public class ListEscandalosFragment extends SherlockFragment{
 
 	public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 	public final static String ID_VINO_SELECCIONADO = "Vino_seleccionado";
@@ -61,14 +59,10 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
     
 	private ListView lView;
 	//private PullToRefreshListView  lView;
-	private FrameLayout banner;
-	private View img_view;
 	private ProgressBar loading;
-	
     private int mActivatedPosition = ListView.INVALID_POSITION;
 	private int first_visible_item_count;
 	public static ArrayList<Escandalo> escandalos;
-	private BannerView adM;
 	AmazonS3Client s3Client;
 	int mCurrentPage;
 	private boolean getting_escandalos = true;
@@ -80,7 +74,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	EscandaloAdapter escanAdapter;
     private Callbacks tCallbacks = null;  
     private Context mContext;
-	
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
 	private UpdateNumComments updateNumCommentsAsync;
@@ -296,12 +289,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 		if (savedInstanceState != null && savedInstanceState
 				.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
-			
-		
-		// Ten
-		//AdsSessionController.setApplicationId(getActivity().getApplicationContext(),APP_ID);
-        //AdsSessionController.registerAdsReadyListener(this);       		
+		}    		
 		
 		if (Connectivity.isOnline(getActivity().getApplicationContext())){
 			getEscandalosAsync = new GetEscandalos();
@@ -329,7 +317,6 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
 	@Override
 	public void onPause() {
 	    super.onPause();   
-	    //AdsSessionController.pauseTracking();
 	}
 	
 	
@@ -384,75 +371,7 @@ public class ListEscandalosFragment extends SherlockFragment implements onAdsRea
         mActivatedPosition = position;
     }
     
-    
-    
-    
-
-	
-	/**
-	 * It will be called when the ads are ready to be shown
-	 */
-	@Override
-	public void onAdsReady(){
-		/*
-	       //The banner will be show inside this view.
-        banner = (FrameLayout) findViewById(R.id.banner);
-     
-        //BannerView initialization
-        adM = new BannerView( this, getApplicationContext());
  
-        banner.removeAllViews();
- 
-        //Add the bannerView to the container view
-        banner.addView( adM );
- 
-        //Set the visibility to VISIBLE.
-        banner.setVisibility( FrameLayout.VISIBLE );
-        */		
-	}
-	 
-
-	
-	
-	/**
-	 * It will be called when any errors ocurred.
-	 */
-	@Override
-	public void onAdsReadyFailed(){
-		Log.e("ZedAdServerLog","Error loading ads");
-	}
-	
-	
-	/**
-	 * onKeyDown
-	 */
-	/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    // TODO Auto-generated method stub
-	    if (keyCode == KeyEvent.KEYCODE_BACK){
-	        AdsSessionController.stopTracking();
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
-	 */
-	
-	/**
-	 * onUserLeaveHint
-	 */
-	/*
-	@Override
-	protected void onUserLeaveHint() {
-	    // TODO Auto-generated method stub
-	    super.onUserLeaveHint();
-	    AdsSessionController.detectHomeButtonEvent();
-	}
-	*/
-
-	
-
-
-
 	
 	/**
 	 * Devuelve el alto de pantalla disponible en píxeles: screen height - (status bar height + action bar height) - tabs height
