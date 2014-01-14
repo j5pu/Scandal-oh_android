@@ -274,7 +274,6 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 		// Si viene de hacer log in o registro
 		
 		if (requestCode == LOG_IN || requestCode == REGISTRATION) {
@@ -283,6 +282,9 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 				// Cerramos directamente la pantalla
 				finish();					
 			}		 
+		}
+		else{
+			Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 		}
 		/*
 		else  if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {

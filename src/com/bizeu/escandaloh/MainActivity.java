@@ -400,6 +400,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 										try{
 									        photo = createFileTemporary("picture", ".png");
 									        photo.delete();
+										    mImageUri = Uri.fromFile(photo);
+										    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+											startActivityForResult(takePictureIntent, SHOW_CAMERA);
 									    }
 									    catch(Exception e){
 									        Log.v("WE", "Can't create file to take picture!");
@@ -408,11 +411,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 											                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 											                       e),                                                             // The exception.
 											                       false).build()); 
+											Toast toast = Toast.makeText(mContext, "No se pudo acceder a la cámara", Toast.LENGTH_SHORT);
+											toast.show();
 									    }
 										
-									    mImageUri = Uri.fromFile(photo);
-									    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-										startActivityForResult(takePictureIntent, SHOW_CAMERA);
+
 									}
 				                     
 									// El dispositivo no dispone de cámara
