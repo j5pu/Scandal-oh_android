@@ -98,13 +98,12 @@ public class ScandalohFragment extends Fragment {
         img.setListener(new FetchableImageViewListener() {
 			
 				@Override
-				public void onImageFetched(Bitmap bitmap, String url) {
-					Log.v("WE","OK!");			
+				public void onImageFetched(Bitmap bitmap, String url) {			
 				}
 				
 				@Override
 				public void onImageFailure(String url) {
-					Log.v("WE","Onfaiulare");
+					Log.v("WE","Error obteniendo foto: " + url);
 				}	
 			});
         

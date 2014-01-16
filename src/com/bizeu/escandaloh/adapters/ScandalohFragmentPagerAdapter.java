@@ -5,6 +5,7 @@ import java.util.List;
 import com.bizeu.escandaloh.ScandalohFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 
 public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
 
@@ -43,6 +44,11 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
     }
     
     
+    @Override
+    public int getItemPosition(Object object){
+        return PagerAdapter.POSITION_NONE;
+    }
+    
     /**
      * Añade un fragmento al final de la lista
      * @param fragment Fragmento a añadir
@@ -58,5 +64,9 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
      */
     public void addFragmentAtStart(ScandalohFragment fragment){
     	this.fragments.add(0,fragment);
+    }
+    
+    public void clearFragments(){
+    	this.fragments.clear();
     }
 }

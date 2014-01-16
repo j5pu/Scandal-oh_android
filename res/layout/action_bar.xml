@@ -18,25 +18,22 @@
             android:orientation="horizontal" >
 
             <LinearLayout
-                android:id="@+id/ll_main_logout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1.5"
-                android:gravity="center_horizontal" >
-            </LinearLayout>
+                android:layout_weight="7"
+                android:gravity="center_vertical|center_horizontal" >
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:orientation="vertical" >
-            </LinearLayout>
+                <Button
+                    android:id="@+id/but_action_bar_happy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Humor" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3" >
+                <Button
+                    android:id="@+id/but_action_bar_angry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Denuncia" />
 
             </LinearLayout>
 

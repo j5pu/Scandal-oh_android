@@ -34,6 +34,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,6 +76,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
 	private ProgressBar progress_refresh;
+	private Button but_happy;
+	private Button but_angry;
  
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -103,7 +106,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		setContentView(R.layout.main);
 		
 		mContext = this;
-		category = HAPPY;
       	escandalos = new ArrayList<Escandalo>();  
 		
 		// Cambiamos la fuente de la pantalla
@@ -132,8 +134,23 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    	actBar.setIcon(R.drawable.noimage);
 	    }
 	    */
-	    
 		
+		// Listeners del action bar
+		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
+		//ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
+		//ll_logout.setOnClickListener(this);
+		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
+		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
+		ll_refresh.setOnClickListener(this);
+		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
+		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
+		ll_take_photo.setOnClickListener(this);
+		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+		but_happy = (Button) findViewById(R.id.but_action_bar_happy);
+		but_happy.setOnClickListener(this);
+		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
+		but_angry.setOnClickListener(this);
+	    	
 		// Asignamos el viewPager al adaptador
         pager = (ViewPager) this.findViewById(R.id.pager);
         adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
@@ -146,6 +163,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             @Override
             public void onPageSelected(int position) {
             	
+            	Log.v("WE","adapter count: " + adapter.getCount() + " y position: " + position);
             	// Si quedan 4 escándalos más para llegar al último y aún quedan más escándalos (si hemos llegado 
             	// a los últimos no se pedirán más): obtenemos los siguientes 10
             	if (position == adapter.getCount() - 5 && there_are_more_escandalos){
@@ -164,33 +182,17 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         
         // Le asignamos la animación al pasar entre escándalos (API 11+)
         pager.setPageTransformer(true, new ZoomOutPageTransformer());
+        
+        // Separación entre escándalos
+		pager.setPageMargin(3);
 		
-		//ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
-		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
-		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
-		
-		// Listeners del action bar
-		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		//ll_logout.setOnClickListener(this);
-		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
-		ll_refresh.setOnClickListener(this);
-		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
-		ll_take_photo.setOnClickListener(this);
-		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-		
+      	//TODO Asignamos categoria happy la primera vez
+      	category = HAPPY;
+      	but_happy.setClickable(false);
+	
+		// Obtenemos los 10 primeros escándalos
 		getEscandalosAsync = new GetEscandalos();
     	getEscandalosAsync.execute();
-	    
-		// Listeners del action bar
-		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		//ll_logout.setOnClickListener(this);
-		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
-		ll_refresh.setOnClickListener(this);
-		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
-		ll_take_photo.setOnClickListener(this);
-		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-		
-		pager.setPageMargin(3);
 	}
 
 
@@ -555,8 +557,54 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				refreshFinished();	
 		    }
 										
-	        break;		
-		}		
+	        break;	
+	       
+	    // Selección de categoría
+		case R.id.but_action_bar_happy: case R.id.but_action_bar_angry:
+		    // Si hay conexión
+			if (Connectivity.isOnline(mContext)){
+				if (v.getId() == R.id.but_action_bar_happy){
+					Log.v("WE","seleccionado happy");
+					// Inhabilitamos este botón y habilitamos el de angry
+					but_happy.setClickable(false);
+					but_angry.setClickable(true);
+					// Indicamos que la categoria es happy
+					category = HAPPY;
+					MyApplication.FIRST_TIME_HAPPY = true;
+				}
+				else{
+					Log.v("WE","Seleccionado angry");
+					// Inhabilitamos este botón y habilitamos el de happy
+					but_angry.setClickable(false);
+					but_happy.setClickable(true);
+					// Indicamos que la categoría es angry
+					category = ANGRY;
+					MyApplication.FIRST_TIME_ANGRY = true;
+				}
+
+				// Obtenemos los primeros 10 escándalos
+			    if (getting_escandalos){   
+			    	cancelGetEscandalos();
+			    }
+
+			    escandalos.clear();
+				pager.setCurrentItem(0);
+				// Obtenemos los escándalos para la categoria seleccionada
+				adapter.clearFragments();
+				adapter.notifyDataSetChanged();
+				getting_escandalos = true;
+				getEscandalosAsync = new GetEscandalos();
+				getEscandalosAsync.execute();					
+			}
+						
+			// No hay conexión
+			else{				
+				Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+				toast.show();
+			} 
+			break;
+		}	
+	
 	}
 	
 	
@@ -651,7 +699,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				// Hacemos la petición al servidor
 		        response = httpClient.execute(getEscandalos);
 		        String respStr = EntityUtils.toString(response.getEntity());
-		         Log.i("WE",respStr);
+		        Log.i("WE",respStr);
 		        
 		        JSONArray escandalosObject = null;
 		        
@@ -758,7 +806,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			            runOnUiThread(new Runnable() {
 	                        @Override
 	                        public void run() {
-	                        // Añadimos el escandalo al ArrayList
+	                        	// Añadimos el escandalo al ArrayList
 	                        	Escandalo escanAux = new Escandalo(id, title, category, BitmapFactory.decodeResource(getResources(),
 	          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, 
 	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
