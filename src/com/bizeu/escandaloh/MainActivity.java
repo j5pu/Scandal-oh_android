@@ -82,7 +82,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private SharedPreferences prefs;
 	private Context mContext;
 	ScandalohFragmentPagerAdapter adapter;
-    ViewPager pager = null;
+	ViewPager pager = null;
 	private boolean any_error;
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -100,7 +100,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main);
 		
 		mContext = this;
 		category = HAPPY;
@@ -116,10 +116,13 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	        startActivity(i);
 		}
 
-		// Action bar
+		// Action Bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-	    
+		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
+		getSupportActionBar().setCustomView(view);
+		
+		/*
 		// Si es 4.2+ deshabilitamos el botón home
 	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
 	    	actBar.setDisplayShowHomeEnabled(false);
@@ -128,9 +131,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    else{
 	    	actBar.setIcon(R.drawable.noimage);
 	    }
+	    */
 	    
-		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
-		getSupportActionBar().setCustomView(view);
 		
 		// Asignamos el viewPager al adaptador
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -158,15 +160,18 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             @Override
             public void onPageScrollStateChanged(int state) {
             }
-        });    
+        });  
+        
+        // Le asignamos la animación al pasar entre escándalos (API 11+)
+        pager.setPageTransformer(true, new ZoomOutPageTransformer());
 		
-		ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
+		//ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
 		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		
 		// Listeners del action bar
-		img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		ll_logout.setOnClickListener(this);
+		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
+		//ll_logout.setOnClickListener(this);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
 		ll_refresh.setOnClickListener(this);
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
@@ -177,13 +182,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     	getEscandalosAsync.execute();
 	    
 		// Listeners del action bar
-		img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		ll_logout.setOnClickListener(this);
+		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
+		//ll_logout.setOnClickListener(this);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
 		ll_refresh.setOnClickListener(this);
 		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+		
+		pager.setPageMargin(3);
 	}
 
 
@@ -196,6 +203,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	public void onStart(){
 		super.onStart();
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		
 		/*
 		// Actualizamos nº de comentarios si no se están obteniendo otros escándalos
 	    if (!getting_escandalos){	
@@ -230,7 +238,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		// Si está logueado quitamos el botón de logout y añadimos la cámara (con su selector)
 		if (MyApplication.logged_user){
-			ll_logout.setVisibility(View.VISIBLE);
+			//ll_logout.setVisibility(View.VISIBLE);
 			
 			StateListDrawable states = new StateListDrawable();
 
@@ -245,7 +253,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		}
 		// Si no está logueado mostramos el botón de logout y añadimos el "+" (con su selector)
 		else{			
-			ll_logout.setVisibility(View.INVISIBLE);
+			//ll_logout.setVisibility(View.INVISIBLE);
 			
 			StateListDrawable states = new StateListDrawable();
 			states.addState(new int[] {android.R.attr.state_pressed},
@@ -429,6 +437,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			break;
 			
 			
+		/*
 		// Logout
 		case R.id.ll_main_logout:
 			
@@ -442,7 +451,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
 			            public void onClick(DialogInterface dialogo1, int id) {  
 			            	
-			            	/*
+			            	
 			  			  // Mandamos el evento a Google Analytics
 			        	  EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 			  			  easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
@@ -451,7 +460,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			  			                   null)            // Event value
 			  			      .build()
 			  			  );
-			  			  */
+			  			  
 			            	
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
@@ -484,7 +493,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			     alert_logout.show(); 
 			}
 			break;
-			
+		*/
 			
 		// Actualizar carrusel: Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.ll_main_refresh:

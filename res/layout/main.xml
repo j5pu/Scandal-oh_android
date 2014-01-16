@@ -3,9 +3,11 @@
     android:id="@+id/lay_pantalla_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-	<FrameLayout android:id="@+id/frag_list_escandalos"
+    android:orientation="vertical"
+    android:background="@color/gris_claro" >
+ 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
  
