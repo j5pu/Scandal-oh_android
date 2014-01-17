@@ -81,11 +81,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
-
 	private SharedPreferences prefs;
 	private Context mContext;
 	ScandalohFragmentPagerAdapter adapter;
 	ViewPager pager = null;
+	ProgressBar loading;
 	private boolean any_error;
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
@@ -134,6 +134,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    	actBar.setIcon(R.drawable.noimage);
 	    }
 	    */
+		
+		loading = (ProgressBar) findViewById(R.id.loading_escandalos);
 		
 		// Listeners del action bar
 		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
@@ -559,52 +561,48 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 										
 	        break;	
 	       
+	        
 	    // Selección de categoría
 		case R.id.but_action_bar_happy: case R.id.but_action_bar_angry:
-		    // Si hay conexión
-			if (Connectivity.isOnline(mContext)){
-				if (v.getId() == R.id.but_action_bar_happy){
-					Log.v("WE","seleccionado happy");
-					// Inhabilitamos este botón y habilitamos el de angry
+				// Si hay conexión
+				if (Connectivity.isOnline(mContext)){
+					// Inhabilitamos ambos botones
 					but_happy.setClickable(false);
-					but_angry.setClickable(true);
-					// Indicamos que la categoria es happy
-					category = HAPPY;
-					MyApplication.FIRST_TIME_HAPPY = true;
-				}
-				else{
-					Log.v("WE","Seleccionado angry");
-					// Inhabilitamos este botón y habilitamos el de happy
 					but_angry.setClickable(false);
-					but_happy.setClickable(true);
-					// Indicamos que la categoría es angry
-					category = ANGRY;
-					MyApplication.FIRST_TIME_ANGRY = true;
+					// Abrimos llave de hay más escandalos
+					there_are_more_escandalos = true;
+				    // Quitamos los escándalos actuales
+				    escandalos.clear();
+
+				    // Seleccionado happy
+					if (v.getId() == R.id.but_action_bar_happy){
+						Log.v("WE","seleccionado happy");
+						category = HAPPY;
+					}
+					// Seleccionado angry
+					else{
+						Log.v("WE","Seleccionado angry");
+						category = ANGRY;
+					}
+
+					pager.setCurrentItem(0);
+					adapter.clearFragments();
+					adapter.notifyDataSetChanged();
+				    // Obtenemos los 10 primeros escándalos para la categoría seleccionada
+					// Mostramos el progressBar y ocultamos la lista de escandalos
+					loading.setVisibility(View.VISIBLE);
+					pager.setVisibility(View.GONE);
+					getEscandalosAsync = new GetEscandalos();
+					getEscandalosAsync.execute();					
 				}
-
-				// Obtenemos los primeros 10 escándalos
-			    if (getting_escandalos){   
-			    	cancelGetEscandalos();
-			    }
-
-			    escandalos.clear();
-				pager.setCurrentItem(0);
-				// Obtenemos los escándalos para la categoria seleccionada
-				adapter.clearFragments();
-				adapter.notifyDataSetChanged();
-				getting_escandalos = true;
-				getEscandalosAsync = new GetEscandalos();
-				getEscandalosAsync.execute();					
-			}
-						
-			// No hay conexión
-			else{				
-				Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
-				toast.show();
-			} 
-			break;
-		}	
-	
+							
+				// No hay conexión
+				else{				
+					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+					toast.show();
+				} 
+				break;
+			}    	
 	}
 	
 	
@@ -618,7 +616,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		@Override
 		protected void onPreExecute(){
-			Log.v("WE","Entra en getescandalos");
+			getting_escandalos = true;
+			Log.v("WE","Entra en getescandalos con category: " + category);
 			any_error = false;
 		}
 		
@@ -626,50 +625,32 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    protected Integer doInBackground(Void... params) {
 			
 			String url = null;
-
+			
 			// HAPPY
 			if (category.equals(MainActivity.HAPPY)){
 				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
-				if (MyApplication.FIRST_TIME_HAPPY){
+				if (escandalos.size() == 0){
 					Log.v("WE","primera vez happy");
 					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
 				}
 				else{
-					/*
-					// A partir del último ID obtenido
-					Log.v("WE","ultimo id obtenido happy");
-					// Si no hay escándalos consideramos que es la primera vez (BUG: si se pulsa muy rápido en las pestañas)
-					if (adapter.getCount() == 0){
-						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
-					}
-					else{
-						*/
 				    url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/?category__id=1";
-					//}
 				}
 			}
 			
 			// ANGRY
 			else if (category.equals(MainActivity.ANGRY)){
 				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
-				if (MyApplication.FIRST_TIME_ANGRY){
+				if (escandalos.size() == 0){
 					Log.v("WE","primera vez angry");
 					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
 				}
 				else{
-					/*
-					Log.v("WE","ultimo id obtenido happy");
-					if (adapter.getCount() == 0){
-						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=2&country=" + MyApplication.code_selected_country;
-
-					}
-					else{
-					*/
 					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/?category__id=2";
-					//}
 				}
 			}
 			
+			/*
 			// BOTH
 			else if (category.equals(MainActivity.BOTH)){
 				// Usamos un servicio u otro dependiendo si es el primer listado de escándalos o ya posteriores
@@ -677,17 +658,18 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&country=" + MyApplication.code_selected_country;
 				}
 				else{
-					/*
+					
 					if (adapter.getCount() == 0){
 						url = MyApplication.SERVER_ADDRESS + "api/v1/photo/?limit=10&category__id=1&country=" + MyApplication.code_selected_country;
 
 					}
 					else{
-					*/
+					
                     url = MyApplication.SERVER_ADDRESS + "api/v1/photo/" + escandalos.get(escandalos.size()-1).getId() + "/" + MyApplication.code_selected_country+ "/previous/";
 					//}
 				}
 			}
+			*/
 			
 	    	HttpResponse response = null;
 			
@@ -703,59 +685,42 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		        
 		        JSONArray escandalosObject = null;
 		        
-		        // Si es la primera vez obtenemos los escandalos a partir de un JSONObject, sino obtenemos directamente el JSONArray
-		       	        
+		        // Si es la primera vez obtenemos los escandalos a partir de un JSONObject, si no obtenemos directamente el JSONArray	       	        
 		        // HAPPY
-		        if (category.equals(MainActivity.HAPPY)) {
-			        if (MyApplication.FIRST_TIME_HAPPY){
-			        	MyApplication.FIRST_TIME_HAPPY = false;
+		        if (category.equals(MainActivity.HAPPY)) {        	
+		        	if (escandalos.size() == 0){
 			        	// Obtenemos el json
 				        JSONObject respJson = new JSONObject(respStr);	                       			            
 				        escandalosObject = respJson.getJSONArray("objects");
 			        }
 			        else{
-			        	// Si no hay escándalos obtenemos los primeros
-			        	if (adapter.getCount() == 0){
-					        JSONObject respJson = new JSONObject(respStr);	                       			            
-					        escandalosObject = respJson.getJSONArray("objects");
-			        	}
-			        	else{
-				        	escandalosObject = new JSONArray(respStr);        	
-				        	// Si no hay más escandalos,lo indicamos
-				        	if (escandalosObject.length() == 0){
-				        		Log.v("WE","No hay mas happys");
-				        		there_are_more_escandalos = false;
-				        	}
-			        	}
+				        escandalosObject = new JSONArray(respStr);        	
+				        // Si no hay más escandalos,lo indicamos
+				        if (escandalosObject.length() == 0){
+				        	Log.v("WE","No hay mas happys");
+				        	there_are_more_escandalos = false;
+				        }
 			        }
 		        }
 		        
 		        // ANGRY
 		        else if (category.equals(MainActivity.ANGRY)) {
-			        if (MyApplication.FIRST_TIME_ANGRY){
-			        	MyApplication.FIRST_TIME_ANGRY = false;
+		        	if (escandalos.size() == 0){
 			        	// Obtenemos el json
-				        JSONObject respJson = new JSONObject(respStr);	                       
-				            
+				        JSONObject respJson = new JSONObject(respStr);	                       	            
 				        escandalosObject = respJson.getJSONArray("objects");
 			        }
 			        else{
-			        	if (adapter.getCount() == 0){
-					        JSONObject respJson = new JSONObject(respStr);	                       			            
-					        escandalosObject = respJson.getJSONArray("objects");
-			        	}
-			        	else{
-				        	escandalosObject = new JSONArray(respStr);
-				        	
-				        	// Si no hay más escandalos,lo indicamos
-				        	if (escandalosObject.length() == 0){
-				        		Log.v("WE","No hay mas angrys");
-				        		there_are_more_escandalos = false;
-				        	}
-			        	}
+				        escandalosObject = new JSONArray(respStr);			   	
+				        // Si no hay más escandalos,lo indicamos
+				        if (escandalosObject.length() == 0){
+				        	Log.v("WE","No hay mas angrys");
+				        	there_are_more_escandalos = false;
+				        }
 			        }
 		        }
 		        
+		        /*
 		        // BOTH
 		        else if (category.equals(MainActivity.BOTH)) {
 			        if (MyApplication.FIRST_TIME_BOTH){
@@ -781,6 +746,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			        	}
 			        }
 		        }
+		        */
 		        	      
 		        
 		        // Obtenemos los datos de los escándalos
@@ -830,7 +796,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 					                       ex),                                                             // The exception.
 					                       false).build());                                                 // False indicates a fatal exception			                       
-		    	*/
+		             */
 		     }
 		       
 		    // Si hubo algún error devolvemos 666
@@ -844,12 +810,12 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    }
 
 		
-		@Override
+		@Override	
 	    protected void onPostExecute(Integer result) {
 			
 			// Quitamos el progresbar y mostramos la lista de escandalos
-			//loading.setVisibility(View.GONE);
-			//lView.setVisibility(View.VISIBLE);
+			loading.setVisibility(View.GONE);
+			pager.setVisibility(View.VISIBLE);
 			
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666){
@@ -858,21 +824,24 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			}
 			
 			// No hubo ningún error inesperado
-			if (!isCancelled()){
+			else{
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
 		        	// Los mostramos en pantalla
 		        	adapter.notifyDataSetChanged();
 		        }
-		        else{
-		        }        
 			}
+				     		
+		    // Habilitamos los botones
+		    if (category.equals(HAPPY)){
+		    	but_angry.setClickable(true);
+		    }
+		    else{
+		    	but_happy.setClickable(true);
+		    }
 			
 			// Ya no se están obteniendo escándalos (abrimos la llave)
 			getting_escandalos = false;
-			
-			// Indicamos que ha terminado de actualizar
-			// (creo que esto sobra) onRefreshFinished();
 	    }
 	}
 	
@@ -1211,8 +1180,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 */
 	private void cancelGetEscandalos(){	
 			
+		Log.v("WE","CANCELAMOS ESCANDALOS");
 		if (getEscandalosAsync != null){
 			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
+				Log.v("WE","Entra en cancel happy");
 				getEscandalosAsync.cancel(true);
 			}
 		} 
