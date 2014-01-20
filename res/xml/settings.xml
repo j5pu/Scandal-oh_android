@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="audioCategory"
+        android:title="Audio" >
+        <CheckBoxPreference
+            android:key="autoreproduccion"
+            android:summary="Reproduce el audio automáticamente"
+            android:title="Autoreproducción"/>
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:key="perfilCategory"
+        android:title="Usuario" >
+        <Preference
+            android:key="cerrarSesion"
+            android:summary="Cierra la sesión actual del usuario"
+            android:title="Cerrar sesión" />
+        <Preference
+            android:key="iniciarSesion"
+            android:summary="Inicia sesión en una cuenta de usuario"
+            android:title="Iniciar sesión" />
+         <Preference
+            android:key="registro"
+            android:summary="Crea una cuenta de usuario"
+            android:title="Crear cuenta" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

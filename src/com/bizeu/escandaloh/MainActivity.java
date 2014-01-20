@@ -17,35 +17,38 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.bizeu.escandaloh.adapters.EscandaloAdapter;
+import com.bizeu.escandaloh.adapters.DrawerMenuAdapter;
 import com.bizeu.escandaloh.adapters.ScandalohFragmentPagerAdapter;
 import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
@@ -68,16 +71,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	public static final String HAPPY = "Humor";
 	public static final String BOTH = "Todas";
 	private final static String APP_ID = "d83c1504-0e74-4cd6-9a6e-87ca2c509506";
-	
-	private LinearLayout ll_logout;
 	private LinearLayout ll_refresh;
 	private LinearLayout ll_take_photo;
-	private ImageView img_logout;
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
 	private ProgressBar progress_refresh;
 	private Button but_happy;
 	private Button but_angry;
+	private ListView list_menu_lateral;
+    DrawerLayout mDrawerLayout;
  
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -94,6 +96,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private boolean getting_escandalos = true;
 	private boolean there_are_more_escandalos = true;
 	public static ArrayList<Escandalo> escandalos;
+    DrawerMenuAdapter mMenuAdapter;
+    String[] options;
+    ActionBarDrawerToggle mDrawerToggle;
 	
 	
 	/**
@@ -118,11 +123,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	        startActivity(i);
 		}
 
-		// Action Bar
+		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		getSupportActionBar().setCustomView(view);
+		
+        // Activamos el logo del menu para el menu
+        actBar.setHomeButtonEnabled(true);
+        actBar.setDisplayHomeAsUpEnabled(true);
 		
 		/*
 		// Si es 4.2+ deshabilitamos el botón home
@@ -136,11 +145,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    */
 		
 		loading = (ProgressBar) findViewById(R.id.loading_escandalos);
-		
-		// Listeners del action bar
-		//img_logout = (ImageView) findViewById(R.id.img_actionbar_logout);
-		//ll_logout = (LinearLayout) findViewById(R.id.ll_main_logout);
-		//ll_logout.setOnClickListener(this);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
 		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
 		ll_refresh.setOnClickListener(this);
@@ -153,7 +157,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
 		but_angry.setOnClickListener(this);
 	    	
-		// Asignamos el viewPager al adaptador
+		// VIEWPAGER
         pager = (ViewPager) this.findViewById(R.id.pager);
         adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
@@ -182,6 +186,39 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             }
         });  
         
+        
+        // MENU LATERAL
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.lay_pantalla_main);
+        
+        // Sombra del menu sobre la pantalla
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        
+        options = new String[] {"Perfil", "Notificaciones", "País", "Ajustes", "Danos tu opinión"};
+        
+        mMenuAdapter = new DrawerMenuAdapter(MainActivity.this, options);
+       
+        list_menu_lateral = (ListView) findViewById(R.id.menu_lateral);
+        list_menu_lateral.setAdapter(mMenuAdapter);
+        list_menu_lateral.setOnItemClickListener(new DrawerItemClickListener());
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_drawer, R.string.drawer_open,
+                R.string.drawer_close) {
+ 
+            public void onDrawerClosed(View view) {
+                // TODO Auto-generated method stub
+                super.onDrawerClosed(view);
+            }
+ 
+            public void onDrawerOpened(View drawerView) {
+                // TODO Auto-generated method stub
+                // Set the title on the action when drawer open
+                super.onDrawerOpened(drawerView);
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // PASO ENTRE ESCÁNDALOS
         // Le asignamos la animación al pasar entre escándalos (API 11+)
         pager.setPageTransformer(true, new ZoomOutPageTransformer());
         
@@ -197,7 +234,22 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     	getEscandalosAsync.execute();
 	}
 
+    
 
+ 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+ 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggles
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 	
 	
 	/**
@@ -240,10 +292,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	   // AdsSessionController.enableTracking();	
 		*/
 		
-		// Si está logueado quitamos el botón de logout y añadimos la cámara (con su selector)
-		if (MyApplication.logged_user){
-			//ll_logout.setVisibility(View.VISIBLE);
-			
+		// Si está logueado mostramos la cámara (con su selector)
+		if (MyApplication.logged_user){		
 			StateListDrawable states = new StateListDrawable();
 
 			states.addState(new int[] {android.R.attr.state_pressed},
@@ -255,10 +305,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			img_take_photo.setImageDrawable(states);
 			
 		}
-		// Si no está logueado mostramos el botón de logout y añadimos el "+" (con su selector)
-		else{			
-			//ll_logout.setVisibility(View.INVISIBLE);
-			
+		// Si no está logueado mostramos el símbolo para hacer login
+		else{					
 			StateListDrawable states = new StateListDrawable();
 			states.addState(new int[] {android.R.attr.state_pressed},
 				    getResources().getDrawable(R.drawable.mas_pressed));
@@ -292,11 +340,34 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	}
 	
 	
+	/**
+	 * onDestroy
+	 */
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
 	    cancelGetEscandalos();
 	}
+	
+	
+	/**
+	 * onOptionsItemSelected
+	 */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+ 
+    	// Asignamos el botón home para el menu lateral
+        if (item.getItemId() == android.R.id.home) {
+ 
+            if (mDrawerLayout.isDrawerOpen(list_menu_lateral)) {
+                mDrawerLayout.closeDrawer(list_menu_lateral);
+            } else {
+                mDrawerLayout.openDrawer(list_menu_lateral);
+            }
+        }
+ 
+        return super.onOptionsItemSelected(item);
+    }
 	
 
 
@@ -440,64 +511,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			
 			break;
 			
-			
-		/*
-		// Logout
-		case R.id.ll_main_logout:
-			
-			// Paramos si hubiera algún audio reproduciéndose
-			Audio.getInstance(mContext).releaseResources();
-			
-			if (MyApplication.logged_user){
-				AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
-				alert_logout.setTitle("Cerrar sesión usuario");
-				alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
-				alert_logout.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {  
-			            public void onClick(DialogInterface dialogo1, int id) {  
-			            	
-			            	
-			  			  // Mandamos el evento a Google Analytics
-			        	  EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			  			  easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
-			  			                   "Boton clickeado",  // Event action (required)
-			  			                   "Acepta log out",   // Event label
-			  			                   null)            // Event value
-			  			      .build()
-			  			  );
-			  			  
-			            	
-							// Deslogueamos al usuario
-							prefs.edit().putString(MyApplication.USER_URI, null).commit();
-							MyApplication.logged_user = false;
-							ll_logout.setVisibility(View.INVISIBLE);
-							// Cambiamos el icono de la cámara al más (con su selector)
-							StateListDrawable states = new StateListDrawable();
-							states.addState(new int[] {android.R.attr.state_pressed},
-								    getResources().getDrawable(R.drawable.mas_pressed));
-								states.addState(new int[] {android.R.attr.state_focused},
-								    getResources().getDrawable(R.drawable.mas_pressed));
-								states.addState(new int[] { },
-								    getResources().getDrawable(R.drawable.mas));
-								img_take_photo.setImageDrawable(states);
-			            }  
-			        });  
-				alert_logout.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {  
-			        	public void onClick(DialogInterface dialogo1, int id) { 
-			        		
-			  			  // Mandamos el evento a Google Analytics
-			        	  EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			  			  easyTracker.send(MapBuilder.createEvent("Acción UI",     // Event category (required)
-			  			                   "Boton clickeado",  // Event action (required)
-			  			                   "Rechaza Log out",   // Event label
-			  			                   null)            // Event value
-			  			      .build()
-			  			  );
-			            }  
-			        });            
-			     alert_logout.show(); 
-			}
-			break;
-		*/
 			
 		// Actualizar carrusel: Le decimos al fragmento que actualice los escándalos (y suba el carrusel al primero)
 		case R.id.ll_main_refresh:
@@ -778,7 +791,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
 	          							sound, username, date);
 	                        	escandalos.add(escanAux);
-	  			                adapter.addFragment(ScandalohFragment.newInstance(escanAux));	        	       
+	  			                adapter.addFragment(ScandalohFragment.newInstance(escanAux));
+	  			                adapter.notifyDataSetChanged();
 	                        }
 			            }); 
 		            }          
@@ -823,6 +837,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				toast.show();
 			}
 			
+			/*
 			// No hubo ningún error inesperado
 			else{
 				// Si es codigo 2xx --> OK
@@ -831,6 +846,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		        	adapter.notifyDataSetChanged();
 		        }
 			}
+			*/
 				     		
 		    // Habilitamos los botones
 		    if (category.equals(HAPPY)){
@@ -925,6 +941,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 										sound, username, date);
 						        escandalos.add(0,escanAux);		
 						        adapter.addFragmentAtStart(ScandalohFragment.newInstance(escanAux));
+						        adapter.notifyDataSetChanged();
 							}
 				        });
 		            }		               	
@@ -964,21 +981,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			}
 			
 			else{
-				if (!isCancelled()){
-					// Si es codigo 2xx --> OK
-			        if (result >= 200 && result <300){
-			        	//updateNumCommentsAsync = new UpdateNumComments();
-			        	//updateNumCommentsAsync.execute();
-			        	//adapter.notifyDataSetChanged();
-			        	//getting_escandalos = false;
-			        	pager.setAdapter(null);
-			        	pager.setAdapter(adapter);
-			        	//updateNumCommentsAsync = new UpdateNumComments();
-			        	//updateNumCommentsAsync.execute();
-			        }
-			        else{
-			        }        
-				}
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result <300){
+					//pager.setAdapter(null);
+					//pager.setAdapter(adapter);
+				}      			
 			}
 			// Abrimos la llave
 			getting_escandalos = false;
@@ -1202,5 +1209,44 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		}
 		*/
 	}
+	
+	
+	
+	/**
+	 * Listener para las opciones del menu lateral
+	 *
+	 */
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            switch (position) {
+	            case 0: // Perfil
+	                Log.v("WE","Seleccionado posicion");
+	                break;
+	
+	            case 1: // Notificaciones
+	                Log.v("WE","Seleccionado notificaciones");
+	                break;
+	                
+	            case 2: // País
+	                Log.v("WE","Seleccionado país");
+	                break;
+	                  
+	            case 3: // Ajustes
+	            	Log.v("WE","Seleccionado ajustes");
+	            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+	            	startActivity(i);
+	            	break;
+	            	
+	            case 4: // Danos tu opinión
+	            	Log.v("WE","seleccionado danos tu opinión");
+	            	break;
+            }
+            list_menu_lateral.setItemChecked(position, true);
+     
+            // Cerramos el menu
+            mDrawerLayout.closeDrawer(list_menu_lateral);
+        }
+    }
 	
 }
