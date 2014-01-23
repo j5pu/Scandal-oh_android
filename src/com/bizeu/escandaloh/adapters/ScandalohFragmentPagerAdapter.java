@@ -44,10 +44,14 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
     }
     
     
+    /**
+     * getItemPosition
+     */
     @Override
     public int getItemPosition(Object object){
         return PagerAdapter.POSITION_NONE;
     }
+    
     
     /**
      * Añade un fragmento al final de la lista
@@ -66,6 +70,10 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
     	this.fragments.add(0,fragment);
     }
     
+    
+    /**
+     * Elimina todos los fragmentos
+     */
     public void clearFragments(){
     	this.fragments.clear();
     }

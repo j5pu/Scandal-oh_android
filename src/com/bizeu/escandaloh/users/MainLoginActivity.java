@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,12 +31,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
-import com.bizeu.escandaloh.users.LoginDialog.OnMyDialogResult;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.bizeu.escandaloh.users.LoginSocialNetworksDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Fuente;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -49,8 +47,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 
 
-public class MainLoginActivity extends SherlockActivity /* implements
-ConnectionCallbacks, OnConnectionFailedListener */{
+public class MainLoginActivity extends SherlockActivity{
 	
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
@@ -58,7 +55,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 	public final static int LOGGING_FACEBOOK = 101;
 	public final static int LOGGING_GOOGLE = 102;
 	public final static int LOGGING_TWITTER = 103;
-    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
+    //private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 	static String TWITTER_CONSUMER_KEY = "MJb4bXehocnroOE871Y6g";
 	static String TWITTER_CONSUMER_SECRET = "ENQygTJn0zldtPTdjVl15jXAQbuBvjsPwoP7a7bg";
 	static final String TWITTER_CALLBACK_URL = "twitter://scandaloh";
@@ -108,8 +105,6 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 		progress.setMessage("Espera, por favor");
 		progress.setCancelable(false);
 		
-
-	
 		// Si estamos en esta pantalla porque el usuario pulsó "+": entonces mostramos un mensaje
 		boolean first_time = false;
 		
@@ -146,7 +141,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 			
 			@Override
 			public void onClick(View v) {
-				
+				// Mostramos la pantalla de registro
 				Intent i = new Intent(getBaseContext(), RegistrationActivity.class);
 				startActivityForResult(i, REGISTRATION);		
 			}
@@ -157,7 +152,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 			@Override
 			public void onClick(View v) {
 				// Mostramos el dialog para seleccionar la red social
-				LoginDialog login_dialog = new LoginDialog(mContext, acti);
+				LoginSocialNetworksDialog login_dialog = new LoginSocialNetworksDialog(mContext, acti);
 				login_dialog.setDialogResult(new OnMyDialogResult(){
 					
 				    public void finish(String result){    	
@@ -297,14 +292,13 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 	
 	
     /**
+     * onNewIntent
      * Este método es lanzado cuando se recibe un nuevo Intent. 
      * En nuestro caso cuando el usuario se haya logueado con twitter en el webview
      */
     @Override
     protected void onNewIntent(Intent intent) {
             super.onNewIntent(intent);
-            
-            Log.v("WE","Entr aonNewIntent");
             
             // Obtenemos la uri devuelta en el intent
             Uri uri = intent.getData();
@@ -317,8 +311,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
     }
 	
 	
-	
-	
+		
 	
 	/**
 	 * Abre un webView para pedir el email y password en twitter de un usuario
@@ -329,8 +322,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 		@Override
 		protected void onPreExecute() {
 			// Mostramos el progress
-			progress.show();
-			
+			progress.show();			
 		}
 		
 		@Override
@@ -353,11 +345,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 					// Mandamos la excepcion a Google Analytics
 					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 					easyTracker.send(MapBuilder.createException(
-							new StandardExceptionParser(mContext, null) 
-									.getDescription(Thread.currentThread()
-											.getName(), // The name of the thread on which the exception occurred
-											e), // The exception.
-							false).build());
+							new StandardExceptionParser(mContext, null).getDescription(Thread.currentThread().getName(),e),false).build()); 
 			   }
 	
 			return null;
@@ -410,9 +398,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 				easyTracker.send(MapBuilder.createException(
 						new StandardExceptionParser(mContext, null) 
 								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on which the exception occurred
-										ex), // The exception.
-						false).build());
+										.getName(),ex),false).build());
 			}
 			
 			return null;
@@ -531,8 +517,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 			// Si no ha habido algún error extraño
 			if (!login_error) {
 				// Logueamos al usuario en la aplicación
-				SharedPreferences prefs = mContext.getSharedPreferences(
-						"com.bizeu.escandaloh", Context.MODE_PRIVATE);
+				SharedPreferences prefs = mContext.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 				prefs.edit().putString(MyApplication.USER_URI, user_uri)
 						.commit();
 				MyApplication.resource_uri = user_uri;
@@ -552,27 +537,10 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 		}
 	}
 	
-	
-	/**
-	 * Limita un string a 22 caracteres + tres puntos suspensivos
-	 * 
-	 * @param completo
-	 *            String oritinal
-	 * @return String con un tamaño máximo de 25 caracteres
-	 */
-	private String limitaCaracteres(String completo) {
-		String acortado = null;
-		if (completo.length() > 25) {
-			acortado = completo.substring(0, 22) + "...";
-		} else {
-			acortado = completo;
-		}
-
-		return acortado;
-	}
 
 
-/*
+
+	/*
 	// Métodos Google+
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
@@ -612,4 +580,30 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 	}
 	*/
 	
+	
+	
+	
+	
+	// -------------------------------------------------------------------------------------------------------
+	// -------------------------    MÉTODOS PRIVADOS    ------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------------
+	
+	
+	/**
+	 * Limita un string a 22 caracteres + tres puntos suspensivos
+	 * 
+	 * @param completo
+	 *            String oritinal
+	 * @return String con un tamaño máximo de 25 caracteres
+	 */
+	private String limitaCaracteres(String completo) {
+		String acortado = null;
+		if (completo.length() > 25) {
+			acortado = completo.substring(0, 22) + "...";
+		} else {
+			acortado = completo;
+		}
+
+		return acortado;
+	}
 }

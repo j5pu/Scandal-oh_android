@@ -1,6 +1,5 @@
 package com.bizeu.escandaloh.model;
 
-import java.util.Date;
 
 public class Comment {
 

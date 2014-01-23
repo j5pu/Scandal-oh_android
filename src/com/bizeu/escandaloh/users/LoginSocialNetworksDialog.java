@@ -1,22 +1,18 @@
 package com.bizeu.escandaloh.users;
 
 
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.util.Fuente;
-
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ScaleDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button; 
 
-public class LoginDialog extends Dialog {
+public class LoginSocialNetworksDialog extends Dialog {
 
 	private Context mContext;
 	private Activity acti;
@@ -26,12 +22,21 @@ public class LoginDialog extends Dialog {
 
 	OnMyDialogResult mDialogResult; 
 	
-	public LoginDialog(Context con, Activity act) {
+	/**
+	 * Constructor
+	 * @param con Contexto
+	 * @param act Actividad
+	 */
+	public LoginSocialNetworksDialog(Context con, Activity act) {
 		super(con);
 		mContext = con;
 		acti = act;
 	}
 
+	
+	/**
+	 * onCreate
+	 */
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,7 +68,7 @@ public class LoginDialog extends Dialog {
 				mDialogResult.finish("FACEBOOK");
 				
 				// Cerramos el dialog
-				LoginDialog.this.dismiss();		
+				LoginSocialNetworksDialog.this.dismiss();		
 			}
 		});
 
@@ -80,11 +85,12 @@ public class LoginDialog extends Dialog {
 				mDialogResult.finish("TWITTER");
 				
 				//Cerramos el dialog
-				LoginDialog.this.dismiss();		
+				LoginSocialNetworksDialog.this.dismiss();		
 			}
 		});
 	}
 	
+	// Callbacks
     public void setDialogResult(OnMyDialogResult dialogResult){
         mDialogResult = dialogResult;
     }

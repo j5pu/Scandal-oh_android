@@ -1,9 +1,8 @@
 package com.bizeu.escandaloh.model;
 
-
 import android.graphics.Bitmap;
 
-public class Escandalo {
+public class Scandaloh {
 	public static final String HAPPY_CATEGORY = "/api/v1/category/1/";
 	public static final String ANGRY_CATEGORY = "/api/v1/category/2/";
 	public static final String ANGRY = "Angry";
@@ -28,7 +27,7 @@ public class Escandalo {
 	/**
 	 * Constructor
 	 */
-	public Escandalo(){
+	public Scandaloh(){
 		super();
 	}
 	
@@ -38,7 +37,7 @@ public class Escandalo {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Escandalo(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String route_img_big, String uri_audio, String user, String date){
+	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String route_img_big, String uri_audio, String user, String date){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -155,8 +154,7 @@ public class Escandalo {
 		return this.user;
 	}
 	
-	public void setDate(String new_date){
-		
+	public void setDate(String new_date){	
 	}
 	
 	public String getDate(){

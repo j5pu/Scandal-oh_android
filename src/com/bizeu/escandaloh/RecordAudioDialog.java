@@ -22,6 +22,7 @@ import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.Audio.PlayListener;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class RecordAudioDialog extends Dialog{
 
@@ -43,11 +44,19 @@ public class RecordAudioDialog extends Dialog{
 	OnMyDialogResult mDialogResult; 
 	private Context mContext;
 
+	/**
+	 * Constructor
+	 * @param con Contexto
+	 * @param record Audio
+	 */
 	public RecordAudioDialog(Context con, Audio record) {
 		super(con);
 		mContext = con;
 	}
 
+	/**
+	 * onCreate
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -308,6 +317,7 @@ public class RecordAudioDialog extends Dialog{
 		   myHandler.post(myRunnable);
 	}
 	
+	// Callbacks
     public void setDialogResult(OnMyDialogResult dialogResult){
         mDialogResult = dialogResult;
     }
@@ -321,9 +331,6 @@ public class RecordAudioDialog extends Dialog{
      * Cambia la interfaz de usuario al terminar de reproducir un audio
      */
     private void changeIUPlayFinised(){
-    	
-    	// Quitamos el hueco en medio
-		//ll_espacio_botones.setVisibility(View.GONE);
 		
 		// Actualizamos descripción
 		txt_description.setText("Audio grabado:");
@@ -351,8 +358,5 @@ public class RecordAudioDialog extends Dialog{
 		// Reseteamos contador de reproducción
 		contador_play = 0;
     }
-    
-  
-	
-	
+    	
 }

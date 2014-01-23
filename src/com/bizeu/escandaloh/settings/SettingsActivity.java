@@ -4,7 +4,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.users.MainLoginActivity;
 import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
@@ -17,9 +17,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.util.Log;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements
 		OnPreferenceClickListener {
@@ -102,17 +100,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogo1, int id) {
 
-							/*
-							 * // Mandamos el evento a Google Analytics
-							 * EasyTracker easyTracker =
-							 * EasyTracker.getInstance(mContext);
-							 * easyTracker.send
-							 * (MapBuilder.createEvent("Acción UI", // Event
-							 * category (required) "Boton clickeado", // Event
-							 * action (required) "Acepta log out", // Event
-							 * label null) // Event value .build() );
-							 */
-
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
 							MyApplication.logged_user = false;
@@ -124,19 +111,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			alert_logout.setNegativeButton("Cancelar",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogo1, int id) {
-
-							/*
-							 * // Mandamos el evento a Google Analytics
-							 * EasyTracker easyTracker =
-							 * EasyTracker.getInstance(mContext);
-							 * easyTracker.send
-							 * (MapBuilder.createEvent("Acción UI", // Event
-							 * category (required) "Boton clickeado", // Event
-							 * action (required) "Rechaza Log out", // Event
-							 * label null) // Event value .build()
-							 * 
-							 * );
-							 */
 						}
 					});
 			alert_logout.show();
@@ -171,7 +145,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
- 
         return super.onOptionsItemSelected(item);
     }
 }

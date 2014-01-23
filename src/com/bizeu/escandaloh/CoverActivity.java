@@ -5,8 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CoverActivity extends Activity {
 
@@ -34,7 +33,7 @@ public class CoverActivity extends Activity {
 		// Obtenemos el código del pais 
 		MyApplication.code_selected_country = prefs.getString(MyApplication.CODE_COUNTRY, null);
 		
-		// Obtenemos si el usuario está logueado
+		// Indicamos si el usuario está logueado
 		String user_uri = prefs.getString(MyApplication.USER_URI, null); 
 		if (user_uri != null){
 			MyApplication.logged_user = true;

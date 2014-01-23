@@ -39,6 +39,7 @@ import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class DetailCommentsActivity extends SherlockActivity {
 
@@ -318,19 +319,15 @@ public class DetailCommentsActivity extends SherlockActivity {
 			}
 			else{
 				// Si es codigo 2xx --> OK
-				if (result >= 200 && result <300){
-		        	Log.v("WE","comentario enviado");
-		        	
+				if (result >= 200 && result <300){	        	
 		        	// Vaciamos el editext
 		        	edit_new_comment.setText("");
 		            	
 		        	// Mostramos de nuevo los comentarios (indicamos que si hemos enviado un comentario)
 		        	add_comment = true;
-		        	new GetComments(mContext, add_comment).execute();
-		        	
+		        	new GetComments(mContext, add_comment).execute();	        	
 		        }
 		        else{
-		        	Log.v("WE","comentario no enviado");
 		        	Toast toast;
 		        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
 		        	toast.show();        	
@@ -373,40 +370,35 @@ public class DetailCommentsActivity extends SherlockActivity {
 			
 			comments.clear();
 			
-			HttpClient httpClient = new DefaultHttpClient();
-			
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + photo_id);
-			 
-			del.setHeader("content-type", "application/json");
-			
+			HttpClient httpClient = new DefaultHttpClient();		
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + photo_id);		 
+			del.setHeader("content-type", "application/json");		
 			HttpResponse response = null ;
 			
 			try{				
-					response = httpClient.execute(del);
-			        String respStr = EntityUtils.toString(response.getEntity());
+				response = httpClient.execute(del);
+			    String respStr = EntityUtils.toString(response.getEntity());
 			        
-			        Log.i("WE",respStr);
+			    Log.i("WE",respStr);
 			  
-			        JSONObject respJSON = new JSONObject(respStr);
+			    JSONObject respJSON = new JSONObject(respStr);
 			        
-			        // Parseamos el json para obtener los escandalos
-		            JSONArray escandalosObject = null;
+			    // Parseamos el json para obtener los escandalos
+		        JSONArray escandalosObject = null;
 		            		   
-		            escandalosObject = respJSON.getJSONArray("objects");
-		            
-		            for (int i=0 ; i < escandalosObject.length(); i++){
-		            	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		        escandalosObject = respJSON.getJSONArray("objects");
+		           
+		        for (int i=0 ; i < escandalosObject.length(); i++){
+		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
-		            	 String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-		            	 String username = escanObject.getString("username");
-		            	 String date = escanObject.getString("date");
-		            	 String resource_uri = escanObject.getString("user");
-		            	// SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-		            	// Date date = formatter.parse(date_string);
+		        	String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+		        	String username = escanObject.getString("username");
+		        	String date = escanObject.getString("date");
+		        	String resource_uri = escanObject.getString("user");
 		            	 
-					     // Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
-					     comments.add(new Comment(comment, username, date, resource_uri));					 
-		            }		            
+		        	// Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
+		        	comments.add(new Comment(comment, username, date, resource_uri));					 
+		        }		            
 			}
 			catch(Exception ex){
 				Log.e("ServicioRest","Error!", ex);
@@ -459,7 +451,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 			else{
 				// Si es codigo 2xx --> OK
 		        if (result >= 200 && result <300){
-		        	Log.v("WE","comentarios listados");
 		        	commentsAdapter.notifyDataSetChanged();
 		        	
 		        	// Actualizamos el indicador de número de comentarios
@@ -471,9 +462,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        	}
 		        }
 		        else{
-		        	Log.v("WE","comentarios no listados");
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, "Hubo algún error obteniendo los comentarios", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, "No se pudo obtener los comentarios", Toast.LENGTH_LONG);
 		        	toast.show();
 		        } 
 			}   

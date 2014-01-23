@@ -17,12 +17,13 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import com.applidium.shutterbug.FetchableImageView;
-import com.bizeu.escandaloh.model.Escandalo;
+import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -80,7 +81,7 @@ public class ScandalohFragment extends Fragment {
      * @param escan Escandalo para dicho fragmento
      * @return Fragmento con el escándalo
      */
-    public static ScandalohFragment newInstance(Escandalo escan) {
+    public static ScandalohFragment newInstance(Scandaloh escan) {
         // Instanciamos el fragmento
         ScandalohFragment fragment = new ScandalohFragment();
  
@@ -103,6 +104,8 @@ public class ScandalohFragment extends Fragment {
         return fragment;
     }
  
+    
+    
     /**
      * onCreate
      */
@@ -128,8 +131,7 @@ public class ScandalohFragment extends Fragment {
      * onCreateView
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
  
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo, container, false);
              
@@ -142,18 +144,6 @@ public class ScandalohFragment extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
-				/*
-				 // Mandamos el evento a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				 easyTracker.send(MapBuilder
-				      .createEvent("Acción UI",     // Event category (required)
-				                   "Boton clickeado",  // Event action (required)
-				                   "Ver foto en detalle desde carrusel",   // Event label
-				                   null)            // Event value
-				      .build()
-				  );
-				*/
-				
 				
 				// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
 				if (!MyApplication.PHOTO_CLICKED){
@@ -162,14 +152,14 @@ public class ScandalohFragment extends Fragment {
 					// Paramos si hubiera algún audio reproduciéndose
 					Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 					
+					// Mostramos la pantalla de la foto en detalle
 					Intent i = new Intent(getActivity(), DetailPhotoActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					ImageView imView = (ImageView) v;
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
-					i.putExtra("uri_audio", uri_audio);
-					
+					i.putExtra("uri_audio", uri_audio);				
 					getActivity().startActivity(i);				
 				}	
 			}
@@ -180,30 +170,18 @@ public class ScandalohFragment extends Fragment {
         	
 			@Override
 			public boolean onLongClick(View v) {			
-				final View mView = v;
-				
-				/*
-				 // Mandamos el evento a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				 easyTracker.send(MapBuilder
-				      .createEvent("Acción UI",     // Event category (required)
-				                   "Boton clickeado prolongadamente",  // Event action (required)
-				                   "Guardar foto en galería desde carrusel",   // Event label
-				                   null)            // Event value
-				      .build()
-				  );
-				  */
 				
 				// Paramos si hubiera algún audio reproduciéndose
 				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 				
-				// Guardamos la foto en la galería	
+				// Mostramos la opción de guardar la foto en la galería
 				final CharSequence[] items = {"Guardar foto en la galería"};
 				 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			        builder.setItems(items, new DialogInterface.OnClickListener() {
 			            @Override
 			            public void onClick(DialogInterface dialog, int item) {
 			            	
+			            	// Guardamos en galería
 			                if (items[item].equals("Guardar foto en la galería")) {
 			                	new SaveImageTask(getActivity()).execute(url_big);     			   
 			                } 			                
@@ -215,41 +193,24 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
         
-
-        
+       
         // Número de comentarios
         num_com = (TextView) rootView.findViewById(R.id.txt_numero_comentarios);
         num_com.setText(Integer.toString(num_comments));
         num_com.setOnClickListener(new View.OnClickListener() {
 			
         	@Override
-			public void onClick(View v) {
-				
-        		/*
-				 // Mandamos el evento a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				 easyTracker.send(MapBuilder
-				      .createEvent("Acción UI",     // Event category (required)
-				                   "Boton clickeado",  // Event action (required)
-				                   "Ver comentarios desde carrusel",   // Event label
-				                   null)            // Event value
-				      .build()
-				  );
-				  */
-				
+			public void onClick(View v) {			
 				// Paramos si hubiera algún audio reproduciéndose
 				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 				
+				// Mostramos la pantalla de comentarios
 				Intent i = new Intent(getActivity().getBaseContext(), DetailCommentsActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("id", id);
-				//i.putExtra("id", v.getTag(R.string.id).toString());
 				i.putExtra("route_image", url);
-				//i.putExtra("route_image", (String) v.getTag(R.string.url_foto));
 				i.putExtra("user", user_name);
-				//i.putExtra("user", (String) v.getTag(R.string.user));
 				i.putExtra("title", title);
-				//i.putExtra("title", (String) v.getTag(R.string.title));
 				getActivity().getBaseContext().startActivity(i);	
 			}
 		});
@@ -258,7 +219,7 @@ public class ScandalohFragment extends Fragment {
         TextView tit = (TextView) rootView.findViewById(R.id.txt_titulo);
         tit.setText(title);
         
-        // Micrófono
+        // Micrófono: lo mostramos si el scándalo tiene audio
         ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_microfono);
         if(has_audio){
         	aud.setVisibility(View.VISIBLE);
@@ -270,17 +231,6 @@ public class ScandalohFragment extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
-				/*
-				 // Mandamos el evento a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				 easyTracker.send(MapBuilder
-				      .createEvent("Acción UI",     // Event category (required)
-				                   "Boton clickeado",  // Event action (required)
-				                   "Escuchar audio desde carrusel",   // Event label
-				                   null)            // Event value
-				      .build()
-				  );
-				  */
 				
 				// Paramos si hubiera algún audio reproduciéndose
 				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
@@ -306,17 +256,6 @@ public class ScandalohFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				/*
-				// Mandamos el evento a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				 easyTracker.send(MapBuilder
-				      .createEvent("Acción UI",     // Event category (required)
-				                   "Boton clickeado",  // Event action (required)
-				                   "Compartir escándalo desde carrusel",   // Event label
-				                   null)            // Event value
-				      .build()
-				  );
-				  */
 				
 				 // Creamos un menu para elegir entre compartir y denunciar foto
 				 final CharSequence[] opciones_compartir = {"Compartir scándalOh!", "Reportar scándalOh!"};
@@ -385,27 +324,7 @@ public class ScandalohFragment extends Fragment {
     }
     
    
-    /**
-     * Transforma una fecha con formato AAAA-MM-DDTHH:MM:SS a formato DD-MM-AAAA
-     * @param date Fecha a transformar
-     * @return
-     */
-    private String changeFormatDate(String date){
-        String date_without_time = (date.split("T",2))[0];   
-        String year = date_without_time.split("-",3)[0];
-        String month = date_without_time.split("-",3)[1];
-        String day = date_without_time.split("-",3)[2];
-        String final_date = day + "-" + month + "-" + year;     
-        return final_date;
-    }
-    
-    
 
-    
-    public int getNumComments(){
-    	return num_comments;
-    }
-    
     
     
 	/**
@@ -469,14 +388,13 @@ public class ScandalohFragment extends Fragment {
 
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	            /*
+	            
 	             // Mandamos la excepcion a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(context);
 				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
 				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 				                       e),                                                             // The exception.
-				                       false).build());
-				                       */
+				                       false).build());		                       
 	        }
 
 	        return null;
@@ -531,14 +449,13 @@ public class ScandalohFragment extends Fragment {
 
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	            /*            
+	                     
 	             // Mandamos la excepcion a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(context);
 				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
 				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 				                       e),                                                             // The exception.
-				                       false).build());
-				 */
+				                       false).build());		 
 	        }
 
 	        return null;
@@ -617,15 +534,13 @@ public class ScandalohFragment extends Fragment {
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true; // Indicamos que hubo algún error
-	             
-	             /*
+	                          
 				// Mandamos la excepcion a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
 					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 					                       ex),                                                             // The exception.
-					                       false).build());  
-				*/
+					                       false).build());  			
 	        }
 	        
 	        if (any_error){
@@ -648,7 +563,6 @@ public class ScandalohFragment extends Fragment {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Log.v("WE","report no enviado");
 				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
 				toast.show();
 			}
@@ -656,13 +570,10 @@ public class ScandalohFragment extends Fragment {
 				
 				// Si es codigo 2xx --> OK
 				if (result >= 200 && result <300){
-		        	Log.v("WE","report enviado");
-		        	
 					Toast toast = Toast.makeText(mContext, "Report enviado correctamente", Toast.LENGTH_SHORT);
 					toast.show();      	
 		        }
 		        else{
-		        	Log.v("WE","report no enviado");
 		        	Toast toast;
 		        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
 		        	toast.show();        	
@@ -685,4 +596,35 @@ public class ScandalohFragment extends Fragment {
 	        return false;
 	    }	
 	}
+	
+	
+	
+
+	// ---------------------------------------------------------------------------------------------
+	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
+	// ---------------------------------------------------------------------------------------------
+	
+    /**
+     * Transforma una fecha con formato AAAA-MM-DDTHH:MM:SS a formato DD-MM-AAAA
+     * @param date Fecha a transformar
+     * @return
+     */
+    private String changeFormatDate(String date){
+        String date_without_time = (date.split("T",2))[0];   
+        String year = date_without_time.split("-",3)[0];
+        String month = date_without_time.split("-",3)[1];
+        String day = date_without_time.split("-",3)[2];
+        String final_date = day + "-" + month + "-" + year;     
+        return final_date;
+    }
+    
+    
+
+    /**
+     * Devuelve el número de comentarios
+     */
+    public int getNumComments(){
+    	return num_comments;
+    }
+    
 }

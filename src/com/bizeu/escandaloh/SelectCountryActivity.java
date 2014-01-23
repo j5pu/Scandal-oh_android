@@ -3,7 +3,7 @@ package com.bizeu.escandaloh;
 import java.util.ArrayList;
 import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
-
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,7 @@ public class SelectCountryActivity extends Activity {
 	private ListView list_countries;
 	
 	private ArrayList<Country> countries;
-	private Context context;
+	private Context mContext;
 	
 
 	/**
@@ -40,15 +39,13 @@ public class SelectCountryActivity extends Activity {
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_select_country));
 		
-		context = this;
+		mContext = this;
 		
-		list_countries = (ListView) findViewById(R.id.list_select_countries);
-		
+		// Rellenamos el listado de países
+		list_countries = (ListView) findViewById(R.id.list_select_countries);	
 		countries = new ArrayList<Country>();
 		addCountries(countries);	
-
-		final CountryArrayAdapter adapter = new CountryArrayAdapter(this,
-				R.layout.country, countries);
+		final CountryArrayAdapter adapter = new CountryArrayAdapter(this,R.layout.country, countries);
 		list_countries.setAdapter(adapter);
 
 		list_countries.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -61,7 +58,7 @@ public class SelectCountryActivity extends Activity {
 				String name_selected_country = countries.get(position).getName();
 				
 				// Mostramos un mensaje indicando que el país no se podrá cambiar en el futuro
-				AlertDialog.Builder alert_country = new AlertDialog.Builder(context);
+				AlertDialog.Builder alert_country = new AlertDialog.Builder(mContext);
 				alert_country.setTitle("País elegido: " + name_selected_country);
 				alert_country
 						.setMessage("Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?");
@@ -93,6 +90,7 @@ public class SelectCountryActivity extends Activity {
 		});
 	}
 	
+	
 	/**
 	 * onStart
 	 */
@@ -118,6 +116,7 @@ public class SelectCountryActivity extends Activity {
 	
 	/**
 	 * onDestroy
+	 * Liberamos los recursos
 	 */
 	@Override
 	protected void onDestroy(){
@@ -128,35 +127,12 @@ public class SelectCountryActivity extends Activity {
 	}
 	
 	
+
+	
 	/**
-	 * Añade la lista de paises
-	 * @param countries
+	 * Adaptador para lista de países
+	 *
 	 */
-	private void addCountries(ArrayList<Country> countries){	
-		countries.add(new Country(getResources().getString(R.string.espania), "ES"));
-		countries.add(new Country(getResources().getString(R.string.argentina), "AR"));
-		countries.add(new Country(getResources().getString(R.string.bolivia), "BO"));
-		countries.add(new Country(getResources().getString(R.string.chile), "CL"));
-		countries.add(new Country(getResources().getString(R.string.colombia), "CO"));
-		countries.add(new Country(getResources().getString(R.string.costa_rica), "CR"));
-		countries.add(new Country(getResources().getString(R.string.cuba), "CU"));
-		countries.add(new Country(getResources().getString(R.string.ecuador), "EC"));
-		countries.add(new Country(getResources().getString(R.string.el_salvador), "SV"));
-		countries.add(new Country(getResources().getString(R.string.guatemala), "GT"));
-		countries.add(new Country(getResources().getString(R.string.guinea_ecuatorial), "GQ"));
-		countries.add(new Country(getResources().getString(R.string.honduras), "HN"));
-		countries.add(new Country(getResources().getString(R.string.mexico), "MX"));
-		countries.add(new Country(getResources().getString(R.string.nicagarua), "NI"));
-		countries.add(new Country(getResources().getString(R.string.panama), "PA"));
-		countries.add(new Country(getResources().getString(R.string.paraguay), "PY"));
-		countries.add(new Country(getResources().getString(R.string.peru), "PE"));
-		countries.add(new Country(getResources().getString(R.string.puerto_rico), "PR"));
-		countries.add(new Country(getResources().getString(R.string.republica_dominicana), "DO"));
-		countries.add(new Country(getResources().getString(R.string.uruguay), "UY"));
-		countries.add(new Country(getResources().getString(R.string.venezuela), "VE"));
-	}
-	
-	
 	private class CountryArrayAdapter extends ArrayAdapter<Country> {
 
 	    Context context; 
@@ -205,6 +181,10 @@ public class SelectCountryActivity extends Activity {
 	}
 	
 	
+	/**
+	 * Clase País
+	 *
+	 */
 	private class Country {
 		private String name;
 		private String code;
@@ -229,5 +209,34 @@ public class SelectCountryActivity extends Activity {
 		public String getCode(){
 			return this.code;
 		}
+	}
+	
+	
+	/**
+	 * Añade la lista de paises al ListView
+	 * @param countries Lista de países
+	 */
+	private void addCountries(ArrayList<Country> countries){	
+		countries.add(new Country(getResources().getString(R.string.espania), "ES"));
+		countries.add(new Country(getResources().getString(R.string.argentina), "AR"));
+		countries.add(new Country(getResources().getString(R.string.bolivia), "BO"));
+		countries.add(new Country(getResources().getString(R.string.chile), "CL"));
+		countries.add(new Country(getResources().getString(R.string.colombia), "CO"));
+		countries.add(new Country(getResources().getString(R.string.costa_rica), "CR"));
+		countries.add(new Country(getResources().getString(R.string.cuba), "CU"));
+		countries.add(new Country(getResources().getString(R.string.ecuador), "EC"));
+		countries.add(new Country(getResources().getString(R.string.el_salvador), "SV"));
+		countries.add(new Country(getResources().getString(R.string.guatemala), "GT"));
+		countries.add(new Country(getResources().getString(R.string.guinea_ecuatorial), "GQ"));
+		countries.add(new Country(getResources().getString(R.string.honduras), "HN"));
+		countries.add(new Country(getResources().getString(R.string.mexico), "MX"));
+		countries.add(new Country(getResources().getString(R.string.nicagarua), "NI"));
+		countries.add(new Country(getResources().getString(R.string.panama), "PA"));
+		countries.add(new Country(getResources().getString(R.string.paraguay), "PY"));
+		countries.add(new Country(getResources().getString(R.string.peru), "PE"));
+		countries.add(new Country(getResources().getString(R.string.puerto_rico), "PR"));
+		countries.add(new Country(getResources().getString(R.string.republica_dominicana), "DO"));
+		countries.add(new Country(getResources().getString(R.string.uruguay), "UY"));
+		countries.add(new Country(getResources().getString(R.string.venezuela), "VE"));
 	}
 }

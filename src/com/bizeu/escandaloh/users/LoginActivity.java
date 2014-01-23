@@ -3,7 +3,6 @@ package com.bizeu.escandaloh.users;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,7 +13,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -32,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -171,58 +169,13 @@ public class LoginActivity extends SherlockActivity {
 	    EasyTracker.getInstance(this).activityStop(this);
 	}
 	  
-	
-	/**
-	 * Comprueba si todos los campos son correctos
-	 * @return True si todos los campos son correctos. False si alguno no lo es.
-	 */
-	private boolean checkFields(){
-		boolean all_correct = true ;
-		
-		edit_nombre_email.setError(null);
-		edit_password.setError(null);
-		
-		// Nombre/Email menos de 4 caracteres
-		if (edit_nombre_email.getText().toString().length() < 4){
-			edit_nombre_email.setError("Este campo debe tener al menos 4 caracteres");
-			all_correct = false;
-		}
-		
-		// Nombre/Email con espacio en blanco
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
-		if (m.find()){
-			edit_nombre_email.setError("Este campo no permite espacios en blanco");
-			all_correct = false;
-		}
-		
-		// Nombre/Email vacío
-		if (edit_nombre_email.getText().toString().length() == 0){
-			edit_nombre_email.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
 
-		// Password vacío
-		if (edit_password.getText().toString().length() == 0){
-			edit_password.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
-		// Password menos de 4 caracteres
-		if (edit_password.getText().toString().length() < 6){
-			edit_password.setError("Este campo debe tener al menos 6 caracteres");
-			all_correct = false;
-		}
-
-		return all_correct;
-	}
-	
 	
 	/**
 	 * Loguea un usuario
 	 * @author Alejandro
 	 *
 	 */
-	
 	private class LogInUser extends AsyncTask<Void,Integer,Void> {
 		 
 		@Override
@@ -374,4 +327,53 @@ public class LoginActivity extends SherlockActivity {
 	    }
 	}
 	
+	
+	
+	// ---------------------------------------------------------------------------------------------------------
+	// ----------------------             MÉTODOS PRIVADOS             -----------------------------------------
+	// ---------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Comprueba si todos los campos son correctos
+	 * @return True si todos los campos son correctos. False si alguno no lo es.
+	 */
+	private boolean checkFields(){
+		boolean all_correct = true ;
+		
+		edit_nombre_email.setError(null);
+		edit_password.setError(null);
+		
+		// Nombre/Email menos de 4 caracteres
+		if (edit_nombre_email.getText().toString().length() < 4){
+			edit_nombre_email.setError("Este campo debe tener al menos 4 caracteres");
+			all_correct = false;
+		}
+		
+		// Nombre/Email con espacio en blanco
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
+		if (m.find()){
+			edit_nombre_email.setError("Este campo no permite espacios en blanco");
+			all_correct = false;
+		}
+		
+		// Nombre/Email vacío
+		if (edit_nombre_email.getText().toString().length() == 0){
+			edit_nombre_email.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+
+		// Password vacío
+		if (edit_password.getText().toString().length() == 0){
+			edit_password.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Password menos de 4 caracteres
+		if (edit_password.getText().toString().length() < 6){
+			edit_password.setError("Este campo debe tener al menos 6 caracteres");
+			all_correct = false;
+		}
+
+		return all_correct;
+	}
 }

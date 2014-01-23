@@ -44,8 +44,9 @@ import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
-public class CreateEscandaloActivity extends SherlockActivity {
+public class CreateScandalohActivity extends SherlockActivity {
 
 	public static final String HAPPY_CATEGORY = "/api/v1/category/1/";
 	public static final String ANGRY_CATEGORY = "/api/v1/category/2/";
@@ -122,8 +123,8 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		progress.setMessage("Espera, por favor");
 		progress.setCancelable(false);
 		
+		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
 		txt_contador_titulo = (TextView) findViewById(R.id.txt_contador_caracteres_titulo);
-
 		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
 		edit_title.addTextChangedListener(new TextWatcher() {          
@@ -143,9 +144,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 				// TODO Auto-generated method stub		
 			} 
 		});
-		
-		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);	
-		
+				
 		img_subir_escandalo = (ImageView) findViewById(R.id.img_new_escandalo_subir);
 		img_subir_escandalo.setOnClickListener(new OnClickListener() {
 			
@@ -238,15 +237,6 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		EasyTracker.getInstance(mContext).activityStart(this);  
 	}
 	
-
-	
-	/**
-	 * onPause Detiene y elimina si había algún audio activo
-	 */
-	@Override
-	protected void onPause(){
-		super.onPause();
-	}
 	
 	
 	/**
@@ -257,6 +247,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 		super.onStop();
 		Audio.getInstance(mContext).releaseResources();
 	}
+	
 	
 	
 	/**
@@ -387,7 +378,7 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			// Si hubo algún error mostramos un mensaje
 			if (result == 666){
 	        	Toast toast;
-	        	toast = Toast.makeText(mContext, "Hubo algún error enviando el scándalOh!", Toast.LENGTH_LONG);
+	        	toast = Toast.makeText(mContext, "No se pudo mandar el scándalOh!", Toast.LENGTH_LONG);
 	        	toast.show();
 			}
 			
@@ -400,14 +391,12 @@ public class CreateEscandaloActivity extends SherlockActivity {
 					resultIntent.putExtra("category", selected_category);
 					Toast toast = Toast.makeText(mContext, "scándalOh! enviado con éxito", Toast.LENGTH_LONG);
 					toast.show();
-					Log.v("WE", "foto enviada");
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
 					
 				} else {
 					Toast toast = Toast.makeText(mContext, "Error subiendo el scándalOh!", Toast.LENGTH_LONG);
 					toast.show();
-					Log.v("WE", "foto no enviada");
 					finish();
 				}
 				
@@ -418,6 +407,5 @@ public class CreateEscandaloActivity extends SherlockActivity {
 			}		
 		}
 	}
-
 
 }

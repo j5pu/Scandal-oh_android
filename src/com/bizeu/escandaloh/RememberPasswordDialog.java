@@ -27,6 +27,7 @@ import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class RememberPasswordDialog extends Dialog{
 
@@ -84,7 +85,7 @@ public class RememberPasswordDialog extends Dialog{
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(mContext, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
 					toast.show();
 				}			
 			}
@@ -92,7 +93,7 @@ public class RememberPasswordDialog extends Dialog{
 		
 		progress = new ProgressDialog(mContext);
 		progress.setTitle("Solicitando contraseña ...");
-		progress.setMessage("Espere, por favor");
+		progress.setMessage("Espera, por favor");
 	}
 
 
@@ -102,7 +103,6 @@ public class RememberPasswordDialog extends Dialog{
 
 	/**
 	 * Solicita el envio de la contraseña a partir de un email de registro
-	 * @author Alejandro
 	 *
 	 */
 	private class RememberPassUser extends AsyncTask<Void,Integer,Void> {
@@ -128,8 +128,7 @@ public class RememberPasswordDialog extends Dialog{
 	             HttpPost post = new HttpPost(urlString);
 	             post.setHeader("Content-Type", "application/json");
 	             
-	             JSONObject dato = new JSONObject();	              
-	             
+	             JSONObject dato = new JSONObject();	                        
 	             dato.put("email", edit_email.getText().toString());
 
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);

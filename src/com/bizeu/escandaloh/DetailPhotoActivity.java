@@ -12,6 +12,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 
 public class DetailPhotoActivity extends SherlockActivity {
@@ -25,15 +26,15 @@ public class DetailPhotoActivity extends SherlockActivity {
 	private Context mContext;
 	private String route_image;
 	
+	
 	/**
 	 * onCreate
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.photo_detail);
 		
-		Log.v("WE","Entra en oncreate");
+		setContentView(R.layout.photo_detail);
 		
 		played_already = false;
 		mContext = this;
@@ -41,8 +42,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 		// Quitamos el action bar
 		getSupportActionBar().hide();
 			
-		if (getIntent() != null){
-			
+		if (getIntent() != null){	
 			// Obtenemos y mostramos la foto		
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
 			photo = ImageUtils.bytesToBitmap(bytes);
@@ -70,8 +70,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 		if (!uri_audio.equals("null") && !played_already){
 			played_already = true;	
 			new PlayAudio().execute();	
-		}
-		
+		}	
 	}
 	
 	
@@ -81,7 +80,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override 
 	public void onStart(){
 		super.onStart();
-		//EasyTracker.getInstance(this).activityStart(this);
+		EasyTracker.getInstance(this).activityStart(this);
 	}
 	
 	
@@ -92,11 +91,11 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	protected void onPause(){
 		super.onPause();
-		/*
+		
 		if (!orientation_changed){
 			Audio.getInstance(mContext).releaseResources();
 		}
-		*/
+		
 	}
 	
 	
@@ -106,7 +105,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	public void onStop(){
 		super.onStop();
-		//EasyTracker.getInstance(this).activityStop(this);
+		EasyTracker.getInstance(this).activityStop(this);
 	}
 	
 	
@@ -116,20 +115,24 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		// Volvemos a permitir que se pulse en las fotos del carruse
+		// Volvemos a permitir que se pulse en las fotos del carrusel
 		MyApplication.PHOTO_CLICKED = false; 
 		
 	}
 	
 	
-
+	/**
+	 * onConfigurationChanged
+	 */
 	public void onConfigurationChanged(Configuration newConfig) {
 	    super.onConfigurationChanged(newConfig);	    
 	    // Ha cambiado la orientación del dispositivo
         orientation_changed = true;
 	  }
 	
-	
+	/**
+	 * onSaveInstanceState
+	 */
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 	  super.onSaveInstanceState(savedInstanceState);
@@ -137,7 +140,9 @@ public class DetailPhotoActivity extends SherlockActivity {
 	}
 	
 	
-	
+	/**
+	 * onRestoreInstanceState
+	 */
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 	  super.onRestoreInstanceState(savedInstanceState);
@@ -148,20 +153,16 @@ public class DetailPhotoActivity extends SherlockActivity {
 	
 	/**
 	 * Reproduce el audio
-	 * @author Alejandro
 	 *
 	 */
 	private class PlayAudio extends AsyncTask<String,Integer,Boolean> {
-		 
-		
+		 	
 		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
 	    	Audio.getInstance(mContext).startPlaying("http://scandaloh.s3.amazonaws.com/" + uri_audio);							
 	        return false;
-	    }
-		
+	    }	
 	}
-
 
 }

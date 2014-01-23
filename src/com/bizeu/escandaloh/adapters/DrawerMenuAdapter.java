@@ -1,6 +1,6 @@
 package com.bizeu.escandaloh.adapters;
 
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 import android.content.Context;
 import android.view.LayoutInflater;

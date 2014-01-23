@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.model.Comment;
 
 public class CommentAdapter extends ArrayAdapter<Comment> {
@@ -25,6 +24,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
     private Comment comment;
     private String user_name_owner;
 	
+    
     /**
      * Constructor
      * @param context
@@ -39,6 +39,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         this.user_name_owner = user_name;
     }
 
+    
     
     /**
      * getView
@@ -60,14 +61,12 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             holder.txtDate = (TextView)mView.findViewById(R.id.txt_comment_date);
             holder.imgUser = (ImageView)mView.findViewById(R.id.img_comment_user);
             holder.imgClock = (ImageView)mView.findViewById(R.id.img_comment_clock);
-            
-              
+                         
             mView.setTag(holder);
         }
         
         else{
-            holder = (CommentHolder)mView.getTag();
-            
+            holder = (CommentHolder)mView.getTag();         
             // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha
             if (user_name_owner.equals(comment.getUsername())){
             	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.azul));

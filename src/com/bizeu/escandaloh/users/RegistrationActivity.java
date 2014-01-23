@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -130,10 +130,10 @@ public class RegistrationActivity extends SherlockActivity {
 				// TODO Auto-generated method stub		
 			}
 
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,int after) {
-					// TODO Auto-generated method stub		
-				} 
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+				// TODO Auto-generated method stub		
+			} 
 		});
 				
 				
@@ -181,79 +181,6 @@ public class RegistrationActivity extends SherlockActivity {
 	}
 	
 	
-	/**
-	 * Comprueba si todos los campos son correctos
-	 * @return True si todos los campos son correctos. False si alguno no lo es.
-	 */
-	private boolean checkFields(){
-		boolean all_correct = true ;
-		
-		edit_nombre_usuario.setError(null);
-		edit_password_usuario.setError(null);
-		edit_email_usuario.setError(null);
-		
-		// Nombre menos de 4 caracteres
-		if (edit_nombre_usuario.getText().toString().length() < 4){
-			edit_nombre_usuario.setError("Este campo debe tener al menos 4 caracteres");
-			all_correct = false;
-		}
-		
-		// Nombre/Email con espacio en blanco
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher m = pattern.matcher(edit_nombre_usuario.getText().toString());
-		if (m.find()){
-			edit_nombre_usuario.setError("Este campo no permite espacios en blanco");
-			all_correct = false;
-		}
-		
-		
-		// Nombre vacío
-		if (edit_nombre_usuario.getText().toString().length() == 0){
-			edit_nombre_usuario.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
-		// Email incorrecto
-		if (!isEmailValid(edit_email_usuario.getText().toString())){
-			edit_email_usuario.setError("Introduzca una dirección de email válida");
-			all_correct = false;
-		}	
-		// Email vacío
-		if (edit_email_usuario.getText().toString().length() == 0){
-			edit_email_usuario.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
-		// Password menos de 4 caracteres
-		if (edit_password_usuario.getText().toString().length() < 6){
-			edit_password_usuario.setError("Este campo debe tener al menos 6 caracteres");
-			all_correct = false;
-		}
-		// Password vacío
-		if (edit_password_usuario.getText().toString().length() == 0){
-			edit_password_usuario.setError("Este campo es obligatorio");
-			all_correct = false;
-		}
-		return all_correct;
-	}
-	
-	
-	/**
-	 * Comprueba si un string tiene formato de email
-	 * @param email
-	 * @return
-	 */
-	public static boolean isEmailValid(String email) {
-	    boolean isValid = false;
-
-	    String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-	    CharSequence inputStr = email;
-
-	    Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-	    Matcher matcher = pattern.matcher(inputStr);
-	    if (matcher.matches()) {
-	        isValid = true;
-	    }
-	    return isValid;
-	}
 	
 	
 	
@@ -400,11 +327,89 @@ public class RegistrationActivity extends SherlockActivity {
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
 		        	setResult(Activity.RESULT_OK);
 		        	finish();
-
-					Log.e("WE","Registro ok");
 				}	
 			}				
 	    }
+	}
+	
+	
+	
+	// ----------------------------------------------------------------------------------------------------------
+	// ---------------------------        MÉTODOS PRIVADOS       ------------------------------------------------
+	// ----------------------------------------------------------------------------------------------------------
+	
+
+	/**
+	 * Comprueba si todos los campos son correctos
+	 * @return True si todos los campos son correctos. False si alguno no lo es.
+	 */
+	private boolean checkFields(){
+		boolean all_correct = true ;
+		
+		edit_nombre_usuario.setError(null);
+		edit_password_usuario.setError(null);
+		edit_email_usuario.setError(null);
+		
+		// Nombre menos de 4 caracteres
+		if (edit_nombre_usuario.getText().toString().length() < 4){
+			edit_nombre_usuario.setError("Este campo debe tener al menos 4 caracteres");
+			all_correct = false;
+		}
+		
+		// Nombre/Email con espacio en blanco
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher m = pattern.matcher(edit_nombre_usuario.getText().toString());
+		if (m.find()){
+			edit_nombre_usuario.setError("Este campo no permite espacios en blanco");
+			all_correct = false;
+		}
+			
+		// Nombre vacío
+		if (edit_nombre_usuario.getText().toString().length() == 0){
+			edit_nombre_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Email incorrecto
+		if (!isEmailValid(edit_email_usuario.getText().toString())){
+			edit_email_usuario.setError("Introduzca una dirección de email válida");
+			all_correct = false;
+		}	
+		// Email vacío
+		if (edit_email_usuario.getText().toString().length() == 0){
+			edit_email_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		// Password menos de 4 caracteres
+		if (edit_password_usuario.getText().toString().length() < 6){
+			edit_password_usuario.setError("Este campo debe tener al menos 6 caracteres");
+			all_correct = false;
+		}
+		// Password vacío
+		if (edit_password_usuario.getText().toString().length() == 0){
+			edit_password_usuario.setError("Este campo es obligatorio");
+			all_correct = false;
+		}
+		return all_correct;
+	}
+	
+	
+	/**
+	 * Comprueba si un string tiene formato de email
+	 * @param email
+	 * @return
+	 */
+	public static boolean isEmailValid(String email) {
+	    boolean isValid = false;
+
+	    String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+	    CharSequence inputStr = email;
+
+	    Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+	    Matcher matcher = pattern.matcher(inputStr);
+	    if (matcher.matches()) {
+	        isValid = true;
+	    }
+	    return isValid;
 	}
 	
 }
