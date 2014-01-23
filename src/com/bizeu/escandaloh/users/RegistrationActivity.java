@@ -334,18 +334,14 @@ public class RegistrationActivity extends SherlockActivity {
 	                		 has_name_error = true;
 	                	 }
 	                	 if (jsonReason.has("password")){
-	                		 JSONArray array = (JSONArray) jsonReason.get("password");
-	                		 password_error = (String) array.get(0);
-	                		
-	                		 //Log.v("WE",array.toString());
-	                		 //password_error = (ArrayList<String>) jsonReason.get("password");
-	                		// password_error = jsonReason.getString("password");
-	                		 has_password_error = true;
-	                		 
+	                		 JSONArray passwordErrors = (JSONArray) jsonReason.get("password");
+	                		 password_error = (String) passwordErrors.get(0);
+	                		 has_password_error = true;	                		 
 	                	 }
 	                	 
 	                	 if (jsonReason.has("email")){
-	                		 email_error = jsonReason.getString("email");
+	                		 JSONArray jsonEmailErrors = new JSONArray(jsonReason.getString("email"));
+	                		 email_error = (String) jsonEmailErrors.get(0);
 	                		 has_email_error = true;
 	                	 }
 	                 }

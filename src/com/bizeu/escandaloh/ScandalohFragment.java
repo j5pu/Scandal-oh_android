@@ -1,13 +1,42 @@
 package com.bizeu.escandaloh;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import com.applidium.shutterbug.FetchableImageView;
-import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.model.Escandalo;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,25 +44,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class ScandalohFragment extends Fragment {
 
 	private static final String ID = "id";
     private static final String URL = "url";
+    private static final String URL_BIG = "url_big";
     private static final String TITLE = "title";
     private static final String NUM_COMMENTS = "num_comments";
     private static final String HAS_AUDIO = "has_audio";
     private static final String USER_NAME = "user_name";
     private static final String DATE = "date";
-
+    private static final String URI_AUDIO = "uri_audio";
+ 
     private String id;
     private String url;
+    private String url_big;
     private String title;
     private int num_comments;
     private boolean has_audio;
     private String user_name;
     private String date;
+    private Bitmap bitma;
+	private boolean any_error;
+	private int chosen_report; // 1:Copyright      2:Ilegalcontent      3:Spam
+	private String uri_audio;
     
     TextView num_com ;
  
@@ -51,11 +88,14 @@ public class ScandalohFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putString(ID, escan.getId());
         bundle.putString(URL, escan.getRouteImg());
+        bundle.putString(URL_BIG, escan.getRouteImgBig());
         bundle.putString(TITLE, escan.getTitle());
         bundle.putInt(NUM_COMMENTS, escan.getNumComments());
         bundle.putBoolean(HAS_AUDIO, escan.hasAudio());
         bundle.putString(USER_NAME, escan.getUser());
         bundle.putString(DATE, escan.getDate());
+        bundle.putString(URI_AUDIO, escan.getUriAudio());
+
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
  
@@ -73,11 +113,13 @@ public class ScandalohFragment extends Fragment {
         // Obtenemos los valores del fragmento (del escándalo)
         this.id = (getArguments() != null) ? getArguments().getString(ID) : null;
         this.url = (getArguments() != null) ? getArguments().getString(URL) : null;
+        this.url_big = (getArguments() != null) ? getArguments().getString(URL_BIG) : null;
         this.title = (getArguments() != null) ? getArguments().getString(TITLE) : null;
         this.num_comments = (getArguments() != null) ? getArguments().getInt(NUM_COMMENTS) : 0;
         this.has_audio = (getArguments() != null) ? getArguments().getBoolean(HAS_AUDIO) : false;
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
+        this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
     }
  
     
@@ -95,21 +137,85 @@ public class ScandalohFragment extends Fragment {
         // Foto
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_foto);
         img.setImage(this.url, R.drawable.cargando);      
-        img.setListener(new FetchableImageViewListener() {
+     
+        img.setOnClickListener(new View.OnClickListener() {
 			
-				@Override
-				public void onImageFetched(Bitmap bitmap, String url) {			
-				}
+			@Override
+			public void onClick(View v) {
+				/*
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Ver foto en detalle desde carrusel",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				*/
 				
-				@Override
-				public void onImageFailure(String url) {
-					Log.v("WE","Error obteniendo foto: " + url);
+				
+				// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
+				if (!MyApplication.PHOTO_CLICKED){
+					MyApplication.PHOTO_CLICKED = true;
+					
+					// Paramos si hubiera algún audio reproduciéndose
+					Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+					
+					Intent i = new Intent(getActivity(), DetailPhotoActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					ImageView imView = (ImageView) v;
+					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
+					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
+					i.putExtra("bytes", bytes);
+					i.putExtra("uri_audio", uri_audio);
+					
+					getActivity().startActivity(i);				
 				}	
-			});
+			}
+		});
         
-        // Título
-        TextView tit = (TextView) rootView.findViewById(R.id.txt_titulo);
-        tit.setText(title);
+        
+        img.setOnLongClickListener(new View.OnLongClickListener() {
+        	
+			@Override
+			public boolean onLongClick(View v) {			
+				final View mView = v;
+				
+				/*
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado prolongadamente",  // Event action (required)
+				                   "Guardar foto en galería desde carrusel",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				  */
+				
+				// Paramos si hubiera algún audio reproduciéndose
+				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+				
+				// Guardamos la foto en la galería	
+				final CharSequence[] items = {"Guardar foto en la galería"};
+				 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			        builder.setItems(items, new DialogInterface.OnClickListener() {
+			            @Override
+			            public void onClick(DialogInterface dialog, int item) {
+			            	
+			                if (items[item].equals("Guardar foto en la galería")) {
+			                	new SaveImageTask(getActivity()).execute(url_big);     			   
+			                } 			                
+			            }
+			        });
+			        builder.show();
+			        
+				return true;
+			}
+		});
+        
+
         
         // Número de comentarios
         num_com = (TextView) rootView.findViewById(R.id.txt_numero_comentarios);
@@ -148,6 +254,9 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
         
+        // Título
+        TextView tit = (TextView) rootView.findViewById(R.id.txt_titulo);
+        tit.setText(title);
         
         // Micrófono
         ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_microfono);
@@ -157,6 +266,31 @@ public class ScandalohFragment extends Fragment {
         else{
         	aud.setVisibility(View.INVISIBLE);
         }
+        aud.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				/*
+				 // Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Escuchar audio desde carrusel",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				  */
+				
+				// Paramos si hubiera algún audio reproduciéndose
+				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+				
+				// Lo reproducimos		
+				if (uri_audio != null){
+					new PlayAudioTask().execute(uri_audio);	
+				}
+			}
+		});
         
         // Nombre de usuario
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
@@ -164,7 +298,87 @@ public class ScandalohFragment extends Fragment {
         
         // Fecha
         TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
-        dat.setText(changeFormatDate(date));     
+        dat.setText(changeFormatDate(date));  
+        
+        // Compartir 
+        ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
+        share.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				/*
+				// Mandamos el evento a Google Analytics
+				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				 easyTracker.send(MapBuilder
+				      .createEvent("Acción UI",     // Event category (required)
+				                   "Boton clickeado",  // Event action (required)
+				                   "Compartir escándalo desde carrusel",   // Event label
+				                   null)            // Event value
+				      .build()
+				  );
+				  */
+				
+				 // Creamos un menu para elegir entre compartir y denunciar foto
+				 final CharSequence[] opciones_compartir = {"Compartir scándalOh!", "Reportar scándalOh!"};
+				 AlertDialog.Builder dialog_compartir = new AlertDialog.Builder(getActivity());
+				 dialog_compartir.setTitle("Selecciona opción");
+				 dialog_compartir.setItems(opciones_compartir, new DialogInterface.OnClickListener() {
+			            @Override
+			            public void onClick(DialogInterface dialog, int item) {
+			            	
+			            	// Compartir scándalOh
+			                if (opciones_compartir[item].equals("Compartir scándalOh!")) {
+			    				// Paramos si hubiera algún audio reproduciéndose
+			    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+			    				
+			    				// Compartimos la foto
+			    				Uri screenshotUri = Uri.parse(url_big);	
+			    				new ShareImageTask(getActivity().getBaseContext(), title).execute(screenshotUri.toString());	      			   
+			                } 
+			                
+			                // Reportar foto
+			                else if (opciones_compartir[item].equals("Reportar scándalOh!")) {
+			                	
+			                	// Si el usuario está logueado
+			                	if (MyApplication.logged_user){
+				                	// Creamos un menu para elegir el tipo de report
+				                	final CharSequence[] opciones_reportar = {"Material ofensivo", "Spam", "Copyright"};
+				                	AlertDialog.Builder dialog_report = new AlertDialog.Builder(getActivity());
+				                	dialog_report.setTitle("Reportar esta foto por");
+				                	dialog_report.setItems(opciones_reportar, new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int item) {
+
+											// Material ofensivo
+											if (opciones_reportar[item].equals("Material ofensivo")){
+												chosen_report = 2;
+											}
+											// Spam
+											else if (opciones_reportar[item].equals("Spam")){
+												chosen_report = 3;
+											}
+											// Copyright
+											else if (opciones_reportar[item].equals("Copyright")){
+												chosen_report = 1;
+											}	
+											new ReportPhoto(getActivity().getBaseContext()).execute();
+										}
+									});
+				                	dialog_report.show();
+			                	}
+			                	// No está logueado
+			                	else{
+			    		        	Toast toast = Toast.makeText(getActivity().getBaseContext(), "Debes iniciar sesión para reportar", Toast.LENGTH_LONG);
+			    		        	toast.show();        
+			                	}
+
+			                } 
+			            }
+			        });
+				 dialog_compartir.show();			
+			}
+		});
         
         // Devolvemos la vista
         return rootView;
@@ -191,4 +405,284 @@ public class ScandalohFragment extends Fragment {
     public int getNumComments(){
     	return num_comments;
     }
+    
+    
+    
+	/**
+	 * Comparte un escándalo
+	 *
+	 */
+	private class ShareImageTask extends AsyncTask<String, String, String> {
+	    private Context context;
+	    private ProgressDialog pDialog;
+	    URL myFileUrl;
+	    String title;
+	    Bitmap bmImg = null;
+	    Intent share;
+	    File file;
+
+	    public ShareImageTask(Context context, String title) {
+	        this.context = context;
+	        this.title = title;
+	    }
+
+	    @Override
+	    protected void onPreExecute() {
+	        super.onPreExecute();
+
+	        pDialog = new ProgressDialog(getActivity());
+	        pDialog.setMessage("Preparando para compartir ...");
+	        pDialog.setIndeterminate(false);
+	        pDialog.setCancelable(false);
+	        pDialog.show();		     
+	    }
+
+	    @Override
+	    protected String doInBackground(String... args) {
+	    	
+	    	// Obtenemos la foto desde la url de amazon
+	        try {
+	            myFileUrl = new URL(args[0]);
+	            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+	            conn.setDoInput(true);
+	            conn.connect();
+	            InputStream is = conn.getInputStream();
+	            bmImg = BitmapFactory.decodeStream(is);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        
+	        try {
+	            String path = myFileUrl.getPath();
+	            String idStr = path.substring(path.lastIndexOf('/') + 1);
+	            File filepath = Environment.getExternalStorageDirectory();
+	            File dir = new File(filepath.getAbsolutePath()+ "/ScándalOh/");
+	            dir.mkdirs();
+	            String fileName = idStr;
+	            // Guardamos la ruta de la foto para más adelante eliminarla
+	            MyApplication.FILES_TO_DELETE.add(filepath.getAbsolutePath() + "/ScándalOh/" + idStr);
+	            file = new File(dir, fileName);
+	            FileOutputStream fos = new FileOutputStream(file);
+	            bmImg.compress(CompressFormat.JPEG, 100, fos);
+	            fos.flush();
+	            fos.close();
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            /*
+	             // Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(context);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build());
+				                       */
+	        }
+
+	        return null;
+	    }
+
+	    @Override
+	    protected void onPostExecute(String args) {
+	    	// Quitamos el progress dialog
+	        pDialog.dismiss();  
+	        
+	        // Ejecutamos el intent de compartir
+	        share = new Intent(Intent.ACTION_SEND);		        
+	        share.putExtra(Intent.EXTRA_SUBJECT, "Deberías ver esto. ¡Qué escándalo!");
+	        share.putExtra(Intent.EXTRA_TEXT, title);
+	        share.putExtra(Intent.EXTRA_TITLE, title);	        
+	        share.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
+	        share.setType("image/jpeg");
+	        getActivity().startActivityForResult(Intent.createChooser(share, "Compartir scándalOh! con..."), MainActivity.SHARING);
+	    }
+	}	
+	
+	
+	
+	/**
+	 * Guarda una foto en la galería
+	 *
+	 */
+	private class SaveImageTask extends AsyncTask<String, String, String> {
+	    private Context context;
+	    private ProgressDialog pDialog;
+
+	    public SaveImageTask(Context context) {
+	        this.context = context;
+	    }
+
+	    @Override
+	    protected void onPreExecute() {
+	        super.onPreExecute();
+
+	        pDialog = new ProgressDialog(context);
+	        pDialog.setMessage("Guardando ...");
+	        pDialog.setIndeterminate(false);
+	        pDialog.setCancelable(false);
+	        pDialog.show();		     
+	    }
+
+	    @Override
+	    protected String doInBackground(String... args) {
+	        try {
+		    	// Obtenemos la foto desde la url
+            	bitma = ImageUtils.getBitmapFromURL(args[0]);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            /*            
+	             // Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(context);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       e),                                                             // The exception.
+				                       false).build());
+				 */
+	        }
+
+	        return null;
+	    }
+
+	    @Override
+	    protected void onPostExecute(String args) {
+	    	// Quitamos el progress dialog
+	        pDialog.dismiss();  
+	        
+	        // Guardamos la foto en la galería
+			ImageUtils.saveBitmapIntoGallery(bitma, context);	
+	    }
+	}	
+	
+	
+	
+	
+	
+	
+
+	/**
+	 * Reporta una foto
+	 *
+	 */
+	private class ReportPhoto extends AsyncTask<Void,Integer,Integer> {
+		 
+	    private ProgressDialog pDialog;
+		private Context mContext;
+		
+	    public ReportPhoto (Context context){
+	         mContext = context;
+	         any_error = false;
+	    }
+		
+		@Override
+		protected void onPreExecute(){
+			// Mostramos el ProgressDialog
+	        pDialog = new ProgressDialog(getActivity());
+	        pDialog.setMessage("Reportando scándalOh! ...");
+	        pDialog.setIndeterminate(false);
+	        pDialog.setCancelable(false);
+	        pDialog.show();	
+		}
+		
+		@Override
+	    protected Integer doInBackground(Void... params) {
+	 
+	    	HttpEntity resEntity;
+	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photocomplaint/";        
+
+	        HttpResponse response = null;
+	        
+	        try{
+	             HttpClient client = new DefaultHttpClient();
+	             HttpPost post = new HttpPost(urlString);
+	             post.setHeader("Content-Type", "application/json");
+	             
+	             JSONObject dato = new JSONObject();
+	             
+	             dato.put("user", MyApplication.resource_uri);
+	             dato.put("photo", "/api/v1/photo/" + id +"/");
+	             dato.put("category", chosen_report);
+
+	             // Formato UTF-8 (ñ,á,ä,...)
+	             StringEntity entity = new StringEntity(dato.toString(),  HTTP.UTF_8);
+	             post.setEntity(entity);
+
+	             response = client.execute(post);
+	             resEntity = response.getEntity();
+	             final String response_str = EntityUtils.toString(resEntity);
+	             
+	             Log.i("WE",response_str);
+	        }
+	        
+	        catch (Exception ex){
+	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             any_error = true; // Indicamos que hubo algún error
+	             
+	             /*
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());  
+				*/
+	        }
+	        
+	        if (any_error){
+	        	return 666;
+	        }
+	        else{
+		        // Devolvemos el resultado 
+		        return (response.getStatusLine().getStatusCode());
+	        }
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Integer result) {
+			
+			// Quitamos el ProgressDialog
+			if (pDialog.isShowing()) {
+		        pDialog.dismiss();
+		    }
+			
+			// Si hubo algún error mostramos un mensaje
+			if (any_error){
+				Log.v("WE","report no enviado");
+				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			else{
+				
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result <300){
+		        	Log.v("WE","report enviado");
+		        	
+					Toast toast = Toast.makeText(mContext, "Report enviado correctamente", Toast.LENGTH_SHORT);
+					toast.show();      	
+		        }
+		        else{
+		        	Log.v("WE","report no enviado");
+		        	Toast toast;
+		        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
+		        	toast.show();        	
+		        }	      
+			}
+	    }
+	}
+	
+	
+	/**
+	 * Reproduce el audio
+	 *
+	 */
+	private class PlayAudioTask extends AsyncTask<String,Integer,Boolean> {
+		 
+		@Override
+	    protected Boolean doInBackground(String... params) {
+	    	
+	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
+	        return false;
+	    }	
+	}
 }

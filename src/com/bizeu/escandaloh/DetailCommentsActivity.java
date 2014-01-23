@@ -1,7 +1,7 @@
  package com.bizeu.escandaloh;
 
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,8 +13,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -25,7 +23,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,7 +30,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
@@ -89,9 +85,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 		mContext = this;
 		
-		// Quitamos el action bar
-		//getSupportActionBar().hide();
-		
 		// Quitamos el texto del action bar
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		
@@ -141,7 +134,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				// Si hay conexión
 				if (Connectivity.isOnline(mContext)){
 					written_comment = edit_new_comment.getText().toString();
-					// Si ha escrito algo y la longitud es menor de 500 caracteres lo intentamos enviar
+					// Si ha escrito algo y la longitud es menor de 500 caracteres lo enviamos
 					if (!written_comment.equals("") && written_comment.length() < 501){
 						Log.v("WE","Longitud comentario: " + written_comment.length());
 						new SendComment(context).execute();
@@ -351,7 +344,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 	
 	/**
 	 * Muestra la lista de comentarios para esa foto
-	 * @author Alejandro
 	 *
 	 */
 	private class GetComments extends AsyncTask<Void,Integer,Integer> {

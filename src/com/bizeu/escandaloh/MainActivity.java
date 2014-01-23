@@ -1,6 +1,7 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
@@ -20,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -99,6 +101,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     DrawerMenuAdapter mMenuAdapter;
     String[] options;
     ActionBarDrawerToggle mDrawerToggle;
+    private boolean no_hay_escandalos;
 	
 	
 	/**
@@ -110,6 +113,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		setContentView(R.layout.main);
 		
+		no_hay_escandalos = false;
 		mContext = this;
       	escandalos = new ArrayList<Escandalo>();  
 		
@@ -193,7 +197,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         // Sombra del menu sobre la pantalla
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         
-        options = new String[] {"Perfil", "Notificaciones", "País", "Ajustes", "Danos tu opinión"};
+        options = new String[] {"Ajustes"};
+        //TODO V2.0 options = new String[] {"Perfil", "Notificaciones", "País", "Ajustes", "Danos tu opinión"};
         
         mMenuAdapter = new DrawerMenuAdapter(MainActivity.this, options);
        
@@ -228,10 +233,21 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
       	//TODO Asignamos categoria happy la primera vez
       	category = HAPPY;
       	but_happy.setClickable(false);
+      	but_happy.setTypeface(null, Typeface.BOLD);
 	
-		// Obtenemos los 10 primeros escándalos
-		getEscandalosAsync = new GetEscandalos();
-    	getEscandalosAsync.execute();
+		// Si hay conexión
+		if (Connectivity.isOnline(mContext)){
+			// Obtenemos los 10 primeros escándalos
+			getEscandalosAsync = new GetEscandalos();
+			getEscandalosAsync.execute();
+		}
+		else{
+			Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+			toast.show();
+			// Quitamos el progresbar y mostramos la lista de escandalos
+			loading.setVisibility(View.GONE);
+			pager.setVisibility(View.VISIBLE);
+		}
 	}
 
     
@@ -271,10 +287,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				}
 			}
 	    }		
-		
+		*/
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);  
-		*/
+		
 	}
 
 	
@@ -326,6 +342,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	@Override
 	protected void onPause() {
 	    super.onPause();   
+	    Log.v("WE","Entra en onPause");
 	}
 	
 	
@@ -335,8 +352,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	@Override
 	public void onStop(){
 		super.onStop();
+		Log.v("WE","Entra en onStop");
 		// Paramos google analytics
-		//EasyTracker.getInstance(this).activityStop(this);
+		EasyTracker.getInstance(this).activityStop(this);
 	}
 	
 	
@@ -346,6 +364,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
+		Log.v("WE","Entra en onDestroy");
 	    cancelGetEscandalos();
 	}
 	
@@ -451,14 +470,16 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				                     if (checkCameraHardware(mContext)){
 										Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 										File photo = null;
-										try{
-									        photo = createFileTemporary("picture", ".png");
-									        photo.delete();
+									    photo = createFileTemporary("picture", ".png");
+									        //photo.delete();
+									    if (photo != null){
 										    mImageUri = Uri.fromFile(photo);
 										    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 											startActivityForResult(takePictureIntent, SHOW_CAMERA);
+											photo.delete();
 									    }
-									    catch(Exception e){
+
+									    	/*
 									        Log.v("WE", "Can't create file to take picture!");
 											// Mandamos la excepcion a Google Analytics
 											easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
@@ -467,7 +488,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 											                       false).build()); 
 											Toast toast = Toast.makeText(mContext, "No se pudo acceder a la cámara", Toast.LENGTH_SHORT);
 											toast.show();
-									    }
+											*/
+									    //}
 										
 
 									}
@@ -554,6 +576,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 						getNewEscandalosAsync.execute();
 					}
 					else{
+						no_hay_escandalos = true; // Indicamos que no hay escándalos aún
 						getEscandalosAsync = new GetEscandalos();
 					   	getEscandalosAsync.execute();
 					}
@@ -591,11 +614,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					if (v.getId() == R.id.but_action_bar_happy){
 						Log.v("WE","seleccionado happy");
 						category = HAPPY;
+				      	but_happy.setTypeface(null, Typeface.BOLD);
+				      	but_angry.setTypeface(null, Typeface.NORMAL);
 					}
 					// Seleccionado angry
 					else{
 						Log.v("WE","Seleccionado angry");
 						category = ANGRY;
+				      	but_angry.setTypeface(null, Typeface.BOLD);
+				      	but_happy.setTypeface(null, Typeface.NORMAL);
 					}
 
 					pager.setCurrentItem(0);
@@ -854,6 +881,12 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		    }
 		    else{
 		    	but_happy.setClickable(true);
+		    }
+		    
+		    // Si hemos llegado aqui porque no habían escándalos, paramos el loading del menu
+		    if (no_hay_escandalos){
+				refreshFinished();
+				no_hay_escandalos = false;
 		    }
 			
 			// Ya no se están obteniendo escándalos (abrimos la llave)
@@ -1147,13 +1180,28 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 * @return
 	 * @throws Exception
 	 */
-	private File createFileTemporary(String part, String ext) throws Exception{
+	private File createFileTemporary(String part, String ext) {
 	    File scandaloh_dir = Environment.getExternalStorageDirectory();
-	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/temp/");
+	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/");
 	    if(!scandaloh_dir.exists()){
-	    	scandaloh_dir.mkdir();
+	    	scandaloh_dir.mkdirs();
 	    }
-	    return File.createTempFile(part, ext, scandaloh_dir);
+	    try {
+			return File.createTempFile(part, ext, scandaloh_dir);
+		} catch (IOException e) {
+			e.printStackTrace();
+	        Log.v("MainActivity", "No se pudo crear archivo temporal para la foto");
+			// Mandamos la excepcion a Google Analytics
+	        EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+			                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+			                       e),                                                             // The exception.
+			                       false).build()); 
+			Toast toast = Toast.makeText(mContext, "No se pudo acceder a la cámara", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	    
+	    return null;
 	}
 	
 	
@@ -1216,6 +1264,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 * Listener para las opciones del menu lateral
 	 *
 	 */
+	/*
+	 * TODO V2.0
+	 * @author Alejandro
+	 *
+	 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1248,5 +1301,23 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             mDrawerLayout.closeDrawer(list_menu_lateral);
         }
     }
+	*/
 	
+	
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            switch (position) {                  
+	            case 0: // Ajustes
+	            	Log.v("WE","Seleccionado ajustes");
+	            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+	            	startActivity(i);
+	            	break;            
+            }
+            list_menu_lateral.setItemChecked(position, true);
+     
+            // Cerramos el menu
+            mDrawerLayout.closeDrawer(list_menu_lateral);
+        }
+    }
 }

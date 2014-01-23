@@ -7,7 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
+import android.util.Log;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
@@ -23,6 +23,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	private boolean played_already ;
 	private boolean orientation_changed ;
 	private Context mContext;
+	private String route_image;
 	
 	/**
 	 * onCreate
@@ -32,8 +33,9 @@ public class DetailPhotoActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo_detail);
 		
+		Log.v("WE","Entra en oncreate");
+		
 		played_already = false;
-
 		mContext = this;
 		
 		// Quitamos el action bar
@@ -41,7 +43,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 			
 		if (getIntent() != null){
 			
-			// Obtenemos y mostarmos la foto
+			// Obtenemos y mostramos la foto		
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
 			photo = ImageUtils.bytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
@@ -63,11 +65,13 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	protected void onResume(){
 		super.onResume();
+		
 		// Si no lo ha reproducido ya (sólo lo reproducimos una vez): reproducimos el audio
 		if (!uri_audio.equals("null") && !played_already){
 			played_already = true;	
 			new PlayAudio().execute();	
 		}
+		
 	}
 	
 	
@@ -77,7 +81,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override 
 	public void onStart(){
 		super.onStart();
-		EasyTracker.getInstance(this).activityStart(this);
+		//EasyTracker.getInstance(this).activityStart(this);
 	}
 	
 	
@@ -88,9 +92,11 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	protected void onPause(){
 		super.onPause();
+		/*
 		if (!orientation_changed){
 			Audio.getInstance(mContext).releaseResources();
 		}
+		*/
 	}
 	
 	
@@ -100,7 +106,7 @@ public class DetailPhotoActivity extends SherlockActivity {
 	@Override
 	public void onStop(){
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this);
+		//EasyTracker.getInstance(this).activityStop(this);
 	}
 	
 	

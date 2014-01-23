@@ -28,14 +28,14 @@ public class ImageUtils {
 
 	
 	/**
-	 * Transforma un Bitmap en un array de bytes
+	 * Transforma un Bitmap en un array de bytes (JPEG)
 	 * @param bmp
 	 * @return
 	 */
 	public static byte[] bitmapToBytes(Bitmap bmp){
 		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+		bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		byte[] byteArray = stream.toByteArray();
 		
 		return byteArray;
@@ -172,7 +172,7 @@ public class ImageUtils {
 	 */
     public static void saveBitmapIntoGallery(Bitmap bmp, Context context){
     	File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"ScándalOh");
-    	imageFileFolder.mkdir();
+    	imageFileFolder.mkdirs();
     	FileOutputStream out = null;
     	
     	// El nombre de la foto se obtiene a partir de la fecha y hora exacta actual

@@ -49,7 +49,7 @@
                 android:ems="10"
                 android:hint="mail98@users.com"
                 android:inputType="textEmailAddress"
-                android:textColorHint="@color/azul"
+                android:textColorHint="@color/azul_hint"
                 android:textColor="@color/azul"
                 android:paddingLeft="5dp" >
 

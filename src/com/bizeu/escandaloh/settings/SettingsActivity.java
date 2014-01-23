@@ -38,14 +38,14 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.settings);
+		addPreferencesFromResource(R.xml.settings2);
 
 		// Título action bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setTitle("Ajustes");
 
 		perfilCategory = (PreferenceCategory) findPreference("perfilCategory");
-		checkP = (CheckBoxPreference) findPreference("autoreproduccion");
+		// TODO V2.0 checkP = (CheckBoxPreference) findPreference("autoreproduccion");
 		cerrar_sesion = (Preference) findPreference("cerrarSesion");
 		iniciar_sesion = (Preference) findPreference("iniciarSesion");
 		registro = (Preference) findPreference("registro");
@@ -69,6 +69,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 
+		/* V2.0
 		checkP.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference,
@@ -81,6 +82,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				return true;
 			}
 		});
+		*/
 	}
 
 	

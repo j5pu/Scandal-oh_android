@@ -163,7 +163,7 @@ ConnectionCallbacks, OnConnectionFailedListener */{
 				    public void finish(String result){    	
 				       // FACEBOOK
 				       if (result.equals("FACEBOOK")){			       
-				    	   // Hacemos loguin con facebook
+				    	   // Hacemos login con facebook
 				    	   Session.openActiveSession(acti, true, new Session.StatusCallback() {
 				    	        		
 				    		   // Callback de cuando cambia el estado de la sesión
