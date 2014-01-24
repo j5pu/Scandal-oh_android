@@ -21,7 +21,7 @@
         android:visibility="gone" />
       
               
-            <ProgressBar
+      <ProgressBar
         android:id="@+id/loading_escandalos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -34,11 +34,12 @@
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/gris_claro"
         android:choiceMode="singleChoice"
         android:divider="@color/morado"
         android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector"/>
+        android:listSelector="@drawable/list_selector"
+        android:background="#88FFFFFF"
+        />
 
  
 </android.support.v4.widget.DrawerLayout>

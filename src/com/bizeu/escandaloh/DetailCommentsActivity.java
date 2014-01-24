@@ -137,13 +137,12 @@ public class DetailCommentsActivity extends SherlockActivity {
 					written_comment = edit_new_comment.getText().toString();
 					// Si ha escrito algo y la longitud es menor de 500 caracteres lo enviamos
 					if (!written_comment.equals("") && written_comment.length() < 501){
-						Log.v("WE","Longitud comentario: " + written_comment.length());
 						new SendComment(context).execute();
 					}	
 				}
 				else{
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_dispones_de_conexion), Toast.LENGTH_SHORT);
 		        	toast.show();
 				}
 			}
@@ -167,7 +166,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		}
 		else{
         	Toast toast;
-        	toast = Toast.makeText(this, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+        	toast = Toast.makeText(this, getResources().getString(R.string.no_dispones_de_conexion), Toast.LENGTH_LONG);
         	toast.show();
         	
         	// Quitamos el loading
@@ -243,8 +242,8 @@ public class DetailCommentsActivity extends SherlockActivity {
 		protected void onPreExecute(){
 		
 			// Mostramos el ProgressDialog
-			progress.setTitle("Enviando comentario ...");
-			progress.setMessage("Espera, por favor");
+			progress.setTitle(R.string.enviando_comentario);
+			progress.setMessage(getResources().getString(R.string.espera_por_favor));
 			progress.setCancelable(false);
 			progress.show();
 		}
@@ -314,7 +313,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, getResources().getString(R.string.lo_sentimos_hubo), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			else{
@@ -329,7 +328,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        }
 		        else{
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, "Hubo algún error enviando el comentario", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.hubo_algun_error_enviando_comentario), Toast.LENGTH_LONG);
 		        	toast.show();        	
 		        }	
 			}
@@ -443,7 +442,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 				
 			// Si hubo algún error 
 			if (result == 666){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, getResources().getString(R.string.lo_sentimos_hubo), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			
@@ -463,7 +462,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		        }
 		        else{
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, "No se pudo obtener los comentarios", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_se_pudieron_obtener_comentarios), Toast.LENGTH_LONG);
 		        	toast.show();
 		        } 
 			}   

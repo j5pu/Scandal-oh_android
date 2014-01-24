@@ -16,8 +16,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.util.Log;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements
 		OnPreferenceClickListener {
@@ -36,14 +38,14 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.settings2);
+		addPreferencesFromResource(R.xml.settings);
 
 		// Título action bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setTitle("Ajustes");
 
 		perfilCategory = (PreferenceCategory) findPreference("perfilCategory");
-		// TODO V2.0 checkP = (CheckBoxPreference) findPreference("autoreproduccion");
+		checkP = (CheckBoxPreference) findPreference("autoreproduccion");
 		cerrar_sesion = (Preference) findPreference("cerrarSesion");
 		iniciar_sesion = (Preference) findPreference("iniciarSesion");
 		registro = (Preference) findPreference("registro");
@@ -66,8 +68,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		registro.setOnPreferenceClickListener(this);
 
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-
-		/* V2.0
+		
 		checkP.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference,
@@ -80,7 +81,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				return true;
 			}
 		});
-		*/
+
 	}
 
 	

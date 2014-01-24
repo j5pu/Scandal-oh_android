@@ -59,10 +59,9 @@ public class SelectCountryActivity extends Activity {
 				
 				// Mostramos un mensaje indicando que el país no se podrá cambiar en el futuro
 				AlertDialog.Builder alert_country = new AlertDialog.Builder(mContext);
-				alert_country.setTitle("País elegido: " + name_selected_country);
-				alert_country
-						.setMessage("Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?");
-				alert_country.setPositiveButton("Si",
+				alert_country.setTitle(getResources().getString(R.string.pais_elegido_dospuntos) + name_selected_country);
+				alert_country.setMessage(getResources().getString(R.string.esta_opcion_no_se_podra));
+				alert_country.setPositiveButton(R.string.si,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialogo1,
 									int id) {
@@ -78,7 +77,7 @@ public class SelectCountryActivity extends Activity {
 								finish();						
 							}
 						});
-				alert_country.setNegativeButton("No",
+				alert_country.setNegativeButton(R.string.no,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialogo1,
 									int id) {

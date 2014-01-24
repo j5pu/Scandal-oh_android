@@ -81,19 +81,19 @@ public class RememberPasswordDialog extends Dialog{
 						new RememberPassUser().execute();
 					}	
 					else{
-						edit_email.setError("Introduce un email válido");
+						edit_email.setError(mContext.getResources().getString(R.string.introduce_un_email_valido));
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
 					toast.show();
 				}			
 			}
 		});
 		
 		progress = new ProgressDialog(mContext);
-		progress.setTitle("Solicitando contraseña ...");
-		progress.setMessage("Espera, por favor");
+		progress.setTitle(R.string.solicitando_contrasenia);
+		progress.setMessage(mContext.getResources().getString(R.string.espera_por_favor));
 	}
 
 
@@ -183,22 +183,22 @@ public class RememberPasswordDialog extends Dialog{
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			// Si no hubo ningún error extraño
 			else{
 				// Comprobamos si se hizo correctamente la petición
 				if (result_ok){
-		        	Toast.makeText(mContext, "Se ha enviado un email con la contraseña", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(mContext, R.string.se_ha_enviando_un_email, Toast.LENGTH_SHORT).show();
 				    dismiss();
 				}
 				else{
 					if (reason_code == 1){ // Email no registrado
-						txt_mensaje.setText("Este email no está registrado");
+						txt_mensaje.setText(R.string.este_email_no_esta_registrado);
 					}
 					else if (reason_code == 2){ // Error al enviar email
-						txt_mensaje.setText("Hubo algún error en la petición");
+						txt_mensaje.setText(R.string.hubo_algun_error_peticion);
 					}
 				}	
 			}				

@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal|bottom"
-            android:text="Inicia sesión con"
+            android:text="@string/iniciar_sesion_con"
             android:textColor="@color/morado"
             android:textSize="28dp" />
 

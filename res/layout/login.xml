@@ -18,7 +18,7 @@
             android:id="@+id/txt_contador_caracteres_titulo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Inicia sesión"
+            android:text="@string/inicia_sesion"
             android:layout_gravity="center_horizontal|center_vertical"
             android:gravity="center_horizontal|center_vertical"
             android:textColor="@color/morado"
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Usuario o email:"
+                android:text="@string/usuario_o_email_dospuntos"
                 android:textColor="@color/morado"
                 android:textSize="20dp"
                 android:gravity="bottom"
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Contraseña:"
+                android:text="@string/contrasenia_dospuntos"
                 android:textColor="@color/morado"
                 android:textSize="20dp"
                 android:gravity="bottom"
@@ -101,7 +101,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="2"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="¿Olvidaste la contraseña?"
+                android:text="@string/olvidaste_la_contrasenia"
                 android:textColor="@color/azul"
                 android:textSize="13sp" />
 
@@ -151,7 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/blue_button_selector"
-                android:text="Entrar"
+                android:text="@string/entrar"
                 android:textColor="@color/blanco" />
 
             <LinearLayout

@@ -88,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp"
-                        android:text="Título:"
+                        android:text="@string/titulo_dospuntos"
                         android:textColor="@color/gris_oscuro"
                         android:textSize="20dp" />
 
@@ -133,7 +133,7 @@
                     android:id="@+id/txt_pasar_registro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Categoría:"
+                    android:text="@string/categoria_dospuntos"
                     android:textColor="@color/gris_oscuro"
                     android:textSize="20dp" />
 
@@ -151,7 +151,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:checked="true"
-                        android:text="Humor"
+                        android:text="@string/humor"
                         android:textColor="@color/gris_oscuro"
                         android:textSize="18sp" />
 
@@ -161,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
                         android:shadowColor="@color/blanco"
-                        android:text="Denuncia"
+                        android:text="@string/denuncia"
                         android:textColor="@color/gris_oscuro"
                         android:textSize="18sp" />
 

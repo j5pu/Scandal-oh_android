@@ -27,13 +27,13 @@
                     android:id="@+id/but_action_bar_happy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Humor" />
+                    android:text="@string/humor" />
 
                 <Button
                     android:id="@+id/but_action_bar_angry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Denuncia" />
+                    android:text="@string/denuncia" />
 
             </LinearLayout>
 

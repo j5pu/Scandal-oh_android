@@ -155,11 +155,11 @@ public class RecordAudioDialog extends Dialog{
 											
 						// Actualizamos la IU para mostrar el tiempo de grabación y el botón de reproducir
 						ll_espacio_botones.setVisibility(View.VISIBLE);
-						but_abajo.setText("Grabar");
+						but_abajo.setText(R.string.grabar);
 						img_subir_foto.setVisibility(View.VISIBLE);	
 						txt_subir_sin_audio.setVisibility(View.VISIBLE);
 						but_reproducir.setVisibility(View.VISIBLE);
-						txt_description.setText("Audio grabado:");
+						txt_description.setText(R.string.audio_grabado_dospuntos);
 						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 						int recorded_seconds = 20 - contador;
@@ -188,12 +188,11 @@ public class RecordAudioDialog extends Dialog{
 						}
 						
 						// Actualizamos la IU para mostrar el tiempo más grande y quitar el botón de reproducir		
-						//ll_espacio_botones.setVisibility(View.GONE);
-						txt_description.setText("Grabando audio...");
+						txt_description.setText(R.string.grabando_audio);
 						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP , 41F);
 						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 61f);
 						txt_meter.setText("00:" + Integer.toString(contador));
-						but_abajo.setText("Parar");	
+						but_abajo.setText(R.string.parar);	
 						but_reproducir.setVisibility(View.GONE);
 						img_subir_foto.setVisibility(View.GONE);
 						txt_subir_sin_audio.setVisibility(View.GONE);			
@@ -214,14 +213,14 @@ public class RecordAudioDialog extends Dialog{
 					
 				// Cambios IU
 				ll_espacio_botones.setVisibility(View.VISIBLE);
-				txt_description.setText("Reproduciendo...");
+				txt_description.setText(R.string.reproduciendo);
 				txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 41F);
 				txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 61f);
 				txt_meter.setText("00:00");	
 				// Quitamos el botón de reproducir
 				but_reproducir.setVisibility(View.GONE);
 				// El boton de abajo ahora pondrá Parar
-				but_abajo.setText("Parar");
+				but_abajo.setText(R.string.parar);
 					
 				// Comenzamos a reproducir
 				Audio.getInstance(mContext).startPlaying();	
@@ -251,11 +250,11 @@ public class RecordAudioDialog extends Dialog{
 							Audio.getInstance(mContext).stopRecording();
 							// Hacemos los cambios necesarios a la IU
 							ll_espacio_botones.setVisibility(View.VISIBLE);
-							but_abajo.setText("Grabar");
+							but_abajo.setText(R.string.grabar);
 							img_subir_foto.setVisibility(View.VISIBLE);	
 							txt_subir_sin_audio.setVisibility(View.VISIBLE);
 							but_reproducir.setVisibility(View.VISIBLE);
-							txt_description.setText("Audio grabado:");
+							txt_description.setText(R.string.audio_grabado_dospuntos);
 							txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 							txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 							int recorded_seconds = 20 - contador;
@@ -333,7 +332,7 @@ public class RecordAudioDialog extends Dialog{
     private void changeIUPlayFinised(){
 		
 		// Actualizamos descripción
-		txt_description.setText("Audio grabado:");
+		txt_description.setText(R.string.audio_grabado_dospuntos);
 		
 		// Disminuimos tamaño del tiempo
 		txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
@@ -353,7 +352,7 @@ public class RecordAudioDialog extends Dialog{
 		but_reproducir.setVisibility(View.VISIBLE);
 		
 		// El botón de abajo indicará Grabar
-		but_abajo.setText("Grabar");
+		but_abajo.setText(R.string.parar);
 		
 		// Reseteamos contador de reproducción
 		contador_play = 0;

@@ -47,6 +47,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.adapters.DrawerMenuAdapter;
 import com.bizeu.escandaloh.adapters.ScandalohFragmentPagerAdapter;
 import com.bizeu.escandaloh.model.Scandaloh;
@@ -83,7 +84,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private Button but_angry;
 	private ListView list_menu_lateral;
     DrawerLayout mDrawerLayout;
- 
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private Context mContext;
@@ -102,7 +102,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     String[] options;
     ActionBarDrawerToggle mDrawerToggle;
     private boolean no_hay_escandalos;
-	
+
 	
 	/**
 	 * onCreate
@@ -119,7 +119,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main));
-
 		
 		// Si el usuario no está logueado mostramos la pantalla de registro/login
 		if (!MyApplication.logged_user){
@@ -149,6 +148,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		but_happy.setOnClickListener(this);
 		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
 		but_angry.setOnClickListener(this);
+		
+
+		
    	
 		// VIEWPAGER
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -182,8 +184,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         // Sombra del menu sobre la pantalla
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         
-        options = new String[] {"Ajustes"};
-        //TODO V2.0 options = new String[] {"Perfil", "Notificaciones", "País", "Ajustes", "Danos tu opinión"};
+        options = new String[] {getResources().getString(R.string.perfil), 
+        		getResources().getString(R.string.notificaciones),
+        		getResources().getString(R.string.pais),
+        		getResources().getString(R.string.ajustes),
+        		getResources().getString(R.string.danos_tu_opinion)};
         
         mMenuAdapter = new DrawerMenuAdapter(MainActivity.this, options);
        
@@ -204,6 +209,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    		
 
         // PASO ENTRE ESCÁNDALOS
         // Le asignamos la animación al pasar entre escándalos (API 11+)
@@ -221,7 +227,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			getEscandalosAsync.execute();
 		}
 		else{
-			Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(mContext, getResources().getString(R.string.no_dispones_de_conexion), Toast.LENGTH_SHORT);
 			toast.show();
 			// Quitamos el progresbar y mostramos la lista de escandalos
 			loading.setVisibility(View.GONE);
@@ -378,7 +384,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					startActivityForResult(i, CREATE_ESCANDALO);
 				}
 				else{
-					Toast toast = Toast.makeText(mContext, "Hubo algún error con la cámara", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.hubo_algun_error_camara), Toast.LENGTH_LONG);
 					toast.show();
 				}			
 			}
@@ -419,15 +425,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					if (MyApplication.logged_user){ 
 						
 						// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-						final CharSequence[] items = {"Hacer foto con la cámara", "Seleccionar foto de la galería"};
+						final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara), getResources().getString(R.string.seleccionar_foto_galeria)};
 						 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-					        builder.setTitle("Añadir foto");
+					        builder.setTitle(R.string.aniadir_foto);
 					        builder.setItems(items, new DialogInterface.OnClickListener() {
 					            @Override
 					            public void onClick(DialogInterface dialog, int item) {
 					            	
 					            	// Cámara
-					                if (items[item].equals("Hacer foto con la cámara")) {
+					                if (items[item].equals(R.string.hacer_foto_con_camara)) {
 					                	
 					                	// Mandamos el evento a Google Analytics
 					            		EasyTracker easyTracker = EasyTracker.getInstance(mContext);
@@ -447,13 +453,13 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 										}     
 										// El dispositivo no dispone de cámara
 										else{
-											Toast toast = Toast.makeText(mContext, "Este dispositivo no dispone de cámara", Toast.LENGTH_LONG);
+											Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara, Toast.LENGTH_LONG);
 											toast.show();
 										}
 					                } 
 					                
 					                // Galería
-					                else if (items[item].equals("Seleccionar foto de la galería")) {
+					                else if (items[item].equals(R.string.seleccionar_foto_galeria)) {
 					                	
 					      			     // Mandamos el evento a Google Analytics
 					            	     EasyTracker easyTracker = EasyTracker.getInstance(mContext);
@@ -475,7 +481,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				}
 				// No dispone de conexión
 				else{
-					Toast toast = Toast.makeText(mContext, "No dispone de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
 					toast.show();
 				}		
 			break;		
@@ -525,7 +531,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 						
 					// No hay conexión
 					else{				
-						Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+						Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
 						toast.show();
 						// Indicamos a la actividad que ha terminado de actualizar
 						refreshFinished();	
@@ -581,7 +587,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 								
 				// No hay conexión
 				else{				
-					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
 					toast.show();
 				} 
 			break;
@@ -676,7 +682,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				        escandalosObject = new JSONArray(respStr);        	
 				        // Si no hay más escandalos,lo indicamos
 				        if (escandalosObject.length() == 0){
-				        	Log.v("WE","No hay mas happys");
 				        	there_are_more_escandalos = false;
 				        }
 			        }
@@ -693,7 +698,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				        escandalosObject = new JSONArray(respStr);			   	
 				        // Si no hay más escandalos,lo indicamos
 				        if (escandalosObject.length() == 0){
-				        	Log.v("WE","No hay mas angrys");
 				        	there_are_more_escandalos = false;
 				        }
 			        }
@@ -798,7 +802,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 						     		
@@ -934,7 +938,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			
 			// Si hubo algún error inesperado
 			if (result == 666){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, hubo un error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			
@@ -1111,7 +1115,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
 			                       e),                                                             // The exception.
 			                       false).build()); 
-			Toast toast = Toast.makeText(mContext, "No se pudo acceder a la cámara", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(mContext, R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
 			toast.show();
 		}
 	    
@@ -1150,7 +1154,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private void cancelGetEscandalos(){	
 		if (getEscandalosAsync != null){
 			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
-				Log.v("WE","Entra en cancel happy");
 				getEscandalosAsync.cancel(true);
 			}
 		} 
@@ -1176,28 +1179,20 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 * Listener para las opciones del menu lateral
 	 *
 	 */
-	/*
-	 * TODO V2.0
-	 *
-	 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
 	            case 0: // Perfil
-	                Log.v("WE","Seleccionado posicion");
 	                break;
 	
 	            case 1: // Notificaciones
-	                Log.v("WE","Seleccionado notificaciones");
 	                break;
 	                
 	            case 2: // País
-	                Log.v("WE","Seleccionado país");
 	                break;
 	                  
 	            case 3: // Ajustes
-	            	Log.v("WE","Seleccionado ajustes");
 	            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
 	            	startActivity(i);
 	            	break;
@@ -1212,26 +1207,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
             mDrawerLayout.closeDrawer(list_menu_lateral);
         }
     }
-	*/
 	
 	
-	/**
-	 * Listener para las opciones del menú lateral
-	 *
-	 */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (position) {                  
-	            case 0: // Ajustes
-	            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-	            	startActivity(i);
-	            	break;            
-            }
-            list_menu_lateral.setItemChecked(position, true);
-     
-            // Cerramos el menu
-            mDrawerLayout.closeDrawer(list_menu_lateral);
-        }
-    }
 }

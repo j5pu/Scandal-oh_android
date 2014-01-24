@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical|left"
-                android:text="Subir sin audio"
+                android:text="@string/subir_sin_audio"
                 android:textColor="@color/azul"
                 android:textSize="20dp" />
 
@@ -86,7 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
-                android:text="Tiempo restante:"
+                android:text="@string/tiempo_restante_dospuntos"
                 android:textColor="@color/gris_oscuro"
                 android:textSize="29sp"
                 android:layout_gravity="center_horizontal"
@@ -125,7 +125,7 @@
                     android:layout_gravity="top|center_vertical"
                     android:gravity="top|center_vertical"
                     android:paddingLeft="10dp"
-                    android:text="seg"
+                    android:text="@string/seg"
                     android:textColor="@color/gris_oscuro"
                     android:textSize="41sp" />
 
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/blue_button_selector"
                 android:clickable="true"
-                android:text="Grabar"
+                android:text="@string/grabar"
                 android:textAlignment="center"
                 android:textSize="22dp"
                 android:textColor="@color/blanco" />

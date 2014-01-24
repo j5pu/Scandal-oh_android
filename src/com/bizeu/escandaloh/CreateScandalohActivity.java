@@ -119,8 +119,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 		}
 
 		progress = new ProgressDialog(this);
-		progress.setTitle("Subiendo scándalOh!...");
-		progress.setMessage("Espera, por favor");
+		progress.setTitle(getResources().getString(R.string.subiendo_scandaloh));
+		progress.setMessage(getResources().getString(R.string.espera_por_favor));
 		progress.setCancelable(false);
 		
 		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
@@ -155,15 +155,14 @@ public class CreateScandalohActivity extends SherlockActivity {
 				if (Connectivity.isOnline(mContext)){
 					String introducido = edit_title.getText().toString();
 					if (introducido.equals("")) {
-						Toast toast = Toast.makeText(getBaseContext(),
-								"Debe introducir primero un título",
+						Toast toast = Toast.makeText(getBaseContext(), getResources().getString(R.string.debes_introducir_primero),
 								Toast.LENGTH_SHORT);
 						toast.show();
 					} else {
 						// Inicializamos el alert dialog
 						AlertDialog.Builder dialog_audio = new AlertDialog.Builder(mContext);
-						dialog_audio.setMessage("¿Deseas agregar audio?");
-						dialog_audio.setPositiveButton("Sí",
+						dialog_audio.setMessage(getResources().getString(R.string.quieres_aniadir_un_audio));
+						dialog_audio.setPositiveButton(R.string.si,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
@@ -193,7 +192,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 										record_audio.show(); 								
 									}
 								});
-						dialog_audio.setNegativeButton("No",
+						dialog_audio.setNegativeButton(R.string.no,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialogo1,
 											int id) {
@@ -218,7 +217,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 				else{
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_dispones_de_conexion), Toast.LENGTH_LONG);
 		        	toast.show();
 				}		
 			}		
@@ -378,7 +377,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 			// Si hubo algún error mostramos un mensaje
 			if (result == 666){
 	        	Toast toast;
-	        	toast = Toast.makeText(mContext, "No se pudo mandar el scándalOh!", Toast.LENGTH_LONG);
+	        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_se_pudo_enviar_el_scandaloh), Toast.LENGTH_LONG);
 	        	toast.show();
 			}
 			
@@ -389,13 +388,13 @@ public class CreateScandalohActivity extends SherlockActivity {
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("title", written_title);
 					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(mContext, "scándalOh! enviado con éxito", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.scandaloh_enviado_con_exito), Toast.LENGTH_LONG);
 					toast.show();
 					setResult(Activity.RESULT_OK, resultIntent);
 					finish();
 					
 				} else {
-					Toast toast = Toast.makeText(mContext, "Error subiendo el scándalOh!", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.error_enviando_el_scandaloh), Toast.LENGTH_LONG);
 					toast.show();
 					finish();
 				}
