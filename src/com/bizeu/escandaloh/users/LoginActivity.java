@@ -93,7 +93,7 @@ public class LoginActivity extends SherlockActivity {
 					}		
 				}
 				else{
-					Toast toast = Toast.makeText(mContext, "No dispone de una conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
 					toast.show();
 				}	
 			}			
@@ -186,8 +186,8 @@ public class LoginActivity extends SherlockActivity {
 			any_error = false;
 			
 			// Mostramos el ProgressDialog
-			progress.setTitle("Iniciando sesión ...");
-			progress.setMessage("Espera, por favor");
+			progress.setTitle(R.string.iniciando_sesion);
+			progress.setMessage(getResources().getString(R.string.espera_por_favor));
 			progress.setCancelable(false);
 			progress.show();
 		}
@@ -292,7 +292,7 @@ public class LoginActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast.makeText(getBaseContext(), "Lo sentimos, se ha producido un error", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT).show();
 			}
 			else{
 				// Si no ha habido algún error extraño 
@@ -310,7 +310,7 @@ public class LoginActivity extends SherlockActivity {
 			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 			        	MyApplication.resource_uri = user_uri;
 			        	MyApplication.logged_user = true;
-			        	Toast.makeText(getBaseContext(), "Sesión iniciada con éxito", Toast.LENGTH_SHORT).show();
+			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
 			        	
 			        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
 			        	setResult(Activity.RESULT_OK);
@@ -345,7 +345,7 @@ public class LoginActivity extends SherlockActivity {
 		
 		// Nombre/Email menos de 4 caracteres
 		if (edit_nombre_email.getText().toString().length() < 4){
-			edit_nombre_email.setError("Este campo debe tener al menos 4 caracteres");
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_debe_tener_4_caracteres));
 			all_correct = false;
 		}
 		
@@ -353,24 +353,24 @@ public class LoginActivity extends SherlockActivity {
 		Pattern pattern = Pattern.compile("\\s");
 		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
 		if (m.find()){
-			edit_nombre_email.setError("Este campo no permite espacios en blanco");
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_no_permite_espacios));
 			all_correct = false;
 		}
 		
 		// Nombre/Email vacío
 		if (edit_nombre_email.getText().toString().length() == 0){
-			edit_nombre_email.setError("Este campo es obligatorio");
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_es_obligatorio));
 			all_correct = false;
 		}
 
 		// Password vacío
 		if (edit_password.getText().toString().length() == 0){
-			edit_password.setError("Este campo es obligatorio");
+			edit_password.setError(getResources().getString(R.string.este_campo_es_obligatorio));
 			all_correct = false;
 		}
 		// Password menos de 4 caracteres
 		if (edit_password.getText().toString().length() < 6){
-			edit_password.setError("Este campo debe tener al menos 6 caracteres");
+			edit_password.setError(getResources().getString(R.string.este_campo_debe_tener_6));
 			all_correct = false;
 		}
 

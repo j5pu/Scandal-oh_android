@@ -110,7 +110,6 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
     
     /**
      * Clase Holder
-     * @author Alejandro
      *
      */
     public static class CommentHolder{

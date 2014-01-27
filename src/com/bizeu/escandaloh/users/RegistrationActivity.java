@@ -92,7 +92,7 @@ public class RegistrationActivity extends SherlockActivity {
 					}
 				}
 				else{
-					Toast toast = Toast.makeText(mContext, "No dispones de conexión a internet", Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}
@@ -201,8 +201,8 @@ public class RegistrationActivity extends SherlockActivity {
 			edit_email_usuario.setError(null);
 			
 			// Mostramos el ProgressDialog
-			progress.setTitle("Registrando usuario ...");
-			progress.setMessage("Espere, por favor");
+			progress.setTitle(R.string.registrando_usuario);
+			progress.setMessage(getResources().getString(R.string.espera_por_favor));
 			progress.setCancelable(false);
 			progress.show();	
 			
@@ -257,7 +257,6 @@ public class RegistrationActivity extends SherlockActivity {
 	                	 if (jsonReason.has("username")){
 	                		 JSONArray jsonUserNameErrors = new JSONArray(jsonReason.getString("username"));
 	                		 name_error = (String) jsonUserNameErrors.get(0);
-	                		// name_error = jsonReason.getString("username");
 	                		 has_name_error = true;
 	                	 }
 	                	 if (jsonReason.has("password")){
@@ -299,7 +298,7 @@ public class RegistrationActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(mContext, "Lo sentimos, se produjo algún error inesperado", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			// Si no hubo ningún error
@@ -322,7 +321,7 @@ public class RegistrationActivity extends SherlockActivity {
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 		        	MyApplication.logged_user = true;
-		        	Toast.makeText(getBaseContext(), "Usuario registrado correctamente", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(getBaseContext(), R.string.usuario_registrado_correctamente, Toast.LENGTH_SHORT).show();
 		        	
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
 		        	setResult(Activity.RESULT_OK);
@@ -352,7 +351,7 @@ public class RegistrationActivity extends SherlockActivity {
 		
 		// Nombre menos de 4 caracteres
 		if (edit_nombre_usuario.getText().toString().length() < 4){
-			edit_nombre_usuario.setError("Este campo debe tener al menos 4 caracteres");
+			edit_nombre_usuario.setError(getResources().getString(R.string.este_campo_debe_tener_4_caracteres));
 			all_correct = false;
 		}
 		
@@ -360,33 +359,33 @@ public class RegistrationActivity extends SherlockActivity {
 		Pattern pattern = Pattern.compile("\\s");
 		Matcher m = pattern.matcher(edit_nombre_usuario.getText().toString());
 		if (m.find()){
-			edit_nombre_usuario.setError("Este campo no permite espacios en blanco");
+			edit_nombre_usuario.setError(getResources().getString(R.string.este_campo_no_permite_espacios));
 			all_correct = false;
 		}
 			
 		// Nombre vacío
 		if (edit_nombre_usuario.getText().toString().length() == 0){
-			edit_nombre_usuario.setError("Este campo es obligatorio");
+			edit_nombre_usuario.setError(getResources().getString(R.string.este_campo_es_obligatorio));
 			all_correct = false;
 		}
 		// Email incorrecto
 		if (!isEmailValid(edit_email_usuario.getText().toString())){
-			edit_email_usuario.setError("Introduzca una dirección de email válida");
+			edit_email_usuario.setError(getResources().getString(R.string.introduce_una_direccion_email_valida));
 			all_correct = false;
 		}	
 		// Email vacío
 		if (edit_email_usuario.getText().toString().length() == 0){
-			edit_email_usuario.setError("Este campo es obligatorio");
+			edit_email_usuario.setError(getResources().getString(R.string.este_campo_es_obligatorio));
 			all_correct = false;
 		}
 		// Password menos de 4 caracteres
 		if (edit_password_usuario.getText().toString().length() < 6){
-			edit_password_usuario.setError("Este campo debe tener al menos 6 caracteres");
+			edit_password_usuario.setError(getResources().getString(R.string.este_campo_debe_tener_6));
 			all_correct = false;
 		}
 		// Password vacío
 		if (edit_password_usuario.getText().toString().length() == 0){
-			edit_password_usuario.setError("Este campo es obligatorio");
+			edit_password_usuario.setError(getResources().getString(R.string.este_campo_es_obligatorio));
 			all_correct = false;
 		}
 		return all_correct;

@@ -42,7 +42,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 
 		// Título action bar
 		ActionBar actBar = getSupportActionBar();
-		actBar.setTitle("Ajustes");
+		actBar.setTitle(R.string.ajustes);
 
 		perfilCategory = (PreferenceCategory) findPreference("perfilCategory");
 		checkP = (CheckBoxPreference) findPreference("autoreproduccion");
@@ -95,9 +95,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			Audio.getInstance(mContext).releaseResources();
 
 			AlertDialog.Builder alert_logout = new AlertDialog.Builder(this);
-			alert_logout.setTitle("Cerrar sesión usuario");
-			alert_logout.setMessage("¿Seguro que desea cerrar la sesión actual?");
-			alert_logout.setPositiveButton("Confirmar",
+			alert_logout.setTitle(R.string.cerrar_sesion_usuario);
+			alert_logout.setMessage(R.string.seguro_que_quieres_cerrar);
+			alert_logout.setPositiveButton(R.string.confirmar,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogo1, int id) {
 
@@ -109,7 +109,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 							finish();
 						}
 					});
-			alert_logout.setNegativeButton("Cancelar",
+			alert_logout.setNegativeButton(R.string.cancelar,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogo1, int id) {
 						}

@@ -6,6 +6,8 @@ import com.bizeu.escandaloh.util.Fuente;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +51,6 @@ public class LoginSocialNetworksDialog extends Dialog {
 		// Botón login con facebook
 		but_login_facebook = (Button) findViewById(R.id.but_login_facebook);
 
-		/* TODO V2.0
 		// Ponemos el icono de facebook en el botón
 		Drawable drawable = mContext.getResources().getDrawable(
 				R.drawable.facebook);
@@ -58,7 +59,6 @@ public class LoginSocialNetworksDialog extends Dialog {
 		ScaleDrawable sd = new ScaleDrawable(drawable, 0, 30, 30);
 		but_login_facebook.setCompoundDrawables(sd.getDrawable(), null, null,
 				null);
-				*/
 
 		but_login_facebook.setOnClickListener(new View.OnClickListener() {
 
@@ -73,7 +73,7 @@ public class LoginSocialNetworksDialog extends Dialog {
 		});
 
 		// Botón login con google
-		//TODO V2.0but_login_google = (Button) findViewById(R.id.but_login_google);
+		//but_login_google = (Button) findViewById(R.id.but_login_google);
 
 		// Botón login con twitter
 		but_login_twitter = (Button) findViewById(R.id.but_login_twitter);

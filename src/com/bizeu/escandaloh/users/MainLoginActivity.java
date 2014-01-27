@@ -101,8 +101,8 @@ public class MainLoginActivity extends SherlockActivity{
 		mContext = this;
 		
 		progress = new ProgressDialog(mContext);
-		progress.setTitle("Iniciando sesión ...");
-		progress.setMessage("Espera, por favor");
+		progress.setTitle(R.string.iniciando_sesion);
+		progress.setMessage(getResources().getString(R.string.espera_por_favor));
 		progress.setCancelable(false);
 		
 		// Si estamos en esta pantalla porque el usuario pulsó "+": entonces mostramos un mensaje
@@ -113,7 +113,7 @@ public class MainLoginActivity extends SherlockActivity{
 		}
 	
 		if (!first_time){ 
-			Toast toast = Toast.makeText(acti, "Regístrate o inicia sesión para agregar contenidos", 2600);
+			Toast toast = Toast.makeText(acti, R.string.registrate_o_inicia_sesion, 2600);
 			toast.show();
 		}
 				
@@ -416,7 +416,7 @@ public class MainLoginActivity extends SherlockActivity{
 				if (progress.isShowing()) {
 					progress.dismiss();
 				}
-				Toast.makeText(mContext,"Lo sentimos, se ha producido un error",Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext,R.string.lo_sentimos_se_ha_producido,Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -522,7 +522,7 @@ public class MainLoginActivity extends SherlockActivity{
 						.commit();
 				MyApplication.resource_uri = user_uri;
 				MyApplication.logged_user = true;
-				Toast.makeText(mContext, "Sesión iniciada con éxito",
+				Toast.makeText(mContext, R.string.sesion_iniciada_exito,
 						Toast.LENGTH_SHORT).show();
 
 				// Le indicamos a la anterior actividad que ha habido éxito en el login
@@ -532,7 +532,7 @@ public class MainLoginActivity extends SherlockActivity{
 
 			// Ha habido algún error extraño: mostramos el mensaje
 			else {
-				Toast.makeText(mContext,"Lo sentimos, se ha producido un error",Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext,R.string.lo_sentimos_se_ha_producido,Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

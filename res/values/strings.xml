@@ -35,5 +35,19 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="iniciar_con_redes_sociales">Iniciar con redes sociales</string>
+    <string name="cerrar_sesion_usuario">Cerrar sesión usuario</string>
+    <string name="seguro_que_quieres_cerrar">¿Seguro que desea cerrar la sesión actual?</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="iniciando_sesion">Iniciando sesión ...</string>
+    <string name="lo_sentimos_se_ha_producido">Lo sentimos, se ha producido un error</string>
+    <string name="sesion_iniciada_exito">Sesión iniciada con éxito</string>
+    <string name="este_campo_debe_tener_4_caracteres">Este campo debe tener al menos 4 caracteres</string>
+    <string name="este_campo_no_permite_espacios">Este campo no permite espacios en blanco</string>
+    <string name="este_campo_es_obligatorio">Este campo es obligatorio</string>
+    <string name="este_campo_debe_tener_6">Este campo debe tener al menos 6 caracteres</string>
+    <string name="registrate_o_inicia_sesion">Regístrate o inicia sesión para agregar contenidos</string>
+    <string name="registrando_usuario">Registrando usuario ...</string>
+    <string name="usuario_registrado_correctamente">Usuario registrado correctamente</string>
+    <string name="introduce_una_direccion_email_valida">Introduce una dirección de email válida</string>
 
 </resources>
