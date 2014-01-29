@@ -6,25 +6,25 @@
         android:title="Audio" >
         <CheckBoxPreference
             android:key="autoreproduccion"
-            android:summary="Reproduce el audio automáticamente"
-            android:title="Autoreproducción"/>
+            android:summary="@string/reproduce_el_audio_automaticamente"
+            android:title="@string/autoreproduccion"/>
     </PreferenceCategory>
     
     <PreferenceCategory
         android:key="perfilCategory"
-        android:title="Usuario" >
+        android:title="@string/usuario" >
         <Preference
             android:key="cerrarSesion"
-            android:summary="Cierra la sesión actual del usuario"
-            android:title="Cerrar sesión" />
+            android:summary="@string/cierra_la_sesion_actual"
+            android:title="@string/cerrar_sesion" />
         <Preference
             android:key="iniciarSesion"
-            android:summary="Inicia sesión en una cuenta de usuario"
-            android:title="Iniciar sesión" />
+            android:summary="@string/inicia_sesion_en_una_cuenta"
+            android:title="@string/iniciar_sesion" />
          <Preference
             android:key="registro"
-            android:summary="Crea una cuenta de usuario"
-            android:title="Crear cuenta" />
+            android:summary="@string/crea_una_cuenta_de_usuario"
+            android:title="@string/crear_cuenta" />
     </PreferenceCategory>
 
 </PreferenceScreen>

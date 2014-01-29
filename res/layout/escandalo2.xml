@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/blanco"
     tools:context=".DemoActivity" >
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -13,40 +14,136 @@
         sothree:collapsedHeight="68dp"
         sothree:shadowHeight="4dp" >
 
-        <com.applidium.shutterbug.FetchableImageView
-            android:id="@+id/img_foto"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/gris_claro"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher"
-            android:visibility="visible" />
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical|center_horizontal" >
+
+                    <TextView
+                        android:id="@+id/txt_escandalo_titulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:gravity="center"
+                        android:text="comentarios en Twitter, así como para muchas otras aplicaciones, esta es un"
+                        android:textColor="@color/gris_oscuro"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_horizontal|center_vertical" >                 
+                    
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="21dp"
+                        android:text="user1980" 
+                        android:textSize="13sp"/>
+
+
+
+                    <ImageView
+                        android:id="@+id/imageView1"
+                        android:layout_width="20dp"
+                        android:layout_height="23dp"
+                        android:src="@drawable/reloj_azul" />
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:text="16-01-2014"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp" />
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="20dp"
+                        android:layout_height="23dp"
+                        android:src="@drawable/user_azul" />
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="123456"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2.5"
+                android:orientation="vertical" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <com.applidium.shutterbug.FetchableImageView
+                        android:id="@+id/img_escandalo_foto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/twitter" />
+
+                    <ImageView
+                        android:id="@+id/img_escandalo_audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/sonido" />
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_comments"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#88FFFFFF"
             android:clickable="true"
             android:focusable="false"
-            android:orientation="vertical"
-            android:background="#88FFFFFF" >
+            android:orientation="vertical" >
 
             <EditText
                 android:id="@+id/edit_write_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/escribe_un_comentario">
-
-                <requestFocus />
+                android:hint="@string/escribe_un_comentario"
+                android:textColorHint="#FFFFFF" >
             </EditText>
 
             <ListView
                 android:id="@+id/lv_comments"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" >
             </ListView>
-            
         </LinearLayout>
+
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>

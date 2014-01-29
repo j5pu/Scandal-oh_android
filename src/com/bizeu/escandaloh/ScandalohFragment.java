@@ -31,12 +31,14 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
@@ -90,7 +92,8 @@ public class ScandalohFragment extends Fragment {
 	private String uri_audio;	
 	private CommentAdapter commentsAdapter;
 	private ArrayList<Comment> comments;
-    
+	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
+	private SharedPreferences prefs;
 
 
     
@@ -138,9 +141,13 @@ public class ScandalohFragment extends Fragment {
         this.title = (getArguments() != null) ? getArguments().getString(TITLE) : null;
         this.num_comments = (getArguments() != null) ? getArguments().getInt(NUM_COMMENTS) : 0;
         this.has_audio = (getArguments() != null) ? getArguments().getBoolean(HAS_AUDIO) : false;
+        Log.v("WE","has_audio: " + has_audio);
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
+        
+        // Preferencias
+		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
  
     
@@ -151,11 +158,15 @@ public class ScandalohFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
  
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo2, container, false);        
+    	Log.v("WE","ENTRA EN ONCREATEVIEW");
+    	Log.v("WE","num com: " + num_comments);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo2, container, false);    
         
-        // Mostramos los datos del escándalo
-        // Foto
-        FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_foto);
+        SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
+        layout.setIsTransparent(true);
+        
+        // FOTO
+        FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setImage(this.url, R.drawable.cargando);      
      
         img.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +188,7 @@ public class ScandalohFragment extends Fragment {
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
+					Log.v("WE","uri audio antes del imagen: " + uri_audio);
 					i.putExtra("uri_audio", uri_audio);				
 					getActivity().startActivity(i);				
 				}	
@@ -211,9 +223,44 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
         
+        // AUDIO
+        ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
+        if(has_audio){
+        	aud.setVisibility(View.VISIBLE);
+            // Si tiene autoreproducir activado lo iniciamos
+            boolean autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
+            if (autoplay){
+            	reproduciendo = true;
+    			// Paramos si hubiera algún audio reproduciéndose
+    			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+    			Log.v("WE","uri_audio: "+  uri_audio);
+            	new PlayAudioTask().execute(uri_audio);
+            }
+        }
+        else{
+        	aud.setVisibility(View.INVISIBLE);
+        }
+
+        aud.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				// Paramos si hubiera algún audio reproduciéndose
+				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+				
+				// Lo reproducimos		
+				if (uri_audio != null){
+					new PlayAudioTask().execute(uri_audio);	
+				}
+			}
+		});
+		
+        
         
         
 		// COMENTARIOS
+        /*
 		comments = new ArrayList<Comment>();
 		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
 		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
@@ -223,6 +270,7 @@ public class ScandalohFragment extends Fragment {
 		if (Connectivity.isOnline(getActivity().getBaseContext())){
 			new GetComments(getActivity().getBaseContext(), true).execute();
 		}
+		*/
 		
 		/*
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
@@ -258,32 +306,15 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
         
+        */
         // Título
-        TextView tit = (TextView) rootView.findViewById(R.id.txt_titulo);
+        TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
         
-        // Micrófono: lo mostramos si el scándalo tiene audio
-        ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_microfono);
-        if(has_audio){
-        	aud.setVisibility(View.VISIBLE);
-        }
-        else{
-        	aud.setVisibility(View.INVISIBLE);
-        }
-        aud.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				// Paramos si hubiera algún audio reproduciéndose
-				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-				
-				// Lo reproducimos		
-				if (uri_audio != null){
-					new PlayAudioTask().execute(uri_audio);	
-				}
-			}
-		});
+        
+
+        
+        /*
         
         // Nombre de usuario
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
@@ -634,6 +665,11 @@ public class ScandalohFragment extends Fragment {
 	private class PlayAudioTask extends AsyncTask<String,Integer,Boolean> {
 		 
 		@Override
+		protected void onPreExecute(){
+			
+		}
+
+		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
 	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
@@ -643,37 +679,7 @@ public class ScandalohFragment extends Fragment {
 	
 	
 	
-
-	// ---------------------------------------------------------------------------------------------
-	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
-	// ---------------------------------------------------------------------------------------------
-	
-    /**
-     * Transforma una fecha con formato AAAA-MM-DDTHH:MM:SS a formato DD-MM-AAAA
-     * @param date Fecha a transformar
-     * @return
-     */
-    private String changeFormatDate(String date){
-        String date_without_time = (date.split("T",2))[0];   
-        String year = date_without_time.split("-",3)[0];
-        String month = date_without_time.split("-",3)[1];
-        String day = date_without_time.split("-",3)[2];
-        String final_date = day + "-" + month + "-" + year;     
-        return final_date;
-    }
-    
-    
-
-    /**
-     * Devuelve el número de comentarios
-     */
-    public int getNumComments(){
-    	return num_comments;
-    }
-    
-    
-    
-    
+	 
     /**
 	 * Muestra la lista de comentarios para esa foto
 	 *
@@ -811,4 +817,38 @@ public class ScandalohFragment extends Fragment {
 	    }
 	}
     
+	
+	
+	
+
+	// ---------------------------------------------------------------------------------------------
+	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
+	// ---------------------------------------------------------------------------------------------
+	
+    /**
+     * Transforma una fecha con formato AAAA-MM-DDTHH:MM:SS a formato DD-MM-AAAA
+     * @param date Fecha a transformar
+     * @return
+     */
+    private String changeFormatDate(String date){
+        String date_without_time = (date.split("T",2))[0];   
+        String year = date_without_time.split("-",3)[0];
+        String month = date_without_time.split("-",3)[1];
+        String day = date_without_time.split("-",3)[2];
+        String final_date = day + "-" + month + "-" + year;     
+        return final_date;
+    }
+    
+    
+
+    /**
+     * Devuelve el número de comentarios
+     */
+    public int getNumComments(){
+    	return num_comments;
+    }
+    
+    
+    
+   
 }

@@ -73,10 +73,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			@Override
 			public boolean onPreferenceChange(Preference preference,
 					Object newValue) {
+				// Guardamos la configuración nueva de autoplay
 				if (newValue.toString().equals("true")) {
-					Log.v("WE", "Autoreproducir activado");
+					prefs.edit().putBoolean(MyApplication.AUTOPLAY_ACTIVATED, true).commit();
 				} else {
-					Log.v("WE", "Autoreprroducir quitado");
+					prefs.edit().putBoolean(MyApplication.AUTOPLAY_ACTIVATED, false).commit();
 				}
 				return true;
 			}

@@ -106,5 +106,26 @@
     <string name="report_enviado_correctamente">Report enviado correctamente</string>
     <string name="esta_opcion_no_se_podra">Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?</string>
     <string name="pais_elegido_dospuntos">País elegido: </string>
-
+    <string name="autoreproduccion">Autoreproducción</string>
+    <string name="usuario">Usuario</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="cierra_la_sesion_actual">Cierra la sesión actual del usuario</string>
+    <string name="crear_cuenta">Crear cuenta</string>
+    <string name="crea_una_cuenta_de_usuario">Crea una cuenta de usuario</string>
+    <string name="inicia_sesion_en_una_cuenta">Inicia sesión en una cuenta de usuario</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="seguro_que_quieres_cerrar">¿Seguro que desea cerrar la sesión actual?</string>
+    <string name="cerrar_sesion_usuario">Cerrar sesión usuario</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="registrate_o_inicia_sesion">Regístrate o inicia sesión para agregar contenidos</string>
+    <string name="iniciando_sesion">Iniciando sesión ...</string>
+    <string name="sesion_iniciada_exito">Bienvenido de nuevo ;)</string>
+    <string name="usuario_registrado_correctamente">Bienvenido ;)</string>
+    <string name="este_campo_debe_tener_4_caracteres">Este campo debe tener al menos 4 caracteres</string>
+    <string name="este_campo_no_permite_espacios">Este campo no permite espacios en blanco</string>
+    <string name="este_campo_es_obligatorio">Este campo es obligatorio</string>
+    <string name="registrando_usuario">Registrando usuario ...</string>
+    <string name="introduce_una_direccion_email_valida">Introduce una dirección de email válida</string>
+    <string name="este_campo_debe_tener_6">Este campo debe tener al menos 6 caracteres</string>
+    <string name="lo_sentimos_se_ha_producido">Lo sentimos, se ha producido un error inesperado</string>
 </resources>

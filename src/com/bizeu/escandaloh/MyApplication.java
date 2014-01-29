@@ -12,6 +12,7 @@ public class MyApplication extends Application {
 	//public static String SERVER_ADDRESS = "http://192.168.1.35:8000/";
 	public static String CODE_COUNTRY = "Code country";
 	public static String USER_URI = "user_uri";
+	public static String AUTOPLAY_ACTIVATED = "autoplay_activated";
 	public static Boolean logged_user = false;
 	public static String code_selected_country = null;
 	public static String resource_uri = "";

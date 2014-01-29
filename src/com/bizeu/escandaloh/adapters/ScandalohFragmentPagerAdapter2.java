@@ -6,8 +6,9 @@ import com.bizeu.escandaloh.ScandalohFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 
-public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
+public class ScandalohFragmentPagerAdapter2 extends FragmentStatePagerAdapter  {
 
 	// Lista de fragmentos con los escándalos
     List<ScandalohFragment> fragments;
@@ -18,7 +19,7 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
      * 
      * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
      */
-    public ScandalohFragmentPagerAdapter(FragmentManager fm) {
+    public ScandalohFragmentPagerAdapter2(FragmentManager fm) {
         super(fm);
         this.fragments = new ArrayList<ScandalohFragment>();
     }
@@ -31,6 +32,7 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
      */
     @Override
     public ScandalohFragment getItem(int position) {
+    	Log.v("WE","position: " + position);
         return this.fragments.get(position);
     }
  
@@ -40,6 +42,7 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
      */
     @Override
     public int getCount() {
+    	Log.v("We","Getcount: " + this.fragments.size());
         return this.fragments.size();
     }
     
@@ -47,10 +50,12 @@ public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
     /**
      * getItemPosition
      */
+    /*
     @Override
     public int getItemPosition(Object object){
         return PagerAdapter.POSITION_NONE;
     }
+    */
     
     
     /**
