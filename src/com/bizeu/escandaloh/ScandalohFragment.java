@@ -160,7 +160,7 @@ public class ScandalohFragment extends Fragment {
  
     	Log.v("WE","ENTRA EN ONCREATEVIEW");
     	Log.v("WE","num com: " + num_comments);
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo3, container, false);    
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo, container, false);    
         
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
