@@ -160,7 +160,7 @@ public class ScandalohFragment extends Fragment {
  
     	Log.v("WE","ENTRA EN ONCREATEVIEW");
     	Log.v("WE","num com: " + num_comments);
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo2, container, false);    
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo3, container, false);    
         
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
@@ -224,6 +224,7 @@ public class ScandalohFragment extends Fragment {
 		});
         
         // AUDIO
+        /*
         ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
         if(has_audio){
         	aud.setVisibility(View.VISIBLE);
@@ -240,6 +241,7 @@ public class ScandalohFragment extends Fragment {
         else{
         	aud.setVisibility(View.INVISIBLE);
         }
+        
 
         aud.setOnClickListener(new View.OnClickListener() {
 			
@@ -255,6 +257,7 @@ public class ScandalohFragment extends Fragment {
 				}
 			}
 		});
+		*/
 		
         
         
@@ -308,8 +311,8 @@ public class ScandalohFragment extends Fragment {
         
         */
         // Título
-        TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
-        tit.setText(title);
+        //TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
+        //tit.setText(title);
         
         
 
