@@ -22,6 +22,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
@@ -140,6 +142,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         // Activamos el logo del menu para el menu lateral
         actBar.setHomeButtonEnabled(true);
         actBar.setDisplayHomeAsUpEnabled(true);
+        actBar.setIcon(R.drawable.logo_blanco);
         	
 		loading = (ProgressBar) findViewById(R.id.loading_escandalos);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
@@ -153,6 +156,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		but_happy.setOnClickListener(this);
 		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
 		but_angry.setOnClickListener(this);
+
+		/* Might need to convert shadowImage from 8-bit to ARGB here, can't remember. */
+
+		Canvas c = new Canvas(shadowImage);
+		c.drawBitmap(originalBitmap, offsetXY[0], offsetXY[1], null);
 		
 		
 		 	
@@ -201,7 +209,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         list_menu_lateral.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, R.string.drawer_open,
+                R.drawable.ic_drawer_blanco, R.string.drawer_open,
                 R.string.drawer_close) {
  
             public void onDrawerClosed(View view) {
@@ -301,7 +309,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			StateListDrawable states = new StateListDrawable();
 			states.addState(new int[] {android.R.attr.state_pressed},getResources().getDrawable(R.drawable.camara_pressed));
 			states.addState(new int[] {android.R.attr.state_focused},getResources().getDrawable(R.drawable.camara_pressed));
-			states.addState(new int[] { },getResources().getDrawable(R.drawable.camara));
+			states.addState(new int[] { },getResources().getDrawable(R.drawable.camara_blanca));
 			img_take_photo.setImageDrawable(states);		
 		}
 		// Si no está logueado mostramos el símbolo para hacer login

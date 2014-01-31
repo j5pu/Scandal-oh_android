@@ -79,7 +79,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="6dp"
                 android:text="1234"
-                android:textColor="@color/azul_fuerte"
+                android:textColor="@color/morado"
                 android:textSize="10sp" />
 
             <TextView
@@ -142,7 +142,7 @@
                 android:layout_marginTop="55dp"
                 android:layout_toRightOf="@+id/emoticono"
                 android:text="alejandro.leonrodriguez.7"
-                android:textColor="@color/morado_fuerte"
+                android:textColor="@color/morado"
                 android:textSize="10sp" />
 
         </RelativeLayout>
