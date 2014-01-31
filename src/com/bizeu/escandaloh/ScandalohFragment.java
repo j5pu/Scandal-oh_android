@@ -158,12 +158,12 @@ public class ScandalohFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
  
-    	Log.v("WE","ENTRA EN ONCREATEVIEW");
-    	Log.v("WE","num com: " + num_comments);
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo, container, false);    
         
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
+        
+       
         
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
@@ -223,12 +223,12 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
         
-        // AUDIO
-        /*
+        // AUDIO    
         ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
         if(has_audio){
         	aud.setVisibility(View.VISIBLE);
             // Si tiene autoreproducir activado lo iniciamos
+        	
             boolean autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
             if (autoplay){
             	reproduciendo = true;
@@ -237,12 +237,13 @@ public class ScandalohFragment extends Fragment {
     			Log.v("WE","uri_audio: "+  uri_audio);
             	new PlayAudioTask().execute(uri_audio);
             }
+            
         }
         else{
         	aud.setVisibility(View.INVISIBLE);
         }
         
-
+        /*
         aud.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -258,6 +259,7 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
 		*/
+		
 		
         
         
@@ -310,22 +312,6 @@ public class ScandalohFragment extends Fragment {
 		});
         
         */
-        // Título
-        //TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
-        //tit.setText(title);
-        
-        
-
-        
-        /*
-        
-        // Nombre de usuario
-        TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
-        user_na.setText(user_name);
-        
-        // Fecha
-        TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
-        dat.setText(changeFormatDate(date));  
         
         // Compartir 
         ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
@@ -333,6 +319,8 @@ public class ScandalohFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
+				
+				Log.v("WE","Entra en share");
 				
 				 // Creamos un menu para elegir entre compartir y denunciar foto
 				 final CharSequence[] opciones_compartir = {"Compartir scándalOh!", "Reportar scándalOh!"};
@@ -395,7 +383,24 @@ public class ScandalohFragment extends Fragment {
 				 dialog_compartir.show();			
 			}
 		});
-		*/
+        
+        
+        // Título
+        TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
+        tit.setText(title);
+         
+        
+        // Nombre de usuario
+        TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
+        user_na.setText(user_name);
+        
+        // Fecha
+        TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
+        dat.setText(changeFormatDate(date));  
+        
+        
+       
+		
         
         // Devolvemos la vista
         return rootView;

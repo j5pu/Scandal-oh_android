@@ -13,7 +13,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/txt_escandalo_name_user"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal|bottom"

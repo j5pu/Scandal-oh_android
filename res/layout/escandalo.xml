@@ -40,73 +40,63 @@
 
             <ImageView
                 android:id="@+id/imageView1"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_alignBottom="@+id/imageView2"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="56dp"
-                android:layout_toLeftOf="@+id/textView2"
+                android:layout_marginTop="60dp"
+                android:layout_toLeftOf="@+id/txt_escandalo_date"
                 android:src="@drawable/reloj_rosa" />
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/txt_escandalo_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/emoticono"
-                android:layout_toRightOf="@+id/emoticono"
-                android:text="user1980"
-                android:textColor="@color/morado"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView1"
-                android:layout_alignBottom="@+id/textView1"
+                android:layout_alignBaseline="@+id/txt_escandalo_name_user"
+                android:layout_alignBottom="@+id/txt_escandalo_name_user"
                 android:layout_marginRight="15dp"
-                android:layout_marginLeft="2dp"
+                android:layout_marginLeft="3dp"
                 android:layout_toLeftOf="@+id/imageView2"
                 android:text="16-01-2014"
                 android:textColor="@color/morado"
-                android:textSize="14sp" />
+                android:textSize="10sp" />
 
             <ImageView
                 android:id="@+id/imageView2"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_toLeftOf="@+id/textView3"
                 android:src="@drawable/ojo_rosa"
-                android:layout_marginTop="55dp" />
+                android:layout_marginTop="59dp"
+                android:layout_marginRight="1dp" />
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView2"
-                android:layout_alignBottom="@+id/textView2"
+                android:layout_alignBaseline="@+id/txt_escandalo_date"
+                android:layout_alignBottom="@+id/txt_escandalo_date"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="2dp"
+                android:layout_marginRight="6dp"
                 android:text="1234"
                 android:textColor="@color/morado"
-                android:textSize="14sp" />
+                android:textSize="10sp" />
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/txt_escandalo_titulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/emoticono"
                 android:layout_alignParentTop="true"
                 android:layout_alignRight="@+id/textView3"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:textColor="@color/gris_oscuro"
                 android:textSize="17sp"
                 android:text="Soy un título para la vista del carrusel de ScandalOh con 75 caracteres !!!" />
 
             <ImageView
-                android:id="@+id/imageView4"
+                android:id="@+id/imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/imageView2"
@@ -114,11 +104,11 @@
                 android:src="@drawable/corazon" />
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/img_escandalo_compartir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/imageView4"
-                android:layout_below="@+id/imageView4"
+                android:layout_alignLeft="@+id/imageView"
+                android:layout_below="@+id/imageView"
                 android:layout_marginTop="18dp"
                 android:src="@drawable/compartir" />
 
@@ -126,22 +116,34 @@
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/imageView4"
+                android:layout_alignBottom="@+id/imageView"
                 android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/textView4"
-                android:layout_marginRight="27dp"
-                android:layout_marginTop="127dp"
+                android:layout_alignTop="@+id/txt_escandalo_titulo"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="122dp"
                 android:text="0000"
                 android:textColor="@color/blanco"
                 android:textSize="9sp" />
 
             <ImageView
-                android:id="@+id/imageView5"
+                android:id="@+id/img_escandalo_audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/altavoz" />
+
+            <TextView
+                android:id="@+id/txt_escandalo_name_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/txt_escandalo_titulo"
+                android:layout_marginLeft="3dp"
+                android:layout_marginTop="55dp"
+                android:layout_toRightOf="@+id/emoticono"
+                android:text="alejandro.leonrodriguez.7"
+                android:textColor="@color/morado"
+                android:textSize="10sp" />
 
         </RelativeLayout>
 

@@ -581,7 +581,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	
 					pager.setCurrentItem(0);
 					adapter.clearFragments();
-					adapter.notifyDataSetChanged();
+					//adapter.notifyDataSetChanged();
+				    adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+				    pager.setAdapter(adapter);
 				    // Obtenemos los 10 primeros escándalos para la categoría seleccionada
 					// Mostramos el progressBar y ocultamos la lista de escandalos
 					loading.setVisibility(View.VISIBLE);
