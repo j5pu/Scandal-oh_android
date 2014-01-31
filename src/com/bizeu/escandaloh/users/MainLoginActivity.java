@@ -171,7 +171,8 @@ public class MainLoginActivity extends SherlockActivity{
 				    					   @Override
 				    					   public void onCompleted(GraphUser user, Response response) {
 				    						   if (user != null) {
-				    							   username = limitaCaracteres( user.getUsername());
+				    							   username = user.getUsername();
+				    							   //username = limitaCaracteres( user.getUsername());
 				    							   new LogInSocialNetwork().execute(LOGGING_FACEBOOK);
 				    						   }
 				    					   }
@@ -389,7 +390,8 @@ public class MainLoginActivity extends SherlockActivity{
                 // Obtenemos el nombre de usuario a partir del access token
                 long userID = accessToken.getUserId();
                 User user = twitter.showUser(userID);
-                username = limitaCaracteres(user.getScreenName());
+                username = user.getScreenName();
+               // username = limitaCaracteres(user.getScreenName());
 			  
 			} catch (TwitterException ex) {
 				login_error = true;
@@ -580,30 +582,5 @@ public class MainLoginActivity extends SherlockActivity{
 	}
 	*/
 	
-	
-	
-	
-	
-	// -------------------------------------------------------------------------------------------------------
-	// -------------------------    MÉTODOS PRIVADOS    ------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------
-	
-	
-	/**
-	 * Limita un string a 22 caracteres + tres puntos suspensivos
-	 * 
-	 * @param completo
-	 *            String oritinal
-	 * @return String con un tamaño máximo de 25 caracteres
-	 */
-	private String limitaCaracteres(String completo) {
-		String acortado = null;
-		if (completo.length() > 25) {
-			acortado = completo.substring(0, 22) + "...";
-		} else {
-			acortado = completo;
-		}
 
-		return acortado;
-	}
 }

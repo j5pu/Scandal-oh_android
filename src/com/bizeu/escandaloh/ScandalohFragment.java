@@ -27,6 +27,7 @@ import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.Utils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
@@ -323,15 +324,15 @@ public class ScandalohFragment extends Fragment {
 				Log.v("WE","Entra en share");
 				
 				 // Creamos un menu para elegir entre compartir y denunciar foto
-				 final CharSequence[] opciones_compartir = {"Compartir scándalOh!", "Reportar scándalOh!"};
+				 final CharSequence[] opciones_compartir = {getResources().getString(R.string.compartir_escandalo), getResources().getString(R.string.reportar_escandalo)};
 				 AlertDialog.Builder dialog_compartir = new AlertDialog.Builder(getActivity());
-				 dialog_compartir.setTitle("Selecciona opción");
+				 dialog_compartir.setTitle(R.string.selecciona_opcion);
 				 dialog_compartir.setItems(opciones_compartir, new DialogInterface.OnClickListener() {
 			            @Override
 			            public void onClick(DialogInterface dialog, int item) {
 			            	
 			            	// Compartir scándalOh
-			                if (opciones_compartir[item].equals("Compartir scándalOh!")) {
+			                if (opciones_compartir[item].equals(R.string.compartir_escandalo)) {
 			    				// Paramos si hubiera algún audio reproduciéndose
 			    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 			    				
@@ -341,14 +342,15 @@ public class ScandalohFragment extends Fragment {
 			                } 
 			                
 			                // Reportar foto
-			                else if (opciones_compartir[item].equals("Reportar scándalOh!")) {
+			                else if (opciones_compartir[item].equals(R.string.reportar_escandalo)) {
 			                	
 			                	// Si el usuario está logueado
 			                	if (MyApplication.logged_user){
 				                	// Creamos un menu para elegir el tipo de report
-				                	final CharSequence[] opciones_reportar = {"Material ofensivo", "Spam", "Copyright"};
+				                	final CharSequence[] opciones_reportar = {getResources().getString(R.string.material_ofensivo), 
+				                			getResources().getString(R.string.spam), getResources().getString(R.string.copyright)};
 				                	AlertDialog.Builder dialog_report = new AlertDialog.Builder(getActivity());
-				                	dialog_report.setTitle("Reportar esta foto por");
+				                	dialog_report.setTitle(R.string.reportar_esta_foto_por);
 				                	dialog_report.setItems(opciones_reportar, new DialogInterface.OnClickListener() {
 										
 										@Override
@@ -373,7 +375,7 @@ public class ScandalohFragment extends Fragment {
 			                	}
 			                	// No está logueado
 			                	else{
-			    		        	Toast toast = Toast.makeText(getActivity().getBaseContext(), "Debes iniciar sesión para reportar", Toast.LENGTH_LONG);
+			    		        	Toast toast = Toast.makeText(getActivity().getBaseContext(), R.string.debes_iniciar_sesion_para_reportar, Toast.LENGTH_LONG);
 			    		        	toast.show();        
 			                	}
 
@@ -392,16 +394,12 @@ public class ScandalohFragment extends Fragment {
         
         // Nombre de usuario
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
-        user_na.setText(user_name);
+        user_na.setText(Utils.limitaCaracteres(user_name));
         
         // Fecha
         TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
         dat.setText(changeFormatDate(date));  
-        
-        
-       
-		
-        
+            
         // Devolvemos la vista
         return rootView;
     }

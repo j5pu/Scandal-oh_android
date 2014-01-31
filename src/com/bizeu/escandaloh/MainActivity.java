@@ -154,6 +154,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
 		but_angry.setOnClickListener(this);
 		
+		
 		 	
 		// VIEWPAGER
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -770,7 +771,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	                        	escandalos.add(escanAux);
 	                        	Log.v("WE","Voy a crear el fragmento y sound vale: " + sound);
 	  			               // adapter.addFragment(ScandalohFragment.newInstance(escanAux));
-	  			               // adapter.notifyDataSetChanged();
+	  			                adapter.notifyDataSetChanged();
 	                        }
 			            }); 
 		            }          

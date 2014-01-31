@@ -13,5 +13,7 @@
     <color name="azul_hint">#b5d2e5</color>
     <color name="azul_facebook">#3b5998</color>
     <color name="rosa_corazon">#FF4444</color>
+    <color name="azul_fuerte">#c21d47</color>
+    <color name="morado_fuerte">#2593ae</color>
     
 </resources>

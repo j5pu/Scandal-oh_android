@@ -129,5 +129,12 @@
     <string name="introduce_una_direccion_email_valida">Enter a valid e-mail address</string>
     <string name="este_campo_debe_tener_6">This field requires at least 6 characters</string>
     <string name="lo_sentimos_se_ha_producido">Unexpected error</string>
-    
+    <string name="compartir_escandalo">Share scandalOh! to...</string>
+    <string name="reportar_escandalo">Report picture</string>
+    <string name="selecciona_opcion">Select...</string>
+    <string name="material_ofensivo">Offensive Materials</string>
+    <string name="spam">Spam</string>
+    <string name="copyright">Copyright Violation</string>
+    <string name="reportar_esta_foto_por">Report as</string>
+    <string name="debes_iniciar_sesion_para_reportar">Log in to report</string>
 </resources>
