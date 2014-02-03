@@ -153,8 +153,31 @@ public class ScandalohFragment extends Fragment {
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
- 
+
     
+    /**
+     * Se ejecuta cuando el fragmento cambia su visibilidad
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser); 
+       
+        if (isVisibleToUser) {   
+        	// Si tiene audio 
+            if(has_audio){
+            	 // Si tiene autoreproducir activado reproducimos el audio          	
+                autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
+                if (autoplay){
+                	reproduciendo = true;
+        			// Paramos si hubiera algún audio reproduciéndose
+        			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+                	new PlayAudioTask().execute(uri_audio);
+                }
+            }
+
+        }
+       
+    }
     
     /**
      * onCreateView
@@ -192,7 +215,6 @@ public class ScandalohFragment extends Fragment {
 					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
 					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
 					i.putExtra("bytes", bytes);
-					Log.v("WE","uri audio antes del imagen: " + uri_audio);
 					i.putExtra("uri_audio", uri_audio);				
 					getActivity().startActivity(i);				
 				}	
@@ -229,28 +251,24 @@ public class ScandalohFragment extends Fragment {
         
         // AUDIO    
         aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
-        loading_audio = (ProgressBar) rootView.findViewById(R.id.progress_escandalo_audio);
-        loading_audio.setTag(id);
+        // Si tiene audio mostramos el icono de audio
+        if(has_audio){
+        	aud.setVisibility(View.VISIBLE);
+        }
         
-
-
-        
-        /*
         aud.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {
-				
+			public void onClick(View v) {			
 				// Paramos si hubiera algún audio reproduciéndose
-				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-				
+				Audio.getInstance(getActivity().getBaseContext()).releaseResources();			
 				// Lo reproducimos		
 				if (uri_audio != null){
 					new PlayAudioTask().execute(uri_audio);	
 				}
 			}
 		});
-		*/
+		
 		
 		
 		
@@ -393,33 +411,7 @@ public class ScandalohFragment extends Fragment {
     }
     
     
-    /**
-     * Se ejecuta cuando el fragmento cambia su visibilidad
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {   	
-        	// Si tiene audio mostramos el icono de audio
-            if(uri_audio != null){
-            	 // Si tiene autoreproducir activado lo iniciamos	          	
-                autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
-                if (autoplay){
-                	// Mostramos el loading
-                	//ProgressBar loading_audio2 = (ProgressBar) getView().getParent().findViewWithTag(id);
-                	//loading_audio2.setVisibility(View.VISIBLE);
-                	reproduciendo = true;
-        			// Paramos si hubiera algún audio reproduciéndose
-        			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-                	new PlayAudioTask().execute(uri_audio);
-                }
-            // Si no tiene audio ocultamos el icono de audio
-            }
-            else{
-            	aud.setVisibility(View.INVISIBLE);
-            }
-        }
-    }
+
 
     
     
@@ -683,24 +675,13 @@ public class ScandalohFragment extends Fragment {
 	 *
 	 */
 	private class PlayAudioTask extends AsyncTask<String,Integer,Boolean> {
-		 
-		@Override
-		protected void onPreExecute(){
-			
-		}
-
+		
 		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
 	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
 	        return false;
 	    }	
-		
-		@Override
-	    protected void onPostExecute(Boolean result) {
-			loading_audio.setVisibility(View.INVISIBLE);
-			aud.setVisibility(View.VISIBLE);
-		}
 	}
 	
 	

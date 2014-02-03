@@ -792,7 +792,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
 	          							sound, username, date);
 	                        	escandalos.add(escanAux);
-	                        	Log.v("WE","Voy a crear el fragmento y sound vale: " + sound);
 	  			               // adapter.addFragment(ScandalohFragment.newInstance(escanAux));
 	  			                adapter.notifyDataSetChanged();
 	                        }
