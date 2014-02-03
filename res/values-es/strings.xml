@@ -103,7 +103,7 @@
     <string name="compartir_scandaloh_con">Compartir scándalOh! con...</string>
     <string name="guardando_dospuntos">Guardando ...</string>
     <string name="reportando_scandaloh">Reportando scándalOh! ...</string>
-    <string name="report_enviado_correctamente">Report enviado correctamente</string>
+    <string name="report_enviado_correctamente">Foto reportada correctamente</string>
     <string name="esta_opcion_no_se_podra">Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?</string>
     <string name="pais_elegido_dospuntos">País elegido: </string>
     <string name="autoreproduccion">Autoreproducción</string>
@@ -136,4 +136,10 @@
     <string name="copyright">Copyright</string>
     <string name="reportar_esta_foto_por">Reportar esta foto por</string>
     <string name="debes_iniciar_sesion_para_reportar">Debes iniciar sesión para reportar</string>
+    
+    <string-array name="array_categorias">
+        <item>Humor</item>
+        <item>Denuncia</item>
+    </string-array>
+    <string name="reproduce_el_audio_automaticamente">Reproduce el audio automáticamente</string>
 </resources>

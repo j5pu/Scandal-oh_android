@@ -58,6 +58,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +79,8 @@ public class ScandalohFragment extends Fragment {
 	private LinearLayout ll_comments;
     private ListView list_comments;
     private EditText edit_write_comment;
+    private ImageView aud;
+    private ProgressBar loading_audio;
     
     private String id;
     private String url;
@@ -95,6 +98,7 @@ public class ScandalohFragment extends Fragment {
 	private ArrayList<Comment> comments;
 	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
 	private SharedPreferences prefs;
+	private boolean autoplay;
 
 
     
@@ -141,8 +145,7 @@ public class ScandalohFragment extends Fragment {
         this.url_big = (getArguments() != null) ? getArguments().getString(URL_BIG) : null;
         this.title = (getArguments() != null) ? getArguments().getString(TITLE) : null;
         this.num_comments = (getArguments() != null) ? getArguments().getInt(NUM_COMMENTS) : 0;
-        this.has_audio = (getArguments() != null) ? getArguments().getBoolean(HAS_AUDIO) : false;
-        Log.v("WE","has_audio: " + has_audio);
+        this.has_audio = (getArguments() != null) ? getArguments().getBoolean(HAS_AUDIO) : null;
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
@@ -225,24 +228,12 @@ public class ScandalohFragment extends Fragment {
 		});
         
         // AUDIO    
-        ImageView aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
-        if(has_audio){
-        	aud.setVisibility(View.VISIBLE);
-            // Si tiene autoreproducir activado lo iniciamos
-        	
-            boolean autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
-            if (autoplay){
-            	reproduciendo = true;
-    			// Paramos si hubiera algún audio reproduciéndose
-    			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-    			Log.v("WE","uri_audio: "+  uri_audio);
-            	new PlayAudioTask().execute(uri_audio);
-            }
-            
-        }
-        else{
-        	aud.setVisibility(View.INVISIBLE);
-        }
+        aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
+        loading_audio = (ProgressBar) rootView.findViewById(R.id.progress_escandalo_audio);
+        loading_audio.setTag(id);
+        
+
+
         
         /*
         aud.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +251,7 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
 		*/
+		
 		
 		
         
@@ -321,8 +313,6 @@ public class ScandalohFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				
-				Log.v("WE","Entra en share");
-				
 				 // Creamos un menu para elegir entre compartir y denunciar foto
 				 final CharSequence[] opciones_compartir = {getResources().getString(R.string.compartir_escandalo), getResources().getString(R.string.reportar_escandalo)};
 				 AlertDialog.Builder dialog_compartir = new AlertDialog.Builder(getActivity());
@@ -332,7 +322,7 @@ public class ScandalohFragment extends Fragment {
 			            public void onClick(DialogInterface dialog, int item) {
 			            	
 			            	// Compartir scándalOh
-			                if (opciones_compartir[item].equals(R.string.compartir_escandalo)) {
+			                if (opciones_compartir[item].equals(getResources().getString(R.string.compartir_escandalo))) {
 			    				// Paramos si hubiera algún audio reproduciéndose
 			    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 			    				
@@ -342,7 +332,7 @@ public class ScandalohFragment extends Fragment {
 			                } 
 			                
 			                // Reportar foto
-			                else if (opciones_compartir[item].equals(R.string.reportar_escandalo)) {
+			                else if (opciones_compartir[item].equals(getResources().getString(R.string.reportar_escandalo))) {
 			                	
 			                	// Si el usuario está logueado
 			                	if (MyApplication.logged_user){
@@ -385,13 +375,11 @@ public class ScandalohFragment extends Fragment {
 				 dialog_compartir.show();			
 			}
 		});
-        
-        
+            
         // Título
         TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
-         
-        
+       
         // Nombre de usuario
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
         user_na.setText(Utils.limitaCaracteres(user_name));
@@ -404,7 +392,34 @@ public class ScandalohFragment extends Fragment {
         return rootView;
     }
     
-   
+    
+    /**
+     * Se ejecuta cuando el fragmento cambia su visibilidad
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {   	
+        	// Si tiene audio mostramos el icono de audio
+            if(uri_audio != null){
+            	 // Si tiene autoreproducir activado lo iniciamos	          	
+                autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
+                if (autoplay){
+                	// Mostramos el loading
+                	//ProgressBar loading_audio2 = (ProgressBar) getView().getParent().findViewWithTag(id);
+                	//loading_audio2.setVisibility(View.VISIBLE);
+                	reproduciendo = true;
+        			// Paramos si hubiera algún audio reproduciéndose
+        			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+                	new PlayAudioTask().execute(uri_audio);
+                }
+            // Si no tiene audio ocultamos el icono de audio
+            }
+            else{
+            	aud.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
 
     
     
@@ -429,7 +444,6 @@ public class ScandalohFragment extends Fragment {
 	    @Override
 	    protected void onPreExecute() {
 	        super.onPreExecute();
-
 	        pDialog = new ProgressDialog(getActivity());
 	        pDialog.setMessage(getResources().getString(R.string.preparando_para_compartir));
 	        pDialog.setIndeterminate(false);
@@ -681,6 +695,12 @@ public class ScandalohFragment extends Fragment {
 	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
 	        return false;
 	    }	
+		
+		@Override
+	    protected void onPostExecute(Boolean result) {
+			loading_audio.setVisibility(View.INVISIBLE);
+			aud.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	
@@ -853,6 +873,9 @@ public class ScandalohFragment extends Fragment {
     public int getNumComments(){
     	return num_comments;
     }
+    
+    
+
     
     
     

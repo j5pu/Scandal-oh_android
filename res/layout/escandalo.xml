@@ -14,7 +14,7 @@
         sothree:collapsedHeight="68dp"
         sothree:shadowHeight="4dp" >
 
-      <RelativeLayout
+        <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
@@ -54,8 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/txt_escandalo_name_user"
                 android:layout_alignBottom="@+id/txt_escandalo_name_user"
-                android:layout_marginRight="15dp"
                 android:layout_marginLeft="3dp"
+                android:layout_marginRight="15dp"
                 android:layout_toLeftOf="@+id/imageView2"
                 android:text="16-01-2014"
                 android:textColor="@color/morado"
@@ -65,10 +65,10 @@
                 android:id="@+id/imageView2"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_toLeftOf="@+id/textView3"
-                android:src="@drawable/ojo_rosa"
+                android:layout_marginRight="1dp"
                 android:layout_marginTop="59dp"
-                android:layout_marginRight="1dp" />
+                android:layout_toLeftOf="@+id/textView3"
+                android:src="@drawable/ojo_rosa" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -91,9 +91,10 @@
                 android:layout_alignRight="@+id/textView3"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:textColor="@color/gris_oscuro"
+                android:text="Soy un título para la vista del carrusel de ScandalOh con 75 caracteres !!!"
+                android:textColor="@color/morado"
                 android:textSize="17sp"
-                android:text="Soy un título para la vista del carrusel de ScandalOh con 75 caracteres !!!" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/imageView"
@@ -131,7 +132,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/altavoz" />
+                android:src="@drawable/altavoz"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/txt_escandalo_name_user"
@@ -145,13 +147,21 @@
                 android:textColor="@color/morado"
                 android:textSize="10sp" />
 
+            <ProgressBar
+                android:id="@+id/progress_escandalo_audio"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/ll_comments"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#88FFFFFF"
+            android:background="#883d99b7"
             android:clickable="true"
             android:focusable="false"
             android:orientation="vertical" >
@@ -170,7 +180,6 @@
                 android:layout_height="wrap_content" >
             </ListView>
         </LinearLayout>
-
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>

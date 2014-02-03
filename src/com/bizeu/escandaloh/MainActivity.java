@@ -42,11 +42,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -68,7 +71,7 @@ import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 
-public class MainActivity extends SherlockFragmentActivity implements OnClickListener{
+public class MainActivity extends SherlockFragmentActivity implements OnClickListener, OnItemSelectedListener{
 
 	public static final int SHOW_CAMERA = 10;
     private static final int CREATE_ESCANDALO = 11;
@@ -88,6 +91,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private Button but_happy;
 	private Button but_angry;
 	private ListView list_menu_lateral;
+	private Spinner spinner_categorias;
     DrawerLayout mDrawerLayout;
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -137,7 +141,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_2, null);
 		actBar.setCustomView(view);	
         // Activamos el logo del menu para el menu lateral
         actBar.setHomeButtonEnabled(true);
@@ -152,17 +156,24 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+		/*
 		but_happy = (Button) findViewById(R.id.but_action_bar_happy);
 		but_happy.setOnClickListener(this);
 		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
 		but_angry.setOnClickListener(this);
-
-		/* Might need to convert shadowImage from 8-bit to ARGB here, can't remember. */
-
-		Canvas c = new Canvas(shadowImage);
-		c.drawBitmap(originalBitmap, offsetXY[0], offsetXY[1], null);
+		*/
 		
-		
+		// SPINNER
+		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
+		// Create an ArrayAdapter using the string array and a default spinner layout
+		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+		        R.array.array_categorias, R.layout.categoria_spinner);
+		// Specify the layout to use when the list of choices appears
+		adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
+		// Apply the adapter to the spinner
+		spinner_categorias.setAdapter(adapter2);
+		spinner_categorias.setOnItemSelectedListener(this);
+				
 		 	
 		// VIEWPAGER
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -230,8 +241,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		pager.setPageMargin(3);		
       	//TODO Asignamos categoria happy la primera vez
       	category = HAPPY;
+      	/*
       	but_happy.setClickable(false);
       	but_happy.setTypeface(null, Typeface.BOLD);
+      	*/
 	
 		// Si hay conexión: obtenemos los 10 primeros escándalos
 		if (Connectivity.isOnline(mContext)){
@@ -556,6 +569,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		    break;	
 		       	        
 		    // Selección de categoría
+		    /*
 			case R.id.but_action_bar_happy: case R.id.but_action_bar_angry:
 				// Si hay conexión
 				if (Connectivity.isOnline(mContext)){
@@ -607,6 +621,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					toast.show();
 				} 
 			break;
+			*/
 		}   	
 	}
 	
@@ -822,14 +837,20 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
-						     		
+				
+			// Habilitamos el spinner
+			spinner_categorias.setClickable(true);
+			
+			
+			/*
 		    // Habilitamos los botones
 		    if (category.equals(HAPPY)){
-		    	but_angry.setClickable(true);
+		    	//but_angry.setClickable(true);
 		    }
 		    else{
-		    	but_happy.setClickable(true);
+		    	//but_happy.setClickable(true);
 		    }
+		    */
 		    
 		    // Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
 		    if (no_hay_escandalos){
@@ -1307,6 +1328,77 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         	this.fragments.clear();
         }
     }
+
+
+
+
+    // MÉTODOS DEL SPINNER
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+		
+		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
+		if ((pos == 0 && category.equals(ANGRY)) || (pos == 1 && category.equals(HAPPY))){
+
+			// Si hay conexión
+			if (Connectivity.isOnline(mContext)){
+				cancelGetEscandalos();
+				refreshFinished();
+				// Inhabilitamos el spinner
+				spinner_categorias.setClickable(false);
+				// Abrimos llave de hay más escandalos
+				there_are_more_escandalos = true;
+			    // Quitamos los escándalos actuales
+			    escandalos.clear();
+
+				switch(pos){
+					case 0: // Humor
+						
+						if (category.equals(ANGRY)){
+							// Mandamos el evento a Google Analytics
+			           	    EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
+			     		    easyTracker2.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado humor",null).build()); 
+							category = HAPPY;
+						}
+				      	break;
+					case 1: // Denuncia
+						// Mandamos el evento a Google Analytics
+		           	    EasyTracker easyTracker3 = EasyTracker.getInstance(mContext);
+		     		    easyTracker3.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado denuncia",null).build()); 
+						category = ANGRY;
+				      	break;
+				}
+
+
+				pager.setCurrentItem(0);
+				adapter.clearFragments();
+				//adapter.notifyDataSetChanged();
+			    adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+			    pager.setAdapter(adapter);
+			    // Obtenemos los 10 primeros escándalos para la categoría seleccionada
+				// Mostramos el progressBar y ocultamos la lista de escandalos
+				loading.setVisibility(View.VISIBLE);
+				pager.setVisibility(View.GONE);
+				getEscandalosAsync = new GetEscandalos();
+				getEscandalosAsync.execute();					
+			}
+							
+			// No hay conexión
+			else{				
+				Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+				toast.show();
+			} 
+		}
+		
+
+		
+	}
+
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	
 }
