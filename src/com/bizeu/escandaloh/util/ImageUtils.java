@@ -19,45 +19,50 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
 public class ImageUtils {
 
-	
 	/**
 	 * Transforma un Bitmap en un array de bytes (JPEG)
+	 * 
 	 * @param bmp
 	 * @return
 	 */
-	public static byte[] bitmapToBytes(Bitmap bmp){
-		
+	public static byte[] bitmapToBytes(Bitmap bmp) {
+
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 		byte[] byteArray = stream.toByteArray();
-		
+
 		return byteArray;
 	}
-	
-	
+
 	/**
 	 * Transforma un array de bytes en un Bitmap
+	 * 
 	 * @param bytes
 	 * @return
 	 */
-	public static Bitmap bytesToBitmap(byte[] bytes){
-		
-		Bitmap bitmap = BitmapFactory.decodeByteArray(bytes , 0, bytes .length);
+	public static Bitmap bytesToBitmap(byte[] bytes) {
+
+		Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 		return bitmap;
 	}
-	
-	
-	
-	
+
 	/**
 	 * Crea un Bitmap a partir de una Uri
+	 * 
 	 * @param selectedImage
 	 * @return
 	 */
@@ -67,16 +72,32 @@ public class ImageUtils {
 		options.inSampleSize = 5;
 		AssetFileDescriptor fileDescriptor = null;
 		try {
-			fileDescriptor = context.getContentResolver().openAssetFileDescriptor(
-					selectedImage, "r");
+			fileDescriptor = context.getContentResolver()
+					.openAssetFileDescriptor(selectedImage, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
+			easyTracker.send(MapBuilder.createException(
+					new StandardExceptionParser(context, null) // Context and
+																// optional
+																// collection of
+																// package names
+																// to be used in
+																// reporting the
+																// exception.
+							.getDescription(Thread.currentThread().getName(), // The
+																				// name
+																				// of
+																				// the
+																				// thread
+																				// on
+																				// which
+																				// the
+																				// exception
+																				// occurred.
+									e), // The exception.
+					false).build());
 		} finally {
 			try {
 				bm = BitmapFactory.decodeFileDescriptor(
@@ -86,26 +107,39 @@ public class ImageUtils {
 				e.printStackTrace();
 				// Mandamos la excepcion a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       e),                                                             // The exception.
-					                       false).build()); 
+				easyTracker.send(MapBuilder.createException(
+						new StandardExceptionParser(context, null) // Context
+																	// and
+																	// optional
+																	// collection
+																	// of
+																	// package
+																	// names to
+																	// be used
+																	// in
+																	// reporting
+																	// the
+																	// exception.
+								.getDescription(Thread.currentThread()
+										.getName(), // The name of the thread on
+													// which the exception
+													// occurred.
+										e), // The exception.
+						false).build());
 			}
 		}
 		return bm;
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Crea un File a partir de un bitmap
+	 * 
 	 * @param bitm
 	 * @return
 	 */
-	public static File bitmapToFile(Bitmap bitm, Context context){
-		String file_path = Environment.getExternalStorageDirectory().getAbsolutePath();
+	public static File bitmapToFile(Bitmap bitm, Context context) {
+		String file_path = Environment.getExternalStorageDirectory()
+				.getAbsolutePath();
 		File return_file = new File(file_path, "tmp.png");
 		FileOutputStream fOut = null;
 		try {
@@ -114,14 +148,30 @@ public class ImageUtils {
 			e.printStackTrace();
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 		
+			easyTracker.send(MapBuilder.createException(
+					new StandardExceptionParser(context, null) // Context and
+																// optional
+																// collection of
+																// package names
+																// to be used in
+																// reporting the
+																// exception.
+							.getDescription(Thread.currentThread().getName(), // The
+																				// name
+																				// of
+																				// the
+																				// thread
+																				// on
+																				// which
+																				// the
+																				// exception
+																				// occurred.
+									e), // The exception.
+					false).build());
 		}
-		
+
 		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-		
+
 		try {
 			fOut.flush();
 			fOut.close();
@@ -129,93 +179,136 @@ public class ImageUtils {
 			e.printStackTrace();
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
+			easyTracker.send(MapBuilder.createException(
+					new StandardExceptionParser(context, null) // Context and
+																// optional
+																// collection of
+																// package names
+																// to be used in
+																// reporting the
+																// exception.
+							.getDescription(Thread.currentThread().getName(), // The
+																				// name
+																				// of
+																				// the
+																				// thread
+																				// on
+																				// which
+																				// the
+																				// exception
+																				// occurred.
+									e), // The exception.
+					false).build());
 		}
-		
+
 		return return_file;
 	}
-	
-	
-	
-	
+
 	/**
 	 * Obtiene un string a partir de una uri
+	 * 
 	 * @param context
 	 * @param contentUri
 	 * @return
 	 */
 	public static String getRealPathFromURI(Context context, Uri contentUri) {
 		Cursor cursor = null;
-		try { 
+		try {
 			String[] proj = { MediaStore.Images.Media.DATA };
-		    cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-		    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-		    cursor.moveToFirst();
-		    return cursor.getString(column_index);
+			cursor = context.getContentResolver().query(contentUri, proj, null,
+					null, null);
+			int column_index = cursor
+					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			cursor.moveToFirst();
+			return cursor.getString(column_index);
 		} finally {
 			if (cursor != null) {
-		      cursor.close();
-		    }
-		 }
+				cursor.close();
+			}
+		}
 	}
-	
-	
-	
-	
+
 	/**
 	 * Guarda un bitmap como una foto en la galería del dispositivo
-	 * @param bmp Bitmap de la foto a guardar
-	 * @param context Contexto
+	 * 
+	 * @param bmp
+	 *            Bitmap de la foto a guardar
+	 * @param context
+	 *            Contexto
 	 */
-    public static void saveBitmapIntoGallery(Bitmap bmp, Context context){
-    	File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"ScándalOh");
-    	imageFileFolder.mkdirs();
-    	FileOutputStream out = null;
-    	
-    	// El nombre de la foto se obtiene a partir de la fecha y hora exacta actual
-    	Calendar c = Calendar.getInstance();
-    	String date = String.valueOf(c.get(Calendar.MONTH))
-                + String.valueOf(c.get(Calendar.DAY_OF_MONTH))
-                + String.valueOf(c.get(Calendar.YEAR))
-                + String.valueOf(c.get(Calendar.HOUR_OF_DAY))
-                + String.valueOf(c.get(Calendar.MINUTE))
-                + String.valueOf(c.get(Calendar.SECOND));
-    	File imageFileName = new File(imageFileFolder, "IMG-" + date.toString() + ".jpg");
-    	
-    	try{
-    		out = new FileOutputStream(imageFileName);
-    		bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-    		out.flush();
-    		out.close();
-     
-    		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-    		Uri contentUri = Uri.fromFile(imageFileName);
-    		mediaScanIntent.setData(contentUri);
-    		context.sendBroadcast(mediaScanIntent);
-        
-    		out = null;
-    	} catch (Exception e){
-    		e.printStackTrace();
-    	}
-    }
-    
-    
-	public static Bitmap getBitmapFromURL(String src) {
-	    try {
-	        URL url = new URL(src);
-	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	        connection.setDoInput(true);
-	        connection.connect();
-	        InputStream input = connection.getInputStream();
-	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
-	        return myBitmap;
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+	public static void saveBitmapIntoGallery(Bitmap bmp, Context context) {
+		File imageFileFolder = new File(
+				Environment.getExternalStorageDirectory(), "ScándalOh");
+		imageFileFolder.mkdirs();
+		FileOutputStream out = null;
+
+		// El nombre de la foto se obtiene a partir de la fecha y hora exacta
+		// actual
+		Calendar c = Calendar.getInstance();
+		String date = String.valueOf(c.get(Calendar.MONTH))
+				+ String.valueOf(c.get(Calendar.DAY_OF_MONTH))
+				+ String.valueOf(c.get(Calendar.YEAR))
+				+ String.valueOf(c.get(Calendar.HOUR_OF_DAY))
+				+ String.valueOf(c.get(Calendar.MINUTE))
+				+ String.valueOf(c.get(Calendar.SECOND));
+		File imageFileName = new File(imageFileFolder, "IMG-" + date.toString()
+				+ ".jpg");
+
+		try {
+			out = new FileOutputStream(imageFileName);
+			bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			out.flush();
+			out.close();
+
+			Intent mediaScanIntent = new Intent(
+					Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+			Uri contentUri = Uri.fromFile(imageFileName);
+			mediaScanIntent.setData(contentUri);
+			context.sendBroadcast(mediaScanIntent);
+
+			out = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
+	public static Bitmap getBitmapFromURL(String src) {
+		try {
+			URL url = new URL(src);
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+			connection.setDoInput(true);
+			connection.connect();
+			InputStream input = connection.getInputStream();
+			Bitmap myBitmap = BitmapFactory.decodeStream(input);
+			return myBitmap;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	
+	 public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+		    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+		        bitmap.getHeight(), Config.ARGB_8888);
+		    Canvas canvas = new Canvas(output);
+		 
+		    final int color = 0xff424242;
+		    final Paint paint = new Paint();
+		    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		    final RectF rectF = new RectF(rect);
+		    final float roundPx = 12;
+		 
+		    paint.setAntiAlias(true);
+		    canvas.drawARGB(0, 0, 0, 0);
+		    paint.setColor(color);
+		    canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+		 
+		    paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+		    canvas.drawBitmap(bitmap, rect, rect, paint);
+		 
+		    return output;
+		  }
 
 }

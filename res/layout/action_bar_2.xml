@@ -14,20 +14,53 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
             android:orientation="horizontal" >
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="7"
+                android:layout_weight="2"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom|left"
+                    android:paddingBottom="3dp"
+                    android:text="ES"
+                    android:textColor="@color/blanco" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_weight="8"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical" >
+
+                <Spinner
+                    android:id="@+id/sp_categorias"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:popupBackground="#883d99b7" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
                 android:gravity="center_vertical|center_horizontal" >
 
                 <LinearLayout
                     android:id="@+id/ll_main_refresh"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.4"
                     android:gravity="center_vertical|center_horizontal"
                     android:orientation="vertical" >
 
@@ -46,20 +79,13 @@
                         android:layout_gravity="center_horizontal"
                         android:visibility="gone" />
                 </LinearLayout>
-
-                <Spinner
-                    android:id="@+id/sp_categorias"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:popupBackground="@android:color/transparent" />
-
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2" >
+                android:layout_weight="2"
+                android:gravity="center_vertical|center_horizontal" >
 
                 <LinearLayout
                     android:id="@+id/ll_main_take_photo"
@@ -67,15 +93,15 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="2"
-                    android:gravity="center_vertical"
+                    android:gravity="center_vertical|center_horizontal"
                     android:orientation="vertical" >
 
                     <ImageView
                         android:id="@+id/img_actionbar_takephoto"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/mas" />
+                        android:src="@drawable/cam_micro" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

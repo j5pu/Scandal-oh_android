@@ -8,7 +8,11 @@ import android.content.SharedPreferences;
 
 public class MyApplication extends Application {
 	public static int ALTO_TABS;
-	public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com/" ;
+	// Producción
+	//public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com/" ;
+	// Desarrollo
+	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com/" ;
+	// Local
 	//public static String SERVER_ADDRESS = "http://192.168.1.35:8000/";
 	public static String CODE_COUNTRY = "Code country";
 	public static String USER_URI = "user_uri";

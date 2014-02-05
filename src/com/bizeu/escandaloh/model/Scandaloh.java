@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh.model;
 
+import java.util.ArrayList;
+
 import android.graphics.Bitmap;
 
 public class Scandaloh {
@@ -21,6 +23,7 @@ public class Scandaloh {
 	private boolean has_audio;
 	private String date;
 	private String user;
+	private ArrayList<Comment> comments; // Listado de comentarios
 
 	
 	
@@ -37,7 +40,9 @@ public class Scandaloh {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, String resource_uri, String route_img, String route_img_big, String uri_audio, String user, String date){
+	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
+						String resource_uri, String route_img, String route_img_big, String uri_audio,
+						String user, String date, ArrayList<Comment> comments){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -55,6 +60,9 @@ public class Scandaloh {
 		this.has_audio = uri_audio.equals("null") ? false : true;
 		this.user = user;
 		this.date = date;
+		this.comments = new ArrayList<Comment>();
+		this.comments = comments;
+
 	}
 	
 	public void setId(String id){
@@ -159,6 +167,14 @@ public class Scandaloh {
 	
 	public String getDate(){
 		return this.date;
+	}
+	
+	public ArrayList<Comment> getComments(){
+		return comments;
+	}
+	
+	public void setComments(ArrayList<Comment> new_comments){
+		comments = new_comments;
 	}
 	
 }

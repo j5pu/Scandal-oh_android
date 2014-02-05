@@ -48,6 +48,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -74,6 +75,7 @@ public class ScandalohFragment extends Fragment {
     private static final String USER_NAME = "user_name";
     private static final String DATE = "date";
     private static final String URI_AUDIO = "uri_audio";
+    private static final String COMMENTS = "comments";
  
     private TextView num_com ;
 	private LinearLayout ll_comments;
@@ -95,10 +97,11 @@ public class ScandalohFragment extends Fragment {
 	private int chosen_report; // 1:Copyright      2:Ilegalcontent      3:Spam
 	private String uri_audio;	
 	private CommentAdapter commentsAdapter;
-	private ArrayList<Comment> comments;
+	private ArrayList<Comment> comments = new ArrayList<Comment>();
 	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
 	private SharedPreferences prefs;
 	private boolean autoplay;
+
 
 
     
@@ -122,6 +125,9 @@ public class ScandalohFragment extends Fragment {
         bundle.putString(USER_NAME, escan.getUser());
         bundle.putString(DATE, escan.getDate());
         bundle.putString(URI_AUDIO, escan.getUriAudio());
+        bundle.putParcelableArrayList(COMMENTS, escan.getComments());
+        Log.v("WE","Num commtns: " +  escan.getComments().size());
+        Log.v("WE","Num comments de verdad: " + escan.getNumComments());
 
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
@@ -149,7 +155,9 @@ public class ScandalohFragment extends Fragment {
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
+        this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
         
+        Log.v("WE","Num comments de verdad oncreate: " + this.num_comments);
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
@@ -190,8 +198,7 @@ public class ScandalohFragment extends Fragment {
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
         
-       
-        
+            
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setImage(this.url, R.drawable.cargando);      
@@ -269,24 +276,12 @@ public class ScandalohFragment extends Fragment {
 			}
 		});
 		
-		
-		
-		
+			
+        // EMOTICONO
+        ImageView emoticono = (ImageView) rootView.findViewById(R.id.emoticono);
+        Bitmap bitma = ImageUtils.getRoundedCornerBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.icono_app));
+		emoticono.setImageBitmap(bitma);
         
-        
-        
-		// COMENTARIOS
-        /*
-		comments = new ArrayList<Comment>();
-		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
-		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
-		list_comments.setAdapter(commentsAdapter);
-		
-		// Si hay conexión
-		if (Connectivity.isOnline(getActivity().getBaseContext())){
-			new GetComments(getActivity().getBaseContext(), true).execute();
-		}
-		*/
 		
 		/*
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
@@ -404,7 +399,19 @@ public class ScandalohFragment extends Fragment {
         
         // Fecha
         TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
-        dat.setText(changeFormatDate(date));  
+        dat.setText(changeFormatDate(date)); 
+        
+		// Comentarios
+		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
+		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
+		Log.v("WE","En el adaptador num comments: " + num_comments);
+		Log.v("WE","En el adaptador tiene: " + comments.size());
+		list_comments.setAdapter(commentsAdapter);
+		
+		// Si hay conexión
+		if (Connectivity.isOnline(getActivity().getBaseContext())){
+			//new GetComments(getActivity().getBaseContext(), true).execute();
+		}
             
         // Devolvemos la vista
         return rootView;
@@ -683,149 +690,6 @@ public class ScandalohFragment extends Fragment {
 	        return false;
 	    }	
 	}
-	
-	
-	
-	 
-    /**
-	 * Muestra la lista de comentarios para esa foto
-	 *
-	 */
-	private class GetComments extends AsyncTask<Void,Integer,Integer> {
-		 	
-		private Context mContext;
-		private boolean add_comm;
-		
-	    public GetComments(Context context, boolean add_comment){
-	         mContext = context;
-	         add_comm = add_comment;
-	    }
-		
-		@Override
-		protected void onPreExecute(){
-			/*
-			// Si estamos obteniendo comntarios sin haber enviado uno mostramos el progress bar
-			if (!add_comm){
-				progress_list_comments.setVisibility(View.VISIBLE);
-				list_comments.setVisibility(View.GONE);		
-			}
-			*/
-			
-			any_error = false;
-			
-		}
-		
-		@Override
-	    protected Integer doInBackground(Void... params) {
-			
-			comments.clear();
-			
-			HttpClient httpClient = new DefaultHttpClient();		
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + id);		 
-			del.setHeader("content-type", "application/json");		
-			HttpResponse response = null ;
-			
-			try{				
-				response = httpClient.execute(del);
-			    String respStr = EntityUtils.toString(response.getEntity());
-			        
-			    Log.i("WE",respStr);
-			  
-			    JSONObject respJSON = new JSONObject(respStr);
-			        
-			    // Parseamos el json para obtener los escandalos
-		        JSONArray escandalosObject = null;
-		            		   
-		        escandalosObject = respJSON.getJSONArray("objects");
-		           
-		        for (int i=0 ; i < escandalosObject.length(); i++){
-		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
-		            	
-		        	String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-		        	String username = escanObject.getString("username");
-		        	String date = escanObject.getString("date");
-		        	String resource_uri = escanObject.getString("user");
-		            	 
-		        	// Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
-		        	comments.add(new Comment(comment, username, date, resource_uri));					 
-		        }		            
-			}
-			catch(Exception ex){
-				Log.e("ServicioRest","Error!", ex);
-				any_error = true; // Indicamos que hubo un error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       ex),                                                             // The exception.
-				                       false).build());  
-			}
-			
-			// Si hubo algún error devolvemos 666
-			if (any_error){
-				return 666;
-			}
-			else{			
-				// Devolvemos el código de respuesta
-		        return (response.getStatusLine().getStatusCode());
-			}
-	    }
-
-		
-		@Override
-	    protected void onPostExecute(Integer result) {
-		
-			/*
-			// Si estamos obteniéndolos porque hemos enviado uno
-			if (add_comm){
-				// Quitamos el ProgressDialog
-				if (progress.isShowing()) {
-			        progress.dismiss();
-			    }
-			}
-			// Si no, mostramos el listview y quitamos el progress bar
-			else{			
-				progress_list_comments.setVisibility(View.GONE);
-				list_comments.setVisibility(View.VISIBLE);
-				ll_list_comments.setGravity(Gravity.TOP);
-			}
-			*/
-			
-				
-			// Si hubo algún error 
-			if (result == 666){
-				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-			
-			// No hubo ningún error extraño
-			else{
-				// Si es codigo 2xx --> OK
-		        if (result >= 200 && result <300){
-		        	commentsAdapter.notifyDataSetChanged();
-		        	
-		        	/*
-		        	// Actualizamos el indicador de número de comentarios
-		        	if (comments.size() == 1){
-		        		txt_num_comments.setText(comments.size() + " comentario");
-		        	}
-		        	else{
-			        	txt_num_comments.setText(comments.size() + " comentarios");
-		        	}
-		        	*/
-		        }
-		        else{
-		        	Toast toast;
-		        	toast = Toast.makeText(mContext, R.string.no_se_pudieron_obtener_comentarios, Toast.LENGTH_LONG);
-		        	toast.show();
-		        } 
-			}   
-	    }
-	}
-    
-	
-	
 	
 
 	// ---------------------------------------------------------------------------------------------

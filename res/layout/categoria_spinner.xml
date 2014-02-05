@@ -2,10 +2,12 @@
 
 <TextView  
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-    android:textSize="20dip"
-    android:gravity="left"  
+	android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_width="fill_parent"
+    android:textSize="18sp"
+    android:paddingLeft="6dip"
+    android:paddingRight="6dip" 
+    android:gravity="right|center_horizontal|center_vertical"
     android:textColor= "@color/blanco"         
-    android:padding="5dip"
+
     />

@@ -99,7 +99,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		progress_list_comments = (ProgressBar) findViewById(R.id.prog_list_comments);
 		
 		comments = new ArrayList<Comment>();
-		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
+//		commentsAdapter = new CommentAdapter(this,R.layout.comment, comments, user);
 		list_comments.setAdapter(commentsAdapter);
 		
 		txt_num_comments = (TextView) findViewById(R.id.txt_comments_num_comments);	
@@ -137,7 +137,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 					written_comment = edit_new_comment.getText().toString();
 					// Si ha escrito algo y la longitud es menor de 500 caracteres lo enviamos
 					if (!written_comment.equals("") && written_comment.length() < 501){
-						new SendComment(context).execute();
+						//new SendComment(context).execute();
 					}	
 				}
 				else{
@@ -162,7 +162,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 		
 		// Si hay conexión
 		if (Connectivity.isOnline(this)){
-			new GetComments(context, add_comment).execute();
+			//new GetComments(context, add_comment).execute();
 		}
 		else{
         	Toast toast;
@@ -229,6 +229,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	 * Sube un comentario
 	 *
 	 */
+	/*
 	private class SendComment extends AsyncTask<Void,Integer,Integer> {
 		 
 		private Context mContext;
@@ -334,7 +335,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			}
 	    }
 	}
-	
+	*/
 	
 	
 	
@@ -342,6 +343,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	 * Muestra la lista de comentarios para esa foto
 	 *
 	 */
+ /*
 	private class GetComments extends AsyncTask<Void,Integer,Integer> {
 		 	
 		private Context mContext;
@@ -468,5 +470,6 @@ public class DetailCommentsActivity extends SherlockActivity {
 			}   
 	    }
 	}
+	*/
 	
 }

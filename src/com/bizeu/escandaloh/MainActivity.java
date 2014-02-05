@@ -58,6 +58,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.adapters.DrawerMenuAdapter;
 import com.bizeu.escandaloh.adapters.ScandalohFragmentPagerAdapter2;
+import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.MainLoginActivity;
@@ -88,8 +89,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
 	private ProgressBar progress_refresh;
-	private Button but_happy;
-	private Button but_angry;
 	private ListView list_menu_lateral;
 	private Spinner spinner_categorias;
     DrawerLayout mDrawerLayout;
@@ -126,8 +125,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		mContext = this;
       	escandalos = new ArrayList<Scandaloh>();  
       	
-
-		
+	
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_main));
 		
@@ -156,12 +154,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-		/*
-		but_happy = (Button) findViewById(R.id.but_action_bar_happy);
-		but_happy.setOnClickListener(this);
-		but_angry = (Button) findViewById(R.id.but_action_bar_angry);
-		but_angry.setOnClickListener(this);
-		*/
 		
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
@@ -317,6 +309,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		// Abrimos la llave para el caso de error del timeout al obtener fotos
 		//MyApplication.TIMEOUT_PHOTO_SHOWN = false;		
 		
+		/*
 		// Si está logueado mostramos la cámara (con su selector)
 		if (MyApplication.logged_user){		
 			StateListDrawable states = new StateListDrawable();
@@ -333,6 +326,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				states.addState(new int[] { },getResources().getDrawable(R.drawable.mas));
 			img_take_photo.setImageDrawable(states);
 		}	
+		*/
 	}
 	
 	
@@ -633,6 +627,17 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 */
 	private class GetEscandalos extends AsyncTask<Void,Integer,Integer> {
 		
+		
+    	 String c_date  ;
+    	 String c_id ;
+    	 String c_photo ;
+    	 String c_resource_uri ;
+    	 String c_social_network ;
+    	 String c_text;
+    	 String c_user ;
+    	 String c_user_id ;
+    	 String c_username ;
+	
 		@Override
 		protected void onPreExecute(){
 			getting_escandalos = true;
@@ -765,6 +770,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		        
 		        // Obtenemos los datos de los escándalos
 		        for (int i=0 ; i < escandalosObject.length(); i++){
+		        	// Hacemos una declaración por cada escándalo 
+		        	final ArrayList<Comment> array_comments = new ArrayList<Comment>();
+		        	
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
 		            	
 		            final String category = escanObject.getString("category");
@@ -781,18 +789,41 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
-	            			           
+		            
+		            // Obtenemos los comentarios
+		            final String comments = escanObject.getString("comments");
+			        JSONArray commentsArray = new JSONArray(comments);  
+			        
+			        Log.v("WE","commentsArray.lengot:" + commentsArray.length());
+			        for (int j=0 ; j < commentsArray.length(); j++){ 
+			        	JSONObject commentObject = commentsArray.getJSONObject(j);		        	
+			        	c_date = commentObject.getString("date");
+			        	c_id = commentObject.getString("id");
+			        	c_photo = commentObject.getString("photo");
+			        	c_resource_uri = commentObject.getString("resource_uri");
+			        	c_social_network = commentObject.getString("social_network");
+			        	c_text = commentObject.getString("text");
+			        	c_user = commentObject.getString("user");
+			        	c_user_id = commentObject.getString("user_id");
+			        	c_username = commentObject.getString("username");
+			        	
+                    	Comment commentAux = new Comment(c_date, c_id, c_photo, c_resource_uri, c_social_network,
+								c_text, c_user, c_user_id, c_username);
+                    	array_comments.add(commentAux);  
+                    	
+			        }
+	            	
+			        Log.v("WE2","primer array: " + array_comments.size());
 		            if (escandalos != null && !isCancelled()){
 			            runOnUiThread(new Runnable() {
 	                        @Override
 	                        public void run() {
-	                        	// Añadimos el escandalo al ArrayList
+	                        	// Añadimos el escandalo al ArrayList                   	
 	                        	Scandaloh escanAux = new Scandaloh(id, title, category, BitmapFactory.decodeResource(getResources(),
 	          							R.drawable.loading), Integer.parseInt(comments_count), resource_uri, 
 	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
-	          							sound, username, date);
+	          							sound, username, date, array_comments);
 	                        	escandalos.add(escanAux);
-	  			               // adapter.addFragment(ScandalohFragment.newInstance(escanAux));
 	  			                adapter.notifyDataSetChanged();
 	                        }
 			            }); 
@@ -800,12 +831,11 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		    	 }
 		     }
 		     catch(Exception ex){
-		            Log.e("ServicioRest","Error obteniendo escándalos", ex);
+		            Log.e("ServicioRest","Error obteniendo escándalos o comentarios", ex);
 		            // Hubo algún error inesperado
 		            any_error = true;
 		            
-					// Mandamos la excepcion a Google Analytics
-		            
+					// Mandamos la excepcion a Google Analytics            
 					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 					easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
 					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
@@ -839,18 +869,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				
 			// Habilitamos el spinner
 			spinner_categorias.setClickable(true);
-			
-			
-			/*
-		    // Habilitamos los botones
-		    if (category.equals(HAPPY)){
-		    	//but_angry.setClickable(true);
-		    }
-		    else{
-		    	//but_happy.setClickable(true);
-		    }
-		    */
-		    
+
 		    // Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
 		    if (no_hay_escandalos){
 				refreshFinished();
@@ -930,7 +949,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		            String visits_count = escanObject.getString("visits_count");
 		            final String sound = escanObject.getString("sound");
 		            final String username = escanObject.getString("username");
-	            		         
+	            		 
+		            /*
 		            if (escandalos != null && !isCancelled()){
 				        runOnUiThread(new Runnable() {
 							@Override
@@ -945,7 +965,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 						        adapter.notifyDataSetChanged();
 							}
 				        });
-		            }		               	
+		            }
+		            */		               	
 		    	 }
 		     }
 		     catch(Exception ex){
@@ -1123,9 +1144,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	}
 	
 	*/
-
 	
-
 	
 	
 	
@@ -1248,90 +1267,12 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     }
 	
     
-    
-    
-    
-    public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
-
-    	// Lista de fragmentos con los escándalos
-        List<ScandalohFragment> fragments;
-     
-        
-        /**
-         * Constructor
-         * 
-         * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
-         */
-        public ScandalohFragmentPagerAdapter(FragmentManager fm) {
-            super(fm);
-            this.fragments = new ArrayList<ScandalohFragment>();
-        }
-
-        
-        
-        /**
-         * Devuelve el fragmento de una posición dada
-         * @param position Posición
-         */
-        @Override
-        public ScandalohFragment getItem(int position) {
-        	//Log.v("WE","position: " + position);
-            //return this.fragments.get(position);
-        	return ScandalohFragment.newInstance(escandalos.get(position));
-        }
-     
-        
-        /**
-         * Devuelve el número de fragmentos
-         */
-        @Override
-        public int getCount() {
-        	//Log.v("We","Getcount: " + this.fragments.size());
-            return escandalos.size();
-        }
-        
-        
-        /**
-         * getItemPosition
-         */
-        /*
-        @Override
-        public int getItemPosition(Object object){
-            return PagerAdapter.POSITION_NONE;
-        }
-        */
-        
-        
-        /**
-         * Añade un fragmento al final de la lista
-         * @param fragment Fragmento a añadir
-         */
-        public void addFragment(ScandalohFragment fragment) {
-            this.fragments.add(fragment);
-        }
-        
-        
-        /**
-         * Añade un fragmento al principio de la lista
-         * @param fragment
-         */
-        public void addFragmentAtStart(ScandalohFragment fragment){
-        	this.fragments.add(0,fragment);
-        }
-        
-        
-        /**
-         * Elimina todos los fragmentos
-         */
-        public void clearFragments(){
-        	this.fragments.clear();
-        }
-    }
 
 
 
-
-    // MÉTODOS DEL SPINNER
+  	/**
+  	 * Seleccionar opción del spinner
+  	 */
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
 		
@@ -1351,7 +1292,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 
 				switch(pos){
 					case 0: // Humor
-						
 						if (category.equals(ANGRY)){
 							// Mandamos el evento a Google Analytics
 			           	    EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
@@ -1386,18 +1326,88 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
 				toast.show();
 			} 
-		}
-		
-
-		
+		}	
 	}
+	
 
-
+	/**
+	 * Al no seleccionar nada del spinner
+	 */
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
+	
+	
+	  /**
+     * Adaptador del view pager
+     *
+     */
+    public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter  {
+
+    	// Lista de fragmentos con los escándalos
+        List<ScandalohFragment> fragments;
+            
+        /**
+         * Constructor
+         * 
+         * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
+         */
+        public ScandalohFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+            this.fragments = new ArrayList<ScandalohFragment>();
+        }
+
+              
+        /**
+         * Devuelve el fragmento de una posición dada
+         * @param position Posición
+         */
+        @Override
+        public ScandalohFragment getItem(int position) {
+        	return ScandalohFragment.newInstance(escandalos.get(position));
+        }
+     
+        
+        /**
+         * Devuelve el número de fragmentos
+         */
+        @Override
+        public int getCount() {
+            return escandalos.size();
+        }
+        
+        
+        /**
+         * Añade un fragmento al final de la lista
+         * @param fragment Fragmento a añadir
+         */
+        public void addFragment(ScandalohFragment fragment) {
+            this.fragments.add(fragment);
+        }
+        
+        
+        /**
+         * Añade un fragmento al principio de la lista
+         * @param fragment
+         */
+        public void addFragmentAtStart(ScandalohFragment fragment){
+        	this.fragments.add(0,fragment);
+        }
+        
+        
+        /**
+         * Elimina todos los fragmentos
+         */
+        public void clearFragments(){
+        	this.fragments.clear();
+        }
+    }
+
 
 	
 }
