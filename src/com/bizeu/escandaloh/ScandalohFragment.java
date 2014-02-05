@@ -20,6 +20,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.actionbarsherlock.app.SherlockFragment;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
@@ -62,9 +64,11 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
 
-public class ScandalohFragment extends Fragment {
+public class ScandalohFragment extends SherlockFragment {
 
 	private static final String ID = "id";
     private static final String URL = "url";
@@ -126,8 +130,6 @@ public class ScandalohFragment extends Fragment {
         bundle.putString(DATE, escan.getDate());
         bundle.putString(URI_AUDIO, escan.getUriAudio());
         bundle.putParcelableArrayList(COMMENTS, escan.getComments());
-        Log.v("WE","Num commtns: " +  escan.getComments().size());
-        Log.v("WE","Num comments de verdad: " + escan.getNumComments());
 
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
@@ -156,8 +158,7 @@ public class ScandalohFragment extends Fragment {
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
         this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
-        
-        Log.v("WE","Num comments de verdad oncreate: " + this.num_comments);
+
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
@@ -182,9 +183,7 @@ public class ScandalohFragment extends Fragment {
                 	new PlayAudioTask().execute(uri_audio);
                 }
             }
-
-        }
-       
+        }    
     }
     
     /**
@@ -193,12 +192,48 @@ public class ScandalohFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
  
+        if (!getSherlockActivity().getSupportActionBar().isShowing()) {
+            getSherlockActivity().getSupportActionBar().show();
+        }
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo, container, false);    
         
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
+        layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+       // layout.setAnchorPoint(0.3f);
         
-            
+        layout.setPanelSlideListener(new PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i("WE", "onPanelSlide, offset " + slideOffset);
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+            	/*
+                if (getSherlockActivity().getSupportActionBar().isShowing()) {
+                    getSherlockActivity().getSupportActionBar().hide();
+                }
+            	 */
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+            	/*
+                if (!getSherlockActivity().getSupportActionBar().isShowing()) {
+                    getSherlockActivity().getSupportActionBar().show();
+                }
+                */
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+                Log.i("WE", "onPanelAnchored");
+
+            }
+        });
+        
+                
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setImage(this.url, R.drawable.cargando);      
@@ -404,8 +439,6 @@ public class ScandalohFragment extends Fragment {
 		// Comentarios
 		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
 		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
-		Log.v("WE","En el adaptador num comments: " + num_comments);
-		Log.v("WE","En el adaptador tiene: " + comments.size());
 		list_comments.setAdapter(commentsAdapter);
 		
 		// Si hay conexión

@@ -137,4 +137,8 @@
     <string name="copyright">Copyright Violation</string>
     <string name="reportar_esta_foto_por">Report as</string>
     <string name="debes_iniciar_sesion_para_reportar">Log in to report</string>
+        <string-array name="array_categorias">
+        <item>Funny</item>
+        <item>Complaint</item>
+    </string-array>
 </resources>

@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:gravity="center_vertical|center_horizontal"
-                    android:popupBackground="#883d99b7" />
+                    android:popupBackground="@color/azul_verdoso" />
 
             </LinearLayout>
 

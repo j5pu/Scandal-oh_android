@@ -157,10 +157,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
-		// Create an ArrayAdapter using the string array and a default spinner layout
 		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
 		        R.array.array_categorias, R.layout.categoria_spinner);
-		// Specify the layout to use when the list of choices appears
 		adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
 		// Apply the adapter to the spinner
 		spinner_categorias.setAdapter(adapter2);
@@ -1230,7 +1228,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		}
 		*/
 	}
-	
 	
 	
 	/**

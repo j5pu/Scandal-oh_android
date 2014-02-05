@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        sothree:collapsedHeight="68dp"
+        sothree:collapsedHeight="115dp"
         sothree:shadowHeight="4dp" >
 
         <RelativeLayout
@@ -161,15 +161,23 @@
             <EditText
                 android:id="@+id/edit_write_comment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:hint="@string/escribe_un_comentario"
-                android:textColorHint="#FFFFFF" >
+                android:textColorHint="@color/gris_oscuro"
+                android:background="@color/blanco"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:paddingLeft="10dp"
+                >
             </EditText>
 
             <ListView
                 android:id="@+id/lv_comments"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:divider="#FFCC00" >
             </ListView>
         </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>

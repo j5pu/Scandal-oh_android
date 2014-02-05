@@ -38,7 +38,7 @@
         android:divider="@color/morado"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/list_selector"
-        android:background="#88FFFFFF"
+        android:background="#FFFFFF"
         />
 
  

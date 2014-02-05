@@ -96,8 +96,8 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	holder.imgClock.setImageResource(R.drawable.reloj_azul);
         }
         else{
-        	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.gris_oscuro));
-        	holder.txtDate.setTextColor(context.getResources().getColor(R.color.gris_oscuro));
+        	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.morado));
+        	holder.txtDate.setTextColor(context.getResources().getColor(R.color.morado));
         	holder.imgUser.setImageResource(R.drawable.user);
         	holder.imgClock.setImageResource(R.drawable.reloj);
         }
