@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
@@ -57,11 +58,13 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -203,27 +206,22 @@ public class ScandalohFragment extends SherlockFragment {
        // layout.setAnchorPoint(0.3f);
         
         layout.setPanelSlideListener(new PanelSlideListener() {
+        	// Action bar
+        	ActionBar actBar = getSherlockActivity().getSupportActionBar();
+        	
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                Log.i("WE", "onPanelSlide, offset " + slideOffset);
+                //Log.i("WE", "onPanelSlide, offset " + slideOffset);
             }
 
             @Override
             public void onPanelExpanded(View panel) {
-            	/*
-                if (getSherlockActivity().getSupportActionBar().isShowing()) {
-                    getSherlockActivity().getSupportActionBar().hide();
-                }
-            	 */
+                ((MainActivity) getActivity()).updateActionBar(true);          
             }
 
             @Override
-            public void onPanelCollapsed(View panel) {
-            	/*
-                if (!getSherlockActivity().getSupportActionBar().isShowing()) {
-                    getSherlockActivity().getSupportActionBar().show();
-                }
-                */
+            public void onPanelCollapsed(View panel) {       
+                ((MainActivity) getActivity()).updateActionBar(false);
             }
 
             @Override
@@ -290,6 +288,7 @@ public class ScandalohFragment extends SherlockFragment {
 				return true;
 			}
 		});
+		
         
         // AUDIO    
         aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);

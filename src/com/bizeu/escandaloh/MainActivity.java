@@ -45,6 +45,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -90,6 +91,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private ImageView img_take_photo;
 	private ProgressBar progress_refresh;
 	private ListView list_menu_lateral;
+	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
     DrawerLayout mDrawerLayout;
 	private Uri mImageUri;
@@ -160,7 +162,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
 		        R.array.array_categorias, R.layout.categoria_spinner);
 		adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
-		// Apply the adapter to the spinner
 		spinner_categorias.setAdapter(adapter2);
 		spinner_categorias.setOnItemSelectedListener(this);
 				
@@ -229,12 +230,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         pager.setPageTransformer(true, new ZoomOutPageTransformer());      
         // Separación entre escándalos
 		pager.setPageMargin(3);		
-      	//TODO Asignamos categoria happy la primera vez
       	category = HAPPY;
-      	/*
-      	but_happy.setClickable(false);
-      	but_happy.setTypeface(null, Typeface.BOLD);
-      	*/
 	
 		// Si hay conexión: obtenemos los 10 primeros escándalos
 		if (Connectivity.isOnline(mContext)){
@@ -792,7 +788,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		            final String comments = escanObject.getString("comments");
 			        JSONArray commentsArray = new JSONArray(comments);  
 			        
-			        Log.v("WE","commentsArray.lengot:" + commentsArray.length());
 			        for (int j=0 ; j < commentsArray.length(); j++){ 
 			        	JSONObject commentObject = commentsArray.getJSONObject(j);		        	
 			        	c_date = commentObject.getString("date");
@@ -811,7 +806,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
                     	
 			        }
 	            	
-			        Log.v("WE2","primer array: " + array_comments.size());
 		            if (escandalos != null && !isCancelled()){
 			            runOnUiThread(new Runnable() {
 	                        @Override
@@ -1146,88 +1140,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	
 	
 	
-	// -----------------------------------------------------------------------------
-	// --------------------         MÉTODOS PRIVADOS          ----------------------
-	// -----------------------------------------------------------------------------
 	
-	
-	/**
-	 * Crea un archivo temporal en una ruta con un formato específico
-	 */
-	private File createFileTemporary(String part, String ext) {
-	    File scandaloh_dir = Environment.getExternalStorageDirectory();
-	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/");
-	    if(!scandaloh_dir.exists()){
-	    	scandaloh_dir.mkdirs();
-	    }
-	    try {
-			return File.createTempFile(part, ext, scandaloh_dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-	        Log.e(this.getClass().toString(), "No se pudo crear el archivo temporal para la foto");
-			// Mandamos la excepcion a Google Analytics
-	        EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-			                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-			                       e),                                                             // The exception.
-			                       false).build()); 
-			Toast toast = Toast.makeText(mContext, R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
-			toast.show();
-		}
-	    
-	    return null;
-	}
-	
-	
-	/**
-	 * Comprueba si el dispositivo dispone de cámara
-	 * @param context
-	 * @return
-	 */
-	private boolean checkCameraHardware(Context context) {
-	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-	        return true;
-	    } else {
-	        return false;
-	    }
-	}
-
-
-	/**
-	 * Se llama cuando se ha terminado de actualizar el carrusel
-	 */
-	public void refreshFinished() {
-		// Cambiamos el loading del menu por el botón de actualizar
-		progress_refresh.setVisibility(View.GONE);
-		img_update_list.setVisibility(View.VISIBLE);
-	}
-	
-	
-
-	/**
-	 * Cancela si hubiese alguna hebra obteniendo escándalos
-	 */
-	private void cancelGetEscandalos(){	
-		if (getEscandalosAsync != null){
-			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
-				getEscandalosAsync.cancel(true);
-			}
-		} 
-		
-		if (getNewEscandalosAsync != null){
-			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
-				getNewEscandalosAsync.cancel(true);
-			}
-		} 
-		
-		/*
-		if (updateNumCommentsAsync != null){
-			if (updateNumCommentsAsync.getStatus() == AsyncTask.Status.PENDING || updateNumCommentsAsync.getStatus() == AsyncTask.Status.RUNNING){
-				updateNumCommentsAsync.cancel(true);
-			}
-		}
-		*/
-	}
 	
 	
 	/**
@@ -1405,6 +1318,135 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         }
     }
 
+    
+ // -----------------------------------------------------------------------------
+ 	// --------------------         MÉTODOS PRIVADOS          ----------------------
+ 	// -----------------------------------------------------------------------------
+ 	
+ 	
+ 	/**
+ 	 * Crea un archivo temporal en una ruta con un formato específico
+ 	 */
+ 	private File createFileTemporary(String part, String ext) {
+ 	    File scandaloh_dir = Environment.getExternalStorageDirectory();
+ 	    scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()+"/ScándalOh/");
+ 	    if(!scandaloh_dir.exists()){
+ 	    	scandaloh_dir.mkdirs();
+ 	    }
+ 	    try {
+ 			return File.createTempFile(part, ext, scandaloh_dir);
+ 		} catch (IOException e) {
+ 			e.printStackTrace();
+ 	        Log.e(this.getClass().toString(), "No se pudo crear el archivo temporal para la foto");
+ 			// Mandamos la excepcion a Google Analytics
+ 	        EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+ 			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+ 			                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+ 			                       e),                                                             // The exception.
+ 			                       false).build()); 
+ 			Toast toast = Toast.makeText(mContext, R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
+ 			toast.show();
+ 		}
+ 	    
+ 	    return null;
+ 	}
+ 	
+ 	
+ 	/**
+ 	 * Comprueba si el dispositivo dispone de cámara
+ 	 * @param context
+ 	 * @return
+ 	 */
+ 	private boolean checkCameraHardware(Context context) {
+ 	    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+ 	        return true;
+ 	    } else {
+ 	        return false;
+ 	    }
+ 	}
 
+
+ 	/**
+ 	 * Se llama cuando se ha terminado de actualizar el carrusel
+ 	 */
+ 	public void refreshFinished() {
+ 		// Cambiamos el loading del menu por el botón de actualizar
+ 		progress_refresh.setVisibility(View.GONE);
+ 		img_update_list.setVisibility(View.VISIBLE);
+ 	}
+ 	
+ 	
+
+ 	/**
+ 	 * Cancela si hubiese alguna hebra obteniendo escándalos
+ 	 */
+ 	private void cancelGetEscandalos(){	
+ 		if (getEscandalosAsync != null){
+ 			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
+ 				getEscandalosAsync.cancel(true);
+ 			}
+ 		} 
+ 		
+ 		if (getNewEscandalosAsync != null){
+ 			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING || getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING){
+ 				getNewEscandalosAsync.cancel(true);
+ 			}
+ 		} 
+ 		
+ 		/*
+ 		if (updateNumCommentsAsync != null){
+ 			if (updateNumCommentsAsync.getStatus() == AsyncTask.Status.PENDING || updateNumCommentsAsync.getStatus() == AsyncTask.Status.RUNNING){
+ 				updateNumCommentsAsync.cancel(true);
+ 			}
+ 		}
+ 		*/
+ 	}
+ 	
+ 	
+ 	/**
+ 	 * Actualiza el action bar: muestra el menú con todas las opciones o muestra un campo para 
+ 	 * escribir un comentario
+ 	 * @param write_mode True indica si el action bar será el de escribir comentario
+ 	 */
+ 	public void updateActionBar(boolean write_mode){
+ 		
+		ActionBar actBar = getSupportActionBar();
+	    // Activamos el logo del menu para el menu lateral
+	    actBar.setHomeButtonEnabled(true);
+	    actBar.setDisplayHomeAsUpEnabled(true);
+	    actBar.setIcon(R.drawable.logo_blanco);
+	    
+	    // Modo escribir comentarios
+ 		if (write_mode){
+ 			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+ 			View view = getLayoutInflater().inflate(R.layout.action_bar_escribir, null);
+ 			actBar.setCustomView(view);	
+ 			
+ 			
+ 		}
+ 		
+ 		// Modo normal
+ 		else{
+ 			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+ 			View view = getLayoutInflater().inflate(R.layout.action_bar_2, null);
+ 			actBar.setCustomView(view);	
+
+ 			spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
+ 			ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+ 			        R.array.array_categorias, R.layout.categoria_spinner);
+ 			adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
+ 			spinner_categorias.setAdapter(adapter2);
+ 			spinner_categorias.setOnItemSelectedListener(this);
+ 			loading = (ProgressBar) findViewById(R.id.loading_escandalos);
+ 			img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
+ 			ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
+ 			ll_refresh.setOnClickListener(this);
+ 			img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
+ 			ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
+ 			ll_take_photo.setOnClickListener(this);
+ 			progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+ 		}
+
+ 	}
 	
 }

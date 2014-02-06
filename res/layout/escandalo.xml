@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        sothree:collapsedHeight="115dp"
+        sothree:collapsedHeight="68dp"
         sothree:shadowHeight="4dp" >
 
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
             <com.applidium.shutterbug.FetchableImageView
                 android:id="@+id/img_escandalo_foto"
@@ -158,20 +158,6 @@
             android:focusable="false"
             android:orientation="vertical" >
 
-            <EditText
-                android:id="@+id/edit_write_comment"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:hint="@string/escribe_un_comentario"
-                android:textColorHint="@color/gris_oscuro"
-                android:background="@color/blanco"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
-                android:paddingLeft="10dp"
-                >
-            </EditText>
 
             <ListView
                 android:id="@+id/lv_comments"
