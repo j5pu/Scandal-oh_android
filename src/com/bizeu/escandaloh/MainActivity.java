@@ -37,6 +37,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,6 +53,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -93,7 +96,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private ListView list_menu_lateral;
 	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
+	private ImageView img_send_comment;
+	private TextView txt_count_characters_comment;
     DrawerLayout mDrawerLayout;
+    
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private Context mContext;
@@ -176,6 +182,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 
             @Override
             public void onPageSelected(int position) {
+            	updateActionBar(false);     		
+     			
             	// Si quedan 4 escándalos más para llegar al último y aún quedan más escándalos (si hemos llegado 
             	// a los últimos no se pedirán más): obtenemos los siguientes 10
             	if (position == adapter.getCount() - 5 && there_are_more_escandalos){
@@ -1403,6 +1411,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  	}
  	
  	
+ 	
  	/**
  	 * Actualiza el action bar: muestra el menú con todas las opciones o muestra un campo para 
  	 * escribir un comentario
@@ -1421,8 +1430,45 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
  			View view = getLayoutInflater().inflate(R.layout.action_bar_escribir, null);
  			actBar.setCustomView(view);	
+ 		    // Activamos el logo del menu para el menu lateral
+ 		    actBar.setHomeButtonEnabled(true);
+ 		    actBar.setDisplayHomeAsUpEnabled(true);
+ 		    actBar.setIcon(R.drawable.logo_blanco);
  			
- 			
+ 			//txt_count_characters_comment = (TextView) findViewById(R.id.txt_count_characters_comment);
+ 		    
+ 			img_send_comment = (ImageView) findViewById(R.id.img_send_comment);
+ 			img_send_comment.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Log.v("WE","Envio comentario");
+					
+				}
+			});
+ 		    	    
+ 			// Cada vez que se modifique el titulo actualizamos el contador: x/75
+  		   edit_escribir_comentario = (EditText) findViewById(R.id.edit_write_comment);
+ 		   edit_escribir_comentario.addTextChangedListener(new TextWatcher() {          
+ 						@Override
+ 			            public void onTextChanged(CharSequence s, int start, int before, int count) {  
+ 							if (s.length() == 1000){
+ 								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.ha_llegado_al_limite), Toast.LENGTH_LONG);
+ 								toast.show();
+ 							}
+ 			            }
+
+ 						@Override
+ 						public void afterTextChanged(Editable arg0) {
+ 							// TODO Auto-generated method stub		
+ 						}
+
+ 						@Override
+ 						public void beforeTextChanged(CharSequence s, int start, int count,
+ 								int after) {
+ 							// TODO Auto-generated method stub		
+ 						} 
+ 					});
  		}
  		
  		// Modo normal
@@ -1430,6 +1476,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
  			View view = getLayoutInflater().inflate(R.layout.action_bar_2, null);
  			actBar.setCustomView(view);	
+ 		    // Activamos el logo del menu para el menu lateral
+ 		    actBar.setHomeButtonEnabled(true);
+ 		    actBar.setDisplayHomeAsUpEnabled(true);
+ 		    actBar.setIcon(R.drawable.logo_blanco);
 
  			spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
  			ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
@@ -1446,7 +1496,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  			ll_take_photo.setOnClickListener(this);
  			progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
  		}
-
  	}
-	
+ 	
+ 	
+
 }

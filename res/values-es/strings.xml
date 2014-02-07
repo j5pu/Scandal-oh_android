@@ -141,4 +141,6 @@
         <item>Denuncia</item>
     </string-array>
     <string name="reproduce_el_audio_automaticamente">Reproduce el audio automáticamente</string>
+    <string name="ha_llegado_al_limite">Has llegado al límite de caracteres</string>
+    <string name="comentarios">comentarios</string>
 </resources>

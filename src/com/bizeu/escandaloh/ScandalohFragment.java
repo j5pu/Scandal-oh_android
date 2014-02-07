@@ -90,6 +90,7 @@ public class ScandalohFragment extends SherlockFragment {
     private EditText edit_write_comment;
     private ImageView aud;
     private ProgressBar loading_audio;
+	private ImageView img_arrow;
     
     private String id;
     private String url;
@@ -206,8 +207,6 @@ public class ScandalohFragment extends SherlockFragment {
        // layout.setAnchorPoint(0.3f);
         
         layout.setPanelSlideListener(new PanelSlideListener() {
-        	// Action bar
-        	ActionBar actBar = getSherlockActivity().getSupportActionBar();
         	
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -216,12 +215,18 @@ public class ScandalohFragment extends SherlockFragment {
 
             @Override
             public void onPanelExpanded(View panel) {
-                ((MainActivity) getActivity()).updateActionBar(true);          
+            	// Mostramos el action bar de escribir comentario
+                ((MainActivity) getActivity()).updateActionBar(true);
+                // Cambiamos la flecha hacia abajo
+                changeArrowDirection(false);
             }
 
             @Override
             public void onPanelCollapsed(View panel) {       
+            	// Mostramos el action bar normal
                 ((MainActivity) getActivity()).updateActionBar(false);
+                // Cambiamos la flecha hacia arriba
+                changeArrowDirection(true);
             }
 
             @Override
@@ -440,10 +445,14 @@ public class ScandalohFragment extends SherlockFragment {
 		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
 		list_comments.setAdapter(commentsAdapter);
 		
-		// Si hay conexión
-		if (Connectivity.isOnline(getActivity().getBaseContext())){
-			//new GetComments(getActivity().getBaseContext(), true).execute();
-		}
+ 		// Número de comentarios
+		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
+		num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
+		
+		// Flecha
+ 		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);
+ 		
+
             
         // Devolvemos la vista
         return rootView;
@@ -753,7 +762,15 @@ public class ScandalohFragment extends SherlockFragment {
     
     
 
-    
+ 	public void changeArrowDirection(boolean top){
+ 		if (top){
+ 	 		img_arrow.setImageDrawable(getResources().getDrawable(R.drawable.flecha_arriba));
+ 		}
+ 		else{
+ 	 		img_arrow.setImageDrawable(getResources().getDrawable(R.drawable.flecha_abajo));
+ 		}
+ 	}
+	
     
     
    
