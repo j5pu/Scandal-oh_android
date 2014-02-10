@@ -110,8 +110,6 @@ public class ScandalohFragment extends SherlockFragment {
 	private SharedPreferences prefs;
 	private boolean autoplay;
 
-
-
     
     /**
      * Crea y devuelve una nueva instancia de un fragmento
@@ -204,6 +202,7 @@ public class ScandalohFragment extends SherlockFragment {
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
         layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+
        // layout.setAnchorPoint(0.3f);
         
         layout.setPanelSlideListener(new PanelSlideListener() {
@@ -216,7 +215,7 @@ public class ScandalohFragment extends SherlockFragment {
             @Override
             public void onPanelExpanded(View panel) {
             	// Mostramos el action bar de escribir comentario
-                ((MainActivity) getActivity()).updateActionBar(true);
+                ((MainActivity) getActivity()).updateActionBar(true, id);
                 // Cambiamos la flecha hacia abajo
                 changeArrowDirection(false);
             }
@@ -224,7 +223,7 @@ public class ScandalohFragment extends SherlockFragment {
             @Override
             public void onPanelCollapsed(View panel) {       
             	// Mostramos el action bar normal
-                ((MainActivity) getActivity()).updateActionBar(false);
+                ((MainActivity) getActivity()).updateActionBar(false, id);
                 // Cambiamos la flecha hacia arriba
                 changeArrowDirection(true);
             }
@@ -320,45 +319,8 @@ public class ScandalohFragment extends SherlockFragment {
         ImageView emoticono = (ImageView) rootView.findViewById(R.id.emoticono);
         Bitmap bitma = ImageUtils.getRoundedCornerBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.icono_app));
 		emoticono.setImageBitmap(bitma);
-        
-		
-		/*
-		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
-		edit_write_comment.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		*/
-        
-       /*
-        // Número de comentarios
-        num_com = (TextView) rootView.findViewById(R.id.txt_numero_comentarios);
-        num_com.setText(Integer.toString(num_comments));
-        num_com.setOnClickListener(new View.OnClickListener() {
-			
-        	@Override
-			public void onClick(View v) {			
-				// Paramos si hubiera algún audio reproduciéndose
-				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-				
-				// Mostramos la pantalla de comentarios
-				Intent i = new Intent(getActivity().getBaseContext(), DetailCommentsActivity.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				i.putExtra("id", id);
-				i.putExtra("route_image", url);
-				i.putExtra("user", user_name);
-				i.putExtra("title", title);
-				getActivity().getBaseContext().startActivity(i);	
-			}
-		});
-        
-        */
-        
-        // Compartir 
+                
+        // COMPARTIR 
         ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
         share.setOnClickListener(new View.OnClickListener() {
 			
@@ -428,32 +390,40 @@ public class ScandalohFragment extends SherlockFragment {
 			}
 		});
             
-        // Título
+        // TÍTULO
         TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
        
-        // Nombre de usuario
+        // NOMBRE DE USUARIO
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
         user_na.setText(Utils.limitaCaracteres(user_name));
         
-        // Fecha
+        // FECHA
         TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
         dat.setText(changeFormatDate(date)); 
         
-		// Comentarios
+		// COMENTARIOS
+		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
 		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
 		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
-		list_comments.setAdapter(commentsAdapter);
+		list_comments.setAdapter(commentsAdapter);	
 		
  		// Número de comentarios
 		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
-		num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
-		
-		// Flecha
- 		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);
- 		
+		if (num_comments == 0){
+			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
+	        layout.setPanelHeight(convertToDp(30));
+		}
+		else if (num_comments == 1){
+			num_com.setText(num_comments + " " + getResources().getString(R.string.comentario));
+			layout.setPanelHeight(convertToDp(78));
+		}
+		else{
+			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
+		}
 
-            
+ 		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);	
+           
         // Devolvemos la vista
         return rootView;
     }
@@ -732,6 +702,10 @@ public class ScandalohFragment extends SherlockFragment {
 	    }	
 	}
 	
+	
+	
+
+	
 
 	// ---------------------------------------------------------------------------------------------
 	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
@@ -772,6 +746,11 @@ public class ScandalohFragment extends SherlockFragment {
  	}
 	
     
-    
+ 	private int convertToDp(int input) {
+        // Get the screen's density scale
+        final float scale = getResources().getDisplayMetrics().density;
+        // Convert the dps to pixels, based on density scale
+        return (int) (input * scale + 0.5f);
+}
    
 }

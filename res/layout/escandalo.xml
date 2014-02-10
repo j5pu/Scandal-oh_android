@@ -59,7 +59,8 @@
                 android:layout_toLeftOf="@+id/imageView2"
                 android:text="16-01-2014"
                 android:textColor="@color/morado"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/imageView2"
@@ -80,7 +81,8 @@
                 android:layout_marginRight="6dp"
                 android:text="1234"
                 android:textColor="@color/morado"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txt_escandalo_titulo"
@@ -145,7 +147,8 @@
                 android:layout_toRightOf="@+id/emoticono"
                 android:text="alejandro.leonrodriguez.7"
                 android:textColor="@color/morado"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
         <LinearLayout

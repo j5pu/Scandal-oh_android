@@ -5,15 +5,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,8 +42,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -87,6 +93,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
 	public static final String BOTH = "Todas";
+	public static final String NORMAL = "Normal";
+	public static final String ENVIAR_COMENTARIO = "Enviar_comentario";
 	
 	private LinearLayout ll_refresh;
 	private LinearLayout ll_take_photo;
@@ -97,7 +105,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
 	private ImageView img_send_comment;
-	private TextView txt_count_characters_comment;
     DrawerLayout mDrawerLayout;
     
 	private Uri mImageUri;
@@ -118,7 +125,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     String[] options;
     ActionBarDrawerToggle mDrawerToggle;
     private boolean no_hay_escandalos;
-
+	private ProgressDialog progress;
+	private ArrayAdapter<CharSequence> adapter_spinner;
+	private String action_bar_type = NORMAL; // NORMAL o ENVIAR_COMENTARIO
 	
 	/**
 	 * onCreate
@@ -164,11 +173,12 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		
 		// SPINNER
+		//no_he_seleccionado_humor = false;
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
-		ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+		adapter_spinner = ArrayAdapter.createFromResource(this,
 		        R.array.array_categorias, R.layout.categoria_spinner);
-		adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
-		spinner_categorias.setAdapter(adapter2);
+		adapter_spinner.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
+		spinner_categorias.setAdapter(adapter_spinner);
 		spinner_categorias.setOnItemSelectedListener(this);
 				
 		 	
@@ -182,7 +192,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 
             @Override
             public void onPageSelected(int position) {
-            	updateActionBar(false);     		
+            	updateActionBar(false, null);     		
      			
             	// Si quedan 4 escándalos más para llegar al último y aún quedan más escándalos (si hemos llegado 
             	// a los últimos no se pedirán más): obtenemos los siguientes 10
@@ -232,8 +242,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     		
-
-        // PASO ENTRE ESCÁNDALOS
         // Le asignamos la animación al pasar entre escándalos (API 11+)
         pager.setPageTransformer(true, new ZoomOutPageTransformer());      
         // Separación entre escándalos
@@ -307,6 +315,16 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	@Override
 	public void onResume(){
 		super.onResume();
+
+		// Actualizamos el action bar según esté en modo normal o escritura
+		if (action_bar_type.equals(ENVIAR_COMENTARIO)){
+			updateActionBar(true,null);
+		}
+		else{
+			updateActionBar(false,null);
+		}
+
+
 				
 		// Abrimos la llave para el caso de error del timeout al obtener fotos
 		//MyApplication.TIMEOUT_PHOTO_SHOWN = false;		
@@ -563,61 +581,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 					refreshFinished();	
 			    }										
 		    break;	
-		       	        
-		    // Selección de categoría
-		    /*
-			case R.id.but_action_bar_happy: case R.id.but_action_bar_angry:
-				// Si hay conexión
-				if (Connectivity.isOnline(mContext)){
-					cancelGetEscandalos();
-					refreshFinished();
-					// Inhabilitamos ambos botones
-					but_happy.setClickable(false);
-					but_angry.setClickable(false);
-					// Abrimos llave de hay más escandalos
-					there_are_more_escandalos = true;
-				    // Quitamos los escándalos actuales
-				    escandalos.clear();
-	
-				    // Seleccionado happy
-					if (v.getId() == R.id.but_action_bar_happy){
-						// Mandamos el evento a Google Analytics
-		           	    EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
-		     		    easyTracker2.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado humor",null).build()); 
-						category = HAPPY;
-				      	but_happy.setTypeface(null, Typeface.BOLD);
-				      	but_angry.setTypeface(null, Typeface.NORMAL);
-					}
-					// Seleccionado angry
-					else{
-						// Mandamos el evento a Google Analytics
-		           	    EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
-		     		    easyTracker2.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado denuncia",null).build()); 
-						category = ANGRY;
-				      	but_angry.setTypeface(null, Typeface.BOLD);
-				      	but_happy.setTypeface(null, Typeface.NORMAL);
-					}
-	
-					pager.setCurrentItem(0);
-					adapter.clearFragments();
-					//adapter.notifyDataSetChanged();
-				    adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
-				    pager.setAdapter(adapter);
-				    // Obtenemos los 10 primeros escándalos para la categoría seleccionada
-					// Mostramos el progressBar y ocultamos la lista de escandalos
-					loading.setVisibility(View.VISIBLE);
-					pager.setVisibility(View.GONE);
-					getEscandalosAsync = new GetEscandalos();
-					getEscandalosAsync.execute();					
-				}
-								
-				// No hay conexión
-				else{				
-					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
-					toast.show();
-				} 
-			break;
-			*/
 		}   	
 	}
 	
@@ -810,8 +773,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 			        	
                     	Comment commentAux = new Comment(c_date, c_id, c_photo, c_resource_uri, c_social_network,
 								c_text, c_user, c_user_id, c_username);
-                    	array_comments.add(commentAux);  
-                    	
+                    	array_comments.add(commentAux);                    	
 			        }
 	            	
 		            if (escandalos != null && !isCancelled()){
@@ -824,6 +786,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	          							"http://scandaloh.s3.amazonaws.com/" + img_p, "http://scandaloh.s3.amazonaws.com/" + img, 
 	          							sound, username, date, array_comments);
 	                        	escandalos.add(escanAux);
+	                        	adapter.addFragment(ScandalohFragment.newInstance(escandalos.get(escandalos.size()-1)));
 	  			                adapter.notifyDataSetChanged();
 	                        }
 			            }); 
@@ -1013,6 +976,242 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	
 	
 
+	/**
+	 * Sube un comentario
+	 *
+	 */
+	private class SendCommentTask extends AsyncTask<Void,Integer,Integer> {
+		 
+		private Context mContext;
+		private String pho_id;
+		
+	    public SendCommentTask (Context context, String photo_id){
+	    	this.pho_id = photo_id;
+	    	mContext = context;
+	        any_error = false;
+	        progress = new ProgressDialog(mContext);
+			progress.setTitle(R.string.enviando_comentario);
+			progress.setMessage(getResources().getString(R.string.espera_por_favor));
+			progress.setCancelable(false);
+	    }
+		
+		@Override
+		protected void onPreExecute(){	
+			// Mostramos el ProgressDialog
+			progress.show();
+		}
+		
+		@Override
+	    protected Integer doInBackground(Void... params) {
+	 
+	    	HttpEntity resEntity;
+	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";        
+
+	        HttpResponse response = null;
+	        
+	        try{
+	             HttpClient client = new DefaultHttpClient();
+	             HttpPost post = new HttpPost(urlString);
+	             post.setHeader("Content-Type", "application/json");
+	             
+	             JSONObject dato = new JSONObject();
+	             
+	             // Obtenemos el comentario en formato UTF-8
+	             String written_comment = edit_escribir_comentario.getText().toString();
+	             
+	             dato.put("user", MyApplication.resource_uri);
+	             dato.put("photo", "/api/v1/photo/" + pho_id +"/"); // Formato: /api/v1/photo/id/
+	             dato.put("text", written_comment);
+
+	             // Formato UTF-8 (ñ,á,ä,...)
+	             StringEntity entity = new StringEntity(dato.toString(),  HTTP.UTF_8);
+	             post.setEntity(entity);
+
+	             response = client.execute(post);
+	             resEntity = response.getEntity();
+	             final String response_str = EntityUtils.toString(resEntity);
+	             
+	             Log.i("WE",response_str);
+	        }
+	        
+	        catch (Exception ex){
+	             Log.e("Debug", "error: " + ex.getMessage(), ex);
+	             any_error = true; // Indicamos que hubo algún error
+	             
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+					                       ex),                                                             // The exception.
+					                       false).build());  
+	        }
+	        
+	        if (any_error){
+	        	return 666;
+	        }
+	        else{
+		        // Devolvemos el resultado 
+		        return (response.getStatusLine().getStatusCode());
+	        }
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Integer result) {
+			
+
+			
+			// Si hubo algún error mostramos un mensaje
+			if (any_error){
+				Toast toast = Toast.makeText(mContext, getResources().getString(R.string.lo_sentimos_hubo), Toast.LENGTH_SHORT);
+				toast.show();
+				// Quitamos el ProgressDialog
+				if (progress.isShowing()) {
+			        progress.dismiss();
+			    }
+			}
+			else{
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result <300){	        	
+		        	// Vaciamos el editext
+		        	edit_escribir_comentario.setText("");
+		            	
+		        	// Mostramos de nuevo los comentarios (indicamos que si hemos enviado un comentario)
+		        	new GetCommentsTask(mContext, pho_id).execute();	        	
+		        }
+		        else{
+		        	Toast toast;
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.hubo_algun_error_enviando_comentario), Toast.LENGTH_LONG);
+		        	toast.show(); 
+					// Quitamos el ProgressDialog
+					if (progress.isShowing()) {
+				        progress.dismiss();
+				    }
+		        }	
+			}
+	    }
+	}	
+	
+	
+	
+	/**
+	 * Muestra la lista de comentarios para esa foto
+	 *
+	 */
+	private class GetCommentsTask extends AsyncTask<Void,Integer,Integer> {
+		 	
+		private Context mContext;
+		private String phot_id;
+		
+	    public GetCommentsTask(Context context, String photo_id){
+	         phot_id = photo_id;
+	         mContext = context;
+	    }
+		
+		@Override
+		protected void onPreExecute(){		
+			any_error = false;
+		}
+		
+		@Override
+	    protected Integer doInBackground(Void... params) {
+			
+			//comments.clear();
+			
+			HttpClient httpClient = new DefaultHttpClient();		
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + phot_id);		 
+			del.setHeader("content-type", "application/json");		
+			HttpResponse response = null ;
+			
+			try{				
+				response = httpClient.execute(del);
+			    String respStr = EntityUtils.toString(response.getEntity());
+			        
+			    Log.i("WE","COMENTARIOS WE: " + respStr);
+			  
+			    JSONObject respJSON = new JSONObject(respStr);
+			        
+			    // Parseamos el json para obtener los escandalos
+		        JSONArray escandalosObject = null;
+		            		   
+		        escandalosObject = respJSON.getJSONArray("objects");
+		           
+		        for (int i=0 ; i < escandalosObject.length(); i++){
+		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
+		            	
+		        	String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+		        	String username = escanObject.getString("username");
+		        	String date = escanObject.getString("date");
+		        	String resource_uri = escanObject.getString("user");
+		            	 
+		        	// Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
+		        	//comments.add(new Comment(comment, username, date, resource_uri));					 
+		        }		            
+			}
+			catch(Exception ex){
+				Log.e("ServicioRest","Error!", ex);
+				any_error = true; // Indicamos que hubo un error
+
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
+				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
+				                       ex),                                                             // The exception.
+				                       false).build());  
+			}
+			
+			// Si hubo algún error devolvemos 666
+			if (any_error){
+				return 666;
+			}
+			else{			
+				// Devolvemos el código de respuesta
+		        return (response.getStatusLine().getStatusCode());
+			}
+	    }
+
+		
+		@Override
+	    protected void onPostExecute(Integer result) {
+		
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+		        progress.dismiss();
+		    }			
+				
+			// Si hubo algún error 
+			if (result == 666){
+				Toast toast = Toast.makeText(mContext, getResources().getString(R.string.lo_sentimos_hubo), Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			
+			// No hubo ningún error extraño
+			else{
+				/*
+				// Si es codigo 2xx --> OK
+		        if (result >= 200 && result <300){
+		        	
+		        	commentsAdapter.notifyDataSetChanged();
+		        	
+		        	// Actualizamos el indicador de número de comentarios
+		        	if (comments.size() == 1){
+		        		num_com.setText(comments.size() + " comentario");
+		        	}
+		        	else{
+		        		num_com.setText(comments.size() + " comentarios");
+		        	}
+		        	
+		        }
+		        else{
+		        	Toast toast;
+		        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_se_pudieron_obtener_comentarios), Toast.LENGTH_LONG);
+		        	toast.show();
+		        } 
+		        */
+			}   
+	    }
+	}
+
 	
 	/**
 	 * Actualiza el número de comentarios de cada escándalo
@@ -1196,7 +1395,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
 		if ((pos == 0 && category.equals(ANGRY)) || (pos == 1 && category.equals(HAPPY))){
-
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)){
 				cancelGetEscandalos();
@@ -1205,47 +1403,46 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 				spinner_categorias.setClickable(false);
 				// Abrimos llave de hay más escandalos
 				there_are_more_escandalos = true;
-			    // Quitamos los escándalos actuales
-			    escandalos.clear();
+				// Quitamos los escándalos actuales
+				escandalos.clear();
 
 				switch(pos){
 					case 0: // Humor
 						if (category.equals(ANGRY)){
 							// Mandamos el evento a Google Analytics
-			           	    EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
-			     		    easyTracker2.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado humor",null).build()); 
-							category = HAPPY;
+					        EasyTracker easyTracker2 = EasyTracker.getInstance(mContext);
+					        easyTracker2.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado humor",null).build()); 
+					     	 category = HAPPY;
 						}
-				      	break;
+						break;
 					case 1: // Denuncia
 						// Mandamos el evento a Google Analytics
-		           	    EasyTracker easyTracker3 = EasyTracker.getInstance(mContext);
-		     		    easyTracker3.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado denuncia",null).build()); 
-						category = ANGRY;
-				      	break;
+				        EasyTracker easyTracker3 = EasyTracker.getInstance(mContext);
+				     	easyTracker3.send(MapBuilder.createEvent("Acción UI","Selección realizada","Seleccionado denuncia",null).build()); 
+				     	category = ANGRY;
+						 break;
 				}
-
 
 				pager.setCurrentItem(0);
 				adapter.clearFragments();
-				//adapter.notifyDataSetChanged();
-			    adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
-			    pager.setAdapter(adapter);
-			    // Obtenemos los 10 primeros escándalos para la categoría seleccionada
+				adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+				pager.setAdapter(adapter);
+				// Obtenemos los 10 primeros escándalos para la categoría seleccionada
 				// Mostramos el progressBar y ocultamos la lista de escandalos
 				loading.setVisibility(View.VISIBLE);
 				pager.setVisibility(View.GONE);
 				getEscandalosAsync = new GetEscandalos();
 				getEscandalosAsync.execute();					
 			}
-							
+									
 			// No hay conexión
 			else{				
 				Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
 				toast.show();
-			} 
-		}	
+			}
+		}
 	}
+	
 	
 
 	/**
@@ -1287,7 +1484,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
          */
         @Override
         public ScandalohFragment getItem(int position) {
-        	return ScandalohFragment.newInstance(escandalos.get(position));
+        	//return ScandalohFragment.newInstance(escandalos.get(position));
+        	return fragments.get(position);
         }
      
         
@@ -1417,8 +1615,9 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  	 * escribir un comentario
  	 * @param write_mode True indica si el action bar será el de escribir comentario
  	 */
- 	public void updateActionBar(boolean write_mode){
+ 	public void updateActionBar(boolean write_mode, String id_photo){
  		
+ 		final String photo_id = id_photo;
 		ActionBar actBar = getSupportActionBar();
 	    // Activamos el logo del menu para el menu lateral
 	    actBar.setHomeButtonEnabled(true);
@@ -1427,6 +1626,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	    
 	    // Modo escribir comentarios
  		if (write_mode){
+ 			action_bar_type = ENVIAR_COMENTARIO;
  			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
  			View view = getLayoutInflater().inflate(R.layout.action_bar_escribir, null);
  			actBar.setCustomView(view);	
@@ -1435,23 +1635,48 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  		    actBar.setDisplayHomeAsUpEnabled(true);
  		    actBar.setIcon(R.drawable.logo_blanco);
  			
- 			//txt_count_characters_comment = (TextView) findViewById(R.id.txt_count_characters_comment);
  		    
- 			img_send_comment = (ImageView) findViewById(R.id.img_send_comment);
+ 			img_send_comment = (ImageView) findViewById(R.id.img_escandalo_send_comment);
  			img_send_comment.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					Log.v("WE","Envio comentario");
-					
+					// Si hay conexión
+					if (Connectivity.isOnline(mContext)){
+						String written_comment;
+						written_comment = edit_escribir_comentario.getText().toString();
+						// Si ha escrito algo y la longitud es menor de 1000 caracteres lo enviamos
+						if (!written_comment.equals("") && written_comment.length() < 1001){
+							new SendCommentTask(mContext, photo_id).execute();
+						}	
+					}
+					else{
+			        	Toast toast;
+			        	toast = Toast.makeText(mContext, getResources().getString(R.string.no_dispones_de_conexion), Toast.LENGTH_SHORT);
+			        	toast.show();
+					}					
 				}
 			});
  		    	    
- 			// Cada vez que se modifique el titulo actualizamos el contador: x/75
   		   edit_escribir_comentario = (EditText) findViewById(R.id.edit_write_comment);
+  		   if (!MyApplication.logged_user){
+  			   edit_escribir_comentario.setHint(R.string.inicia_sesion_para_comentar);
+  			   edit_escribir_comentario.setInputType(InputType.TYPE_NULL);
+  			   edit_escribir_comentario.setOnTouchListener(new View.OnTouchListener() {
+					
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+				        Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
+				        i.putExtra(FIRST_TIME, true);
+				        startActivity(i);
+						return false;
+					}
+				});
+  		   }	   
  		   edit_escribir_comentario.addTextChangedListener(new TextWatcher() {          
  						@Override
  			            public void onTextChanged(CharSequence s, int start, int before, int count) {  
+ 							// Si ha llegado al límite de caracteres se lo indicamos
  							if (s.length() == 1000){
  								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.ha_llegado_al_limite), Toast.LENGTH_LONG);
  								toast.show();
@@ -1473,6 +1698,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  		
  		// Modo normal
  		else{
+ 			action_bar_type = NORMAL;
  			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
  			View view = getLayoutInflater().inflate(R.layout.action_bar_2, null);
  			actBar.setCustomView(view);	
@@ -1481,12 +1707,16 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  		    actBar.setDisplayHomeAsUpEnabled(true);
  		    actBar.setIcon(R.drawable.logo_blanco);
 
+ 		    // Spinner con su categoría seleccionada
  			spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
- 			ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
- 			        R.array.array_categorias, R.layout.categoria_spinner);
- 			adapter2.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
- 			spinner_categorias.setAdapter(adapter2);
+ 			spinner_categorias.setAdapter(adapter_spinner);
  			spinner_categorias.setOnItemSelectedListener(this);
+ 			if (category.equals(HAPPY)){
+ 				spinner_categorias.setSelection(0);
+ 			}
+ 			else{
+ 				spinner_categorias.setSelection(1);
+ 			}
  			loading = (ProgressBar) findViewById(R.id.loading_escandalos);
  			img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
  			ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
@@ -1497,7 +1727,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
  			progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
  		}
  	}
- 	
- 	
+ 		
 
 }

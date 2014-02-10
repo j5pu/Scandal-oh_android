@@ -29,7 +29,7 @@
         </EditText>
 
         <ImageView
-            android:id="@+id/img_send_comment"
+            android:id="@+id/img_escandalo_send_comment"
             android:layout_width="35dp"
             android:layout_height="match_parent"
             android:layout_marginRight="5dp"
