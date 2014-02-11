@@ -141,4 +141,9 @@
         <item>Funny</item>
         <item>Complaint</item>
     </string-array>
+    <string name="reproduce_el_audio_automaticamente">Reproduce el audio automáticamente</string>
+    <string name="ha_llegado_al_limite">Has llegado al límite de caracteres</string>
+    <string name="comentarios">comentarios</string>
+    <string name="comentario">comentario</string>
+    <string name="inicia_sesion_para_comentar">Inicia sesión para comentar</string>
 </resources>
