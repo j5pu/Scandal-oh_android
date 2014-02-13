@@ -1100,6 +1100,15 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	 */
 	private class GetCommentsTask extends AsyncTask<Void,Integer,Integer> {
 		 	
+   	 	String c_date  ;
+   	 	String c_id ;
+   	 	String c_photo ;
+   	 	String c_resource_uri ;
+   	 	String c_social_network ;
+   	 	String c_text;
+   	 	String c_user ;
+   	 	String c_user_id ;
+   	 	String c_username ;
 		private Context mContext;
 		private String phot_id;
 		
@@ -1115,8 +1124,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		
 		@Override
 	    protected Integer doInBackground(Void... params) {
-			
-			//comments.clear();
 			
 			HttpClient httpClient = new DefaultHttpClient();		
 			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + phot_id);		 
@@ -1135,18 +1142,48 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		        JSONArray escandalosObject = null;
 		            		   
 		        escandalosObject = respJSON.getJSONArray("objects");
+		        final ArrayList<Comment> array_comments = new ArrayList<Comment>();
 		           
 		        for (int i=0 ; i < escandalosObject.length(); i++){
 		        	JSONObject escanObject = escandalosObject.getJSONObject(i);
-		            	
-		        	String comment = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-		        	String username = escanObject.getString("username");
-		        	String date = escanObject.getString("date");
-		        	String resource_uri = escanObject.getString("user");
+
+		            c_date = escanObject.getString("date");
+		            c_id = escanObject.getString("id");
+		            c_photo = escanObject.getString("photo");
+		        	c_resource_uri = escanObject.getString("user");
+		        	c_social_network = escanObject.getString("social_network");
+		        	c_text = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+		        	c_user = escanObject.getString("user");
+		        	c_user_id = escanObject.getString("user_id");
+		        	c_username = escanObject.getString("username");
 		            	 
-		        	// Añadimos el comentario en formato UTF-8 (caracteres ñ,á,...)
-		        	//comments.add(new Comment(comment, username, date, resource_uri));					 
-		        }		            
+                	Comment commentAux = new Comment(c_date, c_id, c_photo, c_resource_uri, c_social_network,
+							c_text, c_user, c_user_id, c_username);
+                	array_comments.add(commentAux);                    	
+		        }
+		        
+		        for (int l=0 ; l<array_comments.size(); l++){
+		        	Log.v("WE","array comments username: " + array_comments.get(l).getUsername());
+		        	Log.v("WE","array comments date: " + array_comments.get(l).getDate());
+		        }
+	        
+
+		        runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    	// Añadimos el escandalo al ArrayList 
+                        Scandaloh e = escandalos.get(pager.getCurrentItem());
+                        Scandaloh escanAux = new Scandaloh(e.getId(), e.getTitle(), e.getCategory(), BitmapFactory.decodeResource(getResources(),
+          						R.drawable.loading), array_comments.size(), e.getResourceUri(), e.getRouteImg(), e.getRouteImgBig(), 
+          						e.getUriAudio(), e.getUser(), e.getDate(), array_comments);
+                        escandalos.set(pager.getCurrentItem(), escanAux);
+                        adapter.setFragment(pager.getCurrentItem(), ScandalohFragment.newInstance(escanAux));
+  			            adapter.notifyDataSetChanged();
+  			            pager.setCurrentItem(pager.getCurrentItem());
+                    }
+		        }); 
+	            				 
+		        		            
 			}
 			catch(Exception ex){
 				Log.e("ServicioRest","Error!", ex);
@@ -1494,7 +1531,20 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
          */
         @Override
         public int getCount() {
-            return escandalos.size();
+            return fragments.size();
+        }
+        
+        
+        @Override
+        public int getItemPosition(Object item) {
+            ScandalohFragment fragment = (ScandalohFragment)item;
+        	if (pager.getCurrentItem() == fragments.indexOf(fragment)){
+        		return fragments.indexOf(fragment);
+        	}
+        	else{
+        		return POSITION_NONE;
+        	}
+
         }
         
         
@@ -1513,6 +1563,19 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
          */
         public void addFragmentAtStart(ScandalohFragment fragment){
         	this.fragments.add(0,fragment);
+        }
+        
+        /**
+         * Modifica un fragmento
+         * @param position
+         * @param fragment
+         */
+        public void setFragment(int position, ScandalohFragment fragment){
+        	this.fragments.set(position, fragment);
+        }
+        
+        public ScandalohFragment getFragment(int position){
+        	return this.fragments.get(position);
         }
         
         

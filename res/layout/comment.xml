@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingRight="10dp"
@@ -14,19 +14,20 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_comment_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#BBFFFFFF"
-        android:layout_gravity="top"
-        android:gravity="top"
+        android:layout_gravity="top|left"
+        android:gravity="top|left"
         android:paddingTop="4dp" >
 
         <TextView
             android:id="@+id/txt_comment_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="probandoo000ooo0ooooo"
             android:textColor="@color/gris_oscuro"
             android:layout_gravity="top"
             android:gravity="top"
@@ -35,10 +36,13 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_comment_user_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
-        android:gravity="right|center_vertical"
+        android:layout_gravity="left|center_vertical"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:background="#BBFFFFFF" >
 
         <ImageView
@@ -50,12 +54,11 @@
 
         <TextView
             android:id="@+id/txt_comment_username"
-            android:layout_width="wrap_content"
+            android:layout_width="107dp"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="alejandro.leonrodriguez.7"
             android:textColor="@color/morado"
-            android:paddingRight="10dp"
-            android:textSize="9dp" />
+            android:textSize="9sp" />
 
         <ImageView
             android:id="@+id/img_comment_clock"
@@ -66,13 +69,12 @@
 
         <TextView
             android:id="@+id/txt_comment_date"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:text="TextView"
+            android:text="10-02-2014"
             android:textColor="@color/morado"
-            android:textSize="9dp"
-            android:paddingRight="10dp" />
+            android:textSize="9sp"/>
 
     </LinearLayout>
 

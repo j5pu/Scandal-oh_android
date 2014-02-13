@@ -202,7 +202,6 @@ public class ScandalohFragment extends SherlockFragment {
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
         layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
-
        // layout.setAnchorPoint(0.3f);
         
         layout.setPanelSlideListener(new PanelSlideListener() {
@@ -405,7 +404,7 @@ public class ScandalohFragment extends SherlockFragment {
 		// COMENTARIOS
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
 		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
-		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment, comments, user_name);
+		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment_izquierda, comments, user_name);
 		list_comments.setAdapter(commentsAdapter);	
 		
  		// Número de comentarios
@@ -735,7 +734,10 @@ public class ScandalohFragment extends SherlockFragment {
     }
     
     
-
+    /**
+     * Cambia la dirección de la flecha de los comentarios
+     * @param top True indica flecha hacia arriba. False hacia abajo
+     */
  	public void changeArrowDirection(boolean top){
  		if (top){
  	 		img_arrow.setImageDrawable(getResources().getDrawable(R.drawable.flecha_arriba));
@@ -745,12 +747,17 @@ public class ScandalohFragment extends SherlockFragment {
  		}
  	}
 	
-    
+ 	
+ 	
+    /**
+     * Convierte pixel en dp
+     * @param input
+     * @return
+     */
  	private int convertToDp(int input) {
-        // Get the screen's density scale
         final float scale = getResources().getDisplayMetrics().density;
-        // Convert the dps to pixels, based on density scale
         return (int) (input * scale + 0.5f);
-}
+ 	}
+ 	
    
 }
