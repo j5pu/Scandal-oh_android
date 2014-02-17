@@ -522,6 +522,8 @@ public class MainLoginActivity extends SherlockActivity{
 				SharedPreferences prefs = mContext.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 				prefs.edit().putString(MyApplication.USER_URI, user_uri)
 						.commit();
+	        	prefs.edit().putString(MyApplication.USER_NAME, username).commit();
+	        	MyApplication.user_name = username;
 				MyApplication.resource_uri = user_uri;
 				MyApplication.logged_user = true;
 				Toast.makeText(mContext, R.string.sesion_iniciada_exito,

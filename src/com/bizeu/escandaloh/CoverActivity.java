@@ -38,6 +38,7 @@ public class CoverActivity extends Activity {
 		if (user_uri != null){
 			MyApplication.logged_user = true;
 			MyApplication.resource_uri = user_uri;
+			MyApplication.user_name = prefs.getString(MyApplication.USER_NAME,  null);
 		}
 		else{
 			MyApplication.logged_user = false;

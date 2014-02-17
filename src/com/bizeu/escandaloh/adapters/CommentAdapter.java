@@ -21,7 +21,8 @@ import com.bizeu.escandaloh.model.Comment;
 public class CommentAdapter extends ArrayAdapter<Comment> {
 
     Context context; 
-    int layoutResourceId;    
+    int layoutResourceIdIzquierda;  
+    int layoutResourceIdDerecha;
     ArrayList<Comment> data;  
     CommentHolder holder;
     private Comment comment;
@@ -35,9 +36,10 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
      * @param layoutResourceId
      * @param data
      */
-    public CommentAdapter(Context context, int layoutResourceId, ArrayList<Comment> data, String user_name) {
-        super(context, layoutResourceId, data);
-        this.layoutResourceId = layoutResourceId;
+    public CommentAdapter(Context context, int layoutResourceIdIzquierda, int layoutResourceIdDerecha, ArrayList<Comment> data, String user_name) {
+        super(context, layoutResourceIdIzquierda, layoutResourceIdDerecha, data);
+        this.layoutResourceIdIzquierda = layoutResourceIdIzquierda;
+        this.layoutResourceIdDerecha = layoutResourceIdDerecha;
         this.context = context;
         this.data = data;
         this.user_name_owner = user_name;
@@ -57,8 +59,15 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         
         if(mView == null){
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            mView = inflater.inflate(layoutResourceId, parent, false);
-                                   
+            // Si soy el usuario del comentario, éste aparecerá a la derecha
+            if (user_name_owner.equals(comment.getUsername())){
+                mView = inflater.inflate(layoutResourceIdDerecha, parent, false);
+            }
+            // Si no, a la izquierda
+            else{
+            	 mView = inflater.inflate(layoutResourceIdIzquierda, parent, false);
+            }
+            
             holder = new CommentHolder();
             holder.txtText = (TextView)mView.findViewById(R.id.txt_comment_text);
             holder.txtUsername = (TextView)mView.findViewById(R.id.txt_comment_username);

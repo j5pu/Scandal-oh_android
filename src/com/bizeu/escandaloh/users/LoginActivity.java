@@ -220,7 +220,7 @@ public class LoginActivity extends SherlockActivity {
 	             final String response_str = EntityUtils.toString(resEntity);
 	             	         
 	             if (resEntity != null) {
-	                 Log.i("RESPONSE",response_str);
+	                 Log.i("LOGIN","login: " + response_str);
 	                 // Obtenemos el json devuelto
 	                 JSONObject respJSON = new JSONObject(response_str);
 	                 
@@ -309,6 +309,8 @@ public class LoginActivity extends SherlockActivity {
 			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 			        	MyApplication.resource_uri = user_uri;
+			        	//prefs.edit().putString(MyApplication.USER_NAME, username).commit();
+			        	//MyApplication.user_name = username ;
 			        	MyApplication.logged_user = true;
 			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
 			        	

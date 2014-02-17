@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_menu_lateral"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="3.5"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="alejandro.leonrodriguez.7"
+            android:textColor="@color/morado"
+            android:textSize="16dp"
+            android:paddingTop="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:paddingLeft="5dp" >
+
+        <LinearLayout
+            android:id="@+id/ll_mLateral_notificaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp" >
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/campana" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Notificaciones"
+                android:textColor="@color/azul_verdoso"
+                android:textSize="18dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mLateral_pais"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp" >
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/mundo" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="País"
+                android:textColor="@color/azul_verdoso"
+                android:textSize="18dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mLateral_ajustes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp" >
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/ajustes" />
+
+            <TextView
+                android:id="@+id/txt_mLateral_ajustes"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Ajustes"
+                android:textColor="@color/azul_verdoso"
+                android:textSize="18dp" 
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mLateral_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp" >
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/login" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Iniciar sesión"
+                android:textColor="@color/azul_verdoso"
+                android:textSize="18dp" 
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mLateral_registro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp" >
+
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/registro" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Nuevo usuario"
+                android:textColor="@color/azul_verdoso"
+                android:textSize="18dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center_horizontal|center_vertical" >
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ayuda" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Compartir" />
+    </LinearLayout>
+
+</LinearLayout>

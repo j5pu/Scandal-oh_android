@@ -72,6 +72,7 @@ import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -100,8 +101,14 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	private LinearLayout ll_take_photo;
 	private ImageView img_update_list;
 	private ImageView img_take_photo;
+	private LinearLayout ll_lateral_notificaciones;
+	private LinearLayout ll_lateral_pais;
+	private LinearLayout ll_lateral_ajustes;
+	private LinearLayout ll_lateral_login;
+	private LinearLayout ll_lateral_registro;
+	private TextView txt_lateral_nombreusuario;
 	private ProgressBar progress_refresh;
-	private ListView list_menu_lateral;
+	private LinearLayout ll_menu_lateral;
 	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
 	private ImageView img_send_comment;
@@ -173,7 +180,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		
 		// SPINNER
-		//no_he_seleccionado_humor = false;
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
 		adapter_spinner = ArrayAdapter.createFromResource(this,
 		        R.array.array_categorias, R.layout.categoria_spinner);
@@ -212,6 +218,18 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         
         // MENU LATERAL
         mDrawerLayout = (DrawerLayout) findViewById(R.id.lay_pantalla_main);
+        ll_menu_lateral = (LinearLayout) findViewById(R.id.ll_menu_lateral);
+        ll_lateral_notificaciones = (LinearLayout) findViewById(R.id.ll_mLateral_notificaciones);
+        ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
+        ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
+        ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
+        ll_lateral_registro = (LinearLayout) findViewById(R.id.ll_mLateral_registro);
+        txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
+        
+        // Nombre de usuario
+		if (MyApplication.logged_user){
+			txt_lateral_nombreusuario.setText(MyApplication.user_name);
+		}
      
         // Sombra del menu sobre la pantalla
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -221,12 +239,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         		getResources().getString(R.string.pais),
         		getResources().getString(R.string.ajustes),
         		getResources().getString(R.string.danos_tu_opinion)};
-        
-        mMenuAdapter = new DrawerMenuAdapter(MainActivity.this, options);
        
-        list_menu_lateral = (ListView) findViewById(R.id.menu_lateral);
-        list_menu_lateral.setAdapter(mMenuAdapter);
-        list_menu_lateral.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer_blanco, R.string.drawer_open,
@@ -242,6 +255,40 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     		
+        ll_lateral_ajustes.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+            	startActivity(i);          	 
+                // Cerramos el menu
+                mDrawerLayout.closeDrawer(ll_menu_lateral);
+			}		
+		});
+        
+        ll_lateral_login.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
+				startActivity(i);
+                // Cerramos el menu
+                mDrawerLayout.closeDrawer(ll_menu_lateral);
+			}
+		});
+        
+        ll_lateral_registro.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(MainActivity.this, RegistrationActivity.class);
+				startActivity(i);	
+                // Cerramos el menu
+                mDrawerLayout.closeDrawer(ll_menu_lateral);
+			}
+		});
+                
+        
         // Le asignamos la animación al pasar entre escándalos (API 11+)
         pager.setPageTransformer(true, new ZoomOutPageTransformer());      
         // Separación entre escándalos
@@ -323,6 +370,17 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 		else{
 			updateActionBar(false,null);
 		}
+		
+		// Si está logueado ocultamos las opciones de login y registro y mostramos su nombre en el menu 
+		if (MyApplication.logged_user){
+			ll_lateral_login.setVisibility(View.GONE);
+			ll_lateral_registro.setVisibility(View.GONE);
+			txt_lateral_nombreusuario.setText(MyApplication.user_name);
+		}
+		else{
+			ll_lateral_login.setVisibility(View.VISIBLE);
+			ll_lateral_registro.setVisibility(View.VISIBLE);
+		}
 
 
 				
@@ -391,10 +449,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
     	// Le asignamos el botón home al menú lateral
         if (item.getItemId() == android.R.id.home) {
  
-            if (mDrawerLayout.isDrawerOpen(list_menu_lateral)) {
-                mDrawerLayout.closeDrawer(list_menu_lateral);
+            if (mDrawerLayout.isDrawerOpen(ll_menu_lateral)) {
+                mDrawerLayout.closeDrawer(ll_menu_lateral);
             } else {
-                mDrawerLayout.openDrawer(list_menu_lateral);
+                mDrawerLayout.openDrawer(ll_menu_lateral);
             }
         }
  
@@ -1380,45 +1438,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnClickLis
 	}
 	
 	*/
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * Listener para las opciones del menu lateral
-	 *
-	 */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (position) {
-	            case 0: // Perfil
-	                break;
-	
-	            case 1: // Notificaciones
-	                break;
-	                
-	            case 2: // País
-	                break;
-	                  
-	            case 3: // Ajustes
-	            	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-	            	startActivity(i);
-	            	break;
-	            	
-	            case 4: // Danos tu opinión
-	            	Log.v("WE","seleccionado danos tu opinión");
-	            	break;
-            }
-            list_menu_lateral.setItemChecked(position, true);
-     
-            // Cerramos el menu
-            mDrawerLayout.closeDrawer(list_menu_lateral);
-        }
-    }
 	
     
 

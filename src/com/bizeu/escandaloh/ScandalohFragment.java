@@ -404,7 +404,7 @@ public class ScandalohFragment extends SherlockFragment {
 		// COMENTARIOS
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
 		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
-		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment_izquierda, comments, user_name);
+		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment_izquierda, R.layout.comment_derecha, comments, user_name);
 		list_comments.setAdapter(commentsAdapter);	
 		
  		// Número de comentarios

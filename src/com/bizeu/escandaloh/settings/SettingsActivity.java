@@ -19,17 +19,17 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements
 		OnPreferenceClickListener {
 
 	private PreferenceCategory perfilCategory;
+	private PreferenceScreen screen;
 	private SharedPreferences prefs;
 	private CheckBoxPreference checkP;
 	private Preference cerrar_sesion;
-	private Preference iniciar_sesion;
-	private Preference registro;
 	private Context mContext;
 
 	/**
@@ -47,25 +47,17 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		perfilCategory = (PreferenceCategory) findPreference("perfilCategory");
 		checkP = (CheckBoxPreference) findPreference("autoreproduccion");
 		cerrar_sesion = (Preference) findPreference("cerrarSesion");
-		iniciar_sesion = (Preference) findPreference("iniciarSesion");
-		registro = (Preference) findPreference("registro");
+		screen = (PreferenceScreen) findPreference("screen");
 		
         actBar.setHomeButtonEnabled(true);
         actBar.setDisplayHomeAsUpEnabled(true);
 		
-		// Si el usuario está logueado mostramos la opción de cerrar sesión
-		if (MyApplication.logged_user){
-			perfilCategory.removePreference(iniciar_sesion);
-			perfilCategory.removePreference(registro);
-		}
-		// Si no mostramos las opciones de iniciar sesión y registro 
-		else{
-			perfilCategory.removePreference(cerrar_sesion);
+		// Si no está logueado ocultamos la opción de cerrar sesión
+		if (!MyApplication.logged_user){
+			screen.removePreference(perfilCategory);
 		}
 
 		cerrar_sesion.setOnPreferenceClickListener(this);
-		iniciar_sesion.setOnPreferenceClickListener(this);
-		registro.setOnPreferenceClickListener(this);
 
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
@@ -116,20 +108,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 						}
 					});
 			alert_logout.show();
-		}
-		
-		// Iniciar sesión
-		else if (preference.getKey().equals("iniciarSesion")) {
-			Intent i = new Intent(SettingsActivity.this, MainLoginActivity.class);
-			startActivity(i);
-			finish();
-		}
-		
-		// Registrar usuario
-		else if (preference.getKey().equals("registro")){
-			Intent i = new Intent(SettingsActivity.this, RegistrationActivity.class);
-			startActivity(i);
-			finish();
 		}
 
 		return false;

@@ -320,6 +320,8 @@ public class RegistrationActivity extends SherlockActivity {
 					SharedPreferences prefs = getBaseContext().getSharedPreferences(
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+		        	prefs.edit().putString(MyApplication.USER_NAME, edit_nombre_usuario.getText().toString()).commit();
+		        	MyApplication.user_name = edit_nombre_usuario.getText().toString();
 		        	MyApplication.logged_user = true;
 		        	Toast.makeText(getBaseContext(), R.string.usuario_registrado_correctamente, Toast.LENGTH_SHORT).show();
 		        	
