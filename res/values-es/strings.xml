@@ -145,4 +145,8 @@
     <string name="comentarios">comentarios</string>
     <string name="comentario">comentario</string>
     <string name="inicia_sesion_para_comentar">Inicia sesión para comentar</string>
+    <string name="nuevo_usuario">Nuevo usuario</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="notificaciones">Notificaciones</string>
 </resources>

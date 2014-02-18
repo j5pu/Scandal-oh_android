@@ -18,7 +18,7 @@
             android:layout_marginRight="6dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.93"
-            android:background="@color/blanco"
+            android:background="@drawable/edit_comment"
             android:hint="@string/escribe_un_comentario"
             android:paddingLeft="5dp"
             android:textColor="@color/gris_oscuro"

@@ -114,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|center_vertical"
                     android:gravity="top|center_vertical"
-                    android:text="00:20"
+                    android:text="00:60"
                     android:textColor="@color/gris_oscuro"
                     android:textSize="61sp" />
 

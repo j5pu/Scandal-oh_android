@@ -81,7 +81,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="Notificaciones"
+                    android:text="@string/notificaciones"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
@@ -127,7 +127,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="Ajustes"
+                    android:text="@string/ajustes"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
@@ -150,7 +150,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="Iniciar sesión"
+                    android:text="@string/iniciar_sesion"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
@@ -173,7 +173,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="Nuevo usuario"
+                    android:text="@string/nuevo_usuario"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
