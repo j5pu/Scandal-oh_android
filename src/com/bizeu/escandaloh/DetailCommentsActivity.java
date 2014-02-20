@@ -253,7 +253,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 	    protected Integer doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/comment/";        
+	    	String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/comment/";        
 
 	        HttpResponse response = null;
 	        
@@ -372,7 +372,7 @@ public class DetailCommentsActivity extends SherlockActivity {
 			comments.clear();
 			
 			HttpClient httpClient = new DefaultHttpClient();		
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "api/v1/comment/?photo__id=" + photo_id);		 
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "/api/v1/comment/?photo__id=" + photo_id);		 
 			del.setHeader("content-type", "application/json");		
 			HttpResponse response = null ;
 			

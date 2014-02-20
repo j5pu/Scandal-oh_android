@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.model.Comment;
@@ -72,23 +73,18 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             holder.txtText = (TextView)mView.findViewById(R.id.txt_comment_text);
             holder.txtUsername = (TextView)mView.findViewById(R.id.txt_comment_username);
             holder.txtDate = (TextView)mView.findViewById(R.id.txt_comment_date);
+            holder.imgAvatar = (FetchableImageView)mView.findViewById(R.id.img_comment_avatar);
                          
             mView.setTag(holder);
         }
         
         else{
             holder = (CommentHolder)mView.getTag();   
-            /*
-            // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha
-            if (user_name_owner.equals(comment.getUsername())){
-            	holder.txtUsername.setTextColor(context.getResources().getColor(R.color.azul));
-            	holder.txtDate.setTextColor(context.getResources().getColor(R.color.azul));
-            }
-            */
         }
         	        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
+       // holder.imgAvatar.setImage(, R.drawable.avatar_defecto);
      
         // La fecha tendrá el formato: dd-mm-aaaa
         String date_without_time = (comment.getDate().split("T",2))[0];   
@@ -130,6 +126,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         TextView txtDate; 
         ImageView imgUser;
         ImageView imgClock;
+        FetchableImageView imgAvatar;
         LinearLayout info_comment_user;
         LinearLayout info_comment_text;
         

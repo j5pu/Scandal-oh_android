@@ -149,4 +149,7 @@
     <string name="iniciar_sesion">Iniciar sesión</string>
     <string name="ajustes">Ajustes</string>
     <string name="notificaciones">Notificaciones</string>
+    <string name="avatar">Avatar</string>
+    <string name="actualizando_avatar">Actualizando avatar ...</string>
+    <string name="hubo_algun_problema_actualizando_avatar">Hubo algún problema actualizando el avatar</string>
 </resources>

@@ -281,7 +281,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photo/";
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/";
 			
 			// Se ha tomado desde la camara
 			if (photo_from == MainActivity.SHOW_CAMERA){

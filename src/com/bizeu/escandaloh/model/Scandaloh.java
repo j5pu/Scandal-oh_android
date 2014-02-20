@@ -23,6 +23,7 @@ public class Scandaloh {
 	private boolean has_audio;
 	private String date;
 	private String user;
+	private String avatar;
 	private ArrayList<Comment> comments; // Listado de comentarios
 
 	
@@ -42,7 +43,7 @@ public class Scandaloh {
 	 */
 	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
-						String user, String date, ArrayList<Comment> comments){
+						String user, String date, String avatar, ArrayList<Comment> comments){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -60,6 +61,7 @@ public class Scandaloh {
 		this.has_audio = uri_audio.equals("null") ? false : true;
 		this.user = user;
 		this.date = date;
+		this.avatar = avatar;
 		this.comments = new ArrayList<Comment>();
 		this.comments = comments;
 
@@ -175,6 +177,14 @@ public class Scandaloh {
 	
 	public void setComments(ArrayList<Comment> new_comments){
 		comments = new_comments;
+	}
+	
+	public String getAvatar(){
+		return this.avatar;
+	}
+	
+	public void setAvatar(String new_avatar){
+		this.avatar = new_avatar;
 	}
 	
 }

@@ -214,7 +214,7 @@ public class RegistrationActivity extends SherlockActivity {
 	    protected Void doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = MyApplication.SERVER_ADDRESS + "api/v1/user/";
+	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/";
 	
 	        try{
 	             HttpClient client = new DefaultHttpClient();

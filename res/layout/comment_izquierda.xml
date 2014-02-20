@@ -19,11 +19,11 @@
             android:gravity="top|center_horizontal"
             android:orientation="vertical" >
 
-            <ImageView
-                android:id="@+id/imageView1"
+            <com.bizeu.escandaloh.util.CircularImageView
+                android:id="@+id/img_comment_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_launcher"
+                android:src="@drawable/icono_app"
                 android:gravity="top" />
         </LinearLayout>
 

@@ -442,7 +442,7 @@ public class MainLoginActivity extends SherlockActivity{
 		protected Void doInBackground(Integer... params) {
 
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS+ "api/v1/user/login/";
+			String urlString = MyApplication.SERVER_ADDRESS+ "/api/v1/user/login/";
 
 			try {
 				HttpClient client = new DefaultHttpClient();

@@ -121,7 +121,7 @@ public class RememberPasswordDialog extends Dialog{
 	    protected Void doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = MyApplication.SERVER_ADDRESS + "api/v1/user/generate-new-password/";
+	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/generate-new-password/";
 	
 	        try{
 	             HttpClient client = new DefaultHttpClient();

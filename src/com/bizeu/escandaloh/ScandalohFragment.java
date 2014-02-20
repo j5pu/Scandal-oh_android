@@ -82,6 +82,7 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String USER_NAME = "user_name";
     private static final String DATE = "date";
     private static final String URI_AUDIO = "uri_audio";
+    private static final String AVATAR = "avatar";
     private static final String COMMENTS = "comments";
  
     private TextView num_com ;
@@ -100,6 +101,7 @@ public class ScandalohFragment extends SherlockFragment {
     private boolean has_audio;
     private String user_name;
     private String date;
+    private String avatar;
     private Bitmap bitma;
 	private boolean any_error;
 	private int chosen_report; // 1:Copyright      2:Ilegalcontent      3:Spam
@@ -131,6 +133,7 @@ public class ScandalohFragment extends SherlockFragment {
         bundle.putString(USER_NAME, escan.getUser());
         bundle.putString(DATE, escan.getDate());
         bundle.putString(URI_AUDIO, escan.getUriAudio());
+        bundle.putString(AVATAR, escan.getAvatar());
         bundle.putParcelableArrayList(COMMENTS, escan.getComments());
 
         fragment.setArguments(bundle);
@@ -159,6 +162,7 @@ public class ScandalohFragment extends SherlockFragment {
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
+        this.avatar = (getArguments() != null) ? getArguments().getString(AVATAR) : null;
         this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
 
         // Preferencias
@@ -314,10 +318,9 @@ public class ScandalohFragment extends SherlockFragment {
 		});
 		
 			
-        // EMOTICONO
-        ImageView emoticono = (ImageView) rootView.findViewById(R.id.emoticono);
-        Bitmap bitma = ImageUtils.getRoundedCornerBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.icono_app));
-		emoticono.setImageBitmap(bitma);
+        // AVATAR
+        FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
+        emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
                 
         // COMPARTIR 
         ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
@@ -609,7 +612,7 @@ public class ScandalohFragment extends SherlockFragment {
 	    protected Integer doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	    	String urlString = MyApplication.SERVER_ADDRESS + "api/v1/photocomplaint/";        
+	    	String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photocomplaint/";        
 
 	        HttpResponse response = null;
 	        
