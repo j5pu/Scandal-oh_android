@@ -32,6 +32,9 @@ public class CoverActivity extends Activity {
 		
 		// Obtenemos el código del pais 
 		MyApplication.code_selected_country = prefs.getString(MyApplication.CODE_COUNTRY, null);
+	
+		// Obtenemos el avatar
+		MyApplication.avatar = prefs.getString(MyApplication.AVATAR, null);
 		
 		// Indicamos si el usuario está logueado
 		String user_uri = prefs.getString(MyApplication.USER_URI, null); 

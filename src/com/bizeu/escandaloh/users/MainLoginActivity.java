@@ -432,6 +432,8 @@ public class MainLoginActivity extends SherlockActivity{
 	 */
 	private class LogInSocialNetwork extends AsyncTask<Integer, Integer, Void> {
 
+		private String avatar;
+		
 		@Override
 		protected void onPreExecute() {
 			progress.show();
@@ -487,6 +489,7 @@ public class MainLoginActivity extends SherlockActivity{
 					// Si es OK obtenemos el user_uri
 					if (status.equals("ok")) {
 						user_uri = respJSON.getString("user_uri");
+						avatar = respJSON.getString("avatar");
 						login_error = false;
 					} else {
 						login_error = true;
@@ -511,6 +514,7 @@ public class MainLoginActivity extends SherlockActivity{
 		@Override
 		protected void onPostExecute(Void result) {
 
+			Log.v("WE","onpostexecute");
 			// Quitamos el ProgressDialog
 			if (progress.isShowing()) {
 				progress.dismiss();
@@ -520,11 +524,15 @@ public class MainLoginActivity extends SherlockActivity{
 			if (!login_error) {
 				// Logueamos al usuario en la aplicación
 				SharedPreferences prefs = mContext.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+				// Guardamos el uri, nombre de usuario y avatar
 				prefs.edit().putString(MyApplication.USER_URI, user_uri)
 						.commit();
 	        	prefs.edit().putString(MyApplication.USER_NAME, username).commit();
+	        	prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
 	        	MyApplication.user_name = username;
 				MyApplication.resource_uri = user_uri;
+				Log.v("WE","Avatar de facebook: " + avatar);
+				MyApplication.avatar = avatar;
 				MyApplication.logged_user = true;
 				Toast.makeText(mContext, R.string.sesion_iniciada_exito,
 						Toast.LENGTH_SHORT).show();

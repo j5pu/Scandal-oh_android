@@ -1,6 +1,8 @@
 package com.bizeu.escandaloh;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -24,9 +27,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,6 +47,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -233,12 +239,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
 		ll_lateral_registro = (LinearLayout) findViewById(R.id.ll_mLateral_registro);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
-
-		// Nombre de usuario
-		if (MyApplication.logged_user) {
-			txt_lateral_nombreusuario.setText(MyApplication.user_name);
-		}
-
+		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
@@ -435,13 +436,24 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		// Si está logueado ocultamos las opciones de login y registro y
 		// mostramos su nombre en el menu
+		// Actualizamos el avatar y el nombre de usuario
 		if (MyApplication.logged_user) {
 			ll_lateral_login.setVisibility(View.GONE);
 			ll_lateral_registro.setVisibility(View.GONE);
 			txt_lateral_nombreusuario.setText(MyApplication.user_name);
+			Log.v("WE","Myapplication avatar: " + MyApplication.avatar);
+			if (MyApplication.avatar != null){
+		        img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_mas);
+			}
+			else{
+		        img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
+			}
 		} else {
 			ll_lateral_login.setVisibility(View.VISIBLE);
 			ll_lateral_registro.setVisibility(View.VISIBLE);
+			img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
+			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado));
+			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);		
 		}
 
 		// Abrimos la llave para el caso de error del timeout al obtener fotos
@@ -565,7 +577,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				if (!performCrop(mImageUri)) {
 					Bitmap photo_for_avatar = ImageUtils.uriToBitmap(mImageUri,
 							this);
-					// new updateAvatarTask(photo_for_avatar).execute();
+					 new UpdateAvatarTask(this,photo_for_avatar).execute();
 				}
 			}
 		}
@@ -575,7 +587,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (data != null) {
 				Uri selectedImageUri = data.getData();
 				if (!performCrop(selectedImageUri)) {
-					// new updateAvatarTask(photo_for_avatar).execute();
+					String foto_string = ImageUtils.getRealPathFromURI(mContext, selectedImageUri);
+					Bitmap photo_for_avatar = BitmapFactory.decodeFile(foto_string);
+					new UpdateAvatarTask(this,photo_for_avatar).execute();
 				}
 			}
 		}
@@ -797,6 +811,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		String c_user;
 		String c_user_id;
 		String c_username;
+		String c_avatar;
 
 		@Override
 		protected void onPreExecute() {
@@ -934,15 +949,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String category = escanObject.getString("category");
 					final String date = escanObject.getString("date");
 					final String id = escanObject.getString("id");
-					final String img_p = escanObject.getString("img_p"); // Fotos
-																			// pequeñas
-																			// sin
-																			// marca
-																			// de
-																			// agua
+					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
 					final String img = escanObject.getString("img");
-					final String comments_count = escanObject
-							.getString("comments_count");
+					final String comments_count = escanObject.getString("comments_count");
 					String latitude = escanObject.getString("latitude");
 					String longitude = escanObject.getString("longitude");
 					final String resource_uri = escanObject
@@ -973,10 +982,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 						c_user = commentObject.getString("user");
 						c_user_id = commentObject.getString("user_id");
 						c_username = commentObject.getString("username");
+						c_avatar = commentObject.getString("avatar");
 
 						Comment commentAux = new Comment(c_date, c_id, c_photo,
 								c_resource_uri, c_social_network, c_text,
-								c_user, c_user_id, c_username);
+								c_user, c_user_id, c_username, c_avatar);
 						array_comments.add(commentAux);
 					}
 
@@ -1373,6 +1383,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		String c_user;
 		String c_user_id;
 		String c_username;
+		String c_avatar;
 		private Context mContext;
 		private String phot_id;
 
@@ -1398,8 +1409,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			try {
 				response = httpClient.execute(del);
 				String respStr = EntityUtils.toString(response.getEntity());
-
-				Log.i("WE", "COMENTARIOS WE: " + respStr);
+				
+				Log.i("WE","com: " + respStr.toString());
 
 				JSONObject respJSON = new JSONObject(respStr);
 
@@ -1422,10 +1433,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 					c_user = escanObject.getString("user");
 					c_user_id = escanObject.getString("user_id");
 					c_username = escanObject.getString("username");
+					c_avatar = escanObject.getString("avatar");
+					
 
 					Comment commentAux = new Comment(c_date, c_id, c_photo,
 							c_resource_uri, c_social_network, c_text, c_user,
-							c_user_id, c_username);
+							c_user_id, c_username, c_avatar);
 					array_comments.add(commentAux);
 				}
 
@@ -1531,7 +1544,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		private Context mContext;
 		private Bitmap photo_avatar;
-		private File photo_file;
+		private String url_avatar;
 
 		public UpdateAvatarTask(Context context, Bitmap avatar) {
 			photo_avatar = avatar;
@@ -1556,32 +1569,32 @@ public class MainActivity extends SherlockFragmentActivity implements
 			HttpEntity resEntity;
 			String urlString = MyApplication.SERVER_ADDRESS
 					+ MyApplication.resource_uri;
-			Log.v("useruri", "user uri: " + MyApplication.resource_uri);
 			HttpResponse response = null;
 
 			try {
 				HttpClient client = new DefaultHttpClient();
 				HttpPut put = new HttpPut(urlString);
 				MultipartEntity reqEntity = new MultipartEntity();
-				// Se ha tomado desde la camara
-				// if (photo_from == MainActivity.SHOW_CAMERA){
-				photo_file = new File(mImageUri.getPath());
-				// }
-				// Desde la galería
-				// else if (photo_from == MainActivity.FROM_GALLERY){
-				// photo_file =
-				// ImageUtils.bitmapToFile(BitmapFactory.decodeFile(photo_string),
-				// mContext);
-				// }
+				
+				// Creamos un file a partir del bitmap
+				File f = new File(mContext.getCacheDir(), "avatar");
+				f.createNewFile();
 
-				FileBody bin1 = new FileBody(photo_file);
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				photo_avatar.compress(CompressFormat.JPEG, 70 /*ignored for PNG*/, bos);
+				byte[] bitmapdata = bos.toByteArray();
+				FileOutputStream fos = new FileOutputStream(f);
+				fos.write(bitmapdata);
+				
+				FileBody bin1 = new FileBody(f);
 				reqEntity.addPart("avatar", bin1);
 				put.setEntity(reqEntity);
 				response = client.execute(put);
 				resEntity = response.getEntity();
 				final String response_str = EntityUtils.toString(resEntity);
-
-				Log.i("WE", response_str);
+				
+				JSONObject respJSON = new JSONObject(response_str);
+				url_avatar = respJSON.getString("avatar");
 			}
 
 			catch (Exception ex) {
@@ -1615,8 +1628,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (progress.isShowing()) {
 				progress.dismiss();
 			}
-			Log.v("WE", "any error: " + any_error);
-			Log.v("WE", "result: " + result);
+
 			// Si hubo algún error mostramos un mensaje
 			if (any_error) {
 				Toast toast = Toast.makeText(mContext, getResources()
@@ -1626,13 +1638,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 			} else {
 				// Si es codigo 2xx --> OK
 				if (result >= 200 && result < 300) {
+		        	// Guardamos su avatar
+					SharedPreferences prefs = getBaseContext().getSharedPreferences(
+		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		        	prefs.edit().putString(MyApplication.AVATAR, url_avatar).commit();
+		        	MyApplication.avatar = url_avatar;
+		        	if (url_avatar != null){
+		        		img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + url_avatar);
+		        		img_lateral_avatar.refreshDrawableState();
+		        	}
 				} else {
 					Toast toast;
 					toast = Toast
-							.makeText(
-									mContext,
-									getResources()
-											.getString(
+							.makeText(mContext,getResources().getString(
 													R.string.hubo_algun_problema_actualizando_avatar),
 									Toast.LENGTH_LONG);
 					toast.show();

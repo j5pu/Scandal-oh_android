@@ -152,4 +152,5 @@
     <string name="avatar">Avatar</string>
     <string name="actualizando_avatar">Actualizando avatar ...</string>
     <string name="hubo_algun_problema_actualizando_avatar">Hubo algún problema actualizando el avatar</string>
+    <string name="invitado">Invitado</string>
 </resources>

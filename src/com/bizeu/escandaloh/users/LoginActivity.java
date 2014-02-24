@@ -178,6 +178,9 @@ public class LoginActivity extends SherlockActivity {
 	 */
 	private class LogInUser extends AsyncTask<Void,Integer,Void> {
 		 
+		private String avatar;
+		private String username;
+		
 		@Override
 		protected void onPreExecute(){
 			has_name_error = false;
@@ -230,6 +233,8 @@ public class LoginActivity extends SherlockActivity {
 	                 // Si es OK obtenemos el user_uri
 	                 if (status.equals("ok")){
 	                	 user_uri = respJSON.getString("user_uri");
+	                	 avatar = respJSON.getString("avatar");
+	                	 username = respJSON.getString("username");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
@@ -307,10 +312,16 @@ public class LoginActivity extends SherlockActivity {
 					if (!has_name_error && !has_password_error){
 						SharedPreferences prefs = getBaseContext().getSharedPreferences(
 			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+						// Guardamos su id
 			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
 			        	MyApplication.resource_uri = user_uri;
-			        	//prefs.edit().putString(MyApplication.USER_NAME, username).commit();
-			        	//MyApplication.user_name = username ;
+			        	// Guardamos el nombre de usuario
+			        	prefs.edit().putString(MyApplication.USER_NAME, username).commit();
+			        	MyApplication.user_name = username ;
+			        	// Guardamos su avatar
+			        	prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
+			        	MyApplication.avatar = avatar;
+			        	// Indicamos que está logueado
 			        	MyApplication.logged_user = true;
 			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
 			        	

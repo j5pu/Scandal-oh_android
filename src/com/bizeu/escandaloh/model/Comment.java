@@ -15,10 +15,11 @@ public class Comment implements Parcelable {
 	private String user;
 	private String user_id;
 	private String username;
+	private String avatar;
 
 	
 	public Comment(String date, String id, String photo, String resource_uri,
-					String social_network, String text, String user, String user_id, String username){
+					String social_network, String text, String user, String user_id, String username, String avatar){
 		this.date = date;
 		this.id = id;
 		this.photo = photo;
@@ -28,11 +29,12 @@ public class Comment implements Parcelable {
 		this.user = user;
 		this.user_id = user_id;
 		this.username = username;
+		this.avatar = avatar;
 	}
 	
 
     public Comment(Parcel in){
-        String[] data = new String[9];
+        String[] data = new String[10];
         in.readStringArray(data);
         this.date = data[0];
         this.id = data[1];
@@ -43,6 +45,7 @@ public class Comment implements Parcelable {
         this.user = data[6];
         this.user_id = data[7];
         this.username = data[8];
+        this.avatar = data[9];
     }
 	
 	public String getDate(){
@@ -116,6 +119,14 @@ public class Comment implements Parcelable {
 	public void setUsername(String new_username){
 		this.username = new_username;
 	}
+	
+	public String getAvatar(){
+		return avatar;
+	}
+	
+	public void setAvatar(String new_avatar){
+		this.avatar = new_avatar;
+	}
 
 	@Override
 	public int describeContents() {
@@ -133,7 +144,8 @@ public class Comment implements Parcelable {
                 this.text,
                 this.user,
                 this.user_id,
-                this.username
+                this.username,
+                this.avatar
          });
 	}
 	

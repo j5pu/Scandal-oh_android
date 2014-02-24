@@ -241,7 +241,7 @@ public class ScandalohFragment extends SherlockFragment {
                 
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
-        img.setImage(this.url, R.drawable.cargando);      
+        img.setImage(this.url, R.drawable.cargando);  
      
         img.setOnClickListener(new View.OnClickListener() {
 			

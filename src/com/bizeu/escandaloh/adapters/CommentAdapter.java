@@ -84,7 +84,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
-       // holder.imgAvatar.setImage(, R.drawable.avatar_defecto);
+        holder.imgAvatar.setImage(MyApplication.DIRECCION_BUCKET + comment.getAvatar(), context.getResources().getDrawable(R.drawable.avatar_defecto));
      
         // La fecha tendrá el formato: dd-mm-aaaa
         String date_without_time = (comment.getDate().split("T",2))[0];   

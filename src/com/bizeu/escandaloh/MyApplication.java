@@ -2,6 +2,8 @@ package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
 
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,11 +21,12 @@ public class MyApplication extends Application {
 	public static String USER_URI = "user_uri";
 	public static String USER_NAME = "user_name";
 	public static String AUTOPLAY_ACTIVATED = "autoplay_activated";
+	public static String AVATAR = "avatar";
 	public static Boolean logged_user = false;
 	public static String code_selected_country = null;
 	public static String resource_uri = "";
 	public static String user_name = "";
-	public static String avatar = "";
+	public static String avatar = null;
 	public static boolean FIRST_TIME_HAPPY = true;
 	public static boolean FIRST_TIME_ANGRY = true;
 	public static boolean FIRST_TIME_BOTH = true;

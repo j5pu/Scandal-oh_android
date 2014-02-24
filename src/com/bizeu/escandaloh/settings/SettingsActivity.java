@@ -93,9 +93,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			alert_logout.setPositiveButton(R.string.confirmar,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialogo1, int id) {
-
+							
 							// Deslogueamos al usuario
 							prefs.edit().putString(MyApplication.USER_URI, null).commit();
+				        	prefs.edit().putString(MyApplication.USER_NAME, getResources().getString(R.string.invitado)).commit();
+				        	MyApplication.user_name = getResources().getString(R.string.invitado) ;
+				        	prefs.edit().putString(MyApplication.AVATAR, null).commit();
+				        	MyApplication.avatar = null;
 							MyApplication.logged_user = false;
 							
 							// Cerramos la pantalla
