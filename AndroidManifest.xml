@@ -5,7 +5,7 @@
     android:versionName="2.1" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="19" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -42,10 +42,6 @@
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.MainActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name="com.bizeu.escandaloh.SelectCountryActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

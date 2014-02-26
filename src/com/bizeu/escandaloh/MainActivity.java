@@ -78,6 +78,8 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.countrypicker.CountryPicker;
+import com.countrypicker.CountryPickerListener;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
@@ -112,6 +114,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private TextView txt_lateral_nombreusuario;
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
+	private TextView txt_code_country;
 	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
 	private ImageView img_send_comment;
@@ -175,13 +178,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+		txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
 
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
 		adapter_spinner = ArrayAdapter.createFromResource(this,
 				R.array.array_categorias, R.layout.categoria_spinner);
-		adapter_spinner
-				.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
+		adapter_spinner.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
 		spinner_categorias.setAdapter(adapter_spinner);
 		spinner_categorias.setOnItemSelectedListener(this);
 
@@ -348,6 +351,68 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivity(i);
 				// Cerramos el menu
 				mDrawerLayout.closeDrawer(ll_menu_lateral);
+			}
+		});
+		
+		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Cerramos el menu
+				mDrawerLayout.closeDrawer(ll_menu_lateral);
+				
+				final CountryPicker countryPicker = CountryPicker.newInstance(getResources().getString(R.string.selecciona_pais));
+				countryPicker.setListener(new CountryPickerListener() {
+
+					@Override
+					public void onSelectCountry(String name, String code) {
+						
+						// Si el país seleccionado es distinto al actual
+						if (!MyApplication.code_selected_country.equals(code)){
+							MyApplication.code_selected_country = code;
+							txt_code_country.setText(code);
+							SharedPreferences prefs = getBaseContext().getSharedPreferences(
+				        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+							// Guardamos el código del país
+				        	prefs.edit().putString(MyApplication.CODE_COUNTRY, code).commit();
+							
+							// Si hay conexión
+							if (Connectivity.isOnline(mContext)) {
+								cancelGetEscandalos();
+								refreshFinished();
+								// Abrimos llave de hay más escandalos
+								there_are_more_escandalos = true;
+								// Quitamos los escándalos actuales
+								escandalos.clear();
+
+								pager.setCurrentItem(0);
+								adapter.clearFragments();
+								adapter = new ScandalohFragmentPagerAdapter(
+										getSupportFragmentManager());
+								pager.setAdapter(adapter);
+								// Obtenemos los 10 primeros escándalos para la categoría
+								// seleccionada
+								// Mostramos el progressBar y ocultamos la lista de escandalos
+								loading.setVisibility(View.VISIBLE);
+								pager.setVisibility(View.GONE);
+								getEscandalosAsync = new GetEscandalos();
+								getEscandalosAsync.execute();
+							}
+
+							// No hay conexión
+							else {
+								Toast toast = Toast.makeText(mContext,
+										R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+								toast.show();
+							}
+						}
+			        	
+			        	// Cerramos el dialog
+						countryPicker.dismiss();
+					}
+				});
+				
+				countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");		
 			}
 		});
 
@@ -600,7 +665,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-
+		
 		// Login/Subir escandalo
 		case R.id.ll_main_take_photo:
 
@@ -1657,8 +1722,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		// Si ha seleccionado una categoria diferente de la que se encuentra
 		// actualmente
-		if ((pos == 0 && category.equals(ANGRY))
-				|| (pos == 1 && category.equals(HAPPY))) {
+		if ((pos == 0 && category.equals(ANGRY))|| (pos == 1 && category.equals(HAPPY))) {
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)) {
 				cancelGetEscandalos();
@@ -2046,6 +2110,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 			ll_take_photo.setOnClickListener(this);
 			progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
+			txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
+			
+			txt_code_country.setText(MyApplication.code_selected_country);
 		}
 	}
 
