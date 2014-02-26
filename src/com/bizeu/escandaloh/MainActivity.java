@@ -72,7 +72,7 @@ import com.bizeu.escandaloh.adapters.DrawerMenuAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
-import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
@@ -93,9 +93,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public static final int AVATAR_FROM_GALLERY = 14;
 	public static final int SHARING = 13;
 	public static final int PIC_CROP = 16;
-	public static final String FIRST_TIME = "First_time"; // Nos indica si pulsó
-															// el + para hacer
-															// una foto
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
@@ -158,14 +155,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_main));
-
-		// Si el usuario no está logueado mostramos la pantalla de
-		// registro/login
-		if (!MyApplication.logged_user) {
-			Intent i = new Intent(MainActivity.this, MainLoginActivity.class);
-			i.putExtra(FIRST_TIME, true);
-			startActivity(i);
-		}
 
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
@@ -343,7 +332,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(MainActivity.this,
-						MainLoginActivity.class);
+						LoginSelectActivity.class);
 				startActivity(i);
 				// Cerramos el menu
 				mDrawerLayout.closeDrawer(ll_menu_lateral);
@@ -713,14 +702,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 							});
 					builder.show();
 				}
-				// No está logueado: mostramos la pantalla de login
+				// No está logueado: mostramos un mensaje diciendo que se loguee
 				else {
-					Intent i = new Intent(this, MainLoginActivity.class);
-					i.putExtra(FIRST_TIME, false); // Indicamos que no es la
-													// primera vez que saldrá
-													// esta pantalla (ha pulsado
-													// "+")
-					startActivity(i);
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_LONG);
+					toast.show();
 				}
 			}
 			// No dispone de conexión
@@ -1999,10 +1984,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 							@Override
 							public boolean onTouch(View v, MotionEvent event) {
-								Intent i = new Intent(MainActivity.this,
-										MainLoginActivity.class);
-								i.putExtra(FIRST_TIME, true);
-								startActivity(i);
+								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_SHORT);
+								toast.show();
 								return false;
 							}
 						});

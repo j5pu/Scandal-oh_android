@@ -153,4 +153,8 @@
     <string name="actualizando_avatar">Actualizando avatar ...</string>
     <string name="hubo_algun_problema_actualizando_avatar">Hubo algún problema actualizando el avatar</string>
     <string name="invitado">Invitado</string>
+    <string name="iniciar_sesion_con_twitter">Iniciar sesión con Twitter</string>
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="scandaloh">ScandalOh</string>
 </resources>

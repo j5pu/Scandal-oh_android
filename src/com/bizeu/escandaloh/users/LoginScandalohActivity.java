@@ -38,7 +38,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 
-public class LoginActivity extends SherlockActivity {
+public class LoginScandalohActivity extends SherlockActivity {
 	
 	private EditText edit_nombre_email;
 	private EditText edit_password;
@@ -68,7 +68,7 @@ public class LoginActivity extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.login_scandaloh);
 		
 		// Cambiamos la fuente de la pantalla
 		pantalla = (ViewGroup)findViewById(R.id.lay_pantalla_login);

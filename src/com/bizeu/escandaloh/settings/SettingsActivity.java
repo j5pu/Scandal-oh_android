@@ -5,7 +5,7 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-import com.bizeu.escandaloh.users.MainLoginActivity;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
 import android.app.AlertDialog;
