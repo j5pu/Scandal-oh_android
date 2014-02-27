@@ -18,9 +18,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_weight="1.6"
+        android:gravity="bottom|center_horizontal"
         android:orientation="vertical" >
 
         <com.facebook.widget.LoginButton
@@ -32,20 +32,11 @@
             fb:logout_text="@string/facebook" />
 
         <Button
-            android:id="@+id/but_log_in_twitter"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/blue_button_selector"
-            android:text="@string/twitter"
-            android:textColor="@color/blanco"
-            android:textSize="17sp" />
-
-        <Button
             android:id="@+id/but_log_in_scandaloh"
             android:layout_width="200dp"
             android:layout_height="40dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/blue_button_selector"
             android:text="@string/scandaloh"
             android:textColor="@color/blanco"

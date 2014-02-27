@@ -71,7 +71,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	private static Twitter twitter;
 	private static RequestToken requestToken;
 	private Button but_login_scandaloh;
-	private Button but_login_twitter;
+	//private Button but_login_twitter;
 	private LoginButton but_login_facebook;
 	private Activity acti;
 	private Context mContext;
@@ -92,7 +92,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.main_login);
+		setContentView(R.layout.login_main);
 
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_main_login));
@@ -110,7 +110,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		but_login_scandaloh = (Button) findViewById(R.id.but_log_in_scandaloh);
 		but_login_facebook = (LoginButton) findViewById(R.id.but_log_in_facebook);
-		but_login_twitter = (Button) findViewById(R.id.but_log_in_twitter);
+		//but_login_twitter = (Button) findViewById(R.id.but_log_in_twitter);
 
 		/*
 		 * // Google+ mPlusClient = new PlusClient.Builder(this, this, this)
@@ -124,6 +124,7 @@ public class LoginSelectActivity extends SherlockActivity {
 		 * mConnectionProgressDialog.setMessage("Signing in...");
 		 */
 
+		/*
 		but_login_twitter.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -131,6 +132,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				new InitiateWebViewTwitter().execute();
 			}
 		});
+		*/
 
 		but_login_facebook.setOnErrorListener(new OnErrorListener() {
 
@@ -237,6 +239,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	 * onNewIntent Este método es lanzado cuando se recibe un nuevo Intent. En
 	 * nuestro caso cuando el usuario se haya logueado con twitter en el webview
 	 */
+	/*
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -250,11 +253,13 @@ public class LoginSelectActivity extends SherlockActivity {
 			new LogInTwitter().execute(uri);
 		}
 	}
+	*/
 
 	/**
 	 * Abre un webView para pedir el email y password en twitter de un usuario
 	 * 
 	 */
+	/*
 	private class InitiateWebViewTwitter extends AsyncTask<Void, Integer, Void> {
 
 		@Override
@@ -301,11 +306,13 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Obtiene el nombre de usuario de Twitter y loguea en la aplicación
 	 * 
 	 */
+	/*
 	private class LogInTwitter extends AsyncTask<Uri, Integer, Void> {
 
 		@Override
@@ -362,6 +369,7 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Loguea un usuario a partir de un nombre de usuario (obtenido de facebook,
@@ -406,11 +414,7 @@ public class LoginSelectActivity extends SherlockActivity {
 						social_network = 3;
 						email = "twitter@email.com";
 						break;
-				}
-				
-				Log.i("WE", "username es: " + username);
-				Log.i("WE", "email es: " + email);
-				Log.i("WE", "social network es: " + social_network);			
+				}		
 				
 				dato.put("username", username);
 				dato.put("email", email);
@@ -463,7 +467,6 @@ public class LoginSelectActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Void result) {
 
-			Log.v("WE", "onpostexecute");
 			// Quitamos el ProgressDialog
 			if (progress.isShowing()) {
 				progress.dismiss();
