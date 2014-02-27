@@ -25,6 +25,7 @@ public class Scandaloh {
 	private String user;
 	private String avatar;
 	private ArrayList<Comment> comments; // Listado de comentarios
+	private String social_network;
 
 	
 	
@@ -43,7 +44,7 @@ public class Scandaloh {
 	 */
 	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
-						String user, String date, String avatar, ArrayList<Comment> comments){
+						String user, String date, String avatar, ArrayList<Comment> comments, String social_network){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -64,6 +65,7 @@ public class Scandaloh {
 		this.avatar = avatar;
 		this.comments = new ArrayList<Comment>();
 		this.comments = comments;
+		this.social_network = social_network;
 
 	}
 	
@@ -185,6 +187,14 @@ public class Scandaloh {
 	
 	public void setAvatar(String new_avatar){
 		this.avatar = new_avatar;
+	}
+	
+	public String getSocialNetwork(){
+		return this.social_network;
+	}
+	
+	public void setSocialNetwork(String new_social_network){
+		this.social_network = new_social_network;
 	}
 	
 }

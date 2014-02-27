@@ -84,6 +84,7 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String URI_AUDIO = "uri_audio";
     private static final String AVATAR = "avatar";
     private static final String COMMENTS = "comments";
+    private static final String SOCIAL_NETWORK = "social_network";
  
     private TextView num_com ;
 	private LinearLayout ll_comments;
@@ -106,6 +107,7 @@ public class ScandalohFragment extends SherlockFragment {
 	private boolean any_error;
 	private int chosen_report; // 1:Copyright      2:Ilegalcontent      3:Spam
 	private String uri_audio;	
+	private String social_network; // 0:Scandaloh        1:Facebook
 	private CommentAdapter commentsAdapter;
 	private ArrayList<Comment> comments = new ArrayList<Comment>();
 	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
@@ -135,6 +137,7 @@ public class ScandalohFragment extends SherlockFragment {
         bundle.putString(URI_AUDIO, escan.getUriAudio());
         bundle.putString(AVATAR, escan.getAvatar());
         bundle.putParcelableArrayList(COMMENTS, escan.getComments());
+        bundle.putString(SOCIAL_NETWORK, escan.getSocialNetwork());
 
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
@@ -164,7 +167,8 @@ public class ScandalohFragment extends SherlockFragment {
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
         this.avatar = (getArguments() != null) ? getArguments().getString(AVATAR) : null;
         this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
-
+        this.social_network = (getArguments() != null) ? getArguments().getString(SOCIAL_NETWORK) : null;
+        
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
@@ -317,6 +321,16 @@ public class ScandalohFragment extends SherlockFragment {
 			}
 		});
 		
+        // SOCIAL NETWORK 
+        ImageView user_type = (ImageView) rootView.findViewById(R.id.img_escandalo_tipo_usuario);
+        // Scandaloh
+        if (Integer.parseInt(social_network) == 0){
+        	user_type.setImageResource(R.drawable.s_rosa);
+        }
+        // Facebook
+        else if (Integer.parseInt(social_network) == 1){
+        	user_type.setImageResource(R.drawable.facebook_rosa);
+        }
 			
         // AVATAR
         FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);

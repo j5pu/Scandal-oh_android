@@ -74,6 +74,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             holder.txtUsername = (TextView)mView.findViewById(R.id.txt_comment_username);
             holder.txtDate = (TextView)mView.findViewById(R.id.txt_comment_date);
             holder.imgAvatar = (FetchableImageView)mView.findViewById(R.id.img_comment_avatar);
+            holder.imgUser = (ImageView)mView.findViewById(R.id.img_comment_user);
                          
             mView.setTag(holder);
         }
@@ -93,6 +94,17 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         String day = date_without_time.split("-",3)[2];
         String final_date = day + "-" + month + "-" + year;
         holder.txtDate.setText(final_date); 
+        
+        // El icono del usuario dependerá de la red social de éste
+        // Scandaloh
+        int social_net = Integer.parseInt(comment.getSocialNetwork());
+        if (social_net == 0){
+        	holder.imgUser.setImageResource(R.drawable.s_rosa);
+        }
+        // Facebook
+        else if (social_net == 1){
+        	holder.imgUser.setImageResource(R.drawable.facebook_rosa);
+        }
         
         /*
         // Si soy el usuario del comentario aparecerá en azul el nombre y la fecha

@@ -143,14 +143,22 @@
                 android:id="@+id/txt_escandalo_name_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/txt_escandalo_titulo"
+                android:layout_alignBottom="@+id/imageView1"
                 android:layout_marginLeft="3dp"
-                android:layout_marginTop="55dp"
-                android:layout_toRightOf="@+id/emoticono"
+                android:layout_toRightOf="@+id/img_escandalo_tipo_usuario"
                 android:text="alejandro.leonrodriguez.7"
                 android:textColor="@color/morado"
                 android:textSize="10sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/img_escandalo_tipo_usuario"
+                android:layout_width="10dp"
+                android:layout_height="12dp"
+                android:layout_alignBottom="@+id/txt_escandalo_name_user"
+                android:layout_toRightOf="@+id/emoticono"
+                android:src="@drawable/s_rosa" />
+
         </RelativeLayout>
 
         <LinearLayout

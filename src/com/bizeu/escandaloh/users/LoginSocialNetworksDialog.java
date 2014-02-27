@@ -53,7 +53,7 @@ public class LoginSocialNetworksDialog extends Dialog {
 
 		// Ponemos el icono de facebook en el botón
 		Drawable drawable = mContext.getResources().getDrawable(
-				R.drawable.facebook);
+				R.drawable.facebook_rosa);
 		drawable.setBounds(0, 0, (int) (drawable.getIntrinsicWidth() * 0.5),
 				(int) (drawable.getIntrinsicHeight() * 0.5));
 		ScaleDrawable sd = new ScaleDrawable(drawable, 0, 30, 30);

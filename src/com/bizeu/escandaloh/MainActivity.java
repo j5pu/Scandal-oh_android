@@ -1013,6 +1013,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String sound = escanObject.getString("sound");
 					final String username = escanObject.getString("username");
 					final String avatar = escanObject.getString("avatar");
+					final String social_network = escanObject.getString("social_network");
 
 					// Obtenemos los comentarios
 					final String comments = escanObject.getString("comments");
@@ -1055,7 +1056,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 												+ img_p,
 										"http://scandaloh.s3.amazonaws.com/"
 												+ img, sound, username, date,
-										avatar, array_comments);
+										avatar, array_comments, social_network);
 								escandalos.add(escanAux);
 								adapter.addFragment(ScandalohFragment
 										.newInstance(escandalos.get(escandalos
@@ -1504,7 +1505,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								array_comments.size(), e.getResourceUri(),
 								e.getRouteImg(), e.getRouteImgBig(),
 								e.getUriAudio(), e.getUser(), e.getDate(),
-								e.getAvatar(), array_comments);
+								e.getAvatar(), array_comments, e.getSocialNetwork());
 						escandalos.set(pager.getCurrentItem(), escanAux);
 						adapter.setFragment(pager.getCurrentItem(),
 								ScandalohFragment.newInstance(escanAux));
