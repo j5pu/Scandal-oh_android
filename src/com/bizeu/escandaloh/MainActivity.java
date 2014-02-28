@@ -879,14 +879,31 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Usamos un servicio u otro dependiendo si es el primer listado
 				// de escándalos o ya posteriores
 				if (escandalos.size() == 0) {
-					url = MyApplication.SERVER_ADDRESS
-							+ "/api/v1/photo/?limit=10&category__id=1&country="
-							+ MyApplication.code_selected_country;
+					// Si el usuario está logueado lo enviamos para obtener sus likes/dislikes
+					if (MyApplication.logged_user){
+						url = MyApplication.SERVER_ADDRESS
+								+ "/api/v1/photo/?limit=10&category__id=1&user_uri=" + MyApplication.resource_uri + "&country="
+								+ MyApplication.code_selected_country;
+					}
+					else{
+						url = MyApplication.SERVER_ADDRESS
+								+ "/api/v1/photo/?limit=10&category__id=1&country="
+								+ MyApplication.code_selected_country;
+					}
+
 				} else {
-					url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-							+ escandalos.get(escandalos.size() - 1).getId()
-							+ "/" + MyApplication.code_selected_country
-							+ "/previous/?category__id=1";
+					if (MyApplication.logged_user){
+						url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
+								+ escandalos.get(escandalos.size() - 1).getId()
+								+ "/" + MyApplication.code_selected_country
+								+ "/previous/?category__id=1&user_uri=" + MyApplication.resource_uri + "";
+					}
+					else{
+						url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
+								+ escandalos.get(escandalos.size() - 1).getId()
+								+ "/" + MyApplication.code_selected_country
+								+ "/previous/?category__id=1";
+					}
 				}
 			}
 
@@ -1004,16 +1021,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String comments_count = escanObject.getString("comments_count");
 					String latitude = escanObject.getString("latitude");
 					String longitude = escanObject.getString("longitude");
-					final String resource_uri = escanObject
-							.getString("resource_uri");
-					final String title = new String(escanObject.getString(
-							"title").getBytes("ISO-8859-1"), HTTP.UTF_8);
+					final String resource_uri = escanObject.getString("resource_uri");
+					final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
 					final String user = escanObject.getString("user");
 					String visits_count = escanObject.getString("visits_count");
 					final String sound = escanObject.getString("sound");
 					final String username = escanObject.getString("username");
 					final String avatar = escanObject.getString("avatar");
 					final String social_network = escanObject.getString("social_network");
+					final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
+					final int likes = Integer.parseInt(escanObject.getString("likes"));
+					final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
 
 					// Obtenemos los comentarios
 					final String comments = escanObject.getString("comments");
@@ -1047,16 +1065,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 							public void run() {
 								// Añadimos el escandalo al ArrayList
 								Scandaloh escanAux = new Scandaloh(id, title,
-										category, BitmapFactory.decodeResource(
-												getResources(),
-												R.drawable.loading),
-										Integer.parseInt(comments_count),
-										resource_uri,
-										"http://scandaloh.s3.amazonaws.com/"
-												+ img_p,
-										"http://scandaloh.s3.amazonaws.com/"
-												+ img, sound, username, date,
-										avatar, array_comments, social_network);
+										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+										Integer.parseInt(comments_count),resource_uri,
+										"http://scandaloh.s3.amazonaws.com/"+ img_p,
+										"http://scandaloh.s3.amazonaws.com/"+ img, sound, username, date,
+										avatar, array_comments, social_network,
+										already_voted, likes, dislikes);
 								escandalos.add(escanAux);
 								adapter.addFragment(ScandalohFragment
 										.newInstance(escandalos.get(escandalos
@@ -1505,7 +1519,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 								array_comments.size(), e.getResourceUri(),
 								e.getRouteImg(), e.getRouteImgBig(),
 								e.getUriAudio(), e.getUser(), e.getDate(),
-								e.getAvatar(), array_comments, e.getSocialNetwork());
+								e.getAvatar(), array_comments, e.getSocialNetwork(),
+								e.getAlreadyVoted(), e.getLikes(), e.getDislikes());
 						escandalos.set(pager.getCurrentItem(), escanAux);
 						adapter.setFragment(pager.getCurrentItem(),
 								ScandalohFragment.newInstance(escanAux));
@@ -1790,102 +1805,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	}
 
-	/**
-	 * Adaptador del view pager
-	 * 
-	 */
-	public class ScandalohFragmentPagerAdapter extends
-			FragmentStatePagerAdapter {
-
-		// Lista de fragmentos con los escándalos
-		List<ScandalohFragment> fragments;
-
-		/**
-		 * Constructor
-		 * 
-		 * @param fm
-		 *            Interfaz para interactuar con los fragmentos dentro de una
-		 *            actividad
-		 */
-		public ScandalohFragmentPagerAdapter(FragmentManager fm) {
-			super(fm);
-			this.fragments = new ArrayList<ScandalohFragment>();
-		}
-
-		/**
-		 * Devuelve el fragmento de una posición dada
-		 * 
-		 * @param position
-		 *            Posición
-		 */
-		@Override
-		public ScandalohFragment getItem(int position) {
-			// return ScandalohFragment.newInstance(escandalos.get(position));
-			return fragments.get(position);
-		}
-
-		/**
-		 * Devuelve el número de fragmentos
-		 */
-		@Override
-		public int getCount() {
-			return fragments.size();
-		}
-
-		@Override
-		public int getItemPosition(Object item) {
-			ScandalohFragment fragment = (ScandalohFragment) item;
-			if (pager.getCurrentItem() == fragments.indexOf(fragment)) {
-				return fragments.indexOf(fragment);
-			} else {
-				return POSITION_NONE;
-			}
-
-		}
-
-		/**
-		 * Añade un fragmento al final de la lista
-		 * 
-		 * @param fragment
-		 *            Fragmento a añadir
-		 */
-		public void addFragment(ScandalohFragment fragment) {
-			this.fragments.add(fragment);
-		}
-
-		/**
-		 * Añade un fragmento al principio de la lista
-		 * 
-		 * @param fragment
-		 */
-		public void addFragmentAtStart(ScandalohFragment fragment) {
-			this.fragments.add(0, fragment);
-		}
-
-		/**
-		 * Modifica un fragmento
-		 * 
-		 * @param position
-		 * @param fragment
-		 */
-		public void setFragment(int position, ScandalohFragment fragment) {
-			this.fragments.set(position, fragment);
-		}
-
-		public ScandalohFragment getFragment(int position) {
-			return this.fragments.get(position);
-		}
-
-		/**
-		 * Elimina todos los fragmentos
-		 */
-		public void clearFragments() {
-			this.fragments.clear();
-		}
-	}
+	
 
 	// -----------------------------------------------------------------------------
-	// -------------------- MÉTODOS PRIVADOS ----------------------
+	// ------------------------------ MÉTODOS --------------------------------------
 	// -----------------------------------------------------------------------------
 
 	/**
@@ -2140,5 +2063,137 @@ public class MainActivity extends SherlockFragmentActivity implements
 			return false;
 		}
 	}
+	
+	
+	
+	/**
+	 * Actualiza el already_voted del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param already_voted
+	 */
+	public void updateLikesDislikes(int already_voted, int num_likes, int num_dislikes){
+		adapter.updateFragmentLike(already_voted, num_likes, num_dislikes);
+	}
+	
+	
+	
+	
+	
+	// ---------------------------------------------------------------------------------------------------------
+	
+	
+	/**
+	 * Adaptador del view pager
+	 * 
+	 */
+	public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter {
+
+		// Lista de fragmentos con los escándalos
+		List<ScandalohFragment> fragments;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
+		 */
+		public ScandalohFragmentPagerAdapter(FragmentManager fm) {
+			super(fm);
+			this.fragments = new ArrayList<ScandalohFragment>();
+		}
+
+	
+		/**
+		 * Devuelve el fragmento de una posición dada
+		 * 
+		 * @param position Posición
+		 */
+		@Override
+		public ScandalohFragment getItem(int position) {
+			// return ScandalohFragment.newInstance(escandalos.get(position));
+			return fragments.get(position);
+		}
+
+		/**
+		 * Devuelve el número de fragmentos
+		 */
+		@Override
+		public int getCount() {
+			return fragments.size();
+		}
+
+		/**
+		 * getItemPosition
+		 */
+		@Override
+		public int getItemPosition(Object item) {
+			ScandalohFragment fragment = (ScandalohFragment) item;
+			if (pager.getCurrentItem() == fragments.indexOf(fragment)) {
+				return fragments.indexOf(fragment);
+			} else {
+				return POSITION_NONE;
+			}
+
+		}
+
+		/**
+		 * Añade un fragmento al final de la lista
+		 * @param fragment Fragmento a añadir
+		 */
+		public void addFragment(ScandalohFragment fragment) {
+			this.fragments.add(fragment);
+		}
+
+		/**
+		 * Añade un fragmento al principio de la lista
+		 * @param fragment
+		 */
+		public void addFragmentAtStart(ScandalohFragment fragment) {
+			this.fragments.add(0, fragment);
+		}
+
+		/**
+		 * Modifica un fragmento
+		 * @param position
+		 * @param fragment
+		 */
+		public void setFragment(int position, ScandalohFragment fragment) {
+			this.fragments.set(position, fragment);
+		}
+		
+		/**
+		 * Actualiza el campo already_voted del fragmento que esté actualmente visualizándose
+		 * @param already_voted
+		 */
+		public void updateFragmentLike(int already_voted, int num_likes, int num_dislikes){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el already_voted
+			scan.setAlreadyVoted(already_voted);
+			scan.setLikes(num_likes);
+			scan.setDislikes(num_dislikes);
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+
+		/**
+		 * Obtiene un fragmento a partir de una posición
+		 * @param position
+		 * @return
+		 */
+		public ScandalohFragment getFragment(int position) {
+			return this.fragments.get(position);
+		}
+		
+
+		/**
+		 * Elimina todos los fragmentos
+		 */
+		public void clearFragments() {
+			this.fragments.clear();
+		}
+	}
+	
+	
+
 
 }

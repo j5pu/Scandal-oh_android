@@ -26,6 +26,9 @@ public class Scandaloh {
 	private String avatar;
 	private ArrayList<Comment> comments; // Listado de comentarios
 	private String social_network;
+	private int already_voted;
+	private int likes;
+	private int dislikes;
 
 	
 	
@@ -44,7 +47,8 @@ public class Scandaloh {
 	 */
 	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
-						String user, String date, String avatar, ArrayList<Comment> comments, String social_network){
+						String user, String date, String avatar, ArrayList<Comment> comments, String social_network,
+						int already_voted, int likes, int dislikes){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -66,7 +70,9 @@ public class Scandaloh {
 		this.comments = new ArrayList<Comment>();
 		this.comments = comments;
 		this.social_network = social_network;
-
+		this.already_voted = already_voted;
+		this.likes = likes;
+		this.dislikes = dislikes;
 	}
 	
 	public void setId(String id){
@@ -195,6 +201,30 @@ public class Scandaloh {
 	
 	public void setSocialNetwork(String new_social_network){
 		this.social_network = new_social_network;
+	}
+	
+	public int getAlreadyVoted(){
+		return this.already_voted;
+	}
+	
+	public void setAlreadyVoted(int new_already_voted){
+		this.already_voted = new_already_voted;
+	}
+	
+	public int getLikes(){
+		return this.likes;
+	}
+	
+	public void setLikes(int new_likes){
+		this.likes = new_likes;
+	}
+	
+	public int getDislikes(){
+		return this.dislikes;
+	}
+	
+	public void setDislikes(int new_dislikes){
+		this.dislikes = new_dislikes;
 	}
 	
 }

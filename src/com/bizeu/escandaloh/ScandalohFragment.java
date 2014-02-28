@@ -85,6 +85,10 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String AVATAR = "avatar";
     private static final String COMMENTS = "comments";
     private static final String SOCIAL_NETWORK = "social_network";
+    private static final String ALREADY_VOTED = "already_voted";
+    private static final String LIKE = "like";
+    private static final String DISLIKE = "dislike";
+    private static final String RESOURCE_URI ="resource_uri";
  
     private TextView num_com ;
 	private LinearLayout ll_comments;
@@ -102,6 +106,7 @@ public class ScandalohFragment extends SherlockFragment {
     private boolean has_audio;
     private String user_name;
     private String date;
+    private String resource_uri;
     private String avatar;
     private Bitmap bitma;
 	private boolean any_error;
@@ -113,6 +118,9 @@ public class ScandalohFragment extends SherlockFragment {
 	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
 	private SharedPreferences prefs;
 	private boolean autoplay;
+	private int already_voted;  // 0: nada       1: like            2: dislike
+	private int likes;
+	private int dislikes;
 
     
     /**
@@ -134,10 +142,14 @@ public class ScandalohFragment extends SherlockFragment {
         bundle.putBoolean(HAS_AUDIO, escan.hasAudio());
         bundle.putString(USER_NAME, escan.getUser());
         bundle.putString(DATE, escan.getDate());
+        bundle.putString(RESOURCE_URI, escan.getResourceUri());
         bundle.putString(URI_AUDIO, escan.getUriAudio());
         bundle.putString(AVATAR, escan.getAvatar());
         bundle.putParcelableArrayList(COMMENTS, escan.getComments());
         bundle.putString(SOCIAL_NETWORK, escan.getSocialNetwork());
+        bundle.putInt(ALREADY_VOTED, escan.getAlreadyVoted());
+        bundle.putInt(LIKE, escan.getLikes());
+        bundle.putInt(DISLIKE, escan.getDislikes());
 
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
@@ -164,10 +176,16 @@ public class ScandalohFragment extends SherlockFragment {
         this.has_audio = (getArguments() != null) ? getArguments().getBoolean(HAS_AUDIO) : null;
         this.user_name = (getArguments() != null) ? getArguments().getString(USER_NAME) : null;
         this.date = (getArguments() != null) ? getArguments().getString(DATE) : null;
+        this.resource_uri = (getArguments() != null) ? getArguments().getString(RESOURCE_URI) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
         this.avatar = (getArguments() != null) ? getArguments().getString(AVATAR) : null;
         this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
         this.social_network = (getArguments() != null) ? getArguments().getString(SOCIAL_NETWORK) : null;
+        this.already_voted = (getArguments() != null) ? getArguments().getInt(ALREADY_VOTED) : 0;
+        this.likes = (getArguments() != null) ? getArguments().getInt(LIKE) : 0;
+        this.dislikes = (getArguments() != null) ? getArguments().getInt(DISLIKE) : 0;
+        
+        
         
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
@@ -320,7 +338,7 @@ public class ScandalohFragment extends SherlockFragment {
 				}
 			}
 		});
-		
+	
         // SOCIAL NETWORK 
         ImageView user_type = (ImageView) rootView.findViewById(R.id.img_escandalo_tipo_usuario);
         // Scandaloh
@@ -335,7 +353,116 @@ public class ScandalohFragment extends SherlockFragment {
         // AVATAR
         FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
         emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
-                
+                      
+        // LIKES
+        final ImageView iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
+        final ImageView iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
+        final TextView tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
+        final TextView tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
+        tLikes.setText(Integer.toString(likes));
+        tDislikes.setText(Integer.toString(dislikes));
+        
+        // Si está logueado
+        if (MyApplication.logged_user){
+        	// Mostramos si ya había marcado likes/dislikes anteriormente
+            if (already_voted != 0){ // Si ya ha votado
+            	if (already_voted == 1){ // Ha hecho like
+            		iLike.setImageResource(R.drawable.like_rosa);
+            	}
+            	else if (already_voted == 2){ // Ha hecho dislike
+            		iDislike.setImageResource(R.drawable.dislike_rosa);
+            	}
+            }
+            
+            iLike.setOnClickListener(new View.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v) {
+            		int old_likes = Integer.parseInt(tLikes.getText().toString());  
+            		int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+            		
+            		new SendLikeDislikeTask(LIKE).execute();
+    				
+    				// Había puesto like: quitamos like
+    				if (already_voted == 1){
+    					// Indicamos que no hay likes/dislikes marcados
+    					iLike.setImageResource(R.drawable.like_azul);
+    	        		already_voted = 0;
+    	        		// Decrementamos el nº de likes
+    	        		tLikes.setText(Integer.toString(old_likes-1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(0, old_likes-1, old_dislikes);
+    				}
+    				// Habia puesto dislike: quitamos dislike y marcamos like
+    				else if (already_voted == 2){
+    					// Indicamos que está marcado like
+    					iDislike.setImageResource(R.drawable.dislike_azul);
+    					iLike.setImageResource(R.drawable.like_rosa);
+    	        		already_voted = 1;
+    	        		// Incrementamos like y decrementamos dislike
+    	        		tLikes.setText(Integer.toString(old_likes+1));
+    	        		tDislikes.setText(Integer.toString(old_dislikes-1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes-1);
+    				}
+    				// No había puesto nada: marcamos like
+    				else{
+    					// Indicamos que está marcado like
+    					iLike.setImageResource(R.drawable.like_rosa);
+    	        		already_voted = 1;
+    	        		// Incrementamos like
+    	        		tLikes.setText(Integer.toString(old_likes+1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes);
+    				}			
+    			}
+    		});
+
+            iDislike.setOnClickListener(new View.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v) {
+            		int old_likes = Integer.parseInt(tLikes.getText().toString());  
+            		int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+            		
+            		new SendLikeDislikeTask(DISLIKE).execute();
+            		
+    				// Había puesto dislike: quitamos dislike
+    				if (already_voted == 2){
+    					// Indicamos que está marcado dislike
+    					iDislike.setImageResource(R.drawable.dislike_azul);
+    	        		already_voted = 0;
+    	        		// Decrementamos dislike
+    	        		tDislikes.setText(Integer.toString(old_dislikes-1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(0, old_likes, old_dislikes-1);
+    				}
+    				// Había puesto like: quitamos like y ponemos dislike
+    				else if (already_voted == 1){
+    					// Indicamos que está marcado dislike
+    					iLike.setImageResource(R.drawable.like_azul);
+    					iDislike.setImageResource(R.drawable.dislike_rosa);
+    	        		already_voted = 2;
+    	        		// Decrementamos nº likes e incrementamos nº dislikes
+    	        		tLikes.setText(Integer.toString(old_likes-1));
+    	        		tDislikes.setText(Integer.toString(old_dislikes+1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(2, old_likes-1, old_dislikes+1);
+    				}
+    				// No había puesto nada: marcamos dislike
+    				else{
+    					// Indicamos que está marcado dislike
+    					iDislike.setImageResource(R.drawable.dislike_rosa);
+    	        		already_voted = 2;
+    	        		// Incrementamos nº dislikes
+    	        		tDislikes.setText(Integer.toString(old_dislikes+1));
+    	        		// Actualizamos el fragmento
+    	        		((MainActivity) getActivity()).updateLikesDislikes(2, old_likes, old_dislikes+1);
+    				}			
+    			}
+    		});
+        }
+             
         // COMPARTIR 
         ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
         share.setOnClickListener(new View.OnClickListener() {
@@ -775,6 +902,57 @@ public class ScandalohFragment extends SherlockFragment {
         final float scale = getResources().getDisplayMetrics().density;
         return (int) (input * scale + 0.5f);
  	}
+ 	
+ 	
+ 	
+ 	
+ 	/**
+	 * Envía un like o dislike al servidor a partir de un usuario y una foto
+	 *
+	 */
+	private class SendLikeDislikeTask extends AsyncTask<Void,Integer,Void> {
+		
+		private String like_dislike ;
+		
+		public SendLikeDislikeTask(String like_dislike){
+			this.like_dislike = like_dislike;
+		}
+		
+		
+		@Override
+	    protected Void doInBackground(Void... params) {
+	 
+	    	HttpEntity resEntity;
+	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photovote/";
+	
+	        try{
+	             HttpClient client = new DefaultHttpClient();
+	             HttpPost post = new HttpPost(urlString);
+	             post.setHeader("Content-Type", "application/json");
+
+	             JSONObject dato = new JSONObject();	                        
+	             dato.put("user", MyApplication.resource_uri);
+	             dato.put("photo", resource_uri);
+	             dato.put("vote", like_dislike);
+	             
+	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
+	             post.setEntity(entity);
+
+	             HttpResponse response = client.execute(post);
+	             resEntity = response.getEntity();
+	             final String response_str = EntityUtils.toString(resEntity);
+	                          
+	             if (resEntity != null) {
+	                 Log.i("RESPONSE",response_str);	            
+	             }
+	        }
+	        catch (Exception ex){
+	        }
+	        
+	        return null;
+	    }
+			
+	    }
  	
    
 }
