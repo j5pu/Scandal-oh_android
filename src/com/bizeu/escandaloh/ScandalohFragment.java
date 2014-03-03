@@ -46,6 +46,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -317,6 +318,10 @@ public class ScandalohFragment extends SherlockFragment {
 				return true;
 			}
 		});
+        
+        Paint mShadow = new Paint(); 
+        // radius=10, y-offset=2, color=black 
+        mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); 
 		
         
         // AUDIO    

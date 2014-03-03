@@ -76,7 +76,8 @@
                 android:gravity=""
                 android:paddingTop="4dp"
                 android:text="comentario prueba"
-                android:textColor="@color/gris_oscuro" />
+                android:textColor="@color/gris_oscuro"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -93,7 +94,8 @@
                 android:layout_gravity="right"
                 android:layout_marginTop="5dp"
                 android:paddingTop="5dp"
-                android:src="@drawable/triangulo_derecha" />
+                android:src="@drawable/triangulo_derecha"
+                android:alpha="0.85" />
         </LinearLayout>
 
         <LinearLayout

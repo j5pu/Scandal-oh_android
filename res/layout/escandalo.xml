@@ -14,10 +14,18 @@
         sothree:collapsedHeight="105dp"
         sothree:shadowHeight="4dp" >
 
-        <RelativeLayout
+       <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="79dp"
+                android:layout_toRightOf="@+id/emoticono"
+                android:background="#CCCCCC" />
+
 
             <com.applidium.shutterbug.FetchableImageView
                 android:id="@+id/img_escandalo_foto"
@@ -34,7 +42,6 @@
                 android:layout_width="55dp"
                 android:layout_height="55dp"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="5dp"
                 android:layout_marginTop="55dp"
                 android:background="@drawable/avatar_circular"
                 android:scaleType="centerInside"
@@ -96,7 +103,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="Soy un título para la vista del carrusel de ScandalOh con 75 caracteres !!!"
-                android:textColor="@color/morado"
+                android:textColor="@color/gris_oscuro"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
@@ -166,8 +173,8 @@
                 android:layout_alignBottom="@+id/img_escandalo_like"
                 android:layout_alignRight="@+id/textView3"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
                 android:layout_toRightOf="@+id/txt_escandalo_date"
+                android:gravity="center_horizontal"
                 android:paddingBottom="8dp"
                 android:text="0"
                 android:textColor="@color/blanco"
@@ -180,13 +187,12 @@
                 android:layout_alignBottom="@+id/img_escandalo_dislike"
                 android:layout_alignRight="@+id/txt_escandalo_num_likes"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
                 android:layout_toRightOf="@+id/txt_escandalo_date"
+                android:gravity="center_horizontal"
                 android:paddingBottom="8dp"
                 android:text="0"
                 android:textColor="@color/blanco"
                 android:textSize="8sp" />
-
         </RelativeLayout>
 
         <LinearLayout
