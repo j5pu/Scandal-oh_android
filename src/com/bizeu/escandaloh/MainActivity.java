@@ -488,8 +488,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			updateActionBar(false, null);
 		}
 
-		// Si está logueado ocultamos las opciones de login y registro y
-		// mostramos su nombre en el menu
+		// Si está logueado ocultamos las opciones de login y registro y mostramos su nombre en el menu
 		// Actualizamos el avatar y el nombre de usuario
 		if (MyApplication.logged_user) {
 			ll_lateral_login.setVisibility(View.GONE);
@@ -508,6 +507,27 @@ public class MainActivity extends SherlockFragmentActivity implements
 			img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
 			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado));
 			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);		
+		}
+		
+		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos
+		if (MyApplication.reset_scandals){		
+			// Abrimos llave de hay más escandalos
+			there_are_more_escandalos = true;
+			// Quitamos los escándalos actuales
+			escandalos.clear();
+			pager.setCurrentItem(0);
+			adapter.clearFragments();
+			adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+			pager.setAdapter(adapter);
+			// Obtenemos los 10 primeros escándalos para la categoría seleccionada
+			// Mostramos el progressBar y ocultamos la lista de escandalos
+			loading.setVisibility(View.VISIBLE);
+			pager.setVisibility(View.GONE);
+			getEscandalosAsync = new GetEscandalos();
+			getEscandalosAsync.execute();
+			
+			// Cerramos llave
+			MyApplication.reset_scandals = false;
 		}
 
 		// Abrimos la llave para el caso de error del timeout al obtener fotos
@@ -1736,8 +1756,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,
 			long id) {
 
-		// Si ha seleccionado una categoria diferente de la que se encuentra
-		// actualmente
+		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
 		if ((pos == 0 && category.equals(ANGRY))|| (pos == 1 && category.equals(HAPPY))) {
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)) {
@@ -1778,8 +1797,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				adapter = new ScandalohFragmentPagerAdapter(
 						getSupportFragmentManager());
 				pager.setAdapter(adapter);
-				// Obtenemos los 10 primeros escándalos para la categoría
-				// seleccionada
+				// Obtenemos los 10 primeros escándalos para la categoría seleccionada
 				// Mostramos el progressBar y ocultamos la lista de escandalos
 				loading.setVisibility(View.VISIBLE);
 				pager.setVisibility(View.GONE);

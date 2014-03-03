@@ -102,6 +102,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				        	MyApplication.avatar = null;
 							MyApplication.logged_user = false;
 							
+							// Reiniciamos los escándalos
+							MyApplication.reset_scandals = true;
+							
 							// Cerramos la pantalla
 							finish();
 						}

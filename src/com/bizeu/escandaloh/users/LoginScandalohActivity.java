@@ -325,6 +325,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 			        	MyApplication.logged_user = true;
 			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
 			        	
+			        	// Debemos reiniciar los escándalos
+			        	MyApplication.reset_scandals = true;
+			        	
 			        	// Le indicamos a la anterior actividad que ha habido éxito en el log in
 			        	setResult(Activity.RESULT_OK);
 			        	finish();

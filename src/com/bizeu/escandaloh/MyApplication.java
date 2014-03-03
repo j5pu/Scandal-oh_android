@@ -32,6 +32,7 @@ public class MyApplication extends Application {
 	public static boolean FIRST_TIME_BOTH = true;
 	public static boolean TIMEOUT_PHOTO_SHOWN = false;
 	public static boolean PHOTO_CLICKED = false;
+	public static boolean reset_scandals = false;
 	public static int ACTION_BAR_WITH_TABS_HEIGHT;
 	public static ArrayList<String> FILES_TO_DELETE = new ArrayList<String>();
 	

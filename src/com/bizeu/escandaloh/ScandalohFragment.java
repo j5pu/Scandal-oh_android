@@ -373,95 +373,110 @@ public class ScandalohFragment extends SherlockFragment {
             		iDislike.setImageResource(R.drawable.dislike_rosa);
             	}
             }
-            
-            iLike.setOnClickListener(new View.OnClickListener() {
-    			
-    			@Override
-    			public void onClick(View v) {
-            		int old_likes = Integer.parseInt(tLikes.getText().toString());  
-            		int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
-            		
-            		new SendLikeDislikeTask(LIKE).execute();
-    				
-    				// Había puesto like: quitamos like
-    				if (already_voted == 1){
-    					// Indicamos que no hay likes/dislikes marcados
-    					iLike.setImageResource(R.drawable.like_azul);
-    	        		already_voted = 0;
-    	        		// Decrementamos el nº de likes
-    	        		tLikes.setText(Integer.toString(old_likes-1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(0, old_likes-1, old_dislikes);
-    				}
-    				// Habia puesto dislike: quitamos dislike y marcamos like
-    				else if (already_voted == 2){
-    					// Indicamos que está marcado like
-    					iDislike.setImageResource(R.drawable.dislike_azul);
-    					iLike.setImageResource(R.drawable.like_rosa);
-    	        		already_voted = 1;
-    	        		// Incrementamos like y decrementamos dislike
-    	        		tLikes.setText(Integer.toString(old_likes+1));
-    	        		tDislikes.setText(Integer.toString(old_dislikes-1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes-1);
-    				}
-    				// No había puesto nada: marcamos like
-    				else{
-    					// Indicamos que está marcado like
-    					iLike.setImageResource(R.drawable.like_rosa);
-    	        		already_voted = 1;
-    	        		// Incrementamos like
-    	        		tLikes.setText(Integer.toString(old_likes+1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes);
-    				}			
-    			}
-    		});
-
-            iDislike.setOnClickListener(new View.OnClickListener() {
-    			
-    			@Override
-    			public void onClick(View v) {
-            		int old_likes = Integer.parseInt(tLikes.getText().toString());  
-            		int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
-            		
-            		new SendLikeDislikeTask(DISLIKE).execute();
-            		
-    				// Había puesto dislike: quitamos dislike
-    				if (already_voted == 2){
-    					// Indicamos que está marcado dislike
-    					iDislike.setImageResource(R.drawable.dislike_azul);
-    	        		already_voted = 0;
-    	        		// Decrementamos dislike
-    	        		tDislikes.setText(Integer.toString(old_dislikes-1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(0, old_likes, old_dislikes-1);
-    				}
-    				// Había puesto like: quitamos like y ponemos dislike
-    				else if (already_voted == 1){
-    					// Indicamos que está marcado dislike
-    					iLike.setImageResource(R.drawable.like_azul);
-    					iDislike.setImageResource(R.drawable.dislike_rosa);
-    	        		already_voted = 2;
-    	        		// Decrementamos nº likes e incrementamos nº dislikes
-    	        		tLikes.setText(Integer.toString(old_likes-1));
-    	        		tDislikes.setText(Integer.toString(old_dislikes+1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(2, old_likes-1, old_dislikes+1);
-    				}
-    				// No había puesto nada: marcamos dislike
-    				else{
-    					// Indicamos que está marcado dislike
-    					iDislike.setImageResource(R.drawable.dislike_rosa);
-    	        		already_voted = 2;
-    	        		// Incrementamos nº dislikes
-    	        		tDislikes.setText(Integer.toString(old_dislikes+1));
-    	        		// Actualizamos el fragmento
-    	        		((MainActivity) getActivity()).updateLikesDislikes(2, old_likes, old_dislikes+1);
-    				}			
-    			}
-    		});
         }
+            
+        iLike.setOnClickListener(new View.OnClickListener() {
+    			
+    		@Override
+    		public void onClick(View v) {
+    				
+    			if (MyApplication.logged_user){
+    				int old_likes = Integer.parseInt(tLikes.getText().toString());  
+                	int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+                		
+                	new SendLikeDislikeTask(LIKE).execute();
+        				
+        			// Había puesto like: quitamos like
+        			if (already_voted == 1){
+        				// Indicamos que no hay likes/dislikes marcados
+        				iLike.setImageResource(R.drawable.like_azul);
+        	        	already_voted = 0;
+        	        	// Decrementamos el nº de likes
+        	        	tLikes.setText(Integer.toString(old_likes-1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(0, old_likes-1, old_dislikes);
+        			}
+        			// Habia puesto dislike: quitamos dislike y marcamos like
+        			else if (already_voted == 2){
+        				// Indicamos que está marcado like
+        				iDislike.setImageResource(R.drawable.dislike_azul);
+        				iLike.setImageResource(R.drawable.like_rosa);
+        	        	already_voted = 1;
+        	        	// Incrementamos like y decrementamos dislike
+        	        	tLikes.setText(Integer.toString(old_likes+1));
+        	        	tDislikes.setText(Integer.toString(old_dislikes-1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes-1);
+        			}
+        			// No había puesto nada: marcamos like
+        			else{
+        				// Indicamos que está marcado like
+        				iLike.setImageResource(R.drawable.like_rosa);
+        	        	already_voted = 1;
+        	        	// Incrementamos like
+        	        	tLikes.setText(Integer.toString(old_likes+1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes);
+        			}
+    			}
+    			else{
+        			Toast toast = Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_SHORT);
+        			toast.show();
+        		}     					
+    		}
+    	});
+
+        iDislike.setOnClickListener(new View.OnClickListener() {
+    			
+    		@Override
+    		public void onClick(View v) {
+    				
+    			if (MyApplication.logged_user){
+    				int old_likes = Integer.parseInt(tLikes.getText().toString());  
+                	int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+                		
+                	new SendLikeDislikeTask(DISLIKE).execute();
+                	
+        			// Había puesto dislike: quitamos dislike
+        			if (already_voted == 2){
+        				// Indicamos que está marcado dislike
+        				iDislike.setImageResource(R.drawable.dislike_azul);
+        	        	already_voted = 0;
+        	        	// Decrementamos dislike
+        	        	tDislikes.setText(Integer.toString(old_dislikes-1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(0, old_likes, old_dislikes-1);
+        				}
+        			// Había puesto like: quitamos like y ponemos dislike
+        			else if (already_voted == 1){
+        				// Indicamos que está marcado dislike
+        				iLike.setImageResource(R.drawable.like_azul);
+        				iDislike.setImageResource(R.drawable.dislike_rosa);
+        	        	already_voted = 2;
+        	        	// Decrementamos nº likes e incrementamos nº dislikes
+        	        	tLikes.setText(Integer.toString(old_likes-1));
+        	        	tDislikes.setText(Integer.toString(old_dislikes+1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(2, old_likes-1, old_dislikes+1);
+        			}
+        			// No había puesto nada: marcamos dislike
+        			else{
+        				// Indicamos que está marcado dislike
+        				iDislike.setImageResource(R.drawable.dislike_rosa);
+        	        	already_voted = 2;
+        	        	// Incrementamos nº dislikes
+        	        	tDislikes.setText(Integer.toString(old_dislikes+1));
+        	        	// Actualizamos el fragmento
+        	        	((MainActivity) getActivity()).updateLikesDislikes(2, old_likes, old_dislikes+1);
+        			}
+    			}
+    			else{
+    					Toast toast = Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_SHORT);
+    				toast.show();
+    			}       					
+    		}
+    	});
+        
              
         // COMPARTIR 
         ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
