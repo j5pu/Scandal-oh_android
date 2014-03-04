@@ -98,6 +98,7 @@ public class ScandalohFragment extends SherlockFragment {
     private ImageView aud;
     private ProgressBar loading_audio;
 	private ImageView img_arrow;
+
     
     private String id;
     private String url;
@@ -231,6 +232,8 @@ public class ScandalohFragment extends SherlockFragment {
         layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
        // layout.setAnchorPoint(0.3f);
         
+        final LinearLayout edit_falso_write_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_falso_edit_comentario);
+        
         layout.setPanelSlideListener(new PanelSlideListener() {
         	
             @Override
@@ -244,6 +247,8 @@ public class ScandalohFragment extends SherlockFragment {
                 ((MainActivity) getActivity()).updateActionBar(true, id);
                 // Cambiamos la flecha hacia abajo
                 changeArrowDirection(false);
+                // Ocultamos el falso edit
+                edit_falso_write_comment.setVisibility(View.GONE);
             }
 
             @Override
@@ -252,6 +257,8 @@ public class ScandalohFragment extends SherlockFragment {
                 ((MainActivity) getActivity()).updateActionBar(false, id);
                 // Cambiamos la flecha hacia arriba
                 changeArrowDirection(true);
+                // Mostramos el falso edit
+                edit_falso_write_comment.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -575,14 +582,15 @@ public class ScandalohFragment extends SherlockFragment {
 		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
 		if (num_comments == 0){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
-	        layout.setPanelHeight(convertToDp(30));
+	        layout.setPanelHeight(convertToDp(65));
 		}
 		else if (num_comments == 1){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentario));
-			layout.setPanelHeight(convertToDp(78));
+			layout.setPanelHeight(convertToDp(135));
 		}
 		else{
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
+			layout.setPanelHeight(convertToDp(135));
 		}
 
  		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);	
