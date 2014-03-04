@@ -95,7 +95,7 @@
                 android:layout_marginTop="5dp"
                 android:paddingTop="5dp"
                 android:src="@drawable/triangulo_derecha"
-                android:alpha="0.85" />
+                android:alpha="0.81" />
         </LinearLayout>
 
         <LinearLayout
