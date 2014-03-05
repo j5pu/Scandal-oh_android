@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.applidium.shutterbug.FetchableImageView;
+import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
@@ -45,8 +46,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -90,6 +93,10 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String LIKE = "like";
     private static final String DISLIKE = "dislike";
     private static final String RESOURCE_URI ="resource_uri";
+    private static final String FAVICON = "favicon";
+    private static final String SOURCE = "Source";
+    private static final String SOURCE_NAME = "Source_name";
+    private static final String MEDIA_TYPE = "Media_type";
  
     private TextView num_com ;
 	private LinearLayout ll_comments;
@@ -98,8 +105,7 @@ public class ScandalohFragment extends SherlockFragment {
     private ImageView aud;
     private ProgressBar loading_audio;
 	private ImageView img_arrow;
-
-    
+ 
     private String id;
     private String url;
     private String url_big;
@@ -123,6 +129,10 @@ public class ScandalohFragment extends SherlockFragment {
 	private int already_voted;  // 0: nada       1: like            2: dislike
 	private int likes;
 	private int dislikes;
+	private String favicon;
+	private int media_type;
+	private String source;
+	private String source_name;
 
     
     /**
@@ -152,6 +162,10 @@ public class ScandalohFragment extends SherlockFragment {
         bundle.putInt(ALREADY_VOTED, escan.getAlreadyVoted());
         bundle.putInt(LIKE, escan.getLikes());
         bundle.putInt(DISLIKE, escan.getDislikes());
+        bundle.putInt(MEDIA_TYPE, escan.getMediaType());
+        bundle.putString(FAVICON, escan.getFavicon());
+        bundle.putString(SOURCE, escan.getSource());
+        bundle.putString(SOURCE_NAME, escan.getSourceName());
 
         fragment.setArguments(bundle);
         fragment.setRetainInstance(true);
@@ -186,6 +200,10 @@ public class ScandalohFragment extends SherlockFragment {
         this.already_voted = (getArguments() != null) ? getArguments().getInt(ALREADY_VOTED) : 0;
         this.likes = (getArguments() != null) ? getArguments().getInt(LIKE) : 0;
         this.dislikes = (getArguments() != null) ? getArguments().getInt(DISLIKE) : 0;
+        this.media_type = (getArguments() != null) ? getArguments().getInt(MEDIA_TYPE) : 0;
+        this.favicon = (getArguments() != null) ? getArguments().getString(FAVICON) : null;
+        this.source = (getArguments() != null) ? getArguments().getString(SOURCE) : null;
+        this.source_name = (getArguments() != null) ? getArguments().getString(SOURCE_NAME) : null;
         
         
         
@@ -237,7 +255,7 @@ public class ScandalohFragment extends SherlockFragment {
         layout.setPanelSlideListener(new PanelSlideListener() {
         	
             @Override
-            public void onPanelSlide(View panel, float slideOffset) {
+            public void onPanelSlide(View panel, float slideOffset) { 
                 //Log.i("WE", "onPanelSlide, offset " + slideOffset);
             }
 
@@ -273,62 +291,111 @@ public class ScandalohFragment extends SherlockFragment {
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setImage(this.url, R.drawable.cargando);  
      
-        img.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
-				if (!MyApplication.PHOTO_CLICKED){
-					MyApplication.PHOTO_CLICKED = true;
-					
-					// Paramos si hubiera algún audio reproduciéndose
-					Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-					
-					// Mostramos la pantalla de la foto en detalle
-					Intent i = new Intent(getActivity(), DetailPhotoActivity.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					ImageView imView = (ImageView) v;
-					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
-					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
-					i.putExtra("bytes", bytes);
-					i.putExtra("uri_audio", uri_audio);				
-					getActivity().startActivity(i);				
-				}	
-			}
-		});
-        
-        
-        img.setOnLongClickListener(new View.OnLongClickListener() {
-        	
-			@Override
-			public boolean onLongClick(View v) {			
-				
-				// Paramos si hubiera algún audio reproduciéndose
-				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-				
-				// Mostramos la opción de guardar la foto en la galería
-				final CharSequence[] items = {getResources().getString(R.string.guardar_foto_galeria)};
-				 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			        builder.setItems(items, new DialogInterface.OnClickListener() {
-			            @Override
-			            public void onClick(DialogInterface dialog, int item) {
-			            	
-			            	// Guardamos en galería
-			                if (items[item].equals(R.string.guardar_foto_galeria)) {
-			                	new SaveImageTask(getActivity()).execute(url_big);     			   
-			                } 			                
-			            }
-			        });
-			        builder.show();
-			        
-				return true;
-			}
-		});
+
         
         Paint mShadow = new Paint(); 
         // radius=10, y-offset=2, color=black 
         mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); 
+        
+        
+        // NOTICIA 
+        final FetchableImageView img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
+    	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
+    	
+    	// No es noticia
+        if (media_type == 0){ 
+        	txt_fuente.setVisibility(View.INVISIBLE);
+        	
+        	// Listeners del escándalo
+            img.setOnClickListener(new View.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v) {
+    				
+    				// Evitamos que se pulse dos o más veces en las fotos (para que no se abra más de una vez)
+    				if (!MyApplication.PHOTO_CLICKED){
+    					MyApplication.PHOTO_CLICKED = true;
+    					
+    					// Paramos si hubiera algún audio reproduciéndose
+    					Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+    					
+    					// Mostramos la pantalla de la foto en detalle
+    					Intent i = new Intent(getActivity(), DetailPhotoActivity.class);
+    					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    					ImageView imView = (ImageView) v;
+    					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
+    					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
+    					i.putExtra("bytes", bytes);
+    					i.putExtra("uri_audio", uri_audio);				
+    					getActivity().startActivity(i);				
+    				}	
+    			}
+    		});
+            
+            
+            img.setOnLongClickListener(new View.OnLongClickListener() {
+            	
+    			@Override
+    			public boolean onLongClick(View v) {			
+    				
+    				// Paramos si hubiera algún audio reproduciéndose
+    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+    				
+    				// Mostramos la opción de guardar la foto en la galería
+    				final CharSequence[] items = {getResources().getString(R.string.guardar_foto_galeria)};
+    				 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    			        builder.setItems(items, new DialogInterface.OnClickListener() {
+    			            @Override
+    			            public void onClick(DialogInterface dialog, int item) {
+    			            	
+    			            	// Guardamos en galería
+    			                if (items[item].equals(R.string.guardar_foto_galeria)) {
+    			                	new SaveImageTask(getActivity()).execute(url_big);     			   
+    			                } 			                
+    			            }
+    			        });
+    			        builder.show();
+    			        
+    				return true;
+    			}
+    		});
+        }
+        
+        // Si es noticia
+        else{ 
+        	// Fuente
+        	txt_fuente.setText(source_name);
+        	// Favicon
+        	img_favicon.setImage(favicon);
+        	if (img_favicon.getDrawable() != null){
+        		img_favicon.setVisibility(View.VISIBLE);
+        	}
+        	img_favicon.setListener(new FetchableImageViewListener() {
+				
+				@Override
+				public void onImageFetched(Bitmap bitmap, String url) {
+					img_favicon.setVisibility(View.VISIBLE);
+					
+				}
+				
+				@Override
+				public void onImageFailure(String url) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+        	
+        	img.setOnClickListener(new View.OnClickListener() {
+				
+        		@Override
+				public void onClick(View v) {
+					Log.v("We","Favicon: " + favicon);
+					// Cargamos la noticia en el navegador
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(source));
+					startActivity(browserIntent);		
+				}
+			});
+        }
 		
         
         // AUDIO    
@@ -563,14 +630,12 @@ public class ScandalohFragment extends SherlockFragment {
         // TÍTULO
         TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
+        //tit.setText(Utils.limitaCaracteres(title,75));
+        Log.v("WE","num lineas: " + tit.getLineCount());
        
         // NOMBRE DE USUARIO
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
-        user_na.setText(Utils.limitaCaracteres(user_name));
-        
-        // FECHA
-        TextView dat = (TextView) rootView.findViewById(R.id.txt_escandalo_date);
-        dat.setText(changeFormatDate(date)); 
+        user_na.setText(Utils.limitaCaracteres(user_name, 25));
         
 		// COMENTARIOS
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);

@@ -1052,7 +1052,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
 					final int likes = Integer.parseInt(escanObject.getString("likes"));
 					final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
-
+					final int media_type = Integer.parseInt(escanObject.getString("media_type"));
+					final String favicon = escanObject.getString("favicon");
+					final String source = escanObject.getString("source");
+					final String source_name = escanObject.getString("source_name");
+								
 					// Obtenemos los comentarios
 					final String comments = escanObject.getString("comments");
 					JSONArray commentsArray = new JSONArray(comments);
@@ -1087,13 +1091,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 								Scandaloh escanAux = new Scandaloh(id, title,
 										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
 										Integer.parseInt(comments_count),resource_uri,
-										"http://scandaloh.s3.amazonaws.com/"+ img_p,
-										"http://scandaloh.s3.amazonaws.com/"+ img, sound, username, date,
+										MyApplication.DIRECCION_BUCKET + img_p,
+										MyApplication.DIRECCION_BUCKET + img, sound, username, date,
 										avatar, array_comments, social_network,
-										already_voted, likes, dislikes);
+										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
 								escandalos.add(escanAux);
-								adapter.addFragment(ScandalohFragment
-										.newInstance(escandalos.get(escandalos
+								adapter.addFragment(ScandalohFragment.newInstance(escandalos.get(escandalos
 												.size() - 1)));
 								adapter.notifyDataSetChanged();
 							}
@@ -1540,7 +1543,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 								e.getRouteImg(), e.getRouteImgBig(),
 								e.getUriAudio(), e.getUser(), e.getDate(),
 								e.getAvatar(), array_comments, e.getSocialNetwork(),
-								e.getAlreadyVoted(), e.getLikes(), e.getDislikes());
+								e.getAlreadyVoted(), e.getLikes(), e.getDislikes(), e.getMediaType(),
+								e.getFavicon(), e.getSource(), e.getSourceName());
 						escandalos.set(pager.getCurrentItem(), escanAux);
 						adapter.setFragment(pager.getCurrentItem(),
 								ScandalohFragment.newInstance(escanAux));

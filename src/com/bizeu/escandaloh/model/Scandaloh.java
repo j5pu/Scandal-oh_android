@@ -29,6 +29,12 @@ public class Scandaloh {
 	private int already_voted;
 	private int likes;
 	private int dislikes;
+	// Noticias
+	private int media_type; // 0:escándalo   1:noticia
+	private String favicon;
+	private String source;
+	private String source_name;
+	
 
 	
 	
@@ -48,7 +54,8 @@ public class Scandaloh {
 	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
 						String user, String date, String avatar, ArrayList<Comment> comments, String social_network,
-						int already_voted, int likes, int dislikes){
+						int already_voted, int likes, int dislikes, int media_type, String favicon, String source, 
+						String source_name){
 		this.id = id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
@@ -73,6 +80,10 @@ public class Scandaloh {
 		this.already_voted = already_voted;
 		this.likes = likes;
 		this.dislikes = dislikes;
+		this.media_type = media_type;
+		this.favicon = favicon;
+		this.source = source;
+		this.source_name = source_name;
 	}
 	
 	public void setId(String id){
@@ -225,6 +236,38 @@ public class Scandaloh {
 	
 	public void setDislikes(int new_dislikes){
 		this.dislikes = new_dislikes;
+	}
+	
+	public int getMediaType(){
+		return this.media_type;
+	}
+	
+	public void setMediaType(int new_media_type){
+		this.media_type = new_media_type;
+	}
+	
+	public String getFavicon(){
+		return this.favicon;
+	}
+	
+	public void setFavicon(String new_favicon){
+		this.favicon = new_favicon;
+	}
+	
+	public String getSource(){
+		return this.source;
+	}
+	
+	public void setSource(String new_source){
+		this.source = new_source;
+	}
+	
+	public String getSourceName(){
+		return this.source_name;
+	}
+	
+	public void setSourceName(String new_source_name){
+		this.source_name = new_source_name;
 	}
 	
 }

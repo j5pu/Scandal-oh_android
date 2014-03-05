@@ -21,7 +21,7 @@
             android:src="@drawable/icono_app" />
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/txt_escandalo_num_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="alejandro.leonrodriguez.7"
@@ -44,7 +44,7 @@
             android:paddingBottom="2dp" >
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/img_escandalo_like"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/campana" />
@@ -68,13 +68,13 @@
             android:paddingBottom="2dp" >
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/img_escandalo_dislike"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/mundo" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/img_escandalo_fuente"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="País"
@@ -92,7 +92,7 @@
             android:paddingBottom="2dp" >
 
             <ImageView
-                android:id="@+id/imageView4"
+                android:id="@+id/img_escandalo_compartir"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:src="@drawable/ajustes" />
