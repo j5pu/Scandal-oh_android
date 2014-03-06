@@ -290,8 +290,6 @@ public class ScandalohFragment extends SherlockFragment {
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setImage(this.url, R.drawable.cargando);  
-     
-
         
         Paint mShadow = new Paint(); 
         // radius=10, y-offset=2, color=black 
@@ -630,8 +628,6 @@ public class ScandalohFragment extends SherlockFragment {
         // TÍTULO
         TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
-        //tit.setText(Utils.limitaCaracteres(title,75));
-        Log.v("WE","num lineas: " + tit.getLineCount());
        
         // NOMBRE DE USUARIO
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
@@ -1022,6 +1018,7 @@ public class ScandalohFragment extends SherlockFragment {
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
 	             post.setHeader("Content-Type", "application/json");
+	             post.setHeader("Session-Token", MyApplication.session_token);
 
 	             JSONObject dato = new JSONObject();	                        
 	             dato.put("user", MyApplication.resource_uri);

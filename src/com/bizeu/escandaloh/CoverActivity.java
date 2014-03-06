@@ -57,10 +57,12 @@ public class CoverActivity extends Activity {
 		MyApplication.avatar = prefs.getString(MyApplication.AVATAR, null);
 		
 		// Obtenemos si el usuario estaba logueado
-		String user_uri = prefs.getString(MyApplication.USER_URI, null); 
-		if (user_uri != null){
+		String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
+		//String user_uri = prefs.getString(MyApplication.USER_URI, null); 
+		if (session_token != null){
 			MyApplication.logged_user = true;
-			MyApplication.resource_uri = user_uri;
+			MyApplication.session_token = session_token;
+			//MyApplication.resource_uri = user_uri;
 			MyApplication.user_name = prefs.getString(MyApplication.USER_NAME,  null);
 		}
 		else{

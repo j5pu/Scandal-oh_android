@@ -1,5 +1,8 @@
 package com.bizeu.escandaloh.util;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 public class Utils {
 	
 	/**
@@ -19,5 +22,12 @@ public class Utils {
 
 		return acortado;
 	}
+	
+	
+	
+    public static int dpToPx(int dp, Context context){
+        context.getResources();
+		return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
 
 }

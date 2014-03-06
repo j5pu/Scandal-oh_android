@@ -380,6 +380,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		private String avatar;
 		private int social_network;
+		private String session_token;
 
 		@Override
 		protected void onPreExecute() {
@@ -439,8 +440,9 @@ public class LoginSelectActivity extends SherlockActivity {
 
 					// Si es OK obtenemos el user_uri
 					if (status.equals("ok")) {
-						user_uri = respJSON.getString("user_uri");
+						//user_uri = respJSON.getString("user_uri");
 						avatar = respJSON.getString("avatar");
+						session_token = respJSON.getString("session_token");
 						login_error = false;
 					} else {
 						login_error = true;
@@ -477,14 +479,13 @@ public class LoginSelectActivity extends SherlockActivity {
 				// Logueamos al usuario en la aplicación
 				SharedPreferences prefs = mContext.getSharedPreferences(
 						"com.bizeu.escandaloh", Context.MODE_PRIVATE);
-				// Guardamos el uri, nombre de usuario y avatar
-				prefs.edit().putString(MyApplication.USER_URI, user_uri)
-						.commit();
-				prefs.edit().putString(MyApplication.USER_NAME, username)
-						.commit();
+				// Guardamos el session_token, nombre de usuario y avatar
+				prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token).commit();
+				prefs.edit().putString(MyApplication.USER_NAME, username).commit();
 				prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
 				MyApplication.user_name = username;
-				MyApplication.resource_uri = user_uri;
+				MyApplication.session_token = session_token;
+				//MyApplication.resource_uri = user_uri;
 				Log.v("WE", "Avatar de facebook: " + avatar);
 				MyApplication.avatar = avatar;
 				MyApplication.logged_user = true;

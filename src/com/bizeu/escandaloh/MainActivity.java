@@ -259,8 +259,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		img_lateral_avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// Creamos un popup para elegir entre hacer foto con la cámara o
-				// cogerla de la galería
+				// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
 				final CharSequence[] items = {
 						getResources()
 								.getString(R.string.hacer_foto_con_camara),
@@ -899,6 +898,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Usamos un servicio u otro dependiendo si es el primer listado
 				// de escándalos o ya posteriores
 				if (escandalos.size() == 0) {
+					url = MyApplication.SERVER_ADDRESS
+							+ "/api/v1/photo/?limit=10&category__id=1&country="+ MyApplication.code_selected_country;
+					/*
 					// Si el usuario está logueado lo enviamos para obtener sus likes/dislikes
 					if (MyApplication.logged_user){
 						url = MyApplication.SERVER_ADDRESS
@@ -910,8 +912,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 								+ "/api/v1/photo/?limit=10&category__id=1&country="
 								+ MyApplication.code_selected_country;
 					}
+					*/
 
 				} else {
+					url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
+							+ escandalos.get(escandalos.size() - 1).getId()
+							+ "/" + MyApplication.code_selected_country
+							+ "/previous/?category__id=1";
+					/*
 					if (MyApplication.logged_user){
 						url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
 								+ escandalos.get(escandalos.size() - 1).getId()
@@ -924,6 +932,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								+ "/" + MyApplication.code_selected_country
 								+ "/previous/?category__id=1";
 					}
+					*/
 				}
 			}
 
@@ -968,6 +977,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 				HttpClient httpClient = new DefaultHttpClient();
 				HttpGet getEscandalos = new HttpGet(url);
 				getEscandalos.setHeader("content-type", "application/json");
+				// Si es con usuario le añadimos el session_token
+				if (MyApplication.logged_user){
+					getEscandalos.setHeader("Session-Token", MyApplication.session_token);
+				}
+
 
 				// Hacemos la petición al servidor
 				response = httpClient.execute(getEscandalos);
@@ -1356,6 +1370,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				HttpClient client = new DefaultHttpClient();
 				HttpPost post = new HttpPost(urlString);
 				post.setHeader("Content-Type", "application/json");
+				post.setHeader("Session-Token", MyApplication.session_token);
 
 				JSONObject dato = new JSONObject();
 
@@ -1664,6 +1679,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			try {
 				HttpClient client = new DefaultHttpClient();
 				HttpPut put = new HttpPut(urlString);
+				put.setHeader("Session-Token", MyApplication.session_token);
 				MultipartEntity reqEntity = new MultipartEntity();
 				
 				// Creamos un file a partir del bitmap
@@ -1900,7 +1916,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void refreshFinished() {
 		// Cambiamos el loading del menu por el botón de actualizar
 		progress_refresh.setVisibility(View.GONE);
-		img_update_list.setVisibility(View.VISIBLE);
+		img_update_list.setVisibility(View.VISIBLE); 
 	}
 
 	/**

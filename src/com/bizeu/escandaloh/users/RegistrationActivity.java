@@ -191,6 +191,8 @@ public class RegistrationActivity extends SherlockActivity {
 	 */
 	private class SignInUser extends AsyncTask<Void,Integer,Void> {
 		 	
+		private String session_token;
+		
 		@Override
 		protected void onPreExecute(){
 			has_name_error = false;
@@ -249,7 +251,8 @@ public class RegistrationActivity extends SherlockActivity {
 	                 
 	                 // Si es OK obtenemos el user_uri
 	                 if (status.equals("ok")){
-	                	 user_uri = respJSON.getString("resource_uri");
+	                	 //user_uri = respJSON.getString("resource_uri");
+	                	 session_token = respJSON.getString("sessoin_token");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
@@ -319,10 +322,13 @@ public class RegistrationActivity extends SherlockActivity {
 				if (!has_name_error && !has_password_error && !has_email_error){
 					SharedPreferences prefs = getBaseContext().getSharedPreferences(
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-		        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+					// Guardamos el session_token y el nombre de usuario
+		        	//prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
+					prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token);
+		        	MyApplication.session_token = session_token;
+		        	MyApplication.logged_user = true;
 		        	prefs.edit().putString(MyApplication.USER_NAME, edit_nombre_usuario.getText().toString()).commit();
 		        	MyApplication.user_name = edit_nombre_usuario.getText().toString();
-		        	MyApplication.logged_user = true;
 		        	Toast.makeText(getBaseContext(), R.string.usuario_registrado_correctamente, Toast.LENGTH_SHORT).show();
 		        	
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro

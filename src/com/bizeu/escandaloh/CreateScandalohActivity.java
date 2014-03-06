@@ -272,7 +272,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			// Mostramos el ProgressDialog
+			// Mostramos el ProgressDialog-
 			progress.show();
 			any_error = false;
 		}
@@ -296,6 +296,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 			try {
 				HttpClient client = new DefaultHttpClient();
 				HttpPost post = new HttpPost(urlString);
+				post.setHeader("Session-Token", MyApplication.session_token);
 
 				// Obtenemos los datos y comprimimos en Multipart para su envío
 				written_title = edit_title.getText().toString();

@@ -180,6 +180,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 		 
 		private String avatar;
 		private String username;
+		private String session_token;
 		
 		@Override
 		protected void onPreExecute(){
@@ -232,9 +233,10 @@ public class LoginScandalohActivity extends SherlockActivity {
 	                 
 	                 // Si es OK obtenemos el user_uri
 	                 if (status.equals("ok")){
-	                	 user_uri = respJSON.getString("user_uri");
+	                	// user_uri = respJSON.getString("user_uri");
 	                	 avatar = respJSON.getString("avatar");
 	                	 username = respJSON.getString("username");
+	                	 session_token = respJSON.getString("session_token");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
@@ -312,9 +314,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 					if (!has_name_error && !has_password_error){
 						SharedPreferences prefs = getBaseContext().getSharedPreferences(
 			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-						// Guardamos su id
-			        	prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-			        	MyApplication.resource_uri = user_uri;
+						// Guardamos el session_token
+			        	prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token).commit();
+			        	MyApplication.session_token = session_token;
 			        	// Guardamos el nombre de usuario
 			        	prefs.edit().putString(MyApplication.USER_NAME, username).commit();
 			        	MyApplication.user_name = username ;
