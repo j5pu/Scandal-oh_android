@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ScandalOh!</string>
+    <string name="app_name">ScandalOh</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="mexico">Mejico</string>
@@ -62,16 +62,16 @@
     <string name="introduce_el_email_con_el">Enter the e-mail address associated with your account:</string>
     <string name="enviar">Send</string>
     <string name="cancelar">Cancel</string>
-    <string name="subiendo_scandaloh">Uploading scandalOh!...</string>
+    <string name="subiendo_scandaloh">Uploading scandal...</string>
     <string name="espera_por_favor">Please, wait</string>
     <string name="debes_introducir_primero">Please, enter a title</string>
     <string name="quieres_aniadir_un_audio">¿Wish to add an audio file?</string>
     <string name="si">Yes</string>
     <string name="no">No</string>
     <string name="no_dispones_de_conexion">You are not connected to the internet</string>
-    <string name="no_se_pudo_enviar_el_scandaloh">Not possible to send your scandalOh!</string>
-    <string name="scandaloh_enviado_con_exito">scandalOh! enviado con éxito</string>
-    <string name="error_enviando_el_scandaloh">Not possible to send your scandalOh!</string>
+    <string name="no_se_pudo_enviar_el_scandaloh">Not possible to send your scandal</string>
+    <string name="scandaloh_enviado_con_exito">success!</string>
+    <string name="error_enviando_el_scandaloh">Not possible to send your scandal</string>
     <string name="enviando_comentario">Uploading comment ...</string>
     <string name="lo_sentimos_hubo">Unexpected error</string>
     <string name="hubo_algun_error_enviando_comentario">Upload error</string>
@@ -99,8 +99,8 @@
     <string name="hubo_algun_error_peticion">Error request</string>
     <string name="guardar_foto_galeria">Download photo</string>
     <string name="preparando_para_compartir">Preparing to share ...</string>
-    <string name="deberias_ver_esto_que">¡What a ScandalOh! You should better watch this</string>
-    <string name="compartir_scandaloh_con">Share scandalOh! with...</string>
+    <string name="deberias_ver_esto_que">¡What a scandal! You should better watch this</string>
+    <string name="compartir_scandaloh_con">Share scandal with...</string>
     <string name="guardando_dospuntos">Saving ...</string>
     <string name="reportando_scandaloh">Reporting scandadalOh! ...</string>
     <string name="report_enviado_correctamente">Successfully reported</string>
@@ -129,7 +129,7 @@
     <string name="introduce_una_direccion_email_valida">Enter a valid e-mail address</string>
     <string name="este_campo_debe_tener_6">This field requires at least 6 characters</string>
     <string name="lo_sentimos_se_ha_producido">Unexpected error</string>
-    <string name="compartir_escandalo">Share scandalOh! to...</string>
+    <string name="compartir_escandalo">Share scandal to...</string>
     <string name="reportar_escandalo">Report picture</string>
     <string name="selecciona_opcion">Select...</string>
     <string name="material_ofensivo">Offensive Materials</string>

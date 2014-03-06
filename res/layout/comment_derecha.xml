@@ -58,7 +58,7 @@
                     android:id="@+id/txt_comment_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="1dp"
+                    android:layout_marginLeft="2dp"
                     android:text="12-02-2014"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="10sp"

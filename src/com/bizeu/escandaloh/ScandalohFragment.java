@@ -929,7 +929,7 @@ public class ScandalohFragment extends SherlockFragment {
 		@Override
 	    protected Boolean doInBackground(String... params) {
 	    	
-	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying("http://scandaloh.s3.amazonaws.com/" + params[0]);							
+	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);							
 	        return false;
 	    }	
 	}

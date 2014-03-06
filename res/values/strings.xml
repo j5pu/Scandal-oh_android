@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ScandalOh</string>
+    <string name="app_name">ScándalOh!</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="mexico">México</string>
@@ -62,16 +62,16 @@
     <string name="introduce_el_email_con_el">Introduce el email con el que te registraste para recibir una nueva contraseña:</string>
     <string name="enviar">Enviar</string>
     <string name="cancelar">Cancelar</string>
-    <string name="subiendo_scandaloh">Subiendo escándalo...</string>
+    <string name="subiendo_scandaloh">Subiendo scándalOh!...</string>
     <string name="espera_por_favor">Espera, por favor</string>
     <string name="debes_introducir_primero">Debes introducir primero un título</string>
     <string name="quieres_aniadir_un_audio">¿Quieres añadir un audio?</string>
     <string name="si">Sí</string>
     <string name="no">No</string>
     <string name="no_dispones_de_conexion">No dispones de conexión a internet</string>
-    <string name="no_se_pudo_enviar_el_scandaloh">No se pudo enviar el escándalo!</string>
-    <string name="scandaloh_enviado_con_exito">escándalo enviado con éxito</string>
-    <string name="error_enviando_el_scandaloh">Error enviando el escándalo</string>
+    <string name="no_se_pudo_enviar_el_scandaloh">No se pudo enviar el scándalOh!</string>
+    <string name="scandaloh_enviado_con_exito">scándalOh! enviado con éxito</string>
+    <string name="error_enviando_el_scandaloh">Error enviando el scándalOh!</string>
     <string name="enviando_comentario">Enviando comentario ...</string>
     <string name="lo_sentimos_hubo">Lo sentimos, hubo un error inesperado</string>
     <string name="hubo_algun_error_enviando_comentario">Hubo algún error enviando el comentario</string>
@@ -100,9 +100,9 @@
     <string name="guardar_foto_galeria">Guardar foto en la galería</string>
     <string name="preparando_para_compartir">Preparando para compartir ...</string>
     <string name="deberias_ver_esto_que">Deberías ver esto. ¡Qué escándalo!</string>
-    <string name="compartir_scandaloh_con">Compartir escándalo con...</string>
+    <string name="compartir_scandaloh_con">Compartir scándalOh! con...</string>
     <string name="guardando_dospuntos">Guardando ...</string>
-    <string name="reportando_scandaloh">Reportando escándalo ...</string>
+    <string name="reportando_scandaloh">Reportando scándalOh! ...</string>
     <string name="report_enviado_correctamente">Foto reportada correctamente</string>
     <string name="esta_opcion_no_se_podra">Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?</string>
     <string name="pais_elegido_dospuntos">País elegido: </string>
@@ -128,8 +128,8 @@
     <string name="introduce_una_direccion_email_valida">Introduce una dirección de email válida</string>
     <string name="este_campo_debe_tener_6">Este campo debe tener al menos 6 caracteres</string>
     <string name="lo_sentimos_se_ha_producido">Lo sentimos, se ha producido un error inesperado</string>
-    <string name="compartir_escandalo">Compartir escándalo</string>
-    <string name="reportar_escandalo">Reportar escándalo</string>
+    <string name="compartir_escandalo">Compartir scándalOh!</string>
+    <string name="reportar_escandalo">Reportar scándalOh!</string>
     <string name="selecciona_opcion">Selecciona opción</string>
     <string name="material_ofensivo">Material ofensivo</string>
     <string name="spam">Spam</string>
