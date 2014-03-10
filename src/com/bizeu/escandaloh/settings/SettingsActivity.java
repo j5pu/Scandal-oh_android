@@ -95,7 +95,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 						public void onClick(DialogInterface dialogo1, int id) {
 							
 							// Deslogueamos al usuario
-							prefs.edit().putString(MyApplication.USER_URI, null).commit();
+							prefs.edit().putString(MyApplication.SESSION_TOKEN, null).commit();
+							MyApplication.session_token = null;
 				        	prefs.edit().putString(MyApplication.USER_NAME, getResources().getString(R.string.invitado)).commit();
 				        	MyApplication.user_name = getResources().getString(R.string.invitado) ;
 				        	prefs.edit().putString(MyApplication.AVATAR, null).commit();

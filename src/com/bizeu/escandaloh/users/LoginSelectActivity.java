@@ -1,7 +1,6 @@
 package com.bizeu.escandaloh.users;
 
 import java.util.Arrays;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,14 +10,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -31,13 +22,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
-import com.bizeu.escandaloh.MainActivity;
+import com.bizeu.escandaloh.CoverActivity;
+import com.bizeu.escandaloh.CreateScandalohActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-import com.bizeu.escandaloh.users.LoginSocialNetworksDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Fuente;
 import com.facebook.FacebookException;
 import com.facebook.Request;
@@ -59,7 +49,6 @@ public class LoginSelectActivity extends SherlockActivity {
 	public final static int LOGGING_FACEBOOK = 101;
 	public final static int LOGGING_GOOGLE = 102;
 	public final static int LOGGING_TWITTER = 103;
-	// private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 	static String TWITTER_CONSUMER_KEY = "MJb4bXehocnroOE871Y6g";
 	static String TWITTER_CONSUMER_SECRET = "ENQygTJn0zldtPTdjVl15jXAQbuBvjsPwoP7a7bg";
 	static final String TWITTER_CALLBACK_URL = "twitter://scandaloh";
@@ -67,23 +56,17 @@ public class LoginSelectActivity extends SherlockActivity {
 	static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
 	private String TAG_FACEBOOK = "Facebook Login";
-
-	private static Twitter twitter;
-	private static RequestToken requestToken;
 	private Button but_login_scandaloh;
-	//private Button but_login_twitter;
 	private LoginButton but_login_facebook;
 	private Activity acti;
 	private Context mContext;
 	private ProgressDialog progress;
-
 	private String username;
-	private String email;
 	private String status = null;
 	private boolean login_error = false;
-	private String user_uri;
-	// private PlusClient mPlusClient;
-	// private ConnectionResult mConnectionResult;
+	private String access_token;
+	private Uri shareUri;
+	private boolean viene_de_compartir = false;
 
 	/**
 	 * onCreate
@@ -93,7 +76,13 @@ public class LoginSelectActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.login_main);
-
+		
+		// Si tiene datos, obtenemos si viene de haber compartido desde la galería
+		if (getIntent().getExtras() != null){
+			viene_de_compartir = getIntent().getExtras().getBoolean("from_sharing");	
+			shareUri = Uri.parse(getIntent().getExtras().getString("shareUri"));
+		}
+		
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_main_login));
 
@@ -110,29 +99,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		but_login_scandaloh = (Button) findViewById(R.id.but_log_in_scandaloh);
 		but_login_facebook = (LoginButton) findViewById(R.id.but_log_in_facebook);
-		//but_login_twitter = (Button) findViewById(R.id.but_log_in_twitter);
 
-		/*
-		 * // Google+ mPlusClient = new PlusClient.Builder(this, this, this)
-		 * .setActions("http://schemas.google.com/AddActivity",
-		 * "http://schemas.google.com/BuyActivity")
-		 * .setScopes(Scopes.PLUS_LOGIN) // recommended login scope for social
-		 * features // .setScopes("profile") // alternative basic login scope
-		 * .build(); // Progress bar to be displayed if the connection failure
-		 * is not resolved. mConnectionProgressDialog = new
-		 * ProgressDialog(this);
-		 * mConnectionProgressDialog.setMessage("Signing in...");
-		 */
-
-		/*
-		but_login_twitter.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				new InitiateWebViewTwitter().execute();
-			}
-		});
-		*/
 
 		but_login_facebook.setOnErrorListener(new OnErrorListener() {
 
@@ -152,12 +119,13 @@ public class LoginSelectActivity extends SherlockActivity {
 
 				if (session.isOpened()) {
 					Log.i(TAG_FACEBOOK, "Access Token" + session.getAccessToken());
+					access_token = session.getAccessToken();
 					Request.newMeRequest(session,new Request.GraphUserCallback() {
 								@Override
 								public void onCompleted(GraphUser user,Response response) {
 									if (user != null) {
+										
 										username = user.getUsername();
-										email = (String) user.asMap().get("email");
 										// Cerramos sesión facebook: sólo queremos el nombre e email
 										Session.getActiveSession().closeAndClearTokenInformation();
 										new LogInSocialNetwork().execute(LOGGING_FACEBOOK);
@@ -209,7 +177,6 @@ public class LoginSelectActivity extends SherlockActivity {
 	public void onStop() {
 		super.onStop();
 		EasyTracker.getInstance(this).activityStop(this);
-		// mPlusClient.disconnect();
 	}
 
 	/**
@@ -218,10 +185,16 @@ public class LoginSelectActivity extends SherlockActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		// Si viene de hacer log in o registro
-
 		if (requestCode == LOG_IN || requestCode == REGISTRATION) {
 			// Y lo ha hecho exitosamente
-			if (resultCode == RESULT_OK) {
+			if (resultCode == RESULT_OK){ 
+				// Si venía de compartir y ha hecho login le mandamos a la pantalla de subir escándalo
+				if (viene_de_compartir){
+					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
+					in.putExtra("photo_from", CoverActivity.FROM_SHARING);
+					in.putExtra("shareUri", shareUri.toString());
+					startActivity(in);
+				}
 				// Cerramos directamente la pantalla
 				finish();
 			}
@@ -229,10 +202,6 @@ public class LoginSelectActivity extends SherlockActivity {
 			Session.getActiveSession().onActivityResult(this, requestCode,
 					resultCode, data);
 		}
-		/*
-		 * else if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode ==
-		 * RESULT_OK) { mConnectionResult = null; mPlusClient.connect(); }
-		 */
 	}
 
 	/**
@@ -407,6 +376,7 @@ public class LoginSelectActivity extends SherlockActivity {
 					case LOGGING_FACEBOOK:
 						social_network = 1;
 						break;
+					/*
 					case LOGGING_GOOGLE:
 						social_network = 2;
 						email = "google@email.com";
@@ -415,10 +385,10 @@ public class LoginSelectActivity extends SherlockActivity {
 						social_network = 3;
 						email = "twitter@email.com";
 						break;
+					*/
 				}		
 				
-				dato.put("username", username);
-				dato.put("email", email);
+				dato.put("access_token", access_token);
 				dato.put("social_network", social_network);
 
 				// Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
@@ -485,7 +455,6 @@ public class LoginSelectActivity extends SherlockActivity {
 				prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
 				MyApplication.user_name = username;
 				MyApplication.session_token = session_token;
-				//MyApplication.resource_uri = user_uri;
 				Log.v("WE", "Avatar de facebook: " + avatar);
 				MyApplication.avatar = avatar;
 				MyApplication.logged_user = true;
@@ -494,10 +463,19 @@ public class LoginSelectActivity extends SherlockActivity {
 				
 				// Reiniciamos los escándalos
 				MyApplication.reset_scandals = true;
+				
+				// Si venía de compartir y ha hecho login le mandamos a la pantalla de subir escándalo
+				if (viene_de_compartir){
+					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
+					in.putExtra("photo_from", CoverActivity.FROM_SHARING);
+					in.putExtra("shareUri", shareUri.toString());
+					startActivity(in);
+				}
+				else{
+					// Le indicamos a la anterior actividad que ha habido éxito en el login
+					setResult(Activity.RESULT_OK);
+				}
 
-				// Le indicamos a la anterior actividad que ha habido éxito en
-				// el login
-				setResult(Activity.RESULT_OK);
 				finish();
 			}
 

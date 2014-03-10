@@ -6,16 +6,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.bizeu.escandaloh.util.Connectivity;
-import com.bizeu.escandaloh.util.Utils;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CoverActivity extends Activity {
 
+	public static int FROM_SHARING = 934;
+	
 	private SharedPreferences prefs;
+	private Uri shareUri;
 	
 	/**
 	 * OnCreate
@@ -33,9 +34,6 @@ public class CoverActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		
-		Log.v("WE","IP: " + Connectivity.getIPAddress(true));
-		Log.v("WE", "Locale: " + Locale.getDefault().getCountry()); 
 		
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
@@ -58,20 +56,46 @@ public class CoverActivity extends Activity {
 		
 		// Obtenemos si el usuario estaba logueado
 		String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
-		//String user_uri = prefs.getString(MyApplication.USER_URI, null); 
 		if (session_token != null){
 			MyApplication.logged_user = true;
 			MyApplication.session_token = session_token;
-			//MyApplication.resource_uri = user_uri;
 			MyApplication.user_name = prefs.getString(MyApplication.USER_NAME,  null);
 		}
 		else{
 			MyApplication.logged_user = false;
 		}
+		
+		// La aplicación se ha iniciado porque se ha compartido desde otra app (galería)
+		if (getIntent().getAction().equals(Intent.ACTION_SEND)){
+			Intent i = getIntent();
+			if (i.getType().equals("image/*")){
+				shareUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+
+				// Si está logueado: le mandamos a la pantalla de subir escandalo
+				if (MyApplication.logged_user){
+					Intent in = new Intent(CoverActivity.this, CreateScandalohActivity.class);
+					in.putExtra("photo_from", FROM_SHARING);
+					in.putExtra("shareUri", shareUri.toString());
+					startActivity(in);
+					finish();
+				}
 				
-		// Mostramos la pantalla del carrusel
-		Intent i = new Intent(CoverActivity.this, MainActivity.class);
-		startActivity(i);
-		finish();	
+				// No está logueado, le mandamos a la pantalla de login
+				else{
+					Intent in = new Intent(CoverActivity.this, LoginSelectActivity.class);
+					in.putExtra("shareUri", shareUri.toString());
+					in.putExtra("from_sharing", true);
+					startActivity(in);
+					finish();
+				}
+			}
+		}
+		 // La aplicación se ha iniciado por el método normal
+		else{
+			// Mostramos la pantalla del carrusel
+			Intent i = new Intent(CoverActivity.this, MainActivity.class);
+			startActivity(i);
+			finish();
+		}			
 	}
 }
