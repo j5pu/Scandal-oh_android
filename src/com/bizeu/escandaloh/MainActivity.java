@@ -1026,19 +1026,20 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String source_name = escanObject.getString("source_name");
 								
 					// Obtenemos los comentarios
-					final String comments = escanObject.getString("comments");
-					JSONArray commentsArray = new JSONArray(comments);
+					//final String comments = escanObject.getString("last_comment");
+					//JSONArray commentsArray = new JSONArray(comments);
 
-					for (int j = 0; j < commentsArray.length(); j++) {
-						JSONObject commentObject = commentsArray
-								.getJSONObject(j);
+					//for (int j = 0; j < commentsArray.length(); j++) {
+					if (!escanObject.isNull("last_comment")){
+						JSONObject commentObject = escanObject.getJSONObject("last_comment");
+						//.getJSONObject(j);
 						c_date = commentObject.getString("date");
 						c_id = commentObject.getString("id");
 						c_photo = commentObject.getString("photo");
 						c_resource_uri = commentObject
-								.getString("resource_uri");
+						.getString("resource_uri");
 						c_social_network = commentObject
-								.getString("social_network");
+						.getString("social_network");
 						c_text = commentObject.getString("text");
 						c_user = commentObject.getString("user");
 						c_user_id = commentObject.getString("user_id");
@@ -1047,9 +1048,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 						Comment commentAux = new Comment(c_date, c_id, c_photo,
 								c_resource_uri, c_social_network, c_text,
-								c_user, c_user_id, c_username, c_avatar);
+							c_user, c_user_id, c_username, c_avatar);
 						array_comments.add(commentAux);
 					}
+						
+					//}
 
 					if (escandalos != null && !isCancelled()) {
 						runOnUiThread(new Runnable() {
