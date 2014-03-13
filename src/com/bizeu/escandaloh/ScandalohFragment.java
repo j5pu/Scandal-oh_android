@@ -57,17 +57,21 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -204,9 +208,7 @@ public class ScandalohFragment extends SherlockFragment {
         this.favicon = (getArguments() != null) ? getArguments().getString(FAVICON) : null;
         this.source = (getArguments() != null) ? getArguments().getString(SOURCE) : null;
         this.source_name = (getArguments() != null) ? getArguments().getString(SOURCE_NAME) : null;
-        
-        
-        
+           
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
@@ -245,12 +247,22 @@ public class ScandalohFragment extends SherlockFragment {
         }
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo, container, false);    
         
+       // ll_comments = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_comments);
+		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
+        LinearLayout ll_flecha = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_menu_flecha);
+        EditText edit_comment = (EditText) rootView.findViewById(R.id.edit_escandalo_write_comment);
+        
         SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         layout.setIsTransparent(true);
         layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+        layout.setDragView(ll_flecha);
+        //layout.setDragView(list_comments);
        // layout.setAnchorPoint(0.3f);
         
-        final LinearLayout edit_falso_write_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_falso_edit_comentario);
+       // final LinearLayout edit_falso_write_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_falso_edit_comentario);
+        
+
+       
         
         layout.setPanelSlideListener(new PanelSlideListener() {
         	
@@ -262,21 +274,27 @@ public class ScandalohFragment extends SherlockFragment {
             @Override
             public void onPanelExpanded(View panel) {
             	// Mostramos el action bar de escribir comentario
-                ((MainActivity) getActivity()).updateActionBar(true, id);
+              //  ((MainActivity) getActivity()).updateActionBar(true, id);
                 // Cambiamos la flecha hacia abajo
                 changeArrowDirection(false);
                 // Ocultamos el falso edit
-                edit_falso_write_comment.setVisibility(View.GONE);
+               // edit_falso_write_comment.setVisibility(View.GONE);
+    	        // Cambiamos el alto del ListView
+    	        //LinearLayout.LayoutParams params =
+    	        //params.height = convertToDp(0);
+    	      //  LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(ll_comments.getWidth(), convertToDp(0), 8);
+    	       // list_comments.setLayoutParams(params2);
+    	       // list_comments.requestLayout();
             }
 
             @Override
             public void onPanelCollapsed(View panel) {       
             	// Mostramos el action bar normal
-                ((MainActivity) getActivity()).updateActionBar(false, id);
+                //((MainActivity) getActivity()).updateActionBar(false, id);
                 // Cambiamos la flecha hacia arriba
                 changeArrowDirection(true);
                 // Mostramos el falso edit
-                edit_falso_write_comment.setVisibility(View.VISIBLE);
+                //edit_falso_write_comment.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -387,10 +405,10 @@ public class ScandalohFragment extends SherlockFragment {
 				
         		@Override
 				public void onClick(View v) {
-					Log.v("We","Favicon: " + favicon);
-					// Cargamos la noticia en el navegador
-					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(source));
-					startActivity(browserIntent);		
+					// Cargamos nuestro navegador con la noticia
+        			Intent i = new Intent(getActivity(), BrowserNewsActivity.class);
+        			i.putExtra("source", source);
+        			startActivity(i);	
 				}
 			});
         }
@@ -556,7 +574,7 @@ public class ScandalohFragment extends SherlockFragment {
         
              
         // COMPARTIR 
-        ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
+        final ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
         share.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -624,6 +642,26 @@ public class ScandalohFragment extends SherlockFragment {
 				 dialog_compartir.show();			
 			}
 		});
+        
+        
+        // ESCRIBIR COMENTARIO (EditText) 
+        EditText ed_comments = new EditText(getActivity());
+        ed_comments.setId(R.id.edit_escandalo_write_comment);
+        ed_comments.setHint("Escribe un comentario...");
+        ed_comments.setBackgroundColor(getResources().getColor(R.color.azul_verdoso));
+        //ed_comments.setPadding(convertToDp(50), convertToDp(50), convertToDp(50), convertToDp(50));
+        ed_comments.setHintTextColor(getResources().getColor(R.color.blanco));
+        ed_comments.setTextColor(getResources().getColor(R.color.blanco));
+        ed_comments.setSingleLine(false);
+        ed_comments.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        ed_comments.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        final RelativeLayout pantalla = (RelativeLayout) rootView.findViewById(R.id.rl_escandalo);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+       // params.setMargins(convertToDp(3), 0, convertToDp(3), 0);
+        pantalla.addView(ed_comments, params);
+        
+
             
         // TÍTULO
         TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
@@ -635,7 +673,6 @@ public class ScandalohFragment extends SherlockFragment {
         
 		// COMENTARIOS
 		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
-		list_comments = (ListView) rootView.findViewById(R.id.lv_comments);
 		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment_izquierda, R.layout.comment_derecha, comments, user_name);
 		list_comments.setAdapter(commentsAdapter);	
 		
@@ -644,14 +681,35 @@ public class ScandalohFragment extends SherlockFragment {
 		if (num_comments == 0){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
 	        layout.setPanelHeight(convertToDp(65));
+	        // Cambiamos el alto del ListView
+	        /*
+	        ViewGroup.LayoutParams params = list_comments.getLayoutParams();
+	        params.height = convertToDp(1);
+	        list_comments.setLayoutParams(params);
+	        list_comments.requestLayout();
+	        */
 		}
 		else if (num_comments == 1){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentario));
-			layout.setPanelHeight(convertToDp(135));
+			layout.setPanelHeight(convertToDp(120));
+	        // Cambiamos el alto del ListView
+			/*
+	        ViewGroup.LayoutParams params = list_comments.getLayoutParams();
+	        params.height = convertToDp(56);
+	        list_comments.setLayoutParams(params);
+	        list_comments.requestLayout();
+	        */
 		}
 		else{
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
 			layout.setPanelHeight(convertToDp(135));
+	        // Cambiamos el alto del ListView
+			/*
+	        ViewGroup.LayoutParams params = list_comments.getLayoutParams();
+	        params.height = convertToDp(70);
+	        list_comments.setLayoutParams(params);
+	        list_comments.requestLayout();
+	        */
 		}
 
  		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);	

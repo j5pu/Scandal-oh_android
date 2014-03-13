@@ -6,7 +6,7 @@
     android:background="@color/azul_verdoso" >
 
     <LinearLayout
-        android:id="@+id/ll_main_action_bar_1"
+        android:id="@+id/ll_browser_action_bar"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:orientation="vertical" >

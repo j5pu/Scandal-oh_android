@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blanco"
-    tools:context=".DemoActivity" >
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/ll_comments"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#883d99b7"
-        android:clickable="true"
-        android:focusable="false"
-        android:orientation="vertical" >
+        android:background="#883d99b7" >
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true" >
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -72,30 +69,32 @@
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/linearLayout1" >
+
+            <ListView
+                android:id="@+id/lv_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#FFCC00" >
+            </ListView>
 
             <EditText
-                android:id="@+id/edit_escandalo_write_comment"
+                android:id="@+id/editText1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
                 android:ems="10"
-                android:hint="Escribe un comentario ..."
-                android:textColorHint="@color/blanco" >
+                android:hint="Escribe un comentario..."
+                android:textColorHint="@color/blanco"
+                android:textColor="@color/blanco" />
 
-                <requestFocus />
-            </EditText>
+        </RelativeLayout>
+    </RelativeLayout>
 
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/lv_comments"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="#FFCC00" >
-        </ListView>
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

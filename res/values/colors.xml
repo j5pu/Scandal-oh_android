@@ -17,5 +17,6 @@
     <color name="morado_fuerte">#c21d47</color>
     <color name="azul_fuerte">#3d99b7</color>
     <color name="azul_verdoso">#3d99b7</color>
+    <color name="negro_comentario">#999999</color>
     
 </resources>

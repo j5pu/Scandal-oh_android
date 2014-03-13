@@ -15,7 +15,7 @@
         android:orientation="vertical" >
 
         <com.bizeu.escandaloh.util.CircularImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/img_browser_back"
             android:layout_width="55dp"
             android:layout_height="55dp"
             android:src="@drawable/icono_app" />

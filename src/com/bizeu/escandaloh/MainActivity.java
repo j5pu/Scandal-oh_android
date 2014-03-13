@@ -120,7 +120,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageView img_send_comment;
 	DrawerLayout mDrawerLayout;
 	private FetchableImageView img_lateral_avatar;
-
+	
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private Context mContext;
@@ -900,39 +900,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 				if (escandalos.size() == 0) {
 					url = MyApplication.SERVER_ADDRESS
 							+ "/api/v1/photo/?limit=10&category__id=1&country="+ MyApplication.code_selected_country;
-					/*
-					// Si el usuario está logueado lo enviamos para obtener sus likes/dislikes
-					if (MyApplication.logged_user){
-						url = MyApplication.SERVER_ADDRESS
-								+ "/api/v1/photo/?limit=10&category__id=1&user_uri=" + MyApplication.resource_uri + "&country="
-								+ MyApplication.code_selected_country;
-					}
-					else{
-						url = MyApplication.SERVER_ADDRESS
-								+ "/api/v1/photo/?limit=10&category__id=1&country="
-								+ MyApplication.code_selected_country;
-					}
-					*/
 
 				} else {
 					url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
 							+ escandalos.get(escandalos.size() - 1).getId()
 							+ "/" + MyApplication.code_selected_country
 							+ "/previous/?category__id=1";
-					/*
-					if (MyApplication.logged_user){
-						url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-								+ escandalos.get(escandalos.size() - 1).getId()
-								+ "/" + MyApplication.code_selected_country
-								+ "/previous/?category__id=1&user_uri=" + MyApplication.resource_uri + "";
-					}
-					else{
-						url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-								+ escandalos.get(escandalos.size() - 1).getId()
-								+ "/" + MyApplication.code_selected_country
-								+ "/previous/?category__id=1";
-					}
-					*/
 				}
 			}
 
@@ -951,25 +924,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 							+ "/previous/?category__id=2";
 				}
 			}
-
-			/*
-			 * // BOTH else if (category.equals(MainActivity.BOTH)){ // Usamos
-			 * un servicio u otro dependiendo si es el primer listado de
-			 * escándalos o ya posteriores if (MyApplication.FIRST_TIME_BOTH){
-			 * url = MyApplication.SERVER_ADDRESS +
-			 * "/api/v1/photo/?limit=10&country=" +
-			 * MyApplication.code_selected_country; } else{
-			 * 
-			 * if (adapter.getCount() == 0){ url = MyApplication.SERVER_ADDRESS
-			 * + "/api/v1/photo/?limit=10&category__id=1&country=" +
-			 * MyApplication.code_selected_country;
-			 * 
-			 * } else{
-			 * 
-			 * url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" +
-			 * escandalos.get(escandalos.size()-1).getId() + "/" +
-			 * MyApplication.code_selected_country+ "/previous/"; //} } }
-			 */
 
 			HttpResponse response = null;
 
