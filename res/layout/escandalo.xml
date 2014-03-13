@@ -171,7 +171,7 @@
         android:background="#883d99b7" >
 
         <LinearLayout
-            android:id="@+id/linearLayout1"
+            android:id="@+id/ll_escandalo_menu_flecha"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -234,7 +234,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/linearLayout1" >
+            android:layout_below="@+id/ll_escandalo_menu_flecha" >
 
             <ListView
                 android:id="@+id/lv_comments"
