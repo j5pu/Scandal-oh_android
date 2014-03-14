@@ -28,6 +28,7 @@ import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
@@ -81,7 +82,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
 public class ScandalohFragment extends SherlockFragment {
 
-	private static final String ID = "id";
+	public static final String ID = "id";
     private static final String URL = "url";
     private static final String URL_BIG = "url_big";
     private static final String TITLE = "title";
@@ -91,7 +92,7 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String DATE = "date";
     private static final String URI_AUDIO = "uri_audio";
     private static final String AVATAR = "avatar";
-    private static final String COMMENTS = "comments";
+    private static final String LAST_COMMENT = "last_comment";
     private static final String SOCIAL_NETWORK = "social_network";
     private static final String ALREADY_VOTED = "already_voted";
     private static final String LIKE = "like";
@@ -99,7 +100,7 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String RESOURCE_URI ="resource_uri";
     private static final String FAVICON = "favicon";
     private static final String SOURCE = "Source";
-    private static final String SOURCE_NAME = "Source_name";
+    public static final String SOURCE_NAME = "Source_name";
     private static final String MEDIA_TYPE = "Media_type";
  
     private TextView num_com ;
@@ -125,8 +126,7 @@ public class ScandalohFragment extends SherlockFragment {
 	private int chosen_report; // 1:Copyright      2:Ilegalcontent      3:Spam
 	private String uri_audio;	
 	private String social_network; // 0:Scandaloh        1:Facebook
-	private CommentAdapter commentsAdapter;
-	private ArrayList<Comment> comments = new ArrayList<Comment>();
+	private Comment last_comment;
 	private boolean reproduciendo; // Nos indica si está reproduciendo el audio en un momento dado
 	private SharedPreferences prefs;
 	private boolean autoplay;
@@ -161,7 +161,7 @@ public class ScandalohFragment extends SherlockFragment {
         bundle.putString(RESOURCE_URI, escan.getResourceUri());
         bundle.putString(URI_AUDIO, escan.getUriAudio());
         bundle.putString(AVATAR, escan.getAvatar());
-        bundle.putParcelableArrayList(COMMENTS, escan.getComments());
+        bundle.putParcelable(LAST_COMMENT, escan.getLastComment());
         bundle.putString(SOCIAL_NETWORK, escan.getSocialNetwork());
         bundle.putInt(ALREADY_VOTED, escan.getAlreadyVoted());
         bundle.putInt(LIKE, escan.getLikes());
@@ -199,7 +199,7 @@ public class ScandalohFragment extends SherlockFragment {
         this.resource_uri = (getArguments() != null) ? getArguments().getString(RESOURCE_URI) : null;
         this.uri_audio = (getArguments() != null) ? getArguments().getString(URI_AUDIO) : null;
         this.avatar = (getArguments() != null) ? getArguments().getString(AVATAR) : null;
-        this.comments = (getArguments() != null) ? getArguments().<Comment>getParcelableArrayList(COMMENTS) : null;
+        this.last_comment = (getArguments() != null) ? getArguments().<Comment>getParcelable(LAST_COMMENT) : null;
         this.social_network = (getArguments() != null) ? getArguments().getString(SOCIAL_NETWORK) : null;
         this.already_voted = (getArguments() != null) ? getArguments().getInt(ALREADY_VOTED) : 0;
         this.likes = (getArguments() != null) ? getArguments().getInt(LIKE) : 0;
@@ -591,17 +591,78 @@ public class ScandalohFragment extends SherlockFragment {
        
         // NOMBRE DE USUARIO
         TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
-        user_na.setText(Utils.limitaCaracteres(user_name, 25));
+        user_na.setText(Utils.limitaCaracteres(user_name, 25));      
         
-		// COMENTARIOS
-        /*
-		edit_write_comment = (EditText) rootView.findViewById(R.id.edit_write_comment);
-		commentsAdapter = new CommentAdapter(getActivity(),R.layout.comment_izquierda, R.layout.comment_derecha, comments, user_name);
-		list_comments.setAdapter(commentsAdapter);	
-		*/
-		
+        // COMENTARIOS
+        // Último comentario    
+        TextView comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
+		TextView user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
+        FetchableImageView avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
+		TextView date = (TextView) rootView.findViewById(R.id.txt_comment_date);
+        LinearLayout ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
+        
+        // Si se pulsa accedemos a los comentarios
+        ll_last_comment.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), CommentsActivity.class);
+				i.putExtra(SOURCE_NAME, source_name);
+				i.putExtra(ID, id);
+				startActivity(i);		
+			}
+		});
+
+        // Si hay algún comentario
+        if (last_comment != null){
+        	// Texto
+    		comment_text.setText(last_comment.getText());
+    		
+    		// Nombre de usuario
+    		user_name.setText(last_comment.getUsername());
+    		
+    		// Fecha (formato dd-mm-aaaa)
+            String date_without_time = (last_comment.getDate().split("T",2))[0];   
+            String year = date_without_time.split("-",3)[0];
+            String month = date_without_time.split("-",3)[1];
+            String day = date_without_time.split("-",3)[2];
+            String final_date = day + "-" + month + "-" + year;
+            date.setText(final_date); 
+            
+            // Avatar
+            avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+        }
+        
+        // No hay comentarios
+        else{
+        	// Si el usuario está logueado
+        	if (MyApplication.logged_user){
+        		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
+        		user_name.setText(MyApplication.user_name);
+        		date.setText(Utils.getCurrentDate());
+        	}
+        	// Si no está logueado
+        	else{
+        		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
+        		// Ocultamos la información del usuario
+        		LinearLayout user_info = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment_info_user);
+        		user_info.setVisibility(View.GONE);
+        		// Le mandamos a la pantalla de login si pulsa
+                ll_last_comment.setOnClickListener(new View.OnClickListener() {
+        			
+        			@Override
+        			public void onClick(View v) {
+        				Intent i = new Intent(getActivity(), LoginSelectActivity.class);
+        				startActivity(i);		
+        			}
+        		});
+        	}
+        }
+        
+
+
+        
  		// Número de comentarios
-        /*
 		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
 		if (num_comments == 0){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
@@ -615,7 +676,6 @@ public class ScandalohFragment extends SherlockFragment {
 
  		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);	
            
-           */
         // Devolvemos la vista
         return rootView;
     }

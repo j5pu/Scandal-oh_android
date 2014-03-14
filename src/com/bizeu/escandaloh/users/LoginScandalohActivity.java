@@ -315,13 +315,14 @@ public class LoginScandalohActivity extends SherlockActivity {
 						SharedPreferences prefs = getBaseContext().getSharedPreferences(
 			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 						// Guardamos el session_token
-			        	prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token).commit();
+			        	prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token);
 			        	MyApplication.session_token = session_token;
 			        	// Guardamos el nombre de usuario
-			        	prefs.edit().putString(MyApplication.USER_NAME, username).commit();
+			        	prefs.edit().putString(MyApplication.USER_NAME, username);
 			        	MyApplication.user_name = username ;
 			        	// Guardamos su avatar
-			        	prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
+			        	prefs.edit().putString(MyApplication.AVATAR, avatar);
+			        	prefs.edit().commit();
 			        	MyApplication.avatar = avatar;
 			        	// Indicamos que está logueado
 			        	MyApplication.logged_user = true;

@@ -24,7 +24,7 @@ public class Scandaloh {
 	private String date;
 	private String user;
 	private String avatar;
-	private ArrayList<Comment> comments; // Listado de comentarios
+	private Comment last_comment; // Comentario más reciente
 	private String social_network;
 	private int already_voted;
 	private int likes;
@@ -53,7 +53,7 @@ public class Scandaloh {
 	 */
 	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
-						String user, String date, String avatar, ArrayList<Comment> comments, String social_network,
+						String user, String date, String avatar, Comment last_comment, String social_network,
 						int already_voted, int likes, int dislikes, int media_type, String favicon, String source, 
 						String source_name){
 		this.id = id;
@@ -74,8 +74,7 @@ public class Scandaloh {
 		this.user = user;
 		this.date = date;
 		this.avatar = avatar;
-		this.comments = new ArrayList<Comment>();
-		this.comments = comments;
+		this.last_comment = last_comment;
 		this.social_network = social_network;
 		this.already_voted = already_voted;
 		this.likes = likes;
@@ -190,12 +189,12 @@ public class Scandaloh {
 		return this.date;
 	}
 	
-	public ArrayList<Comment> getComments(){
-		return comments;
+	public Comment getLastComment(){
+		return this.last_comment;
 	}
 	
-	public void setComments(ArrayList<Comment> new_comments){
-		comments = new_comments;
+	public void setLastComment(Comment new_last_comment){
+		this.last_comment = new_last_comment;
 	}
 	
 	public String getAvatar(){

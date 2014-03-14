@@ -976,28 +976,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 					}
 				}
 
-				/*
-				 * // BOTH else if (category.equals(MainActivity.BOTH)) { if
-				 * (MyApplication.FIRST_TIME_BOTH){
-				 * MyApplication.FIRST_TIME_BOTH = false; // Obtenemos el json
-				 * JSONObject respJson = new JSONObject(respStr);
-				 * 
-				 * escandalosObject = respJson.getJSONArray("objects"); } else{
-				 * if (adapter.getCount() == 0){ JSONObject respJson = new
-				 * JSONObject(respStr); escandalosObject =
-				 * respJson.getJSONArray("objects"); } else{ escandalosObject =
-				 * new JSONArray(respStr);
-				 * 
-				 * // Si no hay más escandalos,lo indicamos if
-				 * (escandalosObject.length() == 0){
-				 * Log.v("WE","No hay mas boths"); there_are_more_escandalos =
-				 * false; } } } }
-				 */
-
 				// Obtenemos los datos de los escándalos
 				for (int i = 0; i < escandalosObject.length(); i++) {
 					// Hacemos una declaración por cada escándalo
-					final ArrayList<Comment> array_comments = new ArrayList<Comment>();
+					final Comment last_comment;
 
 					JSONObject escanObject = escandalosObject.getJSONObject(i);
 
@@ -1024,15 +1006,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String favicon = escanObject.getString("favicon");
 					final String source = escanObject.getString("source");
 					final String source_name = escanObject.getString("source_name");
-								
-					// Obtenemos los comentarios
-					//final String comments = escanObject.getString("last_comment");
-					//JSONArray commentsArray = new JSONArray(comments);
-
-					//for (int j = 0; j < commentsArray.length(); j++) {
+					
+					// Obtenemos el comentario más reciente
 					if (!escanObject.isNull("last_comment")){
 						JSONObject commentObject = escanObject.getJSONObject("last_comment");
-						//.getJSONObject(j);
 						c_date = commentObject.getString("date");
 						c_id = commentObject.getString("id");
 						c_photo = commentObject.getString("photo");
@@ -1040,31 +1017,31 @@ public class MainActivity extends SherlockFragmentActivity implements
 						.getString("resource_uri");
 						c_social_network = commentObject
 						.getString("social_network");
-						c_text = commentObject.getString("text");
+						c_text = new String(commentObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 						c_user = commentObject.getString("user");
 						c_user_id = commentObject.getString("user_id");
 						c_username = commentObject.getString("username");
 						c_avatar = commentObject.getString("avatar");
 
-						Comment commentAux = new Comment(c_date, c_id, c_photo,
+						last_comment = new Comment(c_date, c_id, c_photo,
 								c_resource_uri, c_social_network, c_text,
 							c_user, c_user_id, c_username, c_avatar);
-						array_comments.add(commentAux);
 					}
-						
-					//}
+					else{
+						last_comment = null;
+					}
 
 					if (escandalos != null && !isCancelled()) {
 						runOnUiThread(new Runnable() {
 							@Override
-							public void run() {
+							public void run() {							
 								// Añadimos el escandalo al ArrayList
 								Scandaloh escanAux = new Scandaloh(id, title,
 										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
 										Integer.parseInt(comments_count),resource_uri,
 										MyApplication.DIRECCION_BUCKET + img_p,
 										MyApplication.DIRECCION_BUCKET + img, sound, username, date,
-										avatar, array_comments, social_network,
+										avatar, last_comment, social_network,
 										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
 								escandalos.add(escanAux);
 								adapter.addFragment(ScandalohFragment.newInstance(escandalos.get(escandalos
@@ -1083,18 +1060,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Mandamos la excepcion a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
+						new StandardExceptionParser(mContext, null) 
 								.getDescription(Thread.currentThread()
 										.getName(), // The name of the thread on
 													// which the exception
@@ -1173,12 +1139,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 						+ MyApplication.code_selected_country
 						+ "/new/?category__id=2";
 			}
-			/*
-			 * // BOTH if (category.equals(MainActivity.BOTH)){
-			 * Log.v("WE","nuevos both"); url = MyApplication.SERVER_ADDRESS +
-			 * "/api/v1/photo/" + escandalos.get(0).getId() + "/" +
-			 * MyApplication.code_selected_country+ "/new/"; }
-			 */
 
 			HttpResponse response = null;
 
@@ -1288,315 +1248,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	/**
-	 * Sube un comentario
-	 * 
-	 */
-	private class SendCommentTask extends AsyncTask<Void, Integer, Integer> {
 
-		private Context mContext;
-		private String pho_id;
-
-		public SendCommentTask(Context context, String photo_id) {
-			this.pho_id = photo_id;
-			mContext = context;
-			any_error = false;
-			progress = new ProgressDialog(mContext);
-			progress.setTitle(R.string.enviando_comentario);
-			progress.setMessage(getResources().getString(
-					R.string.espera_por_favor));
-			progress.setCancelable(false);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			// Mostramos el ProgressDialog
-			progress.show();
-		}
-
-		@Override
-		protected Integer doInBackground(Void... params) {
-
-			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS
-					+ "/api/v1/comment/";
-
-			HttpResponse response = null;
-
-			try {
-				HttpClient client = new DefaultHttpClient();
-				HttpPost post = new HttpPost(urlString);
-				post.setHeader("Content-Type", "application/json");
-				post.setHeader("Session-Token", MyApplication.session_token);
-
-				JSONObject dato = new JSONObject();
-
-				// Obtenemos el comentario en formato UTF-8
-				String written_comment = edit_escribir_comentario.getText()
-						.toString();
-
-				dato.put("user", MyApplication.resource_uri);
-				dato.put("photo", "/api/v1/photo/" + pho_id + "/"); // Formato:
-																	// /api/v1/photo/id/
-				dato.put("text", written_comment);
-
-				// Formato UTF-8 (ñ,á,ä,...)
-				StringEntity entity = new StringEntity(dato.toString(),
-						HTTP.UTF_8);
-				post.setEntity(entity);
-
-				response = client.execute(post);
-				resEntity = response.getEntity();
-				final String response_str = EntityUtils.toString(resEntity);
-
-				Log.i("WE", response_str);
-			}
-
-			catch (Exception ex) {
-				Log.e("Debug", "error: " + ex.getMessage(), ex);
-				any_error = true; // Indicamos que hubo algún error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
-			}
-
-			if (any_error) {
-				return 666;
-			} else {
-				// Devolvemos el resultado
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Si hubo algún error mostramos un mensaje
-			if (any_error) {
-				Toast toast = Toast.makeText(mContext, getResources()
-						.getString(R.string.lo_sentimos_hubo),
-						Toast.LENGTH_SHORT);
-				toast.show();
-				// Quitamos el ProgressDialog
-				if (progress.isShowing()) {
-					progress.dismiss();
-				}
-			} else {
-				// Si es codigo 2xx --> OK
-				if (result >= 200 && result < 300) {
-					// Vaciamos el editext
-					edit_escribir_comentario.setText("");
-
-					// Mostramos de nuevo los comentarios (indicamos que si
-					// hemos enviado un comentario)
-					new GetCommentsTask(mContext, pho_id).execute();
-				} else {
-					Toast toast;
-					toast = Toast
-							.makeText(
-									mContext,
-									getResources()
-											.getString(
-													R.string.hubo_algun_error_enviando_comentario),
-									Toast.LENGTH_LONG);
-					toast.show();
-					// Quitamos el ProgressDialog
-					if (progress.isShowing()) {
-						progress.dismiss();
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Muestra la lista de comentarios para esa foto
-	 * 
-	 */
-	private class GetCommentsTask extends AsyncTask<Void, Integer, Integer> {
-
-		String c_date;
-		String c_id;
-		String c_photo;
-		String c_resource_uri;
-		String c_social_network;
-		String c_text;
-		String c_user;
-		String c_user_id;
-		String c_username;
-		String c_avatar;
-		private Context mContext;
-		private String phot_id;
-
-		public GetCommentsTask(Context context, String photo_id) {
-			phot_id = photo_id;
-			mContext = context;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			any_error = false;
-		}
-
-		@Override
-		protected Integer doInBackground(Void... params) {
-
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS
-					+ "/api/v1/comment/?photo__id=" + phot_id);
-			del.setHeader("content-type", "application/json");
-			HttpResponse response = null;
-
-			try {
-				response = httpClient.execute(del);
-				String respStr = EntityUtils.toString(response.getEntity());
-				
-				Log.i("WE","com: " + respStr.toString());
-
-				JSONObject respJSON = new JSONObject(respStr);
-
-				// Parseamos el json para obtener los escandalos
-				JSONArray escandalosObject = null;
-
-				escandalosObject = respJSON.getJSONArray("objects");
-				final ArrayList<Comment> array_comments = new ArrayList<Comment>();
-
-				for (int i = 0; i < escandalosObject.length(); i++) {
-					JSONObject escanObject = escandalosObject.getJSONObject(i);
-
-					c_date = escanObject.getString("date");
-					c_id = escanObject.getString("id");
-					c_photo = escanObject.getString("photo");
-					c_resource_uri = escanObject.getString("user");
-					c_social_network = escanObject.getString("social_network");
-					c_text = new String(escanObject.getString("text").getBytes(
-							"ISO-8859-1"), HTTP.UTF_8);
-					c_user = escanObject.getString("user");
-					c_user_id = escanObject.getString("user_id");
-					c_username = escanObject.getString("username");
-					c_avatar = escanObject.getString("avatar");
-					
-
-					Comment commentAux = new Comment(c_date, c_id, c_photo,
-							c_resource_uri, c_social_network, c_text, c_user,
-							c_user_id, c_username, c_avatar);
-					array_comments.add(commentAux);
-				}
-
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						// Añadimos el escandalo al ArrayList
-						Scandaloh e = escandalos.get(pager.getCurrentItem());
-						Scandaloh escanAux = new Scandaloh(e.getId(),
-								e.getTitle(), e.getCategory(),
-								BitmapFactory.decodeResource(getResources(),
-										R.drawable.loading),
-								array_comments.size(), e.getResourceUri(),
-								e.getRouteImg(), e.getRouteImgBig(),
-								e.getUriAudio(), e.getUser(), e.getDate(),
-								e.getAvatar(), array_comments, e.getSocialNetwork(),
-								e.getAlreadyVoted(), e.getLikes(), e.getDislikes(), e.getMediaType(),
-								e.getFavicon(), e.getSource(), e.getSourceName());
-						escandalos.set(pager.getCurrentItem(), escanAux);
-						adapter.setFragment(pager.getCurrentItem(),
-								ScandalohFragment.newInstance(escanAux));
-						adapter.notifyDataSetChanged();
-						pager.setCurrentItem(pager.getCurrentItem());
-					}
-				});
-
-			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error!", ex);
-				any_error = true; // Indicamos que hubo un error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
-			}
-
-			// Si hubo algún error devolvemos 666
-			if (any_error) {
-				return 666;
-			} else {
-				// Devolvemos el código de respuesta
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Quitamos el ProgressDialog
-			if (progress.isShowing()) {
-				progress.dismiss();
-			}
-
-			// Si hubo algún error
-			if (result == 666) {
-				Toast toast = Toast.makeText(mContext, getResources()
-						.getString(R.string.lo_sentimos_hubo),
-						Toast.LENGTH_SHORT);
-				toast.show();
-			}
-
-			// No hubo ningún error extraño
-			else {
-				/*
-				 * // Si es codigo 2xx --> OK if (result >= 200 && result <300){
-				 * 
-				 * commentsAdapter.notifyDataSetChanged();
-				 * 
-				 * // Actualizamos el indicador de número de comentarios if
-				 * (comments.size() == 1){ num_com.setText(comments.size() +
-				 * " comentario"); } else{ num_com.setText(comments.size() +
-				 * " comentarios"); }
-				 * 
-				 * } else{ Toast toast; toast = Toast.makeText(mContext,
-				 * getResources
-				 * ().getString(R.string.no_se_pudieron_obtener_comentarios),
-				 * Toast.LENGTH_LONG); toast.show(); }
-				 */
-			}
-		}
-	}
+	
 
 	/**
 	 * Envía un avatar nuevo al servidor
@@ -1945,7 +1598,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 						// caracteres lo enviamos
 						if (!written_comment.equals("")
 								&& written_comment.length() < 1001) {
-							new SendCommentTask(mContext, photo_id).execute();
+							//new SendCommentTask(mContext, photo_id).execute();
 						}
 					} else {
 						Toast toast;
