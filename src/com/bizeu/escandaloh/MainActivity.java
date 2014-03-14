@@ -141,7 +141,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private boolean no_hay_escandalos;
 	private ProgressDialog progress;
 	private ArrayAdapter<CharSequence> adapter_spinner;
-	private String action_bar_type = NORMAL; // NORMAL o ENVIAR_COMENTARIO
 
 	/**
 	 * onCreate
@@ -163,7 +162,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
 				| ActionBar.DISPLAY_SHOW_HOME);
-		View view = getLayoutInflater().inflate(R.layout.action_bar_2, null);
+		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		actBar.setCustomView(view);
 		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
@@ -200,7 +199,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			@Override
 			public void onPageSelected(int position) {
-				updateActionBar(false, null);
 
 				// Si quedan 4 escándalos más para llegar al último y aún quedan
 				// más escándalos (si hemos llegado
@@ -480,12 +478,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onResume() {
 		super.onResume();
 
-		// Actualizamos el action bar según esté en modo normal o escritura
-		if (action_bar_type.equals(ENVIAR_COMENTARIO)) {
-			updateActionBar(true, null);
-		} else {
-			updateActionBar(false, null);
-		}
+
 
 		// Si está logueado ocultamos las opciones de login y registro y mostramos su nombre en el menu
 		// Actualizamos el avatar y el nombre de usuario
@@ -1555,138 +1548,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 */
 	}
 
-	/**
-	 * Actualiza el action bar: muestra el menú con todas las opciones o muestra
-	 * un campo para escribir un comentario
-	 * 
-	 * @param write_mode
-	 *            True indica si el action bar será el de escribir comentario
-	 */
-	public void updateActionBar(boolean write_mode, String id_photo) {
-
-		final String photo_id = id_photo;
-		ActionBar actBar = getSupportActionBar();
-		// Activamos el logo del menu para el menu lateral
-		actBar.setHomeButtonEnabled(true);
-		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setIcon(R.drawable.logo_blanco);
-
-		// Modo escribir comentarios
-		if (write_mode) {
-			action_bar_type = ENVIAR_COMENTARIO;
-			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-					| ActionBar.DISPLAY_SHOW_HOME);
-			View view = getLayoutInflater().inflate(
-					R.layout.action_bar_escribir, null);
-			actBar.setCustomView(view);
-			// Activamos el logo del menu para el menu lateral
-			actBar.setHomeButtonEnabled(true);
-			actBar.setDisplayHomeAsUpEnabled(true);
-			actBar.setIcon(R.drawable.logo_blanco);
-
-			img_send_comment = (ImageView) findViewById(R.id.img_escandalo_send_comment);
-			img_send_comment.setOnClickListener(new View.OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					// Si hay conexión
-					if (Connectivity.isOnline(mContext)) {
-						String written_comment;
-						written_comment = edit_escribir_comentario.getText()
-								.toString();
-						// Si ha escrito algo y la longitud es menor de 1000
-						// caracteres lo enviamos
-						if (!written_comment.equals("")
-								&& written_comment.length() < 1001) {
-							//new SendCommentTask(mContext, photo_id).execute();
-						}
-					} else {
-						Toast toast;
-						toast = Toast.makeText(mContext, getResources()
-								.getString(R.string.no_dispones_de_conexion),
-								Toast.LENGTH_SHORT);
-						toast.show();
-					}
-				}
-			});
-
-			edit_escribir_comentario = (EditText) findViewById(R.id.edit_write_comment);
-			if (!MyApplication.logged_user) {
-				edit_escribir_comentario
-						.setHint(R.string.inicia_sesion_para_comentar);
-				edit_escribir_comentario.setInputType(InputType.TYPE_NULL);
-				edit_escribir_comentario
-						.setOnTouchListener(new View.OnTouchListener() {
-
-							@Override
-							public boolean onTouch(View v, MotionEvent event) {
-								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_SHORT);
-								toast.show();
-								return false;
-							}
-						});
-			}
-			edit_escribir_comentario.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void onTextChanged(CharSequence s, int start,
-						int before, int count) {
-					// Si ha llegado al límite de caracteres se lo indicamos
-					if (s.length() == 1000) {
-						Toast toast = Toast.makeText(mContext, getResources()
-								.getString(R.string.ha_llegado_al_limite),
-								Toast.LENGTH_LONG);
-						toast.show();
-					}
-				}
-
-				@Override
-				public void afterTextChanged(Editable arg0) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start,
-						int count, int after) {
-					// TODO Auto-generated method stub
-				}
-			});
-		}
-
-		// Modo normal
-		else {
-			action_bar_type = NORMAL;
-			actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-					| ActionBar.DISPLAY_SHOW_HOME);
-			View view = getLayoutInflater()
-					.inflate(R.layout.action_bar_2, null);
-			actBar.setCustomView(view);
-			// Activamos el logo del menu para el menu lateral
-			actBar.setHomeButtonEnabled(true);
-			actBar.setDisplayHomeAsUpEnabled(true);
-			actBar.setIcon(R.drawable.logo_blanco);
-
-			// Spinner con su categoría seleccionada
-			spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
-			spinner_categorias.setAdapter(adapter_spinner);
-			spinner_categorias.setOnItemSelectedListener(this);
-			if (category.equals(HAPPY)) {
-				spinner_categorias.setSelection(0);
-			} else {
-				spinner_categorias.setSelection(1);
-			}
-			loading = (ProgressBar) findViewById(R.id.loading_escandalos);
-			img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
-			ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
-			ll_refresh.setOnClickListener(this);
-			img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
-			ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
-			ll_take_photo.setOnClickListener(this);
-			progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-			txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
-			
-			txt_code_country.setText(MyApplication.code_selected_country);
-		}
-	}
+	
 
 	/**
 	 * Hace crop a una foto

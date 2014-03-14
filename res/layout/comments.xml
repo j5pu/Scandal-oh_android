@@ -35,6 +35,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:ems="10"
+                android:inputType="text"
                 android:maxLines="6"
                 android:hint="@string/escribe_un_comentario"
                 android:textColor="@color/gris_oscuro" >

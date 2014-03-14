@@ -245,7 +245,7 @@ public class ScandalohFragment extends SherlockFragment {
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
         }
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.escandalo2, container, false);    
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.scandal, container, false);    
         
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
@@ -658,9 +658,7 @@ public class ScandalohFragment extends SherlockFragment {
         		});
         	}
         }
-        
-
-
+   
         
  		// Número de comentarios
 		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
@@ -674,7 +672,6 @@ public class ScandalohFragment extends SherlockFragment {
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
 		}
 
- 		img_arrow = (ImageView) rootView.findViewById(R.id.img_flecha);	
            
         // Devolvemos la vista
         return rootView;

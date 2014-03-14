@@ -102,7 +102,10 @@ public class CommentsActivity extends Activity {
 				public void onClick(View v) {
 					// Hay conexión
 					if (Connectivity.isOnline(mContext)){
-						new SendCommentTask().execute();	
+						// Si ha escrito algo
+						if (edit_comment.getText().toString().length() >0){
+							new SendCommentTask().execute();
+						}
 					}
 					// No hay conexión
 					else{
@@ -164,7 +167,8 @@ public class CommentsActivity extends Activity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "/api/v1/comment/?photo__id=" + id);
+			HttpGet del = new HttpGet(MyApplication.SERVER_ADDRESS + "/api/v1/comment/?photo__id=" + id 
+					+ "&limit=0");
 			del.setHeader("content-type", "application/json");
 			HttpResponse response = null;
 
