@@ -387,8 +387,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								adapter = new ScandalohFragmentPagerAdapter(
 										getSupportFragmentManager());
 								pager.setAdapter(adapter);
-								// Obtenemos los 10 primeros escándalos para la categoría
-								// seleccionada
+								// Obtenemos los 10 primeros escándalos para la categoría seleccionada
 								// Mostramos el progressBar y ocultamos la lista de escandalos
 								loading.setVisibility(View.VISIBLE);
 								pager.setVisibility(View.GONE);
@@ -926,6 +925,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				getEscandalos.setHeader("content-type", "application/json");
 				// Si es con usuario le añadimos el session_token
 				if (MyApplication.logged_user){
+					Log.v("WE","session token " + MyApplication.session_token);
 					getEscandalos.setHeader("Session-Token", MyApplication.session_token);
 				}
 

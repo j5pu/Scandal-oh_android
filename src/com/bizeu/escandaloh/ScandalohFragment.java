@@ -83,9 +83,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 public class ScandalohFragment extends SherlockFragment {
 
 	public static final String ID = "id";
-    private static final String URL = "url";
+    public static final String URL = "url";
     private static final String URL_BIG = "url_big";
-    private static final String TITLE = "title";
+    public static final String TITLE = "title";
     private static final String NUM_COMMENTS = "num_comments";
     private static final String HAS_AUDIO = "has_audio";
     private static final String USER_NAME = "user_name";
@@ -245,10 +245,11 @@ public class ScandalohFragment extends SherlockFragment {
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
         }
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.scandal, container, false);    
+        final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.scandal, container, false);    
         
         // FOTO
         FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
+        img.setTag(109);
         img.setImage(this.url, R.drawable.cargando);  
         
         Paint mShadow = new Paint(); 
@@ -598,6 +599,7 @@ public class ScandalohFragment extends SherlockFragment {
         TextView comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
 		TextView user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
         FetchableImageView avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
+        ImageView social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
 		TextView date = (TextView) rootView.findViewById(R.id.txt_comment_date);
         LinearLayout ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
         
@@ -609,6 +611,8 @@ public class ScandalohFragment extends SherlockFragment {
 				Intent i = new Intent(getActivity(), CommentsActivity.class);
 				i.putExtra(SOURCE_NAME, source_name);
 				i.putExtra(ID, id);
+				i.putExtra(TITLE, title);
+				i.putExtra(URL, url);			
 				startActivity(i);		
 			}
 		});
@@ -631,6 +635,15 @@ public class ScandalohFragment extends SherlockFragment {
             
             // Avatar
             avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+       
+            // Red social
+            int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
+            if (social_ne == 0){
+            	social_net.setImageResource(R.drawable.s_gris);
+            }
+            else if (social_ne == 1){
+            	social_net.setImageResource(R.drawable.facebook_gris);
+            }
         }
         
         // No hay comentarios
@@ -644,9 +657,11 @@ public class ScandalohFragment extends SherlockFragment {
         	// Si no está logueado
         	else{
         		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
+        		user_name.setText(getResources().getString(R.string.anonimo));
+        		date.setText(Utils.getCurrentDate());
         		// Ocultamos la información del usuario
         		LinearLayout user_info = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment_info_user);
-        		user_info.setVisibility(View.GONE);
+        		//user_info.setVisibility(View.GONE);
         		// Le mandamos a la pantalla de login si pulsa
                 ll_last_comment.setOnClickListener(new View.OnClickListener() {
         			
@@ -661,6 +676,7 @@ public class ScandalohFragment extends SherlockFragment {
    
         
  		// Número de comentarios
+        /*
 		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
 		if (num_comments == 0){
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
@@ -671,6 +687,7 @@ public class ScandalohFragment extends SherlockFragment {
 		else{
 			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
 		}
+		*/
 
            
         // Devolvemos la vista

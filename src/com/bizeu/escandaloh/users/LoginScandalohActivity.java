@@ -212,6 +212,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	             String username_email = edit_nombre_email.getText().toString();
 	             String password = edit_password.getText().toString();
              
+	             dato.put("device_token", "");
 	             dato.put("username_email", username_email);
 	             dato.put("password", password);
 
@@ -231,7 +232,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	                 // Comprobamos el campo status del json
 	                 status = respJSON.getString("status");  
 	                 
-	                 // Si es OK obtenemos el user_uri
+	                 // Si es OK obtenemos el session token
 	                 if (status.equals("ok")){
 	                	// user_uri = respJSON.getString("user_uri");
 	                	 avatar = respJSON.getString("avatar");
@@ -314,18 +315,19 @@ public class LoginScandalohActivity extends SherlockActivity {
 					if (!has_name_error && !has_password_error){
 						SharedPreferences prefs = getBaseContext().getSharedPreferences(
 			        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+						SharedPreferences.Editor editor = prefs.edit();
 						// Guardamos el session_token
-			        	prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token);
+						editor.putString(MyApplication.SESSION_TOKEN, session_token);
 			        	MyApplication.session_token = session_token;
 			        	// Guardamos el nombre de usuario
-			        	prefs.edit().putString(MyApplication.USER_NAME, username);
+			        	editor.putString(MyApplication.USER_NAME, username);
 			        	MyApplication.user_name = username ;
 			        	// Guardamos su avatar
-			        	prefs.edit().putString(MyApplication.AVATAR, avatar);
-			        	prefs.edit().commit();
+			        	editor.putString(MyApplication.AVATAR, avatar);
 			        	MyApplication.avatar = avatar;
 			        	// Indicamos que está logueado
 			        	MyApplication.logged_user = true;
+			        	editor.commit();
 			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
 			        	
 			        	// Debemos reiniciar los escándalos

@@ -102,7 +102,7 @@
                 android:layout_weight="2"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="@string/olvidaste_la_contrasenia"
-                android:textColor="@color/azul"
+            	android:textColor="@color/azul"
                 android:textSize="13sp" />
 
         </LinearLayout>

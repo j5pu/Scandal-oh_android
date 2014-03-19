@@ -1,6 +1,7 @@
 package com.bizeu.escandaloh.users;
 
 import java.util.Arrays;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -10,11 +11,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,12 +25,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.CreateScandalohActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.util.Fuente;
 import com.facebook.FacebookException;
 import com.facebook.Request;
@@ -40,6 +44,7 @@ import com.facebook.widget.LoginButton.OnErrorListener;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class LoginSelectActivity extends SherlockActivity {
 
@@ -56,11 +61,14 @@ public class LoginSelectActivity extends SherlockActivity {
 	static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
 	private String TAG_FACEBOOK = "Facebook Login";
+	
 	private Button but_login_scandaloh;
 	private LoginButton but_login_facebook;
+	private TextView txt_crea_tu_cuenta;
+	
+	private ProgressDialog progress;
 	private Activity acti;
 	private Context mContext;
-	private ProgressDialog progress;
 	private String username;
 	private String status = null;
 	private boolean login_error = false;
@@ -99,7 +107,18 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		but_login_scandaloh = (Button) findViewById(R.id.but_log_in_scandaloh);
 		but_login_facebook = (LoginButton) findViewById(R.id.but_log_in_facebook);
-
+		txt_crea_tu_cuenta = (TextView) findViewById(R.id.txt_loginmain_register);
+		
+		// Subrayamos el TextView
+		txt_crea_tu_cuenta.setPaintFlags(txt_crea_tu_cuenta.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+		txt_crea_tu_cuenta.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(LoginSelectActivity.this, RegistrationActivity.class);
+				startActivity(i);	
+			}
+		});
 
 		but_login_facebook.setOnErrorListener(new OnErrorListener() {
 
@@ -255,8 +274,10 @@ public class LoginSelectActivity extends SherlockActivity {
 					*/
 				}		
 				
+				Log.v("WE","acceso token: " + access_token);
 				dato.put("access_token", access_token);
 				dato.put("social_network", social_network);
+				dato.put("device_token", "");
 
 				// Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
 				StringEntity entity = new StringEntity(dato.toString(),
@@ -316,13 +337,16 @@ public class LoginSelectActivity extends SherlockActivity {
 				// Logueamos al usuario en la aplicación
 				SharedPreferences prefs = mContext.getSharedPreferences(
 						"com.bizeu.escandaloh", Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = prefs.edit();
 				// Guardamos el session_token, nombre de usuario y avatar
-				prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token).commit();
-				prefs.edit().putString(MyApplication.USER_NAME, username).commit();
-				prefs.edit().putString(MyApplication.AVATAR, avatar).commit();
+				editor.putString(MyApplication.SESSION_TOKEN, session_token);
+				Log.v("WE","primer session token: " + session_token);
+				editor.putString(MyApplication.USER_NAME, username);
+				editor.putString(MyApplication.AVATAR, avatar);
+				editor.commit();
+				Log.v("WE", "Avatar de facebook: " + avatar);
 				MyApplication.user_name = username;
 				MyApplication.session_token = session_token;
-				Log.v("WE", "Avatar de facebook: " + avatar);
 				MyApplication.avatar = avatar;
 				MyApplication.logged_user = true;
 				Toast.makeText(mContext, R.string.sesion_iniciada_exito,

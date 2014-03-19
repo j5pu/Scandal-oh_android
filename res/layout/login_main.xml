@@ -41,6 +41,14 @@
             android:text="@string/scandaloh"
             android:textColor="@color/blanco"
             android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/txt_loginmain_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/crea_tu_cuenta"
+            android:textColor="@color/azul" />
+
     </LinearLayout>
 
 </LinearLayout>

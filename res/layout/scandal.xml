@@ -121,7 +121,9 @@
         <LinearLayout
             android:id="@+id/ll_escandalo_lastcomment"
             android:layout_width="match_parent"
-            android:layout_height="110dp"
+            android:layout_height="80dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:background="#88000000"
@@ -129,159 +131,120 @@
             android:orientation="vertical" >
 
             <LinearLayout
-                android:id="@+id/ll_escandalo_menu_flecha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:orientation="vertical" >
-
-                    <TextView
-                        android:id="@+id/textView1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/escribe_un_comentario" 
-                        android:textColor="@color/blanco"
-                        android:textSize="10sp"
-                        android:paddingLeft="10dp"/>
-
-                    <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:layout_weight="3" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|right|center_vertical"
-                    android:layout_weight="3"
-                    android:gravity="center_horizontal|right|center_vertical"
-                    android:orientation="vertical" >
-
-                    <TextView
-                        android:id="@+id/txt_num_comments"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:paddingRight="10dp"
-                        android:text="33 comentarios"
-                        android:textColor="@color/blanco"
-                        android:textSize="10sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/ll_escandalo_com_izquierda"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp" >
+                android:layout_marginTop="5dp"
+                android:orientation="vertical" >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:gravity="top|center_horizontal"
-                    android:orientation="vertical" >
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-                    <com.bizeu.escandaloh.util.CircularImageView
-                        android:id="@+id/img_comment_avatar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:gravity="top"
-                        android:src="@drawable/avatar_defecto" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="right"
-                    android:orientation="vertical" >
-
-                    <ImageView
-                        android:id="@+id/ImageView02"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:layout_marginTop="5dp"
-                        android:alpha="0.81"
-                        android:paddingTop="5dp"
-                        android:src="@drawable/triangulo" />
-                </LinearLayout>
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:orientation="vertical" >
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/comentario_curvo_izquierda"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:paddingBottom="4dp"
-                    android:paddingTop="6dp" >
+                        <com.bizeu.escandaloh.util.CircularImageView
+                            android:id="@+id/img_comment_avatar"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:gravity="center_vertical"
+                            android:src="@drawable/avatar_defecto" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/ll_escandalo_lastcomment_info_user"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="left|top"
+                        android:layout_marginLeft="6dp"
                         android:layout_marginRight="5dp"
-                        android:gravity="left" >
+                        android:layout_weight="3.90"
+                        android:gravity="left"
+                        android:orientation="vertical" >
 
-                        <ImageView
-                            android:id="@+id/img_comment_user"
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/user_rosa" />
-
-                        <TextView
-                            android:id="@+id/txt_comment_username"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="1dp"
-                            android:gravity="center_vertical"
-                            android:text="alejandro.leonrodriguez.7"
-                            android:textColor="@color/azul_verdoso"
-                            android:textSize="10sp"
+                            android:layout_gravity="top"
+                            android:gravity="top" >
+
+                            <ImageView
+                                android:id="@+id/img_lastcomment_socialnetwork"
+                                android:layout_width="11dp"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/s_gris"  />
+
+                            <TextView
+                                android:id="@+id/txt_comment_username"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="1dp"
+                                android:gravity="center_vertical"
+                                android:text="alejandro.leonrodriguez.7"
+                                android:textColor="#aaaaaa"
+                                android:textSize="9sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/txt_comment_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:paddingBottom="4dp"
+                            android:paddingTop="4dp"
+                            android:paddingLeft="1dp"
+                            android:text="coscosfdfdsdf sdf dsfsdfcosfdfdsdf sdf dsfsdfcosfdfdsdf sdf dsfsdfcosfdfdsdf sdf dsfsdfcosfdfdsdf sdf dsfsdfcosfdfdsdf sdf dsfsdffdfdsdf sdf dsfsdf"
+                            android:textColor="@color/blanco"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <ImageView
-                            android:id="@+id/ImageView01"
-                            android:layout_width="10dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
-                            android:src="@drawable/reloj_rosa" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8"
+                        android:orientation="vertical" >
 
                         <TextView
                             android:id="@+id/txt_comment_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="2dp"
+                            android:layout_marginLeft="5dp"
                             android:text="12-02-2014"
-                            android:textColor="@color/azul_verdoso"
-                            android:textSize="10sp"
+                            android:textColor="#aaaaaa"
+                            android:textSize="9sp"
                             android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="10dp"
+                            android:layout_gravity="center_horizontal"
+                            android:gravity="center_horizontal" >
+
+                            <ImageView
+                                android:id="@+id/imageView1"
+                                android:layout_width="13dp"
+                                android:layout_height="13dp"
+                                android:src="@drawable/arrow_right" />
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/txt_comment_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="4dp"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:paddingTop="4dp"
-                        android:maxLines="3"
-                        android:text="co pmeoebantario prueba"
-                        android:textColor="@color/gris_oscuro"
-                        android:textStyle="bold" />
                 </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

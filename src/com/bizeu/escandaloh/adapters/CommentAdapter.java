@@ -1,19 +1,15 @@
 package com.bizeu.escandaloh.adapters;
 
 import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
@@ -25,10 +21,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
     int layoutResourceIdIzquierda;  
     int layoutResourceIdDerecha;
     ArrayList<Comment> data;  
-    CommentHolder holder;
     private Comment comment;
-    private String user_name_owner;
-    private int text_width, user_width;
 	
     
     /**
@@ -37,13 +30,12 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
      * @param layoutResourceId
      * @param data
      */
-    public CommentAdapter(Context context, int layoutResourceIdIzquierda, int layoutResourceIdDerecha, ArrayList<Comment> data, String user_name) {
+    public CommentAdapter(Context context, int layoutResourceIdIzquierda, int layoutResourceIdDerecha, ArrayList<Comment> data) {
         super(context, layoutResourceIdIzquierda, layoutResourceIdDerecha, data);
         this.layoutResourceIdIzquierda = layoutResourceIdIzquierda;
         this.layoutResourceIdDerecha = layoutResourceIdDerecha;
         this.mContext = context;
         this.data = data;
-        this.user_name_owner = user_name;
     }
 
     
@@ -53,44 +45,28 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View mView = convertView;
-        holder = null;
+        CommentHolder holder ;
 
         comment = data.get(position);
-        
-        if(mView == null){
-            LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();        
-            // Si soy el usuario del comentario, éste aparecerá a la derecha
-            if (MyApplication.user_name.equals(comment.getUsername())){
-                mView = inflater.inflate(layoutResourceIdDerecha, parent, false);
-            }
-            // Si no, a la izquierda
-            else{
-            	 mView = inflater.inflate(layoutResourceIdIzquierda, parent, false);
-            }
-                           
-            holder = new CommentHolder();
-            holder.txtText = (TextView)mView.findViewById(R.id.txt_comment_text);
-            holder.txtUsername = (TextView)mView.findViewById(R.id.txt_comment_username);
-            holder.txtDate = (TextView)mView.findViewById(R.id.txt_comment_date);
-            holder.imgAvatar = (FetchableImageView)mView.findViewById(R.id.img_comment_avatar);
-            holder.imgUser = (ImageView)mView.findViewById(R.id.img_comment_user);
+        LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             
-            /*
-            // Si soy el dueño del escándalo la info aparecerá en azul
-            if (user_name_owner.equals(comment.getUsername())){
-                holder.txtUsername.setTextColor(mContext.getResources().getColor(R.color.azul_verdoso));
-                holder.txtDate.setTextColor(mContext.getResources().getColor(R.color.azul_verdoso));
-            }
-            */
-                         
-            mView.setTag(holder);
+        // Si soy el usuario del comentario, éste aparecerá a la derecha
+        if (MyApplication.user_name.equals(comment.getUsername())){
+        	convertView = inflater.inflate(layoutResourceIdDerecha, parent, false);
         }
-        
+        // Si no, a la izquierda
         else{
-            holder = (CommentHolder)mView.getTag();   
+        	convertView = inflater.inflate(layoutResourceIdIzquierda, parent, false);
         }
-        	        
+                           
+        holder = new CommentHolder();
+        holder.txtText = (TextView)convertView.findViewById(R.id.txt_comment_text);
+        holder.txtUsername = (TextView)convertView.findViewById(R.id.txt_comment_username);
+        holder.txtDate = (TextView)convertView.findViewById(R.id.txt_comment_date);
+        holder.imgAvatar = (FetchableImageView)convertView.findViewById(R.id.img_comment_avatar);
+        holder.imgUser = (ImageView)convertView.findViewById(R.id.img_comment_socialnetwork);                                 
+
+        // Rellenamos los datos	        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
         holder.imgAvatar.setImage(MyApplication.DIRECCION_BUCKET + comment.getAvatar(), mContext.getResources().getDrawable(R.drawable.avatar_defecto));
@@ -114,17 +90,17 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         	holder.imgUser.setImageResource(R.drawable.facebook_rosa);
         }  
              
-        return mView;
+        return convertView;
     }
     
-    
+
     
     
     /**
      * Clase Holder
      *
      */
-    public static class CommentHolder{
+     static class CommentHolder{
         TextView txtText;
         TextView txtUsername;
         TextView txtDate; 

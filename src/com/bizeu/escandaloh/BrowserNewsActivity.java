@@ -50,11 +50,9 @@ public class BrowserNewsActivity extends SherlockActivity {
 		
 		// Action Bar
 		ActionBar actBar = getSupportActionBar();
-		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-				| ActionBar.DISPLAY_SHOW_HOME);
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_browser, null);
 		actBar.setCustomView(view);
-		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setIcon(R.drawable.logo_blanco);
