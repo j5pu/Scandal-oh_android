@@ -161,4 +161,7 @@
     <string name="se_el_primero_en_comentar">¡Se el primero en comentar este escándalo!</string>
     <string name="inicia_sesion_para_comentar_este_escandalo">Inicia sesión para comentar este escándalo</string>
     <string name="anonimo">Anónimo</string>
+    <string name="debes_iniciar_sesion_para_compartir">Debes iniciar sesión para compartir contenidos</string>
+    <string name="foto_sin_titulo">Foto sin título</string>
+    <string name="quieres_hacerlo_ahora">¿Quieres hacerlo ahora?</string>
 </resources>

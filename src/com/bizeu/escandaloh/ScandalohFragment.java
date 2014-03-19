@@ -1,6 +1,5 @@
 package com.bizeu.escandaloh;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,37 +7,19 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.applidium.shutterbug.FetchableImageView;
-import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
-import com.bizeu.escandaloh.adapters.CommentAdapter;
-import com.bizeu.escandaloh.model.Comment;
-import com.bizeu.escandaloh.model.Scandaloh;
-import com.bizeu.escandaloh.users.LoginSelectActivity;
-import com.bizeu.escandaloh.util.Audio;
-import com.bizeu.escandaloh.util.Connectivity;
-import com.bizeu.escandaloh.util.ImageUtils;
-import com.bizeu.escandaloh.util.Utils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
-import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -46,39 +27,41 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
+import com.actionbarsherlock.app.SherlockFragment;
+import com.applidium.shutterbug.FetchableImageView;
+import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
+import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.model.Scandaloh;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.Utils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ScandalohFragment extends SherlockFragment {
 
@@ -102,14 +85,15 @@ public class ScandalohFragment extends SherlockFragment {
     private static final String SOURCE = "Source";
     public static final String SOURCE_NAME = "Source_name";
     private static final String MEDIA_TYPE = "Media_type";
- 
-    private TextView num_com ;
-	private LinearLayout ll_comments;
-    private ListView list_comments;
-    private EditText edit_write_comment;
+    public static final int SHOW_COMMENTS = 343;
+
     private ImageView aud;
-    private ProgressBar loading_audio;
 	private ImageView img_arrow;
+	private TextView comment_text;
+	private TextView txt_user_name; 
+    private FetchableImageView img_avatar;
+    private ImageView social_net;
+	private TextView txt_date;
  
     private String id;
     private String url;
@@ -137,6 +121,7 @@ public class ScandalohFragment extends SherlockFragment {
 	private int media_type;
 	private String source;
 	private String source_name;
+	private CharSequence[] opciones_compartir;
 
     
     /**
@@ -212,6 +197,45 @@ public class ScandalohFragment extends SherlockFragment {
         // Preferencias
 		prefs = getActivity().getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
     }
+    
+    
+    
+    /**
+     * onActivityResult
+     */
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+	    if(requestCode == SHOW_COMMENTS && resultCode == Activity.RESULT_OK) {
+	    	// Actualizamos el último comentario
+	    	if (data.getExtras() != null){    		
+	 	        Comment last_comm = (Comment) data.getExtras().getParcelable(CommentsActivity.LST_COMMENT);
+	 	        // Actualizamos el adaptador
+	        	((MainActivity) getActivity()).updateLastComment(last_comm);
+	        	// Actualizamos las vistas
+	        	comment_text.setText(last_comm.getText());
+	        	// Nombre de usuario
+	    		txt_user_name.setText(last_comm.getUsername());   		
+	    		// Fecha (formato dd-mm-aaaa)
+	            String date_without_time = (last_comm.getDate().split("T",2))[0];   
+	            String year = date_without_time.split("-",3)[0];
+	            String month = date_without_time.split("-",3)[1];
+	            String day = date_without_time.split("-",3)[2];
+	            String final_date = day + "-" + month + "-" + year;
+	            txt_date.setText(final_date); 	            
+	            // Avatar
+	            img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comm.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));       
+	            // Red social
+	            int social_ne = Integer.parseInt(last_comm.getSocialNetwork());
+	            if (social_ne == 0){
+	            	social_net.setImageResource(R.drawable.s_gris);
+	            }
+	            else if (social_ne == 1){
+	            	social_net.setImageResource(R.drawable.facebook_gris);
+	            }
+	    	} 
+	    }
+	  }
 
     
     /**
@@ -230,6 +254,7 @@ public class ScandalohFragment extends SherlockFragment {
                 	reproduciendo = true;
         			// Paramos si hubiera algún audio reproduciéndose
         			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+        			// Reproducimos
                 	new PlayAudioTask().execute(uri_audio);
                 }
             }
@@ -255,8 +280,7 @@ public class ScandalohFragment extends SherlockFragment {
         Paint mShadow = new Paint(); 
         // radius=10, y-offset=2, color=black 
         mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); 
-        
-        
+           
         // NOTICIA 
         final FetchableImageView img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
     	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
@@ -288,34 +312,6 @@ public class ScandalohFragment extends SherlockFragment {
     					i.putExtra("uri_audio", uri_audio);				
     					getActivity().startActivity(i);				
     				}	
-    			}
-    		});
-            
-            
-            img.setOnLongClickListener(new View.OnLongClickListener() {
-            	
-    			@Override
-    			public boolean onLongClick(View v) {			
-    				
-    				// Paramos si hubiera algún audio reproduciéndose
-    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-    				
-    				// Mostramos la opción de guardar la foto en la galería
-    				final CharSequence[] items = {getResources().getString(R.string.guardar_foto_galeria)};
-    				 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    			        builder.setItems(items, new DialogInterface.OnClickListener() {
-    			            @Override
-    			            public void onClick(DialogInterface dialog, int item) {
-    			            	
-    			            	// Guardamos en galería
-    			                if (items[item].equals(R.string.guardar_foto_galeria)) {
-    			                	new SaveImageTask(getActivity()).execute(url_big);     			   
-    			                } 			                
-    			            }
-    			        });
-    			        builder.show();
-    			        
-    				return true;
     			}
     		});
         }
@@ -399,7 +395,7 @@ public class ScandalohFragment extends SherlockFragment {
         final TextView tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
         tLikes.setText(Integer.toString(likes));
         tDislikes.setText(Integer.toString(dislikes));
-        
+      
         // Si está logueado
         if (MyApplication.logged_user){
         	// Mostramos si ya había marcado likes/dislikes anteriormente
@@ -523,66 +519,80 @@ public class ScandalohFragment extends SherlockFragment {
 			@Override
 			public void onClick(View arg0) {
 				
-				 // Creamos un menu para elegir entre compartir y denunciar foto
-				 final CharSequence[] opciones_compartir = {getResources().getString(R.string.compartir_escandalo), getResources().getString(R.string.reportar_escandalo)};
-				 AlertDialog.Builder dialog_compartir = new AlertDialog.Builder(getActivity());
-				 dialog_compartir.setTitle(R.string.selecciona_opcion);
-				 dialog_compartir.setItems(opciones_compartir, new DialogInterface.OnClickListener() {
-			            @Override
-			            public void onClick(DialogInterface dialog, int item) {
-			            	
-			            	// Compartir scándalOh
-			                if (opciones_compartir[item].equals(getResources().getString(R.string.compartir_escandalo))) {
-			    				// Paramos si hubiera algún audio reproduciéndose
-			    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-			    				
-			    				// Compartimos la foto
-			    				Uri screenshotUri = Uri.parse(url_big);	
-			    				new ShareImageTask(getActivity().getBaseContext(), title).execute(screenshotUri.toString());	      			   
-			                } 
-			                
-			                // Reportar foto
-			                else if (opciones_compartir[item].equals(getResources().getString(R.string.reportar_escandalo))) {
-			                	
-			                	// Si el usuario está logueado
-			                	if (MyApplication.logged_user){
-				                	// Creamos un menu para elegir el tipo de report
-				                	final CharSequence[] opciones_reportar = {getResources().getString(R.string.material_ofensivo), 
-				                			getResources().getString(R.string.spam), getResources().getString(R.string.copyright)};
-				                	AlertDialog.Builder dialog_report = new AlertDialog.Builder(getActivity());
-				                	dialog_report.setTitle(R.string.reportar_esta_foto_por);
-				                	dialog_report.setItems(opciones_reportar, new DialogInterface.OnClickListener() {
-										
-										@Override
-										public void onClick(DialogInterface dialog, int item) {
+    				// Creamos un menu para elegir entre compartir y denunciar foto
+    				AlertDialog.Builder dialog_compartir = new AlertDialog.Builder(getActivity());
+    				dialog_compartir.setTitle(R.string.selecciona_opcion);
+    				List<String> options_share = new ArrayList<String>();
 
-											// Material ofensivo
-											if (opciones_reportar[item].equals("Material ofensivo")){
-												chosen_report = 2;
-											}
-											// Spam
-											else if (opciones_reportar[item].equals("Spam")){
-												chosen_report = 3;
-											}
-											// Copyright
-											else if (opciones_reportar[item].equals("Copyright")){
-												chosen_report = 1;
-											}	
-											new ReportPhoto(getActivity().getBaseContext()).execute();
-										}
-									});
-				                	dialog_report.show();
-			                	}
-			                	// No está logueado
-			                	else{
-			    		        	Toast toast = Toast.makeText(getActivity().getBaseContext(), R.string.debes_iniciar_sesion_para_reportar, Toast.LENGTH_LONG);
-			    		        	toast.show();        
-			                	}
+    				// Si está logueado mostramos las opciones de compartir, reportar y guardar en galeria
+    				if (MyApplication.logged_user){
+    					options_share.add(new String(getResources().getString(R.string.compartir_escandalo)));
+    					options_share.add(new String(getResources().getString(R.string.reportar_escandalo)));
+    					options_share.add(new String(getResources().getString(R.string.guardar_foto_galeria)));
+    				}
+    				
+    				// Si no, no mostramos la opción de reportar
+    				else{
+    					options_share.add(new String(getResources().getString(R.string.compartir_escandalo)));
+    					options_share.add(new String(getResources().getString(R.string.guardar_foto_galeria)));
+    				}
+    				
+    				opciones_compartir = options_share.toArray(new CharSequence[options_share.size()]);
+    				dialog_compartir.setItems(opciones_compartir, new DialogInterface.OnClickListener() {
+   			            @Override
+   			            public void onClick(DialogInterface dialog, int item) {
+   			            	
+   			            	// Compartir scándalOh
+   			                if (opciones_compartir[item].equals(getResources().getString(R.string.compartir_escandalo))) {
+   			    				// Paramos si hubiera algún audio reproduciéndose
+   			    				Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+   			    				
+   			    				// Compartimos la foto
+   			    				Uri screenshotUri = Uri.parse(url_big);	
+   			    				new ShareImageTask(getActivity().getBaseContext(), title).execute(screenshotUri.toString());	      			   
+   			                } 
+   			                
+   			                // Reportar foto
+   			                else if (opciones_compartir[item].equals(getResources().getString(R.string.reportar_escandalo))) {
+   			                	
+   			                	// Si el usuario está logueado
+   			                	if (MyApplication.logged_user){
+   				                	// Creamos un menu para elegir el tipo de report
+   				                	final CharSequence[] opciones_reportar = {getResources().getString(R.string.material_ofensivo), 
+   				                			getResources().getString(R.string.spam), getResources().getString(R.string.copyright)};
+   				                	AlertDialog.Builder dialog_report = new AlertDialog.Builder(getActivity());
+   				                	dialog_report.setTitle(R.string.reportar_esta_foto_por);
+   				                	dialog_report.setItems(opciones_reportar, new DialogInterface.OnClickListener() {
+   										
+   										@Override
+   										public void onClick(DialogInterface dialog, int item) {
 
-			                } 
-			            }
-			        });
-				 dialog_compartir.show();			
+   											// Material ofensivo
+   											if (opciones_reportar[item].equals("Material ofensivo")){
+   												chosen_report = 2;
+   											}
+   											// Spam
+   											else if (opciones_reportar[item].equals("Spam")){
+   												chosen_report = 3;
+   											}
+   											// Copyright
+   											else if (opciones_reportar[item].equals("Copyright")){
+   												chosen_report = 1;
+   											}	
+   											new ReportPhoto(getActivity().getBaseContext()).execute();
+   										}
+   									});
+   				                	dialog_report.show();
+   			                	}
+   			                } 
+   			                
+   			                // Guardar foto en la galería
+   			                else if (opciones_compartir[item].equals(getResources().getString(R.string.guardar_foto_galeria))) {
+   			                	new SaveImageTask(getActivity()).execute(url_big);
+   			                }
+   			            }
+   			        });
+   				 dialog_compartir.show();			 		
 			}
 		});
                 
@@ -596,11 +606,11 @@ public class ScandalohFragment extends SherlockFragment {
         
         // COMENTARIOS
         // Último comentario    
-        TextView comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
-		TextView user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
-        FetchableImageView avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
-        ImageView social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
-		TextView date = (TextView) rootView.findViewById(R.id.txt_comment_date);
+        comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
+		txt_user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
+        img_avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
+        social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
+		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
         LinearLayout ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
         
         // Si se pulsa accedemos a los comentarios
@@ -613,7 +623,7 @@ public class ScandalohFragment extends SherlockFragment {
 				i.putExtra(ID, id);
 				i.putExtra(TITLE, title);
 				i.putExtra(URL, url);			
-				startActivity(i);		
+				startActivityForResult(i,SHOW_COMMENTS);		
 			}
 		});
 
@@ -623,7 +633,7 @@ public class ScandalohFragment extends SherlockFragment {
     		comment_text.setText(last_comment.getText());
     		
     		// Nombre de usuario
-    		user_name.setText(last_comment.getUsername());
+    		txt_user_name.setText(last_comment.getUsername());
     		
     		// Fecha (formato dd-mm-aaaa)
             String date_without_time = (last_comment.getDate().split("T",2))[0];   
@@ -631,10 +641,10 @@ public class ScandalohFragment extends SherlockFragment {
             String month = date_without_time.split("-",3)[1];
             String day = date_without_time.split("-",3)[2];
             String final_date = day + "-" + month + "-" + year;
-            date.setText(final_date); 
+            txt_date.setText(final_date); 
             
             // Avatar
-            avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+            img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
        
             // Red social
             int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
@@ -651,14 +661,14 @@ public class ScandalohFragment extends SherlockFragment {
         	// Si el usuario está logueado
         	if (MyApplication.logged_user){
         		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
-        		user_name.setText(MyApplication.user_name);
-        		date.setText(Utils.getCurrentDate());
+        		txt_user_name.setText(MyApplication.user_name);
+        		txt_date.setText(Utils.getCurrentDate());
         	}
         	// Si no está logueado
         	else{
         		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
-        		user_name.setText(getResources().getString(R.string.anonimo));
-        		date.setText(Utils.getCurrentDate());
+        		txt_user_name.setText(getResources().getString(R.string.anonimo));
+        		txt_date.setText(Utils.getCurrentDate());
         		// Ocultamos la información del usuario
         		LinearLayout user_info = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment_info_user);
         		//user_info.setVisibility(View.GONE);
@@ -1075,5 +1085,8 @@ public class ScandalohFragment extends SherlockFragment {
 			
 	    }
  	
+	
+	
+
    
 }

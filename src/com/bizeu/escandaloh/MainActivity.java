@@ -110,7 +110,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private LinearLayout ll_lateral_pais;
 	private LinearLayout ll_lateral_ajustes;
 	private LinearLayout ll_lateral_login;
-	private LinearLayout ll_lateral_registro;
 	private TextView txt_lateral_nombreusuario;
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
@@ -227,18 +226,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
 		ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
-		ll_lateral_registro = (LinearLayout) findViewById(R.id.ll_mLateral_registro);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
 		
 		// Sombra del menu sobre la pantalla
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-				GravityCompat.START);
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
 
-		options = new String[] { getResources().getString(R.string.perfil),
+		/*options = new String[] { getResources().getString(R.string.perfil),
 				getResources().getString(R.string.notificaciones),
 				getResources().getString(R.string.pais),
 				getResources().getString(R.string.ajustes),
 				getResources().getString(R.string.danos_tu_opinion) };
+				*/
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer_blanco, R.string.drawer_open,
@@ -339,17 +337,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 
-		ll_lateral_registro.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(MainActivity.this,
-						RegistrationActivity.class);
-				startActivity(i);
-				// Cerramos el menu
-				mDrawerLayout.closeDrawer(ll_menu_lateral);
-			}
-		});
 		
 		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
 			
@@ -432,6 +419,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			pager.setVisibility(View.VISIBLE);
 		}
 	}
+	
 
 	/**
 	 * onPostCreate
@@ -457,14 +445,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		/*
-		 * // Actualizamos nº de comentarios si no se están obteniendo otros
-		 * escándalos if (!getting_escandalos){ // Si hay conexión if
-		 * (Connectivity.isOnline(mContext)){ if (escandalos.size() > 0){
-		 * updateNumCommentsAsync = new UpdateNumComments();
-		 * updateNumCommentsAsync.execute(); } } }
-		 */
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);
 
@@ -476,14 +456,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-
-
-
-		// Si está logueado ocultamos las opciones de login y registro y mostramos su nombre en el menu
+		
+		// Si está logueado ocultamos las opción de login  y mostramos su nombre en el menu
 		// Actualizamos el avatar y el nombre de usuario
 		if (MyApplication.logged_user) {
 			ll_lateral_login.setVisibility(View.GONE);
-			ll_lateral_registro.setVisibility(View.GONE);
 			txt_lateral_nombreusuario.setText(MyApplication.user_name);
 			Log.v("WE","Myapplication avatar: " + MyApplication.avatar);
 			if (MyApplication.avatar != null){
@@ -494,7 +471,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		} else {
 			ll_lateral_login.setVisibility(View.VISIBLE);
-			ll_lateral_registro.setVisibility(View.VISIBLE);
 			img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
 			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado));
 			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);		
@@ -520,31 +496,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Cerramos llave
 			MyApplication.reset_scandals = false;
 		}
-
-		// Abrimos la llave para el caso de error del timeout al obtener fotos
-		// MyApplication.TIMEOUT_PHOTO_SHOWN = false;
-
-		/*
-		 * // Si está logueado mostramos la cámara (con su selector) if
-		 * (MyApplication.logged_user){ StateListDrawable states = new
-		 * StateListDrawable(); states.addState(new int[]
-		 * {android.R.attr.state_pressed
-		 * },getResources().getDrawable(R.drawable.camara_pressed));
-		 * states.addState(new int[]
-		 * {android.R.attr.state_focused},getResources(
-		 * ).getDrawable(R.drawable.camara_pressed)); states.addState(new int[]
-		 * { },getResources().getDrawable(R.drawable.camara_blanca));
-		 * img_take_photo.setImageDrawable(states); } // Si no está logueado
-		 * mostramos el símbolo para hacer login else{ StateListDrawable states
-		 * = new StateListDrawable(); states.addState(new int[]
-		 * {android.R.attr.state_pressed
-		 * },getResources().getDrawable(R.drawable.mas_pressed));
-		 * states.addState(new int[]
-		 * {android.R.attr.state_focused},getResources(
-		 * ).getDrawable(R.drawable.mas_pressed)); states.addState(new int[] {
-		 * },getResources().getDrawable(R.drawable.mas));
-		 * img_take_photo.setImageDrawable(states); }
-		 */
 	}
 
 	/**
@@ -597,8 +548,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	/**
 	 * onActivityResult
 	 */
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
 		// Escándalo desde la cámara
 		if (requestCode == SHOW_CAMERA) {
 			if (resultCode == RESULT_OK) {
@@ -685,9 +637,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// Si dispone de conexión
 			if (Connectivity.isOnline(mContext)) {
+				
 				// Si está logueado
 				if (MyApplication.logged_user) {
-
+					
 					// Creamos un menu para elegir entre hacer foto con la
 					// cámara o cogerla de la galería
 					final CharSequence[] items = {
@@ -778,12 +731,28 @@ public class MainActivity extends SherlockFragmentActivity implements
 							});
 					builder.show();
 				}
-				// No está logueado: mostramos un mensaje diciendo que se loguee
+				
+				// No está logueado: mostramos un popup preguntando si quiere loguearse
 				else {
-					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.registrate_o_inicia_sesion), Toast.LENGTH_LONG);
-					toast.show();
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					builder.setTitle(R.string.debes_iniciar_sesion_para_compartir);		
+					builder.setPositiveButton(R.string.iniciar_sesion, new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				               Intent i = new Intent(MainActivity.this, LoginSelectActivity.class);
+				               startActivity(i);
+				           }
+				       });
+					builder.setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				               dialog.dismiss();
+				           }
+				       });
+
+					AlertDialog dialog = builder.create();
+					dialog.show();
 				}
 			}
+			
 			// No dispone de conexión
 			else {
 				Toast toast = Toast.makeText(mContext,
@@ -1585,6 +1554,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 	
 	
+	/**
+	 * Actualiza el último comentario del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param lst_comm
+	 */
+	public void updateLastComment(Comment lst_comm){
+		adapter.updateLastComment(lst_comm);
+	}
+	
+	
 	
 	
 	
@@ -1680,6 +1658,22 @@ public class MainActivity extends SherlockFragmentActivity implements
 			scan.setAlreadyVoted(already_voted);
 			scan.setLikes(num_likes);
 			scan.setDislikes(num_dislikes);
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		/**
+		 * Actualiza el último comentario del fragmento que esté actualmente visualizándose
+		 * @param comment_text
+		 */
+		public void updateLastComment(Comment comm){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el último comentario
+			scan.setLastComment(comm);
+			
+			Log.v("WE","texto last comment: " + scan.getLastComment().getText());
 			// Actualizamos el adaptador con el nuevo fragmento
 			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);

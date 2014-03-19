@@ -42,6 +42,8 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CommentsActivity extends SherlockActivity {
 
+	public static String LST_COMMENT = "last_comment";
+	
 	private ListView list_comments;
 	private LinearLayout img_send;
 	private LinearLayout ll_loading;
@@ -54,7 +56,6 @@ public class CommentsActivity extends SherlockActivity {
 	private ArrayList<Comment> array_comments = new ArrayList<Comment>();
 	private CommentAdapter commentsAdapter;
 	private boolean any_error;
-	private String scandaloh_owner;
 	private String id;
 	private ProgressDialog send_progress;
 	private Context mContext;
@@ -73,8 +74,6 @@ public class CommentsActivity extends SherlockActivity {
 		mContext = this;
 
 		if (getIntent() != null) {
-			scandaloh_owner = getIntent().getExtras().getString(
-					ScandalohFragment.SOURCE_NAME);
 			id = getIntent().getExtras().getString(ScandalohFragment.ID);
 			title = getIntent().getExtras().getString(ScandalohFragment.TITLE);
 			url_photo = getIntent().getExtras().getString(ScandalohFragment.URL);
@@ -169,11 +168,29 @@ public class CommentsActivity extends SherlockActivity {
 		}
 	}
 
+	
+	/**
+	 * onPause
+	 */
 	@Override
 	public void onPause() {
 		super.onPause();
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(screen.getWindowToken(), 0);
+	}
+	
+	
+	/**
+	 * onBackPressed
+	 */
+	@Override
+	public void onBackPressed() {
+	   Intent returnIntent = new Intent();
+	   if (array_comments.size() > 0){
+		   returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
+	   }
+	   setResult(RESULT_OK, returnIntent);
+	   finish();
 	}
 
 	/**

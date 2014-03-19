@@ -154,29 +154,6 @@
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_mLateral_registro"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="7dp" >
-
-                <ImageView
-                    android:id="@+id/imageView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:src="@drawable/registro" />
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="2dp"
-                    android:text="@string/nuevo_usuario"
-                    android:textColor="@color/azul_verdoso"
-                    android:textSize="22sp" />
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
