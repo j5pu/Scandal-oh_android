@@ -1563,6 +1563,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 	
 	
+	public void updateNumComments(int num_comments){
+		adapter.updateNumComments(num_comments);
+	}
+	
+	
 	
 	
 	
@@ -1647,6 +1652,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			this.fragments.set(position, fragment);
 		}
 		
+		
 		/**
 		 * Actualiza el campo already_voted del fragmento que esté actualmente visualizándose
 		 * @param already_voted
@@ -1663,6 +1669,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			this.fragments.set(pager.getCurrentItem(), sf2);
 		}
 		
+		
 		/**
 		 * Actualiza el último comentario del fragmento que esté actualmente visualizándose
 		 * @param comment_text
@@ -1672,8 +1679,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 			Scandaloh scan = escandalos.get(pager.getCurrentItem());
 			// Le modificamos el último comentario
 			scan.setLastComment(comm);
-			
-			Log.v("WE","texto last comment: " + scan.getLastComment().getText());
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		
+		/**
+		 * Actualiza el nº de comentarios del fragmento que esté actualmente visualizándose
+		 * @param num_c
+		 */
+		public void updateNumComments(int num_c){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el último comentario
+			scan.setNumComments(num_c);
 			// Actualizamos el adaptador con el nuevo fragmento
 			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);

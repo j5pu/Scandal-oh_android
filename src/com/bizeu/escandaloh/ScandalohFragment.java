@@ -94,6 +94,7 @@ public class ScandalohFragment extends SherlockFragment {
     private FetchableImageView img_avatar;
     private ImageView social_net;
 	private TextView txt_date;
+	private TextView num_com;
  
     private String id;
     private String url;
@@ -207,8 +208,9 @@ public class ScandalohFragment extends SherlockFragment {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 	    if(requestCode == SHOW_COMMENTS && resultCode == Activity.RESULT_OK) {
-	    	// Actualizamos el último comentario
-	    	if (data.getExtras() != null){    		
+
+	    	if (data.getExtras() != null){   
+		    	// Actualizamos el último comentario
 	 	        Comment last_comm = (Comment) data.getExtras().getParcelable(CommentsActivity.LST_COMMENT);
 	 	        // Actualizamos el adaptador
 	        	((MainActivity) getActivity()).updateLastComment(last_comm);
@@ -233,6 +235,13 @@ public class ScandalohFragment extends SherlockFragment {
 	            else if (social_ne == 1){
 	            	social_net.setImageResource(R.drawable.facebook_gris);
 	            }
+	            
+	            // Actualizamos el nº de comentarios
+	            int num_comments = data.getExtras().getInt(CommentsActivity.NUM_COMMENTS);
+	            // Actualizamos el adaptador
+	            ((MainActivity) getActivity()).updateNumComments(num_comments);
+	            // Actualizamos la vista
+	            num_com.setText(Integer.toString(num_comments));
 	    	} 
 	    }
 	  }
@@ -685,21 +694,10 @@ public class ScandalohFragment extends SherlockFragment {
         }
    
         
- 		// Número de comentarios
-        /*
-		num_com = (TextView) rootView.findViewById(R.id.txt_num_comments);
-		if (num_comments == 0){
-			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
-		}
-		else if (num_comments == 1){
-			num_com.setText(num_comments + " " + getResources().getString(R.string.comentario));
-		}
-		else{
-			num_com.setText(num_comments + " " + getResources().getString(R.string.comentarios));
-		}
-		*/
-
-           
+ 		// Número de comentarios        
+		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
+		num_com.setText(Integer.toString(num_comments));
+   
         // Devolvemos la vista
         return rootView;
     }

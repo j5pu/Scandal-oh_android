@@ -43,6 +43,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 public class CommentsActivity extends SherlockActivity {
 
 	public static String LST_COMMENT = "last_comment";
+	public static String NUM_COMMENTS = "num_comments";
 	
 	private ListView list_comments;
 	private LinearLayout img_send;
@@ -187,7 +188,10 @@ public class CommentsActivity extends SherlockActivity {
 	public void onBackPressed() {
 	   Intent returnIntent = new Intent();
 	   if (array_comments.size() > 0){
+		   // Devolvemos el último comentario
 		   returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
+		   // Devolvemos el nº de comentarios
+		   returnIntent.putExtra(NUM_COMMENTS, array_comments.size());
 	   }
 	   setResult(RESULT_OK, returnIntent);
 	   finish();
