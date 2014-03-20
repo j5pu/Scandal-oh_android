@@ -1,18 +1,40 @@
 package com.bizeu.escandaloh.settings;
 
+import java.io.File;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.ImageUtils;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -21,6 +43,7 @@ import android.preference.PreferenceCategory;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements
 		OnPreferenceClickListener {
@@ -102,6 +125,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				        	prefs.edit().putString(MyApplication.AVATAR, null).commit();
 				        	MyApplication.avatar = null;
 							MyApplication.logged_user = false;
+							// Avisamos al servidor
+							new LogOutTask().execute();
 							
 							// Reiniciamos los escándalos
 							MyApplication.reset_scandals = true;
@@ -135,4 +160,60 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         }
         return super.onOptionsItemSelected(item);
     }
+    
+    
+    
+	/**
+	 * Desloguea a un usuario
+	 * 
+	 */
+	private class LogOutTask extends AsyncTask<Void, Integer, Integer> {
+
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			HttpEntity resEntity;
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/logout/";
+
+			HttpResponse response = null;
+			try {
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost(urlString);
+				post.setHeader("Session-Token", MyApplication.session_token);
+	
+				response = client.execute(post);
+				resEntity = response.getEntity();
+				final String response_str = EntityUtils.toString(resEntity);
+
+				// Comprobamos si ha habido algún error
+				if (response_str != null) {
+					Log.i("WE", response_str);
+					// Obtenemos el json devuelto
+					JSONObject respJSON = new JSONObject(response_str);
+
+					if (respJSON.has("error")) {
+					}
+				}
+
+			} catch (Exception ex) {
+				Log.e("Debug", "error: " + ex.getMessage(), ex);
+
+				// Mandamos la excepción a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(
+						new StandardExceptionParser(mContext, null) 
+								.getDescription(Thread.currentThread()
+										.getName(), // The name of the thread on
+													// which the exception
+													// occurred.
+										ex), // The exception.
+						false).build()); // False indicates a fatal exception
+			}
+			return null;
+			
+		}
+
+		
+	}
 }
