@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 
 public class Utils {
@@ -52,4 +53,20 @@ public class Utils {
     	return sdf.format(date);
     }
 
+    
+    
+	/**
+	 * Comprueba si el dispositivo dispone de cámara
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static boolean checkCameraHardware(Context context) {
+		if (context.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_CAMERA)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

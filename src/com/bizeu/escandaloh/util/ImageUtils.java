@@ -10,26 +10,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class ImageUtils {
 
@@ -68,68 +62,107 @@ public class ImageUtils {
 	 */
 	public static Bitmap uriToBitmap(Uri selectedImage, Context context) {
 		Bitmap bm = null;
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inSampleSize = 5;
 		AssetFileDescriptor fileDescriptor = null;
+		BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+
 		try {
 			fileDescriptor = context.getContentResolver()
 					.openAssetFileDescriptor(selectedImage, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(context, null) // Context and
-																// optional
-																// collection of
-																// package names
-																// to be used in
-																// reporting the
-																// exception.
-							.getDescription(Thread.currentThread().getName(), // The
-																				// name
-																				// of
-																				// the
-																				// thread
-																				// on
-																				// which
-																				// the
-																				// exception
-																				// occurred.
-									e), // The exception.
-					false).build());
 		} finally {
 			try {
-				bm = BitmapFactory.decodeFileDescriptor(
+				BitmapFactory.decodeFileDescriptor(
 						fileDescriptor.getFileDescriptor(), null, options);
 				fileDescriptor.close();
+				
+			    // Calculate inSampleSize
+			    options.inSampleSize = calculateInSampleSize(options, 200, 200);
+			    
+			    // Decode bitmap with inSampleSize set
+			    options.inJustDecodeBounds = false;
+			    
+			    try {
+					fileDescriptor = context.getContentResolver()
+							.openAssetFileDescriptor(selectedImage, "r");
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						bm = BitmapFactory.decodeFileDescriptor(
+								fileDescriptor.getFileDescriptor(), null, options);
+						fileDescriptor.close();
+					    
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			    
 			} catch (IOException e) {
 				e.printStackTrace();
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(context, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										e), // The exception.
-						false).build());
 			}
 		}
 		return bm;
 	}
+	
+	
+	
+	/**
+	 * Crea un File en cache a partir de un bitmap 
+	 * @param bitm
+	 * @param context
+	 * @param file_name
+	 * @return
+	 */
+	public static File bitmapToFileTemp(Bitmap bitm, Context context, String file_name){
+		File f = new File(context.getCacheDir(), "avatar.jpg");
+		try {
+			f.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bitm.compress(CompressFormat.JPEG, 100, bos);
+		byte[] bitmapdata = bos.toByteArray();
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(f);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fos.write(bitmapdata);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    
+	    BitmapFactory.decodeFile(f.getPath(), options);
+	    
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, 100, 100);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    BitmapFactory.decodeFile(f.getPath(), options);	
+	    
+	    try {
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return f;
+	}
+	
+	
 
 	/**
 	 * Crea un File a partir de un bitmap
@@ -149,23 +182,8 @@ public class ImageUtils {
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(context);
 			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(context, null) // Context and
-																// optional
-																// collection of
-																// package names
-																// to be used in
-																// reporting the
-																// exception.
-							.getDescription(Thread.currentThread().getName(), // The
-																				// name
-																				// of
-																				// the
-																				// thread
-																				// on
-																				// which
-																				// the
-																				// exception
-																				// occurred.
+					new StandardExceptionParser(context, null) 
+							.getDescription(Thread.currentThread().getName(), 
 									e), // The exception.
 					false).build());
 		}
@@ -180,23 +198,8 @@ public class ImageUtils {
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(context);
 			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(context, null) // Context and
-																// optional
-																// collection of
-																// package names
-																// to be used in
-																// reporting the
-																// exception.
-							.getDescription(Thread.currentThread().getName(), // The
-																				// name
-																				// of
-																				// the
-																				// thread
-																				// on
-																				// which
-																				// the
-																				// exception
-																				// occurred.
+					new StandardExceptionParser(context, null) 
+							.getDescription(Thread.currentThread().getName(), 
 									e), // The exception.
 					false).build());
 		}
@@ -287,6 +290,31 @@ public class ImageUtils {
 			return null;
 		}
 	}
+
+	private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if (height > reqHeight || width > reqWidth) {
+
+			final int halfHeight = height / 2;
+			final int halfWidth = width / 2;
+
+			// Calculate the largest inSampleSize value that is a power of 2 and
+			// keeps both
+			// height and width larger than the requested height and width.
+			while ((halfHeight / inSampleSize) > reqHeight
+					&& (halfWidth / inSampleSize) > reqWidth) {
+				inSampleSize *= 2;
+			}
+		}
+
+		return inSampleSize;
+	}
+	
+	
 
 
 }

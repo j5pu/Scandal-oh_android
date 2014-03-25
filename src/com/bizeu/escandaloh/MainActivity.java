@@ -73,11 +73,13 @@ import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
+import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.Utils;
 import com.countrypicker.CountryPicker;
 import com.countrypicker.CountryPickerListener;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -91,10 +93,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public static final int SHOW_CAMERA = 10;
 	private static final int CREATE_ESCANDALO = 11;
 	public static final int FROM_GALLERY = 12;
-	public static final int AVATAR_SHOW_CAMERA = 15;
-	public static final int AVATAR_FROM_GALLERY = 14;
 	public static final int SHARING = 13;
-	public static final int PIC_CROP = 16;
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
@@ -108,6 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageView img_take_photo;
 	private LinearLayout ll_lateral_notificaciones;
 	private LinearLayout ll_lateral_pais;
+	private LinearLayout ll_lateral_perfil;
 	private LinearLayout ll_lateral_ajustes;
 	private LinearLayout ll_lateral_login;
 	private TextView txt_lateral_nombreusuario;
@@ -129,7 +129,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private boolean any_error;
 	private GetEscandalos getEscandalosAsync;
 	private GetNewEscandalos getNewEscandalosAsync;
-	// private UpdateNumComments updateNumCommentsAsync;
 	private String category;
 	private boolean getting_escandalos = true;
 	private boolean there_are_more_escandalos = true;
@@ -138,7 +137,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	String[] options;
 	ActionBarDrawerToggle mDrawerToggle;
 	private boolean no_hay_escandalos;
-	private ProgressDialog progress;
 	private ArrayAdapter<CharSequence> adapter_spinner;
 
 	/**
@@ -224,19 +222,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		img_lateral_avatar = (FetchableImageView) findViewById(R.id.img_mLateral_avatar);
 		ll_lateral_notificaciones = (LinearLayout) findViewById(R.id.ll_mLateral_notificaciones);
 		ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
+		ll_lateral_perfil = (LinearLayout) findViewById(R.id.ll_mLateral_profile);
 		ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
-
-		/*options = new String[] { getResources().getString(R.string.perfil),
-				getResources().getString(R.string.notificaciones),
-				getResources().getString(R.string.pais),
-				getResources().getString(R.string.ajustes),
-				getResources().getString(R.string.danos_tu_opinion) };
-				*/
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer_blanco, R.string.drawer_open,
@@ -255,62 +247,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 		img_lateral_avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
-				final CharSequence[] items = {
-						getResources()
-								.getString(R.string.hacer_foto_con_camara),
-						getResources().getString(
-								R.string.seleccionar_foto_galeria) };
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
-				builder.setTitle(R.string.avatar);
-				builder.setItems(items, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int item) {
-
-						// Cámara
-						if (items[item].equals(getResources().getString(
-								R.string.hacer_foto_con_camara))) {
-
-							// Si dispone de cámara iniciamos la cámara
-							if (checkCameraHardware(mContext)) {
-								Intent takePictureIntent = new Intent(
-										"android.media.action.IMAGE_CAPTURE");
-								File photo = null;
-								photo = createFileTemporary("picture", ".png");
-								if (photo != null) {
-									mImageUri = Uri.fromFile(photo);
-									takePictureIntent.putExtra(
-											MediaStore.EXTRA_OUTPUT, mImageUri);
-									startActivityForResult(takePictureIntent,
-											AVATAR_SHOW_CAMERA);
-									photo.delete();
-								}
-							}
-							// El dispositivo no dispone de cámara
-							else {
-								Toast toast = Toast
-										.makeText(
-												mContext,
-												R.string.este_dispositivo_no_dispone_camara,
-												Toast.LENGTH_LONG);
-								toast.show();
-							}
-						}
-
-						// Galería
-						else if (items[item].equals(getResources().getString(
-								R.string.seleccionar_foto_galeria))) {
-
-							Intent i = new Intent(
-									Intent.ACTION_PICK,
-									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-							startActivityForResult(i, AVATAR_FROM_GALLERY);
-						}
-					}
-				});
-				builder.show();
-
+				if (MyApplication.logged_user){
+					
+				}
+			}
+		});
+		
+		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+					
+				Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+				startActivity(i);		
 			}
 		});
 
@@ -457,13 +406,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onResume() {
 		super.onResume();
 		
-		// Si está logueado ocultamos las opción de login  y mostramos su nombre en el menu
-		// Actualizamos el avatar y el nombre de usuario
+		// Si está logueado ocultamos las opción de login  y mostramos su info y la opción de perfil
 		if (MyApplication.logged_user) {
 			ll_lateral_login.setVisibility(View.GONE);
+			ll_lateral_perfil.setVisibility(View.VISIBLE);
 			txt_lateral_nombreusuario.setText(MyApplication.user_name);
-			Log.v("WE","Myapplication avatar: " + MyApplication.avatar);
 			if (MyApplication.avatar != null){
+				Log.v("WE","Myapplication.avatar: " + MyApplication.avatar);
 		        img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_mas);
 			}
 			else{
@@ -471,6 +420,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		} else {
 			ll_lateral_login.setVisibility(View.VISIBLE);
+			ll_lateral_perfil.setVisibility(View.GONE);
 			img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
 			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado));
 			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);		
@@ -587,38 +537,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivityForResult(i, CREATE_ESCANDALO);
 			}
 		}
-
-		// Avatar desde la cámara
-		else if (requestCode == AVATAR_SHOW_CAMERA) {
-			if (mImageUri != null) {
-				if (!performCrop(mImageUri)) {
-					Bitmap photo_for_avatar = ImageUtils.uriToBitmap(mImageUri,
-							this);
-					 new UpdateAvatarTask(this,photo_for_avatar).execute();
-				}
-			}
-		}
-
-		// Avatar desde la galería
-		else if (requestCode == AVATAR_FROM_GALLERY) {
-			if (data != null) {
-				Uri selectedImageUri = data.getData();
-				if (!performCrop(selectedImageUri)) {
-					String foto_string = ImageUtils.getRealPathFromURI(mContext, selectedImageUri);
-					Bitmap photo_for_avatar = BitmapFactory.decodeFile(foto_string);
-					new UpdateAvatarTask(this,photo_for_avatar).execute();
-				}
-			}
-		}
-
-		// Crop de la foto
-		if (requestCode == PIC_CROP) {
-			if (data != null) {
-				Bundle extras = data.getExtras();
-				Bitmap photo_crop = extras.getParcelable("data");
-				new UpdateAvatarTask(this, photo_crop).execute();
-			}
-		}
 	}
 
 	/**
@@ -676,7 +594,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 										// Si dispone de cámara iniciamos la
 										// cámara
-										if (checkCameraHardware(mContext)) {
+										if (Utils.checkCameraHardware(mContext)) {
 											Intent takePictureIntent = new Intent(
 													"android.media.action.IMAGE_CAPTURE");
 											File photo = null;
@@ -779,20 +697,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			pager.setCurrentItem(0);
 
 			// Si no se están obteniendo otros escándalos
-			if (!getting_escandalos) {
+			if (!getting_escandalos) {			
 				// Si hay conexión
 				if (Connectivity.isOnline(mContext)) {
-					// Paramos si se estuviesen actualizando el nº de
-					// comentarios
-					/*
-					 * if (updateNumCommentsAsync != null){ if
-					 * (updateNumCommentsAsync.getStatus() ==
-					 * AsyncTask.Status.PENDING ||
-					 * updateNumCommentsAsync.getStatus() ==
-					 * AsyncTask.Status.RUNNING){
-					 * updateNumCommentsAsync.cancel(true); } }
-					 */
-
 					// Obtenemos los escándalos:
 					// Si no hay ninguno mostrado obtenemos los primeros, si hay
 					// alguno obtenemos si hay nuevos escándalos subidos
@@ -1213,133 +1120,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	
 
-	/**
-	 * Envía un avatar nuevo al servidor
-	 * 
-	 */
-	private class UpdateAvatarTask extends AsyncTask<Void, Integer, Integer> {
-
-		private Context mContext;
-		private Bitmap photo_avatar;
-		private String url_avatar;
-
-		public UpdateAvatarTask(Context context, Bitmap avatar) {
-			photo_avatar = avatar;
-			mContext = context;
-			progress = new ProgressDialog(mContext);
-			progress.setTitle(R.string.actualizando_avatar);
-			progress.setMessage(getResources().getString(
-					R.string.espera_por_favor));
-			progress.setCancelable(false);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			// Mostramos el ProgressDialog
-			progress.show();
-			any_error = false;
-		}
-
-		@Override
-		protected Integer doInBackground(Void... params) {
-
-			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS
-					+ MyApplication.resource_uri;
-			HttpResponse response = null;
-
-			try {
-				HttpClient client = new DefaultHttpClient();
-				HttpPut put = new HttpPut(urlString);
-				put.setHeader("Session-Token", MyApplication.session_token);
-				MultipartEntity reqEntity = new MultipartEntity();
-				
-				// Creamos un file a partir del bitmap
-				File f = new File(mContext.getCacheDir(), "avatar");
-				f.createNewFile();
-
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				photo_avatar.compress(CompressFormat.JPEG, 70 /*ignored for PNG*/, bos);
-				byte[] bitmapdata = bos.toByteArray();
-				FileOutputStream fos = new FileOutputStream(f);
-				fos.write(bitmapdata);
-				
-				FileBody bin1 = new FileBody(f);
-				reqEntity.addPart("avatar", bin1);
-				put.setEntity(reqEntity);
-				response = client.execute(put);
-				resEntity = response.getEntity();
-				final String response_str = EntityUtils.toString(resEntity);
-				
-				JSONObject respJSON = new JSONObject(response_str);
-				url_avatar = respJSON.getString("avatar");
-			}
-
-			catch (Exception ex) {
-				Log.e("Debug", "error: " + ex.getMessage(), ex);
-				any_error = true; // Indicamos que hubo algún error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) 
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
-			}
-
-			if (any_error) {
-				return 666;
-			} else {
-				// Devolvemos el resultado
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Quitamos el ProgressDialog
-			if (progress.isShowing()) {
-				progress.dismiss();
-			}
-
-			// Si hubo algún error mostramos un mensaje
-			if (any_error) {
-				Toast toast = Toast.makeText(mContext, getResources()
-						.getString(R.string.lo_sentimos_hubo),
-						Toast.LENGTH_SHORT);
-				toast.show();
-			} else {
-				// Si es codigo 2xx --> OK
-				if (result >= 200 && result < 300) {
-		        	// Guardamos su avatar
-					SharedPreferences prefs = getBaseContext().getSharedPreferences(
-		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-		        	prefs.edit().putString(MyApplication.AVATAR, url_avatar).commit();
-		        	MyApplication.avatar = url_avatar;
-		        	if (url_avatar != null){
-		        		img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + url_avatar);
-		        		img_lateral_avatar.refreshDrawableState();
-		        	}
-				} else {
-					Toast toast;
-					toast = Toast
-							.makeText(mContext,getResources().getString(
-													R.string.hubo_algun_problema_actualizando_avatar),
-									Toast.LENGTH_LONG);
-					toast.show();
-					// Quitamos el ProgressDialog
-					if (progress.isShowing()) {
-						progress.dismiss();
-					}
-				}
-			}
-		}
-	}
+	
 
 	/**
 	 * Seleccionar opción del spinner
@@ -1467,20 +1248,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		return null;
 	}
 
-	/**
-	 * Comprueba si el dispositivo dispone de cámara
-	 * 
-	 * @param context
-	 * @return
-	 */
-	private boolean checkCameraHardware(Context context) {
-		if (context.getPackageManager().hasSystemFeature(
-				PackageManager.FEATURE_CAMERA)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+
 
 	/**
 	 * Se llama cuando se ha terminado de actualizar el carrusel
@@ -1508,41 +1276,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				getNewEscandalosAsync.cancel(true);
 			}
 		}
-
-		/*
-		 * if (updateNumCommentsAsync != null){ if
-		 * (updateNumCommentsAsync.getStatus() == AsyncTask.Status.PENDING ||
-		 * updateNumCommentsAsync.getStatus() == AsyncTask.Status.RUNNING){
-		 * updateNumCommentsAsync.cancel(true); } }
-		 */
 	}
-
-	
-
-	/**
-	 * Hace crop a una foto
-	 * 
-	 * @param picUri
-	 *            Uri de la foto
-	 */
-	private boolean performCrop(Uri picUri) {
-		try {
-			Intent cropIntent = new Intent("com.android.camera.action.CROP");
-			cropIntent.setDataAndType(picUri, "image/*");
-			cropIntent.putExtra("crop", "true");
-			cropIntent.putExtra("aspectX", 1);
-			cropIntent.putExtra("aspectY", 1);
-			cropIntent.putExtra("outputX", 128);
-			cropIntent.putExtra("outputY", 128);
-			cropIntent.putExtra("return-data", true);
-			startActivityForResult(cropIntent, PIC_CROP);
-			return true;
-		} catch (ActivityNotFoundException anfe) {
-			// display an error message
-			return false;
-		}
-	}
-	
 	
 	
 	/**

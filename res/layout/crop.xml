@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <com.edmodo.cropper.CropImageView
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/img_crop_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            custom:imageResource="@drawable/avatar_defecto" />
+
+        <Button
+            android:id="@+id/but_crop_recortar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recortar" />
+
+</LinearLayout>

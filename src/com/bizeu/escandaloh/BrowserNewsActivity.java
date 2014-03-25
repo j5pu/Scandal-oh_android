@@ -101,7 +101,9 @@ public class BrowserNewsActivity extends SherlockActivity {
 	}
 	
 	
-
+	/**
+	 * onOptionsItemSelected
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

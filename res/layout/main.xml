@@ -132,6 +132,30 @@
                     android:textSize="22sp" />
             </LinearLayout>
 
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_perfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:src="@drawable/perfil_azulverdoso" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="@string/perfil"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/ll_mLateral_login"
                 android:layout_width="match_parent"
@@ -163,7 +187,7 @@
             android:gravity="center_horizontal|center_vertical" >
 
             <Button
-                android:id="@+id/button1"
+                android:id="@+id/but_crop_recortar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ayuda" />

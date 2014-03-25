@@ -74,8 +74,8 @@ public class LoginSelectActivity extends SherlockActivity {
 	private String status = null;
 	private boolean login_error = false;
 	private String access_token;
-	private Uri shareUri;
-	private boolean viene_de_compartir = false;
+	private String shared;
+	private int sharing_type;
 
 	/**
 	 * onCreate
@@ -88,8 +88,8 @@ public class LoginSelectActivity extends SherlockActivity {
 		
 		// Si tiene datos, obtenemos si viene de haber compartido desde la galería
 		if (getIntent().getExtras() != null){
-			viene_de_compartir = getIntent().getExtras().getBoolean("from_sharing");	
-			shareUri = Uri.parse(getIntent().getExtras().getString("shareUri"));
+			shared = getIntent().getExtras().getString("shareUri");
+			sharing_type = getIntent().getExtras().getInt("photo_from");
 		}
 		
 		// Cambiamos la fuente de la pantalla
@@ -198,6 +198,7 @@ public class LoginSelectActivity extends SherlockActivity {
 		super.onStop();
 		EasyTracker.getInstance(this).activityStop(this);
 	}
+	
 
 	/**
 	 * onActivityResult
@@ -209,10 +210,10 @@ public class LoginSelectActivity extends SherlockActivity {
 			// Y lo ha hecho exitosamente
 			if (resultCode == RESULT_OK){ 
 				// Si venía de compartir y ha hecho login le mandamos a la pantalla de subir escándalo
-				if (viene_de_compartir){
+				if (sharing_type == CoverActivity.FROM_SHARING_PICTURE || sharing_type == CoverActivity.FROM_SHARING_TEXT){
 					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
-					in.putExtra("photo_from", CoverActivity.FROM_SHARING);
-					in.putExtra("shareUri", shareUri.toString());
+					in.putExtra("photo_from", sharing_type);
+					in.putExtra("shareUri", shared);
 					startActivity(in);
 				}
 				// Cerramos directamente la pantalla
@@ -341,7 +342,6 @@ public class LoginSelectActivity extends SherlockActivity {
 				SharedPreferences.Editor editor = prefs.edit();
 				// Guardamos el session_token, nombre de usuario y avatar
 				editor.putString(MyApplication.SESSION_TOKEN, session_token);
-				Log.v("WE","primer session token: " + session_token);
 				editor.putString(MyApplication.USER_NAME, username);
 				editor.putString(MyApplication.AVATAR, avatar);
 				editor.commit();
@@ -357,10 +357,10 @@ public class LoginSelectActivity extends SherlockActivity {
 				MyApplication.reset_scandals = true;
 				
 				// Si venía de compartir y ha hecho login le mandamos a la pantalla de subir escándalo
-				if (viene_de_compartir){
+				if (sharing_type == CoverActivity.FROM_SHARING_PICTURE || sharing_type == CoverActivity.FROM_SHARING_TEXT){
 					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
-					in.putExtra("photo_from", CoverActivity.FROM_SHARING);
-					in.putExtra("shareUri", shareUri.toString());
+					in.putExtra("photo_from", sharing_type);
+					in.putExtra("shareUri", shared);
 					startActivity(in);
 				}
 				else{

@@ -6,10 +6,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -35,7 +37,6 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
@@ -72,6 +73,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private boolean any_error;
 	private String photo_string;
 	private Uri shareUri;
+	private String shared_url;
 
 	/**
 	 * OnCreate
@@ -117,13 +119,18 @@ public class CreateScandalohActivity extends SherlockActivity {
 							.decodeFile(photo_string));
 				}
 
-				// Se ha compartido desde otra app (galería)
-				else if (photo_from == CoverActivity.FROM_SHARING) {
-					// Obtenemos la uri de la foto
-					shareUri = Uri
-							.parse(data.getExtras().getString("shareUri"));
+				// Se ha compartido una imagen (galería)
+				else if (photo_from == CoverActivity.FROM_SHARING_PICTURE) {
+					// Mostramos la foto
+					shareUri = Uri.parse(data.getExtras().getString("shareUri"));
 					taken_photo = ImageUtils.uriToBitmap(shareUri, this);
 					picture.setImageBitmap(taken_photo);
+				}
+				
+				// Se ha compartido un texto (url)
+				else if (photo_from == CoverActivity.FROM_SHARING_TEXT){
+					shared_url = data.getExtras().getString("shareUri");
+					Log.v("WE","share uri: " + shared_url);
 				}
 			}
 		}
@@ -245,7 +252,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 								} else if (result.equals("CANCELED")) {
 									con_audio = false;
 								}
-								new SendScandalo().execute();
+								new SendScandalTask().execute();
 							}
 						});
 						record_audio.setCancelable(false);
@@ -269,7 +276,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 						// Enviamos el escandalo sin audio
 						con_audio = false;
-						new SendScandalo().execute();
+						new SendScandalTask().execute();
 					}
 				});
 
@@ -282,7 +289,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	 * Sube un escandalo al servidor
 	 * 
 	 */
-	private class SendScandalo extends AsyncTask<Void, Integer, Integer> {
+	private class SendScandalTask extends AsyncTask<Void, Integer, Integer> {
 
 		@Override
 		protected void onPreExecute() {
@@ -317,6 +324,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				HttpClient client = new DefaultHttpClient();
 				HttpPost post = new HttpPost(urlString);
 				post.setHeader("Session-Token", MyApplication.session_token);
+				
 
 				// Obtenemos los datos y comprimimos en Multipart para su envío
 				written_title = edit_title.getText().toString();
@@ -456,5 +464,111 @@ public class CreateScandalohActivity extends SherlockActivity {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Envia un comentario
+	 * 
+	 */
+	/*
+	private class GetScandalFromUrlTask extends AsyncTask<Void, Integer, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+			any_error = false;
+			// Mostramos el ProgressDialog
+			progress.show();
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			HttpEntity resEntity;
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/preview-news/";
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost(urlString);
+				post.setHeader("Content-Type", "application/json");
+				post.setHeader("Session-Token", MyApplication.session_token);
+
+				JSONObject dato = new JSONObject();
+
+				dato.put("url", MyApplication.resource_uri);
+
+				// Formato UTF-8 (ñ,á,ä,...)
+				StringEntity entity = new StringEntity(dato.toString(),HTTP.UTF_8);
+				post.setEntity(entity);
+
+				response = client.execute(post);
+				resEntity = response.getEntity();
+				final String response_str = EntityUtils.toString(resEntity);
+
+				Log.i("WE", response_str);
+			}
+
+			catch (Exception ex) {
+				Log.e("Debug", "error: " + ex.getMessage(), ex);
+				any_error = true; // Indicamos que hubo algún error
+
+				// Mandamos la excepcion a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(
+						new StandardExceptionParser(mContext, null)
+								.getDescription(Thread.currentThread()
+										.getName(), // The name of the thread on
+													// which the exception
+													// occurred.
+										ex), // The exception.
+						false).build());
+			}
+
+			if (any_error) {
+				return 666;
+			} else {
+				// Devolvemos el resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Si hubo algún error mostramos un mensaje
+			if (any_error) {
+				Toast toast = Toast.makeText(mContext, getResources()
+						.getString(R.string.lo_sentimos_hubo),
+						Toast.LENGTH_SHORT);
+				toast.show();
+				// Quitamos el ProgressDialog
+				if (progress.isShowing()) {
+					progress.dismiss();
+				}
+
+			} else {
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result < 300) {
+					
+				} else {
+					Toast toast;
+					toast = Toast
+							.makeText(
+									mContext,
+									getResources()
+											.getString(
+													R.string.hubo_algun_error_enviando_comentario),
+									Toast.LENGTH_LONG);
+					toast.show();
+					// Quitamos el ProgressDialog
+					if (send_progress.isShowing()) {
+						send_progress.dismiss();
+					}
+				}
+			}
+		}
+	}
+	*/
 
 }

@@ -676,11 +676,8 @@ public class ScandalohFragment extends SherlockFragment {
         	// Si no está logueado
         	else{
         		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
-        		txt_user_name.setText(getResources().getString(R.string.anonimo));
+        		txt_user_name.setText(getResources().getString(R.string.invitado));
         		txt_date.setText(Utils.getCurrentDate());
-        		// Ocultamos la información del usuario
-        		LinearLayout user_info = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment_info_user);
-        		//user_info.setVisibility(View.GONE);
         		// Le mandamos a la pantalla de login si pulsa
                 ll_last_comment.setOnClickListener(new View.OnClickListener() {
         			

@@ -8,15 +8,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CoverActivity extends Activity {
 
-	public static int FROM_SHARING = 934;
+	public static int FROM_SHARING_PICTURE = 234;
+	public static int FROM_SHARING_TEXT = 2367;
 	
 	private SharedPreferences prefs;
-	private Uri shareUri;
 	
 	/**
 	 * OnCreate
@@ -65,32 +67,45 @@ public class CoverActivity extends Activity {
 			MyApplication.logged_user = false;
 		}
 		
-		// La aplicación se ha iniciado porque se ha compartido desde otra app (galería)
+		String shared = null;
+		int sharing_type = 0;
+		
+		// La aplicación se ha iniciado porque se ha compartido desde otra app 
 		if (getIntent().getAction().equals(Intent.ACTION_SEND)){
 			Intent i = getIntent();
-			if (i.getType().equals("image/*")){
-				shareUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
-
-				// Si está logueado: le mandamos a la pantalla de subir escandalo
-				if (MyApplication.logged_user){
-					Intent in = new Intent(CoverActivity.this, CreateScandalohActivity.class);
-					in.putExtra("photo_from", FROM_SHARING);
-					in.putExtra("shareUri", shareUri.toString());
-					startActivity(in);
-					finish();
-				}
-				
-				// No está logueado, le mandamos a la pantalla de login
-				else{
-					Intent in = new Intent(CoverActivity.this, LoginSelectActivity.class);
-					in.putExtra("shareUri", shareUri.toString());
-					in.putExtra("from_sharing", true);
-					startActivity(in);
-					finish();
-				}
+			
+			// Es una foto
+			if (i.getType().equals("image/*")){	
+				Uri shareUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+				shared = shareUri.toString();
+				sharing_type = FROM_SHARING_PICTURE;
 			}
+			
+			// Es texto (Url)
+			else if (i.getType().equals("text/plain")){
+				shared = i.getStringExtra(Intent.EXTRA_TEXT);
+				sharing_type = FROM_SHARING_TEXT;
+			}
+			
+			Intent in;
+			
+			// Si está logueado: le mandamos a la pantalla de subir escandalo
+			if (MyApplication.logged_user){
+				in = new Intent(CoverActivity.this, CreateScandalohActivity.class);
+			}
+				
+			// No está logueado, le mandamos a la pantalla de login
+			else{
+				in = new Intent(CoverActivity.this, LoginSelectActivity.class);
+			}	
+			
+			in.putExtra("photo_from", sharing_type);
+			in.putExtra("shareUri", shared);			
+			startActivity(in);
+			finish();
 		}
-		 // La aplicación se ha iniciado por el método normal
+		
+		// La aplicación se ha iniciado por el método normal
 		else{
 			// Mostramos la pantalla del carrusel
 			Intent i = new Intent(CoverActivity.this, MainActivity.class);

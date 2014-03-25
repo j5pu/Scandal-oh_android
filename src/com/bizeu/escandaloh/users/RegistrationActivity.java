@@ -232,6 +232,7 @@ public class RegistrationActivity extends SherlockActivity {
 	             dato.put("username", username);
 	             dato.put("password", password);
 	             dato.put("email", email);
+	             dato.put("device_token", "");
 
 	             // Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
@@ -251,17 +252,18 @@ public class RegistrationActivity extends SherlockActivity {
 	                 
 	                 // Si es OK obtenemos el user_uri
 	                 if (status.equals("ok")){
-	                	 //user_uri = respJSON.getString("resource_uri");
-	                	 session_token = respJSON.getString("sessoin_token");
+	                	 session_token = respJSON.getString("session_token");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
+	                	 
 	                	 JSONObject jsonReason = new JSONObject(respJSON.getString("reason"));
 	                	 if (jsonReason.has("username")){
 	                		 JSONArray jsonUserNameErrors = new JSONArray(jsonReason.getString("username"));
 	                		 name_error = (String) jsonUserNameErrors.get(0);
 	                		 has_name_error = true;
 	                	 }
+	                	 
 	                	 if (jsonReason.has("password")){
 	                		 JSONArray passwordErrors = (JSONArray) jsonReason.get("password");
 	                		 password_error = (String) passwordErrors.get(0);
