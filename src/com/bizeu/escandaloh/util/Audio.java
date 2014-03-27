@@ -114,6 +114,9 @@ public class Audio{
 		
 		// ESTADO Initialized: Indiamos el formato
 		mRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		mRecord.setAudioChannels(1);
+		mRecord.setAudioSamplingRate(8);
+		mRecord.setAudioEncodingBitRate(8);
 		
 		// ESTADO DataSourceConfigured
 		mRecord.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);

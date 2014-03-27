@@ -6,8 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -127,7 +125,6 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});
 		
-
 		username.setText(MyApplication.user_name);
 	}
 	
@@ -157,9 +154,9 @@ public class ProfileActivity extends SherlockActivity {
 		if (requestCode == AVATAR_FROM_CAMERA) {
 			if (resultCode == RESULT_OK) {
 				if (mImageUri != null) {
-					Bitmap photo_for_avatar = ImageUtils.uriToBitmap(mImageUri,this);
 					Intent i = new Intent(ProfileActivity.this, CropActivity.class);
-					i.putExtra(PICTURE_BYTES, ImageUtils.bitmapToBytes(photo_for_avatar));
+					i.putExtra("photo_from", AVATAR_FROM_CAMERA);
+					i.putExtra("photoUri", mImageUri.toString());
 					startActivityForResult(i,CROP_PICTURE);
 				}
 			}
@@ -169,10 +166,9 @@ public class ProfileActivity extends SherlockActivity {
 		else if (requestCode == AVATAR_FROM_GALLERY) {
 			if (data != null) {
 				Uri selectedImageUri = data.getData();
-				String foto_string = ImageUtils.getRealPathFromURI(mContext, selectedImageUri);
-				Bitmap photo_for_avatar = BitmapFactory.decodeFile(foto_string);
 				Intent i = new Intent(ProfileActivity.this, CropActivity.class);
-				i.putExtra(PICTURE_BYTES, ImageUtils.bitmapToBytes(photo_for_avatar));
+				i.putExtra("photo_from", AVATAR_FROM_GALLERY);
+				i.putExtra("photoUri", ImageUtils.getRealPathFromURI(mContext,selectedImageUri));
 				startActivityForResult(i,CROP_PICTURE);
 			}
 		}
@@ -182,13 +178,6 @@ public class ProfileActivity extends SherlockActivity {
 			picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
 		}
 	}
-	
-	
-	
-	
-
-	
-	
 	
 	
 	

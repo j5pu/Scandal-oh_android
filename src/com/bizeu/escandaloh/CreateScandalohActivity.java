@@ -1,17 +1,16 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -63,7 +62,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String selected_category;
 	private String written_title;
 	private Bitmap taken_photo;
-	private File photo_file;
 	private Uri mImageUri;
 	private ProgressDialog progress;
 	private Context mContext;
@@ -104,8 +102,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Si se ha tomado de la cámara
 				if (photo_from == MainActivity.SHOW_CAMERA) {
-					mImageUri = Uri.parse(data.getExtras()
-							.getString("photoUri"));
+					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
 					this.getContentResolver().notifyChange(mImageUri, null);
 					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
 
@@ -115,8 +112,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Se ha cogido de la galería
 				else if (photo_from == MainActivity.FROM_GALLERY) {
-					picture.setImageBitmap(BitmapFactory
-							.decodeFile(photo_string));
+					picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
+					taken_photo = BitmapFactory.decodeFile(photo_string);
 				}
 
 				// Se ha compartido una imagen (galería)
@@ -203,18 +200,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 		Audio.getInstance(mContext).releaseResources();
 	}
 
-	/**
-	 * onDestroy
-	 */
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		// Si se ha tomado desde la cámara borramos la foto
-		if (photo_from == MainActivity.SHOW_CAMERA) {
-			photo_file = new File(mImageUri.getPath());
-			photo_file.delete();
-		}
-	}
 
 	
 	
@@ -291,6 +276,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 	 */
 	private class SendScandalTask extends AsyncTask<Void, Integer, Integer> {
 
+		File f;
+		
 		@Override
 		protected void onPreExecute() {
 			// Mostramos el ProgressDialog-
@@ -302,49 +289,35 @@ public class CreateScandalohActivity extends SherlockActivity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/";
-
-			// Desde la galería
-			if (photo_from == MainActivity.FROM_GALLERY) {
-				photo_file = ImageUtils.bitmapToFile(
-						BitmapFactory.decodeFile(photo_string), mContext);
-			}
-			// Se ha tomado desde la camara
-			else if (photo_from == MainActivity.SHOW_CAMERA) {
-				photo_file = new File(mImageUri.getPath());
-			}
-			// Se ha compartido desde otra app
-			else {
-				String path = ImageUtils.getRealPathFromURI(mContext, shareUri);
-				photo_file = new File(path);
-			}
-
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/";		
+			
+			f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
+		
 			HttpResponse response = null;
 			try {
 				HttpClient client = new DefaultHttpClient();
 				HttpPost post = new HttpPost(urlString);
 				post.setHeader("Session-Token", MyApplication.session_token);
-				
 
 				// Obtenemos los datos y comprimimos en Multipart para su envío
 				written_title = edit_title.getText().toString();
 				if (written_title.equals("")) {
-					written_title = getResources().getString(
-							R.string.foto_sin_titulo);
+					written_title = getResources().getString(R.string.foto_sin_titulo);
 				}
+				
 				int id_category_selected = radio_category
 						.getCheckedRadioButtonId();
 				switch (id_category_selected) {
-				case R.id.rb_create_category_happy:
-					selected_category = HAPPY_CATEGORY;
-					break;
-				case R.id.rb_create_category_angry:
-					selected_category = ANGRY_CATEGORY;
-					break;
+					case R.id.rb_create_category_happy:
+						selected_category = HAPPY_CATEGORY;
+						break;
+					case R.id.rb_create_category_angry:
+						selected_category = ANGRY_CATEGORY;
+						break;
 				}
-
-				MultipartEntity reqEntity = new MultipartEntity();
-
+				
+				MultipartEntity reqEntity = new MultipartEntity();				
+				
 				if (con_audio) {
 					audio_file = new File(Audio.getInstance(mContext).getPath());
 					FileBody audioBody = new FileBody(audio_file);
@@ -352,11 +325,10 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 
 				StringBody categoryBody = new StringBody(selected_category);
-				FileBody bin1 = new FileBody(photo_file);
+				FileBody bin1 = new FileBody(f);
 				StringBody titleBody = new StringBody(written_title);
 				StringBody userBody = new StringBody(MyApplication.resource_uri);
-				StringBody codeCountryBody = new StringBody(
-						MyApplication.code_selected_country);
+				StringBody codeCountryBody = new StringBody(MyApplication.code_selected_country);
 
 				reqEntity.addPart("img", bin1);
 				reqEntity.addPart("title", titleBody);
@@ -388,18 +360,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				// Mandamos la excepción a Google Analytics
 				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
+						new StandardExceptionParser(mContext, null) 
 								.getDescription(Thread.currentThread()
 										.getName(), // The name of the thread on
 													// which the exception
@@ -407,7 +368,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 										ex), // The exception.
 						false).build()); // False indicates a fatal exception
 			}
-
+			
 			if (any_error) {
 				return 666;
 			} else {
@@ -456,11 +417,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 					finish();
 				}
 
-				// Si la foto se tomó de la galería borramos el archivo
-				if (photo_from == MainActivity.FROM_GALLERY
-						&& photo_file.exists()) {
-					photo_file.delete();
-				}
 			}
 		}
 	}

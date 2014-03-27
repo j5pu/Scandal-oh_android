@@ -40,7 +40,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="6dp"
-            android:text="www.soyunafuentelarga.com"
+            android:text="soyunafuentelarga"
             android:textColor="@color/morado"
             android:textSize="10sp"
             android:textStyle="bold" />

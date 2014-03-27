@@ -510,8 +510,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					ImageUtils.saveBitmapIntoGallery(bitAux, mContext);
 
 					// Mostramos la pantalla de subir escándalo
-					Intent i = new Intent(MainActivity.this,
-							CreateScandalohActivity.class);
+					Intent i = new Intent(MainActivity.this,CreateScandalohActivity.class);
 					i.putExtra("photo_from", SHOW_CAMERA);
 					i.putExtra("photoUri", mImageUri.toString());
 					startActivityForResult(i, CREATE_ESCANDALO);
@@ -529,11 +528,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (data != null) {
 				// Mostramos la pantalla de subir escándalo
 				Uri selectedImageUri = data.getData();
-				Intent i = new Intent(MainActivity.this,
-						CreateScandalohActivity.class);
+				Intent i = new Intent(MainActivity.this,CreateScandalohActivity.class);
 				i.putExtra("photo_from", FROM_GALLERY);
-				i.putExtra("photoUri", ImageUtils.getRealPathFromURI(mContext,
-						selectedImageUri));
+				i.putExtra("photoUri", ImageUtils.getRealPathFromURI(mContext,selectedImageUri));
 				startActivityForResult(i, CREATE_ESCANDALO);
 			}
 		}
@@ -582,11 +579,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 															R.string.hacer_foto_con_camara))) {
 
 										// Mandamos el evento a Google Analytics
-										EasyTracker easyTracker = EasyTracker
-												.getInstance(mContext);
-										easyTracker
-												.send(MapBuilder
-														.createEvent(
+										EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+										easyTracker.send(MapBuilder.createEvent(
 																"Acción UI",
 																"Selección realizada",
 																"Hacer foto desde la cámara",
@@ -602,8 +596,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 													"picture", ".png");
 											if (photo != null) {
 												mImageUri = Uri.fromFile(photo);
-												takePictureIntent
-														.putExtra(
+												takePictureIntent.putExtra(
 																MediaStore.EXTRA_OUTPUT,
 																mImageUri);
 												startActivityForResult(
@@ -1221,23 +1214,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Mandamos la excepcion a Google Analytics
 			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
 			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(mContext, null) // Context and
-																// optional
-																// collection of
-																// package names
-																// to be used in
-																// reporting the
-																// exception.
-							.getDescription(Thread.currentThread().getName(), // The
-																				// name
-																				// of
-																				// the
-																				// thread
-																				// on
-																				// which
-																				// the
-																				// exception
-																				// occurred.
+					new StandardExceptionParser(mContext, null) 
+							.getDescription(Thread.currentThread().getName(),
 									e), // The exception.
 					false).build());
 			Toast toast = Toast.makeText(mContext,

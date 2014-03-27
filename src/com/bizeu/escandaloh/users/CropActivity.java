@@ -1,9 +1,6 @@
 package com.bizeu.escandaloh.users;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,23 +10,21 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.edmodo.cropper.CropImageView;
@@ -40,17 +35,17 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CropActivity extends Activity {
 
-    private static final int DEFAULT_ASPECT_RATIO_VALUES = 200;
-    private static final int ROTATE_NINETY_DEGREES = 200;
 	
 	private CropImageView img_crop_picture;
 	private Button but_crop;
-	
-	private Bitmap picture_to_crop;
 	private Bitmap cropped_picture;
 	private ProgressDialog progress;
 	private boolean any_error;
 	private Context mContext;
+	private int photo_from;
+	private String photo_string;
+	private Uri mImageUri;
+	private Bitmap taken_photo;
 	
 	
 	/**
@@ -66,27 +61,47 @@ public class CropActivity extends Activity {
 		
 		img_crop_picture = (CropImageView) findViewById(R.id.img_crop_picture);
 		but_crop = (Button) findViewById(R.id.but_crop_recortar);
-		
-		if (getIntent().getExtras() != null){
-			Intent i = getIntent();
-			Bundle data = i.getExtras();
-			picture_to_crop = ImageUtils.bytesToBitmap(data.getByteArray(ProfileActivity.PICTURE_BYTES));
-			img_crop_picture.setImageBitmap(picture_to_crop);
 			
-	        // Sets initial aspect ratio to 10/10, for demonstration purposes
-	        img_crop_picture.setAspectRatio(400, 400);   
+		if (getIntent().getExtras() != null){
+			Intent data = getIntent();
+			photo_from = data.getExtras().getInt("photo_from");
+			
+			if (data != null) {
+				photo_string = data.getExtras().getString("photoUri");
+
+				// Se ha tomado de la cámara
+				if (photo_from == ProfileActivity.AVATAR_FROM_CAMERA) {
+					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
+					this.getContentResolver().notifyChange(mImageUri, null);
+					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
+					img_crop_picture.setImageBitmap(taken_photo);
+				}
+
+				// Se ha cogido de la galería
+				else if (photo_from == ProfileActivity.AVATAR_FROM_GALLERY) {
+					img_crop_picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
+				}
+			}
+
+	        img_crop_picture.setAspectRatio(180, 180);   
 	        img_crop_picture.setFixedAspectRatio(true);
 	        
 	        but_crop.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
+					// Obtenemos la foto después del crop
 					cropped_picture = img_crop_picture.getCroppedImage();
+					// Escalamos la foto a 180 px x 180 px
+					cropped_picture = ImageUtils.scaleBitmap(cropped_picture, 180, 180);
+					//cropped_picture = ImageUtils.getResizedBitmap(cropped_picture, 180, 180);
+					//cropped_picture = ImageUtils.compressBitmapToJpg(cropped_picture, 80);
+					// Actualizamos el avatar
 					new UpdateAvatarTask(mContext, cropped_picture).execute();
 				}
 			});
-
 		}
+		
 	}
 	
 	
@@ -133,19 +148,6 @@ public class CropActivity extends Activity {
 				MultipartEntity reqEntity = new MultipartEntity();
 				
 				File f = ImageUtils.bitmapToFileTemp(photo_avatar, mContext, "avatar.jpg");
-				
-				/*
-				// Creamos un file a partir del bitmap
-				File f = new File(mContext.getCacheDir(), "avatar.jpg");
-				f.createNewFile();
-
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				photo_avatar.compress(CompressFormat.JPEG, 100, bos);
-				byte[] bitmapdata = bos.toByteArray();
-				FileOutputStream fos = new FileOutputStream(f);
-				fos.write(bitmapdata);
-				
-				*/
 				
 				FileBody fb_avatar = new FileBody(f);
 				reqEntity.addPart("avatar", fb_avatar);
