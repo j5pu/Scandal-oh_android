@@ -395,7 +395,12 @@ public class ScandalohFragment extends SherlockFragment {
 			
         // AVATAR
         FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
-        emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
+        Log.v("WE","avatar del escandalo en fragment: " + avatar);
+        // Si el usuario tiene avatar
+        if (!avatar.equals("")){
+            emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
+        }
+
                       
         // LIKES
         final ImageView iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
@@ -634,7 +639,7 @@ public class ScandalohFragment extends SherlockFragment {
 				i.putExtra(URL, url);			
 				startActivityForResult(i,SHOW_COMMENTS);		
 			}
-		});
+		});       
 
         // Si hay algún comentario
         if (last_comment != null){
@@ -652,9 +657,6 @@ public class ScandalohFragment extends SherlockFragment {
             String final_date = day + "-" + month + "-" + year;
             txt_date.setText(final_date); 
             
-            // Avatar
-            img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
-       
             // Red social
             int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
             if (social_ne == 0){
@@ -663,15 +665,26 @@ public class ScandalohFragment extends SherlockFragment {
             else if (social_ne == 1){
             	social_net.setImageResource(R.drawable.facebook_gris);
             }
+            
+            // Avatar
+            Log.v("WE","Avatar del ultimo comentario en fragment: " + last_comment.getAvatar());
+            if (!last_comment.getAvatar().equals("")){
+                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+            }
         }
         
         // No hay comentarios
         else{
         	// Si el usuario está logueado
         	if (MyApplication.logged_user){
+        		
         		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
         		txt_user_name.setText(MyApplication.user_name);
         		txt_date.setText(Utils.getCurrentDate());
+        		
+                // Avatar
+                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+                
         	}
         	// Si no está logueado
         	else{

@@ -218,7 +218,7 @@ public class ImageUtils {
 			if (actual_height > max_pixels){
 				percentage = max_pixels / actual_height;
 				new_height = max_pixels;
-				new_width = (int) (actual_width * percentage);	
+				new_width = actual_width * percentage;	
 			}
 		}
 		
@@ -227,7 +227,7 @@ public class ImageUtils {
 			if (actual_width > max_pixels){
 				percentage = max_pixels / actual_width;
 				new_width = max_pixels;
-				new_height = actual_width * percentage;
+				new_height = actual_height * percentage;
 			}
 		} 
 		

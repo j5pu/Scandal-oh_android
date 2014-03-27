@@ -90,6 +90,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 public class MainActivity extends SherlockFragmentActivity implements
 		OnClickListener, OnItemSelectedListener {
 
+	public static final int NUM_SCANDALS_TO_LOAD = 10;
 	public static final int SHOW_CAMERA = 10;
 	private static final int CREATE_ESCANDALO = 11;
 	public static final int FROM_GALLERY = 12;
@@ -131,7 +132,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private GetNewEscandalos getNewEscandalosAsync;
 	private String category;
 	private boolean getting_escandalos = true;
-	private boolean there_are_more_escandalos = true;
+	private boolean there_are_more_scandals = true;
 	public static ArrayList<Scandaloh> escandalos;
 	DrawerMenuAdapter mMenuAdapter;
 	String[] options;
@@ -197,11 +198,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onPageSelected(int position) {
 
-				// Si quedan 4 escándalos más para llegar al último y aún quedan
+				// Si quedan 3 escándalos más para llegar al último y aún quedan
 				// más escándalos (si hemos llegado
 				// a los últimos no se pedirán más): obtenemos los siguientes 10
-				if (position == adapter.getCount() - 5
-						&& there_are_more_escandalos) {
+				if (position == adapter.getCount() - (NUM_SCANDALS_TO_LOAD-3)
+						&& there_are_more_scandals) {
 					// Usamos una llave de paso (sólo la primera vez entrará).
 					// Cuando se obtengan los 10 escándalos se volverá a abrir
 					if (!getting_escandalos) {
@@ -314,7 +315,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								cancelGetEscandalos();
 								refreshFinished();
 								// Abrimos llave de hay más escandalos
-								there_are_more_escandalos = true;
+								there_are_more_scandals = true;
 								// Quitamos los escándalos actuales
 								escandalos.clear();
 
@@ -429,7 +430,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos
 		if (MyApplication.reset_scandals){		
 			// Abrimos llave de hay más escandalos
-			there_are_more_escandalos = true;
+			there_are_more_scandals = true;
 			// Quitamos los escándalos actuales
 			escandalos.clear();
 			pager.setCurrentItem(0);
@@ -760,13 +761,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// de escándalos o ya posteriores
 				if (escandalos.size() == 0) {
 					url = MyApplication.SERVER_ADDRESS
-							+ "/api/v1/photo/?limit=10&category__id=1&country="+ MyApplication.code_selected_country;
+							+ "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD 
+							+ "&category__id=1" 
+							+ "&country="+ MyApplication.code_selected_country;
 
 				} else {
-					url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-							+ escandalos.get(escandalos.size() - 1).getId()
-							+ "/" + MyApplication.code_selected_country
-							+ "/previous/?category__id=1";
+					url = MyApplication.SERVER_ADDRESS 
+							+ "/api/v1/photo/?id__lt=" + escandalos.get(escandalos.size() - 1).getId()
+							+ "&category_id=1"
+							+ "&country=" + MyApplication.code_selected_country
+							+ "&order_by=-id" // Descendente = de más nuevas a más antiguas
+							+ "&limit=" + NUM_SCANDALS_TO_LOAD;
 				}
 			}
 
@@ -776,13 +781,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// de escándalos o ya posteriores
 				if (escandalos.size() == 0) {
 					url = MyApplication.SERVER_ADDRESS
-							+ "/api/v1/photo/?limit=10&category__id=2&country="
-							+ MyApplication.code_selected_country;
+							+ "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD 
+							+ "&category__id=2" 
+							+ "&country="+ MyApplication.code_selected_country;
 				} else {
-					url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-							+ escandalos.get(escandalos.size() - 1).getId()
-							+ "/" + MyApplication.code_selected_country
-							+ "/previous/?category__id=2";
+					url = MyApplication.SERVER_ADDRESS 
+							+ "/api/v1/photo/?id__lt=" + escandalos.get(escandalos.size() - 1).getId()
+							+ "&category_id=2"
+							+ "&country=" + MyApplication.code_selected_country
+							+ "&order_by=-id" // Descendente = de más nuevas a más antiguas
+							+ "&limit=" + NUM_SCANDALS_TO_LOAD;
 				}
 			}
 
@@ -798,7 +806,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 					getEscandalos.setHeader("Session-Token", MyApplication.session_token);
 				}
 
-
 				// Hacemos la petición al servidor
 				response = httpClient.execute(getEscandalos);
 				String respStr = EntityUtils.toString(response.getEntity());
@@ -806,36 +813,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 				JSONArray escandalosObject = null;
 
-				// Si es la primera vez obtenemos los escandalos a partir de un
-				// JSONObject, si no obtenemos directamente el JSONArray
-				// HAPPY
-				if (category.equals(MainActivity.HAPPY)) {
-					if (escandalos.size() == 0) {
-						// Obtenemos el json
-						JSONObject respJson = new JSONObject(respStr);
-						escandalosObject = respJson.getJSONArray("objects");
-					} else {
-						escandalosObject = new JSONArray(respStr);
-						// Si no hay más escandalos,lo indicamos
-						if (escandalosObject.length() == 0) {
-							there_are_more_escandalos = false;
-						}
-					}
-				}
-
-				// ANGRY
-				else if (category.equals(MainActivity.ANGRY)) {
-					if (escandalos.size() == 0) {
-						// Obtenemos el json
-						JSONObject respJson = new JSONObject(respStr);
-						escandalosObject = respJson.getJSONArray("objects");
-					} else {
-						escandalosObject = new JSONArray(respStr);
-						// Si no hay más escandalos,lo indicamos
-						if (escandalosObject.length() == 0) {
-							there_are_more_escandalos = false;
-						}
-					}
+				// Parseamos los escándalos devueltos
+				JSONObject respJson = new JSONObject(respStr);
+				escandalosObject = respJson.getJSONArray("objects");
+				
+				if (escandalosObject.length() == 0){
+					there_are_more_scandals = false;
 				}
 
 				// Obtenemos los datos de los escándalos
@@ -1131,7 +1114,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Inhabilitamos el spinner
 				spinner_categorias.setClickable(false);
 				// Abrimos llave de hay más escandalos
-				there_are_more_escandalos = true;
+				there_are_more_scandals = true;
 				// Quitamos los escándalos actuales
 				escandalos.clear();
 
