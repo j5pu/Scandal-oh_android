@@ -166,4 +166,10 @@
     <string name="quieres_hacerlo_ahora">¿Quieres hacerlo ahora?</string>
     <string name="recortar">Recortar</string>
     <string name="cerrando_sesion">Cerrando sesión...</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_expandable_list">ExpandableList Demo</string>
+    <string name="filtrado_por">Filtrado por</string>
+    <string name="mas_recientes">Más recientes</string>
+    <string name="mas_votados">Más votados</string>
+    <string name="mas_comentados">Más comentados</string>
 </resources>

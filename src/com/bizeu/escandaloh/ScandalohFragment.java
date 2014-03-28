@@ -203,7 +203,8 @@ public class ScandalohFragment extends SherlockFragment {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 	    if(requestCode == SHOW_COMMENTS && resultCode == Activity.RESULT_OK) {
-	    	if (data.getExtras() != null){   
+	    	if (data.getExtras() != null){ 
+	    		
 		    	// ACTUALIZAMOS EL ÚLTIMO COMENTARIO
 	 	        Comment last_comm = (Comment) data.getExtras().getParcelable(CommentsActivity.LST_COMMENT);
 	 	        // Actualizamos el adaptador
@@ -389,7 +390,6 @@ public class ScandalohFragment extends SherlockFragment {
 			
         // AVATAR
         FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
-        Log.v("WE","avatar del escandalo en fragment: " + avatar);
         // Si el usuario tiene avatar
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
@@ -661,7 +661,6 @@ public class ScandalohFragment extends SherlockFragment {
             }
             
             // Avatar
-            Log.v("WE","Avatar del ultimo comentario en fragment: " + last_comment.getAvatar());
             if (!last_comment.getAvatar().equals("")){
                 img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
             }

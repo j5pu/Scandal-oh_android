@@ -3,7 +3,10 @@ package com.bizeu.escandaloh;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -12,6 +15,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +35,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,18 +44,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.applidium.shutterbug.FetchableImageView;
-import com.bizeu.escandaloh.adapters.DrawerMenuAdapter;
+import com.bizeu.escandaloh.adapters.*;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
@@ -102,6 +111,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageView img_send_comment;
 	DrawerLayout mDrawerLayout;
 	private FetchableImageView img_lateral_avatar;
+	private ExpandableListView explist_lateral_filtros;
 	
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -123,6 +133,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ArrayAdapter<CharSequence> adapter_spinner;
 	private String actual_avatar; // Usado para saber si el usuario ha cambiado de avatar
 	private String meta_next_scandals = null;
+	private List<String> filter_header;
+    private List<String> filter_childs;
+    private Map<String, List<String>> filterCollection;
+    private String actual_filter = "-date";
 
 	/**
 	 * onCreate
@@ -211,6 +225,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
+		explist_lateral_filtros = (ExpandableListView) findViewById(R.id.explist_mLateral_filtros);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
@@ -229,6 +244,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+		// Avatar
 		img_lateral_avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -238,6 +254,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 		
+		// Perfil
 		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -249,6 +266,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 
+		// Ajustes
 		ll_lateral_ajustes.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -260,6 +278,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 
+		// Login
 		ll_lateral_login.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -271,8 +290,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 				mDrawerLayout.closeDrawer(ll_menu_lateral);
 			}
 		});
-
 		
+		// Pais
 		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -333,6 +352,51 @@ public class MainActivity extends SherlockFragmentActivity implements
 				countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");		
 			}
 		});
+		
+		// Filtros
+		// Los rellenamos
+		filter_header = new ArrayList<String>();
+		filter_header.add(getResources().getString(R.string.filtrado_por));
+		String[] filter_types = { getResources().getString(R.string.mas_recientes),
+				getResources().getString(R.string.mas_votados), 
+				getResources().getString(R.string.mas_comentados) };
+		filterCollection = new LinkedHashMap<String, List<String>>();
+        for (String laptop : filter_header) {
+            if (laptop.equals(getResources().getString(R.string.filtrado_por))) {
+            	filter_childs = new ArrayList<String>();
+                for (String model : filter_types)
+                	filter_childs.add(model);
+            } 
+            filterCollection.put(laptop, filter_childs);
+        }
+        
+        // Asignamos los listeners
+        final ExpandableListAdapter expListAdapter = new FilterAdapter(this, filter_header, filterCollection);
+        explist_lateral_filtros.setAdapter(expListAdapter);
+        explist_lateral_filtros.setOnChildClickListener(new OnChildClickListener() {
+ 
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                final String selected_filter = (String) expListAdapter.getChild(groupPosition, childPosition);
+                
+                // Más recientes
+                if (selected_filter.equals(getResources().getString(R.string.mas_recientes))){
+                	actual_filter = "-date";
+                }
+                // Más votados
+                else if (selected_filter.equals(getResources().getString(R.string.mas_votados))){
+                	actual_filter = "-votes_count";
+                }
+                // Más comentados
+                else if (selected_filter.equals(getResources().getString(R.string.mas_comentados))){
+                	actual_filter = "-comments_count";
+                }
+ 
+                resetScandals();
+				// Cerramos el menu
+				mDrawerLayout.closeDrawer(ll_menu_lateral);
+                return true;
+            }
+        });
 
 		// Le asignamos la animación al pasar entre escándalos (API 11+)
 		pager.setPageTransformer(true, new ZoomOutPageTransformer());
@@ -340,7 +404,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		pager.setPageMargin(3);
 		category = HAPPY;
 
-		// Si hay conexión: obtenemos los 10 primeros escándalos
+		// Si hay conexión: obtenemos los primeros escándalos
 		if (Connectivity.isOnline(mContext)) {
 			getEscandalosAsync = new GetEscandalos();
 			getEscandalosAsync.execute();
@@ -414,23 +478,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		
 		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos
 		if (MyApplication.reset_scandals){		
-			// Abrimos llave de hay más escandalos
-			there_are_more_scandals = true;
-			// Quitamos los escándalos actuales
-			escandalos.clear();
-			pager.setCurrentItem(0);
-			adapter.clearFragments();
-			adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
-			pager.setAdapter(adapter);
-			// Obtenemos los 10 primeros escándalos para la categoría seleccionada
-			// Mostramos el progressBar y ocultamos la lista de escandalos
-			loading.setVisibility(View.VISIBLE);
-			pager.setVisibility(View.GONE);
-			getEscandalosAsync = new GetEscandalos();
-			getEscandalosAsync.execute();
-			
-			// Cerramos llave
-			MyApplication.reset_scandals = false;
+			resetScandals();
 		}
 	}
 
@@ -761,12 +809,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 				}
 						
 				url += "&country="+ MyApplication.code_selected_country;
+				url += "&order_by=" + actual_filter ;
 			}
 			
 			// Obtenemos los siguientes escándalos
 			else{
 				url = MyApplication.SERVER_ADDRESS + meta_next_scandals;
-				Log.v("WE","url: " + url);
 			}
 
 			HttpResponse response = null;
@@ -918,8 +966,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Habilitamos el spinner
 			spinner_categorias.setClickable(true);
 
-			// Si hemos llegado aqui porque no habían escándalos (y le dio a
-			// actualizar), paramos el loading del menu
+			// Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
 			if (no_hay_escandalos) {
 				refreshFinished();
 				no_hay_escandalos = false;
@@ -1215,6 +1262,26 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 	
+	private void resetScandals(){
+		// Abrimos llave de hay más escandalos
+		there_are_more_scandals = true;
+		// Quitamos los escándalos actuales
+		escandalos.clear();
+		pager.setCurrentItem(0);
+		adapter.clearFragments();
+		adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+		pager.setAdapter(adapter);
+		// Obtenemos los 10 primeros escándalos para la categoría seleccionada
+		// Mostramos el progressBar y ocultamos la lista de escandalos
+		loading.setVisibility(View.VISIBLE);
+		pager.setVisibility(View.GONE);
+		getEscandalosAsync = new GetEscandalos();
+		getEscandalosAsync.execute();
+		
+		// Cerramos llave
+		MyApplication.reset_scandals = false;
+	}
+	
 	
 	/**
 	 * Actualiza el already_voted del escandalo (fragmento) que esté actualmente visualizándose
@@ -1427,8 +1494,5 @@ public class MainActivity extends SherlockFragmentActivity implements
 			this.fragments.clear();
 		}
 	}
-	
-	
-
 
 }

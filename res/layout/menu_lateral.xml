@@ -7,174 +7,186 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/ll_menu_lateral"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="3.5"
-        android:gravity="center_horizontal|center_vertical"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#E8dEdEdE"
         android:orientation="vertical" >
 
-        <com.bizeu.escandaloh.util.CircularImageView
-            android:id="@+id/img_browser_back"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:src="@drawable/icono_app" />
-
-        <TextView
-            android:id="@+id/txt_escandalo_num_likes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="alejandro.leonrodriguez.7"
-            android:textColor="@color/morado"
-            android:textSize="16dp"
-            android:paddingTop="5dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="5"
-        android:orientation="vertical"
-        android:paddingLeft="5dp" >
-
         <LinearLayout
-            android:id="@+id/ll_mLateral_notificaciones"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp" >
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="3.5"
+            android:gravity="center_horizontal|center_vertical"
+            android:orientation="vertical" >
 
-            <ImageView
-                android:id="@+id/img_escandalo_like"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/campana" />
+            <com.bizeu.escandaloh.util.CircularImageView
+                android:id="@+id/img_mLateral_avatar"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:src="@drawable/avatar_mas" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/txt_lateral_nombreusuario"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Notificaciones"
-                android:textColor="@color/azul_verdoso"
-                android:textSize="18dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="2dp" />
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:text="alejandro.leonrodriguez.8"
+                android:textColor="@color/morado"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="vertical"
+            android:paddingLeft="5dp" >
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_notificaciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/campana" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="@string/notificaciones"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_pais"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_dislike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/mundo" />
+
+                <TextView
+                    android:id="@+id/img_escandalo_fuente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="País"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_ajustes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_compartir"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ajustes" />
+
+                <TextView
+                    android:id="@+id/txt_mLateral_ajustes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="@string/ajustes"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_perfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:src="@drawable/perfil_azulverdoso" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="@string/perfil"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_mLateral_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/login" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="@string/iniciar_sesion"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <ExpandableListView
+                android:id="@+id/explist_mLateral_filtros"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="7dp" >
+            </ExpandableListView>
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll_mLateral_pais"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp" >
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center_horizontal|center_vertical" >
 
-            <ImageView
-                android:id="@+id/img_escandalo_dislike"
+            <Button
+                android:id="@+id/but_crop_recortar"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/mundo" />
+                android:layout_height="wrap_content"
+                android:text="Ayuda" />
 
-            <TextView
-                android:id="@+id/img_escandalo_fuente"
+            <Button
+                android:id="@+id/button2"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="País"
-                android:textColor="@color/azul_verdoso"
-                android:textSize="18dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="2dp" />
-
+                android:layout_height="wrap_content"
+                android:text="Compartir" />
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_mLateral_ajustes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp" >
-
-            <ImageView
-                android:id="@+id/img_escandalo_compartir"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/ajustes" />
-
-            <TextView
-                android:id="@+id/txt_mLateral_ajustes"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Ajustes"
-                android:textColor="@color/azul_verdoso"
-                android:textSize="18dp" 
-                android:gravity="center_vertical"
-                android:paddingLeft="2dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_mLateral_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp" >
-
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/login" />
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Iniciar sesión"
-                android:textColor="@color/azul_verdoso"
-                android:textSize="18dp" 
-                android:gravity="center_vertical"
-                android:paddingLeft="2dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_mLateral_registro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp" >
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/registro" />
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Nuevo usuario"
-                android:textColor="@color/azul_verdoso"
-                android:textSize="18dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="2dp" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center_horizontal|center_vertical" >
-
-        <Button
-            android:id="@+id/but_crop_recortar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ayuda" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Compartir" />
     </LinearLayout>
 
 </LinearLayout>
