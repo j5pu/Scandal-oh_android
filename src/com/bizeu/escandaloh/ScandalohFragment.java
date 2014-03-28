@@ -39,16 +39,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.applidium.shutterbug.FetchableImageView;
 import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
@@ -207,10 +201,10 @@ public class ScandalohFragment extends SherlockFragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		
 	    if(requestCode == SHOW_COMMENTS && resultCode == Activity.RESULT_OK) {
-
 	    	if (data.getExtras() != null){   
-		    	// Actualizamos el último comentario
+		    	// ACTUALIZAMOS EL ÚLTIMO COMENTARIO
 	 	        Comment last_comm = (Comment) data.getExtras().getParcelable(CommentsActivity.LST_COMMENT);
 	 	        // Actualizamos el adaptador
 	        	((MainActivity) getActivity()).updateLastComment(last_comm);
@@ -236,7 +230,7 @@ public class ScandalohFragment extends SherlockFragment {
 	            	social_net.setImageResource(R.drawable.facebook_gris);
 	            }
 	            
-	            // Actualizamos el nº de comentarios
+	            // ACTUALIZAMOS EL Nº DE COMENTARIOS
 	            int num_comments = data.getExtras().getInt(CommentsActivity.NUM_COMMENTS);
 	            // Actualizamos el adaptador
 	            ((MainActivity) getActivity()).updateNumComments(num_comments);

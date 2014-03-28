@@ -312,8 +312,6 @@ public class CommentsActivity extends SherlockActivity {
 				commentsAdapter.notifyDataSetChanged();
 				// Nos posicionamos en el último comentario
 				list_comments.setSelection(list_comments.getAdapter().getCount() - 1);
-
-
 			}
 
 			if (array_comments.size() == 0) {
@@ -417,8 +415,7 @@ public class CommentsActivity extends SherlockActivity {
 					// Vaciamos el editext
 					edit_comment.setText("");
 
-					// Mostramos de nuevo los comentarios (indicamos que hemos
-					// enviado un comentario)
+					// Mostramos de nuevo los comentarios (indicamos que hemos enviado un comentario)
 					new GetCommentsTask().execute();
 				} else {
 					Toast toast;

@@ -333,6 +333,9 @@ public class RegistrationActivity extends SherlockActivity {
 		        	MyApplication.user_name = edit_nombre_usuario.getText().toString();
 		        	Toast.makeText(getBaseContext(), R.string.usuario_registrado_correctamente, Toast.LENGTH_SHORT).show();
 		        	
+		        	// Debemos reiniciar los escándalos
+		        	MyApplication.reset_scandals = true;
+		        	
 		        	// Le indicamos a la anterior actividad que ha habido éxito en el registro
 		        	setResult(Activity.RESULT_OK);
 		        	finish();

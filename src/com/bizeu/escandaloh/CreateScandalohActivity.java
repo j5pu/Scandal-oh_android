@@ -280,7 +280,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 		
 		@Override
 		protected void onPreExecute() {
-			// Mostramos el ProgressDialog-
+			// Mostramos el ProgressDialog
 			progress.show();
 			any_error = false;
 		}

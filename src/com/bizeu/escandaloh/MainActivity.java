@@ -1,37 +1,24 @@
 package com.bizeu.escandaloh;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -44,12 +31,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -74,7 +56,6 @@ import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
-import com.bizeu.escandaloh.users.RegistrationActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -95,6 +76,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private static final int CREATE_ESCANDALO = 11;
 	public static final int FROM_GALLERY = 12;
 	public static final int SHARING = 13;
+	public static final int SHOW_PROFILE = 14;
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
@@ -139,6 +121,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	ActionBarDrawerToggle mDrawerToggle;
 	private boolean no_hay_escandalos;
 	private ArrayAdapter<CharSequence> adapter_spinner;
+	private String actual_avatar; // Usado para saber si el usuario ha cambiado de avatar
+	private String meta_next_scandals = null;
 
 	/**
 	 * onCreate
@@ -257,10 +241,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {
-					
+			public void onClick(View v) {		
+				// Almacenamos el avatar actual del usuario
+				actual_avatar = MyApplication.avatar;
 				Intent i = new Intent(MainActivity.this, ProfileActivity.class);
-				startActivity(i);		
+				startActivityForResult(i,SHOW_PROFILE);		
 			}
 		});
 
@@ -535,6 +520,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivityForResult(i, CREATE_ESCANDALO);
 			}
 		}
+		
+		// Perfil de usuario
+		else if (requestCode == SHOW_PROFILE){
+			if (!MyApplication.avatar.equals(actual_avatar)){
+				Log.v("WE","Ha cambiado de avatar");
+				updateUserAvatar();
+			}
+		}
 	}
 
 	/**
@@ -754,44 +747,26 @@ public class MainActivity extends SherlockFragmentActivity implements
 		protected Integer doInBackground(Void... params) {
 
 			String url = null;
-
-			// HAPPY
-			if (category.equals(MainActivity.HAPPY)) {
-				// Usamos un servicio u otro dependiendo si es el primer listado
-				// de escándalos o ya posteriores
-				if (escandalos.size() == 0) {
-					url = MyApplication.SERVER_ADDRESS
-							+ "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD 
-							+ "&category__id=1" 
-							+ "&country="+ MyApplication.code_selected_country;
-
-				} else {
-					url = MyApplication.SERVER_ADDRESS 
-							+ "/api/v1/photo/?id__lt=" + escandalos.get(escandalos.size() - 1).getId()
-							+ "&category_id=1"
-							+ "&country=" + MyApplication.code_selected_country
-							+ "&order_by=-id" // Descendente = de más nuevas a más antiguas
-							+ "&limit=" + NUM_SCANDALS_TO_LOAD;
+			
+			// No hay escándalos: obtenemos los primeros
+			if (escandalos.size() == 0){
+				
+				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD;
+				// HAPPY
+				if (category.equals(MainActivity.HAPPY)) {
+					url += "&category__id=1";
 				}
+				else{
+					url += "&category__id=2";
+				}
+						
+				url += "&country="+ MyApplication.code_selected_country;
 			}
-
-			// ANGRY
-			else if (category.equals(MainActivity.ANGRY)) {
-				// Usamos un servicio u otro dependiendo si es el primer listado
-				// de escándalos o ya posteriores
-				if (escandalos.size() == 0) {
-					url = MyApplication.SERVER_ADDRESS
-							+ "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD 
-							+ "&category__id=2" 
-							+ "&country="+ MyApplication.code_selected_country;
-				} else {
-					url = MyApplication.SERVER_ADDRESS 
-							+ "/api/v1/photo/?id__lt=" + escandalos.get(escandalos.size() - 1).getId()
-							+ "&category_id=2"
-							+ "&country=" + MyApplication.code_selected_country
-							+ "&order_by=-id" // Descendente = de más nuevas a más antiguas
-							+ "&limit=" + NUM_SCANDALS_TO_LOAD;
-				}
+			
+			// Obtenemos los siguientes escándalos
+			else{
+				url = MyApplication.SERVER_ADDRESS + meta_next_scandals;
+				Log.v("WE","url: " + url);
 			}
 
 			HttpResponse response = null;
@@ -800,9 +775,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 				HttpClient httpClient = new DefaultHttpClient();
 				HttpGet getEscandalos = new HttpGet(url);
 				getEscandalos.setHeader("content-type", "application/json");
+				
 				// Si es con usuario le añadimos el session_token
 				if (MyApplication.logged_user){
-					Log.v("WE","session token " + MyApplication.session_token);
 					getEscandalos.setHeader("Session-Token", MyApplication.session_token);
 				}
 
@@ -811,11 +786,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 				String respStr = EntityUtils.toString(response.getEntity());
 				Log.i("WE", respStr);
 
-				JSONArray escandalosObject = null;
-
 				// Parseamos los escándalos devueltos
 				JSONObject respJson = new JSONObject(respStr);
-				escandalosObject = respJson.getJSONArray("objects");
+
+				// Obtenemos el meta
+				JSONObject respMetaJson = respJson.getJSONObject("meta");
+				meta_next_scandals = respMetaJson.getString("next");
+
+				JSONArray escandalosObject = respJson.getJSONArray("objects");
 				
 				if (escandalosObject.length() == 0){
 					there_are_more_scandals = false;
@@ -1168,8 +1146,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 */
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	
@@ -1257,9 +1233,20 @@ public class MainActivity extends SherlockFragmentActivity implements
 		adapter.updateLastComment(lst_comm);
 	}
 	
-	
+	/**
+	 * Actualiza el número de comentarios del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param num_comments
+	 */
 	public void updateNumComments(int num_comments){
 		adapter.updateNumComments(num_comments);
+	}
+	
+	/**
+	 * Actualiza el avatar del usuario en todos los escándalos (fragmentos) 
+	 */
+	private void updateUserAvatar(){
+		adapter.updateUserAvatar();
+		adapter.notifyDataSetChanged();
 	}
 	
 	
@@ -1392,6 +1379,35 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Actualizamos el adaptador con el nuevo fragmento
 			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		
+		/**
+		 * Actualiza el avatar del usuario en todos los escándalos
+		 */
+		public void updateUserAvatar(){
+			 for (int i=0; i<escandalos.size(); i++){
+				 
+				 // Obtenemos el escándalo
+				 Scandaloh scan = escandalos.get(i);
+				 
+				 // Si soy el usuario del escándalo actualizo mi avatar
+				 if (scan.getUser().equals(MyApplication.user_name)){
+					 scan.setAvatar(MyApplication.avatar);
+				 }
+				 
+				 // Si soy el usuario del último comentario actualizo mi avatar
+				 Comment cAux = escandalos.get(i).getLastComment();
+				 if (cAux != null){
+					 if (cAux.getUsername().equals(MyApplication.user_name)){
+						 cAux.setAvatar(MyApplication.avatar);
+						 scan.setLastComment(cAux);
+					 }
+				 }
+				 
+				 ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+				 this.fragments.set(i, sf2); 
+			 }
 		}
 
 		/**

@@ -141,8 +141,6 @@ public class ProfileActivity extends SherlockActivity {
 		}
 		return true;
 	}
-	
-	
 
 	/**
 	 * onActivityResult

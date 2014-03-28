@@ -117,7 +117,7 @@ public class LoginSelectActivity extends SherlockActivity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(LoginSelectActivity.this, RegistrationActivity.class);
-				startActivity(i);	
+				startActivityForResult(i,REGISTRATION);	
 			}
 		});
 

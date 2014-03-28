@@ -165,4 +165,5 @@
     <string name="foto_sin_titulo">Foto sin título</string>
     <string name="quieres_hacerlo_ahora">¿Quieres hacerlo ahora?</string>
     <string name="recortar">Recortar</string>
+    <string name="cerrando_sesion">Cerrando sesión...</string>
 </resources>
