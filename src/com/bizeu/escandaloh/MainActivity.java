@@ -814,9 +814,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 			
 			// Obtenemos los siguientes escándalos
 			else{
+				// Fin del carrusel: meta nulo indica que no hay más escándalos
+				if (meta_next_scandals.equals("null")){
+					there_are_more_scandals = false;
+					return 5;
+				}
 				url = MyApplication.SERVER_ADDRESS + meta_next_scandals;
 			}
 
+			Log.v("WE","Url: " + url);
+			Log.v("WE","meta_next_scandals: " + meta_next_scandals);
 			HttpResponse response = null;
 
 			try {
@@ -843,10 +850,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 				JSONArray escandalosObject = respJson.getJSONArray("objects");
 				
-				if (escandalosObject.length() == 0){
-					there_are_more_scandals = false;
-				}
-
 				// Obtenemos los datos de los escándalos
 				for (int i = 0; i < escandalosObject.length(); i++) {
 					// Hacemos una declaración por cada escándalo
