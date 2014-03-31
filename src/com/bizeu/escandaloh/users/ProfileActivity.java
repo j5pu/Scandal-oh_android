@@ -2,19 +2,31 @@ package com.bizeu.escandaloh.users;
 
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -36,9 +48,13 @@ public class ProfileActivity extends SherlockActivity {
 	
 	private FetchableImageView picture;
 	private TextView username;
+	private Button but_logout;
 	
 	private Context mContext;
 	private Uri mImageUri;
+	private ProgressDialog progress;
+	private boolean any_error;
+	private SharedPreferences prefs;
 	
 	/**
 	 * OnCreate
@@ -59,6 +75,7 @@ public class ProfileActivity extends SherlockActivity {
 		
 		picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
 		username = (TextView) findViewById(R.id.txt_profile_username);
+		but_logout = (Button) findViewById(R.id.but_profile_logout);
 		
 		if (MyApplication.avatar != null){
 			picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
@@ -123,9 +140,39 @@ public class ProfileActivity extends SherlockActivity {
 				});
 				builder.show();		
 			}
-		});
+		});	
 		
 		username.setText(MyApplication.user_name);
+		
+		but_logout.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder alert_logout = new AlertDialog.Builder(mContext);
+				alert_logout.setTitle(R.string.cerrar_sesion_usuario);
+				alert_logout.setMessage(R.string.seguro_que_quieres_cerrar);
+				alert_logout.setPositiveButton(R.string.confirmar,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1, int id) {
+
+								// Avisamos al servidor
+								new LogOutTask().execute();
+							}
+						});
+				alert_logout.setNegativeButton(R.string.cancelar,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1, int id) {
+							}
+						});
+				alert_logout.show();
+			}
+		});
+		
+		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
+		
+		progress = new ProgressDialog(this);
+		progress.setMessage(getResources().getString(R.string.cerrando_sesion));
+		progress.setCancelable(false);
 	}
 	
 	
@@ -211,5 +258,109 @@ public class ProfileActivity extends SherlockActivity {
 
 		return null;
 	}
+	
+	
+	
+	
+	
+    
+	/**
+	 * Desloguea a un usuario
+	 * 
+	 */
+	private class LogOutTask extends AsyncTask<Void, Integer, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+			any_error = false;
+			// Mostramos el ProgressDialog
+			progress.show();
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			HttpEntity resEntity;
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/logout/";
+
+			HttpResponse response = null;
+			try {
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost(urlString);
+				post.setHeader("Session-Token", MyApplication.session_token);
+	
+				response = client.execute(post);
+				resEntity = response.getEntity();
+				final String response_str = EntityUtils.toString(resEntity);
+
+				// Comprobamos si ha habido algún error
+				if (response_str != null) {
+					Log.i("WE", response_str);
+					// Obtenemos el json devuelto
+					JSONObject respJSON = new JSONObject(response_str);
+
+					if (respJSON.has("error")) {
+						any_error = true;
+					}
+				}
+
+			} catch (Exception ex) {
+				Log.e("Debug", "error: " + ex.getMessage(), ex);
+				any_error = true;
+
+				// Mandamos la excepción a Google Analytics
+				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+				easyTracker.send(MapBuilder.createException(
+						new StandardExceptionParser(mContext, null) 
+								.getDescription(Thread.currentThread()
+										.getName(), // The name of the thread on
+													// which the exception
+													// occurred.
+										ex), // The exception.
+						false).build()); // False indicates a fatal exception
+			}
+			
+			// Si hubo algún error devolvemos 666
+			if (any_error) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}		
+		}
+				
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Quitamos el ProgressDialog
+			if (progress.isShowing()) {
+				progress.dismiss();
+			}
+			
+			// Si hubo algún error inesperado
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,
+						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			else{	
+				// Deslogueamos al usuario
+				prefs.edit().putString(MyApplication.SESSION_TOKEN, null).commit();
+				MyApplication.session_token = null;
+	        	prefs.edit().putString(MyApplication.USER_NAME, getResources().getString(R.string.invitado)).commit();
+	        	MyApplication.user_name = getResources().getString(R.string.invitado) ;
+	        	prefs.edit().putString(MyApplication.AVATAR, null).commit();
+	        	MyApplication.avatar = null;
+				MyApplication.logged_user = false;
+							
+				// Reiniciamos los escándalos
+				MyApplication.reset_scandals = true;
+							
+				// Cerramos la pantalla
+				finish();
+			}
+		}
+	}
+
 
 }

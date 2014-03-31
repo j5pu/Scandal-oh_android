@@ -131,7 +131,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	ActionBarDrawerToggle mDrawerToggle;
 	private boolean no_hay_escandalos;
 	private ArrayAdapter<CharSequence> adapter_spinner;
-	private String actual_avatar; // Usado para saber si el usuario ha cambiado de avatar
+	private String actual_avatar = null; // Usado para saber si el usuario ha cambiado de avatar
 	private String meta_next_scandals = null;
 	private List<String> filter_header;
     private List<String> filter_childs;
@@ -571,9 +571,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 		
 		// Perfil de usuario
 		else if (requestCode == SHOW_PROFILE){
-			if (!MyApplication.avatar.equals(actual_avatar)){
-				Log.v("WE","Ha cambiado de avatar");
-				updateUserAvatar();
+			// Comprobamos si ha cambiado de avatar
+			if (actual_avatar != null && MyApplication.avatar != null){
+				if (!MyApplication.avatar.equals(actual_avatar)){
+					// Lo actualizamos
+					updateUserAvatar();
+				}
 			}
 		}
 	}
@@ -1262,6 +1265,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 	
+	/**
+	 * Resetea los escándalos del carrusel
+	 */
 	private void resetScandals(){
 		// Abrimos llave de hay más escandalos
 		there_are_more_scandals = true;

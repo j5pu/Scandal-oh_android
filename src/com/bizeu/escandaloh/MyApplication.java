@@ -8,9 +8,9 @@ public class MyApplication extends Application {
 	// Producción
 	//public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com" ;
 	// Desarrollo
-	//public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
+	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
 	// Local
-	public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
+	//public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";

@@ -10,14 +10,5 @@
             android:summary="@string/reproduce_el_audio_automaticamente"
             android:title="@string/autoreproduccion"/>
     </PreferenceCategory>
-    
-    <PreferenceCategory
-        android:key="perfilCategory"
-        android:title="@string/usuario" >
-        <Preference
-            android:key="cerrarSesion"
-            android:summary="@string/cierra_la_sesion_actual"
-            android:title="@string/cerrar_sesion" />
-    </PreferenceCategory>
 
 </PreferenceScreen>
