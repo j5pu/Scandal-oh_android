@@ -892,6 +892,7 @@ public class ScandalohFragment extends SherlockFragment {
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
 	             post.setHeader("Content-Type", "application/json");
+	             post.setHeader("Session-Token", MyApplication.session_token);
 	             
 	             JSONObject dato = new JSONObject();
 	             
@@ -954,7 +955,7 @@ public class ScandalohFragment extends SherlockFragment {
 		        }
 		        else{
 		        	Toast toast;
-		        	toast = Toast.makeText(mContext, R.string.hubo_algun_error_enviando_comentario, Toast.LENGTH_LONG);
+		        	toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_LONG);
 		        	toast.show();        	
 		        }	      
 			}

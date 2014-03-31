@@ -1,8 +1,6 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -65,6 +63,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private Uri mImageUri;
 	private ProgressDialog progress;
 	private Context mContext;
+	private Activity acti;
 	private File audio_file;
 	private boolean con_audio = false;
 	private int photo_from;
@@ -86,6 +85,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_create_escandalo));
 
 		mContext = this;
+		acti = this;
 
 		// Quitamos el action bar
 		getSupportActionBar().hide();
@@ -237,7 +237,13 @@ public class CreateScandalohActivity extends SherlockActivity {
 								} else if (result.equals("CANCELED")) {
 									con_audio = false;
 								}
+								// Mostramos un mensaje
+								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
+								toast.show();
+								// Enviamos el escándalo en un hilo aparte
 								new SendScandalTask().execute();
+								// Cerramos la pantalla
+								acti.finish();
 							}
 						});
 						record_audio.setCancelable(false);
@@ -261,7 +267,10 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 						// Enviamos el escandalo sin audio
 						con_audio = false;
+						Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
+						toast.show();
 						new SendScandalTask().execute();
+						finish();
 					}
 				});
 
@@ -280,8 +289,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 		
 		@Override
 		protected void onPreExecute() {
-			// Mostramos el ProgressDialog
-			progress.show();
 			any_error = false;
 		}
 
@@ -374,51 +381,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 			} else {
 				return (response.getStatusLine().getStatusCode());
 			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Quitamos el ProgressDialog
-			if (progress.isShowing()) {
-				progress.dismiss();
-			}
-
-			// Si hubo algún error mostramos un mensaje
-			if (result == 666) {
-				Toast toast;
-				toast = Toast.makeText(
-						mContext,
-						getResources().getString(
-								R.string.no_se_pudo_enviar_el_scandaloh),
-						Toast.LENGTH_LONG);
-				toast.show();
-			}
-
-			// No hubo ningún error extraño
-			else {
-				// Si es codigo 2xx --> OK
-				if (result >= 200 && result < 300) {
-					Intent resultIntent = new Intent();
-					resultIntent.putExtra("title", written_title);
-					resultIntent.putExtra("category", selected_category);
-					Toast toast = Toast.makeText(mContext, getResources()
-							.getString(R.string.scandaloh_enviado_con_exito),
-							Toast.LENGTH_LONG);
-					toast.show();
-					setResult(Activity.RESULT_OK, resultIntent);
-					finish();
-
-				} else {
-					Toast toast = Toast.makeText(mContext, getResources()
-							.getString(R.string.error_enviando_el_scandaloh),
-							Toast.LENGTH_LONG);
-					toast.show();
-					finish();
-				}
-
-			}
-		}
+		}	
 	}
 	
 	

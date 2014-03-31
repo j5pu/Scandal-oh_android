@@ -116,7 +116,6 @@ public class CommentsActivity extends SherlockActivity {
 		send_progress = new ProgressDialog(this);
 		send_progress.setTitle(R.string.enviando_comentario);
 		send_progress.setMessage(getResources().getString(R.string.espera_por_favor));
-		send_progress.setCancelable(false);
 	}
 
 	/**
