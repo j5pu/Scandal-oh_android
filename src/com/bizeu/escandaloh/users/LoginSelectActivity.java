@@ -264,16 +264,6 @@ public class LoginSelectActivity extends SherlockActivity {
 					case LOGGING_FACEBOOK:
 						social_network = 1;
 						break;
-					/*
-					case LOGGING_GOOGLE:
-						social_network = 2;
-						email = "google@email.com";
-						break;
-					case LOGGING_TWITTER:
-						social_network = 3;
-						email = "twitter@email.com";
-						break;
-					*/
 				}		
 				
 				Log.v("WE","acceso token: " + access_token);

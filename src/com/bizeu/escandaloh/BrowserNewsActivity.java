@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebBackForwardList;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class BrowserNewsActivity extends SherlockActivity {
@@ -96,6 +98,32 @@ public class BrowserNewsActivity extends SherlockActivity {
 					String lastUrl = mWebBackForwardList.getItemAtIndex(mWebBackForwardList.getCurrentIndex()).getUrl();
 					web.loadUrl(lastUrl);
 				}
+			}
+		});
+		
+		img_share.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				Intent i;
+				
+				// Logueado: mostramos pantalla de subir escándalo
+				if (MyApplication.logged_user){
+					i = new Intent(BrowserNewsActivity.this, CreateScandalohActivity.class);
+				}
+				
+				// No logueado: mostramos pantalla de iniciar sesión
+				else{
+					i = new Intent(BrowserNewsActivity.this, LoginSelectActivity.class);
+				}
+				
+				// Mantamos la url actual
+				WebBackForwardList mWebBackForwardList = web.copyBackForwardList();
+				String lastUrl = mWebBackForwardList.getItemAtIndex(mWebBackForwardList.getCurrentIndex()).getUrl();
+				i.putExtra("photo_from", CoverActivity.FROM_SHARING_TEXT);
+				i.putExtra("shareUri", lastUrl);
+				startActivity(i);
 			}
 		});
 	}

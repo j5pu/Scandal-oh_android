@@ -92,6 +92,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public static final String BOTH = "Todas";
 	public static final String NORMAL = "Normal";
 	public static final String ENVIAR_COMENTARIO = "Enviar_comentario";
+	private static final String FILTRO_RECIENTES = "-date";
+	private static final String FILTRO_COMENTADAS = "-comments_count";
+	private static final String FILTRO_VOTADAS = "-votes_count";
 
 	private LinearLayout ll_refresh;
 	private LinearLayout ll_take_photo;
@@ -136,7 +139,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private List<String> filter_header;
     private List<String> filter_childs;
     private Map<String, List<String>> filterCollection;
-    private String actual_filter = "-date";
+    private String actual_filter = FILTRO_RECIENTES ;
 
 	/**
 	 * onCreate
@@ -156,8 +159,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
-		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-				| ActionBar.DISPLAY_SHOW_HOME);
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
 		actBar.setCustomView(view);
 		// Activamos el logo del menu para el menu lateral
@@ -380,15 +382,15 @@ public class MainActivity extends SherlockFragmentActivity implements
                 
                 // Más recientes
                 if (selected_filter.equals(getResources().getString(R.string.mas_recientes))){
-                	actual_filter = "-date";
+                	actual_filter = FILTRO_RECIENTES;
                 }
                 // Más votados
                 else if (selected_filter.equals(getResources().getString(R.string.mas_votados))){
-                	actual_filter = "-votes_count";
+                	actual_filter = FILTRO_VOTADAS;
                 }
                 // Más comentados
                 else if (selected_filter.equals(getResources().getString(R.string.mas_comentados))){
-                	actual_filter = "-comments_count";
+                	actual_filter = FILTRO_COMENTADAS;
                 }
  
                 resetScandals();
@@ -720,53 +722,48 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Actualizar carrusel: Le decimos al fragmento que actualice los
 		// escándalos (y suba el carrusel al primero)
 		case R.id.ll_main_refresh:
-
-			// Mandamos el evento a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createEvent("Acción UI",
-					"Boton clickeado", "Actualizar lista escándalos", null)
-					.build());
-
-			// Cambiamos la imagen de actualizar por un loading
-			progress_refresh.setVisibility(View.VISIBLE);
-			img_update_list.setVisibility(View.GONE);
-
+		
 			// Nos colocamos en el primer escandalo
 			pager.setCurrentItem(0);
+			
+			// Comprobamos si hay nuevos escándalos sólo si estamos filtrando por fecha
+			if (actual_filter.equals(FILTRO_RECIENTES)){
+				
+				// Si no se están obteniendo otros escándalos
+				if (!getting_escandalos) {
+					
+					// Si hay conexión
+					if (Connectivity.isOnline(mContext)) {
+						
+						// Cambiamos la imagen de actualizar por un loading
+						progress_refresh.setVisibility(View.VISIBLE);
+						img_update_list.setVisibility(View.GONE);
+						
+						// Obtenemos los escándalos:
+						// Si no hay ninguno mostrado obtenemos los primeros, si hay
+						// alguno obtenemos si hay nuevos escándalos subidos
+						getting_escandalos = true;
 
-			// Si no se están obteniendo otros escándalos
-			if (!getting_escandalos) {			
-				// Si hay conexión
-				if (Connectivity.isOnline(mContext)) {
-					// Obtenemos los escándalos:
-					// Si no hay ninguno mostrado obtenemos los primeros, si hay
-					// alguno obtenemos si hay nuevos escándalos subidos
-					getting_escandalos = true;
-
-					if (escandalos.size() > 0) {
-						getNewEscandalosAsync = new GetNewEscandalos();
-						getNewEscandalosAsync.execute();
-					} else {
-						no_hay_escandalos = true; // Indicamos que no hay
-													// escándalos aún
-						getEscandalosAsync = new GetEscandalos();
-						getEscandalosAsync.execute();
+						if (escandalos.size() > 0) {
+							getNewEscandalosAsync = new GetNewEscandalos();
+							getNewEscandalosAsync.execute();
+						} else {
+							no_hay_escandalos = true; // Indicamos que no hay
+														// escándalos aún
+							getEscandalosAsync = new GetEscandalos();
+							getEscandalosAsync.execute();
+						}
 					}
-				}
 
-				// No hay conexión
-				else {
-					Toast toast = Toast.makeText(mContext,
-							R.string.no_dispones_de_conexion,
-							Toast.LENGTH_SHORT);
-					toast.show();
-					// Indicamos a la actividad que ha terminado de actualizar
-					refreshFinished();
-				}
-			} else {
-				// Indicamos a la actividad que ha terminado de actualizar
-				refreshFinished();
-			}
+					// No hay conexión
+					else {
+						Toast toast = Toast.makeText(mContext,
+								R.string.no_dispones_de_conexion,
+								Toast.LENGTH_SHORT);
+						toast.show();
+					}
+				} 
+			}				
 			break;
 		}
 	}
@@ -930,17 +927,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 						"Error obteniendo escándalos o comentarios", ex);
 				// Hubo algún error inesperado
 				any_error = true;
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) 
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), false).build());
-
 			}
 
 			// Si hubo algún error devolvemos 666
@@ -988,30 +974,39 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 */
 	private class GetNewEscandalos extends AsyncTask<Void, Integer, Integer> {
 
+		String c_date;
+		String c_id;
+		String c_photo;
+		String c_resource_uri;
+		String c_social_network;
+		String c_text;
+		String c_user;
+		String c_user_id;
+		String c_username;
+		String c_avatar;
+		
 		@Override
 		protected void onPreExecute() {
+			getting_escandalos = true;
 			any_error = false;
 		}
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-
-			// A partir del id más nuevo obtenido (el primero del array)
+				
 			String url = null;
+			
+			url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?id__gt=" + escandalos.get(0).getId();
 			// HAPPY
 			if (category.equals(MainActivity.HAPPY)) {
-				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-						+ escandalos.get(0).getId() + "/"
-						+ MyApplication.code_selected_country
-						+ "/new/?category__id=1";
+				url += "&category__id=1";
 			}
-			// ANGRY
-			if (category.equals(MainActivity.ANGRY)) {
-				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/"
-						+ escandalos.get(0).getId() + "/"
-						+ MyApplication.code_selected_country
-						+ "/new/?category__id=2";
+			else{
+				url += "&category__id=2";
 			}
+									
+			url += "&country="+ MyApplication.code_selected_country;
+			url += "&order_by=" + actual_filter ;
 
 			HttpResponse response = null;
 
@@ -1024,74 +1019,89 @@ public class MainActivity extends SherlockFragmentActivity implements
 				response = httpClient.execute(getEscandalos);
 				String respStr = EntityUtils.toString(response.getEntity());
 				Log.i("WE", respStr);
+				
+				// Parseamos los escándalos devueltos
+				JSONObject respJson = new JSONObject(respStr);
+				JSONArray escandalosObject = respJson.getJSONArray("objects");
 
-				JSONArray escandalosObject = new JSONArray(respStr);
+				// Obtenemos los datos de los escándalos
+				for (int i = escandalosObject.length() -1; i >= 0; i--) {
+					// Hacemos una declaración por cada escándalo
+					final Comment last_comment;
 
-				for (int i = 0; i < escandalosObject.length(); i++) {
 					JSONObject escanObject = escandalosObject.getJSONObject(i);
 
 					final String category = escanObject.getString("category");
 					final String date = escanObject.getString("date");
 					final String id = escanObject.getString("id");
-					final String img_p = escanObject.getString("img_p");
+					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
 					final String img = escanObject.getString("img");
-					final String comments_count = escanObject
-							.getString("comments_count");
+					final String comments_count = escanObject.getString("comments_count");
 					String latitude = escanObject.getString("latitude");
 					String longitude = escanObject.getString("longitude");
-					final String resource_uri = escanObject
-							.getString("resource_uri");
-					final String title = new String(escanObject.getString(
-							"title").getBytes("ISO-8859-1"), HTTP.UTF_8);
+					final String resource_uri = escanObject.getString("resource_uri");
+					final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
 					final String user = escanObject.getString("user");
 					String visits_count = escanObject.getString("visits_count");
 					final String sound = escanObject.getString("sound");
 					final String username = escanObject.getString("username");
 					final String avatar = escanObject.getString("avatar");
+					final String social_network = escanObject.getString("social_network");
+					final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
+					final int likes = Integer.parseInt(escanObject.getString("likes"));
+					final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
+					final int media_type = Integer.parseInt(escanObject.getString("media_type"));
+					final String favicon = escanObject.getString("favicon");
+					final String source = escanObject.getString("source");
+					final String source_name = escanObject.getString("source_name");
+					
+					// Obtenemos el comentario más reciente
+					if (!escanObject.isNull("last_comment")){
+						JSONObject commentObject = escanObject.getJSONObject("last_comment");
+						c_date = commentObject.getString("date");
+						c_id = commentObject.getString("id");
+						c_photo = commentObject.getString("photo");
+						c_resource_uri = commentObject
+						.getString("resource_uri");
+						c_social_network = commentObject
+						.getString("social_network");
+						c_text = new String(commentObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+						c_user = commentObject.getString("user");
+						c_user_id = commentObject.getString("user_id");
+						c_username = commentObject.getString("username");
+						c_avatar = commentObject.getString("avatar");
 
-					/*
-					 * if (escandalos != null && !isCancelled()){
-					 * runOnUiThread(new Runnable() {
-					 * 
-					 * @Override public void run() { // Añadimos el escandalo al
-					 * comienzo Scandaloh escanAux = new Scandaloh(id, title,
-					 * category, BitmapFactory.decodeResource(getResources(),
-					 * R.drawable.loading), Integer.parseInt(comments_count),
-					 * resource_uri, "http://scandaloh.s3.amazonaws.com/" +
-					 * img_p, "http://scandaloh.s3.amazonaws.com/" + img, sound,
-					 * username, avatar, date); escandalos.add(0,escanAux);
-					 * adapter
-					 * .addFragmentAtStart(ScandalohFragment.newInstance(escanAux
-					 * )); adapter.notifyDataSetChanged(); } }); }
-					 */
+						last_comment = new Comment(c_date, c_id, c_photo,
+								c_resource_uri, c_social_network, c_text,
+							c_user, c_user_id, c_username, c_avatar);
+					}
+					else{
+						last_comment = null;
+					}
+
+					if (escandalos != null && !isCancelled()) {
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {							
+								// Añadimos el escandalo al ArrayList
+								Scandaloh escanAux = new Scandaloh(id, title,
+										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+										Integer.parseInt(comments_count),resource_uri,
+										MyApplication.DIRECCION_BUCKET + img_p,
+										MyApplication.DIRECCION_BUCKET + img, sound, username, date,
+										avatar, last_comment, social_network,
+										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
+								escandalos.add(0,escanAux);
+								adapter.addFragmentAtStart(ScandalohFragment.newInstance(escandalos.get(0)));
+								adapter.notifyDataSetChanged();
+							}
+						});
+					}
 				}
 			} catch (Exception ex) {
 				Log.e("ServicioRest", "Error!", ex);
 				// Hubo algún error inesperado
 				any_error = true;
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) // Context
-																	// and
-																	// optional
-																	// collection
-																	// of
-																	// package
-																	// names to
-																	// be used
-																	// in
-																	// reporting
-																	// the
-																	// exception.
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
-
 			}
 
 			// Si hubo algún error devolvemos 666
@@ -1106,16 +1116,33 @@ public class MainActivity extends SherlockFragmentActivity implements
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			// Si hubo algún error inesperado
+			// Quitamos el progresbar y mostramos la lista de escandalos
+			loading.setVisibility(View.GONE);
+			pager.setVisibility(View.VISIBLE);
+
+			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666) {
-				Toast toast = Toast.makeText(mContext,
-						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
+			else{
+				pager.setCurrentItem(0);
+			}
 
-			// Abrimos la llave
+			// Habilitamos el spinner
+			spinner_categorias.setClickable(true);
+
+			// Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
+			if (no_hay_escandalos) {
+				refreshFinished();
+				no_hay_escandalos = false;
+			}
+
+			// Ya no se están obteniendo escándalos (abrimos la llave)
 			getting_escandalos = false;
 
+			adapter.notifyDataSetChanged();
+			
 			// Indicamos a la actividad que ha terminado de actualizar
 			refreshFinished();
 		}
@@ -1240,7 +1267,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	/**
 	 * Se llama cuando se ha terminado de actualizar el carrusel
 	 */
-	public void refreshFinished() {
+	private void refreshFinished() {
 		// Cambiamos el loading del menu por el botón de actualizar
 		progress_refresh.setVisibility(View.GONE);
 		img_update_list.setVisibility(View.VISIBLE); 

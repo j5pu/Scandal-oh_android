@@ -587,6 +587,8 @@ public class ScandalohFragment extends SherlockFragment {
    											else if (opciones_reportar[item].equals("Copyright")){
    												chosen_report = 1;
    											}	
+   											Toast toast = Toast.makeText(getActivity().getBaseContext(), getResources().getString(R.string.reportando_scandaloh) , Toast.LENGTH_SHORT);
+   											toast.show();
    											new ReportPhoto(getActivity().getBaseContext()).execute();
    										}
    									});
@@ -851,11 +853,6 @@ public class ScandalohFragment extends SherlockFragment {
 	}	
 	
 	
-	
-	
-	
-	
-
 	/**
 	 * Reporta una foto
 	 *
@@ -869,16 +866,6 @@ public class ScandalohFragment extends SherlockFragment {
 	         mContext = context;
 	         any_error = false;
 	    }
-		
-		@Override
-		protected void onPreExecute(){
-			// Mostramos el ProgressDialog
-	        pDialog = new ProgressDialog(getActivity());
-	        pDialog.setMessage(getResources().getString(R.string.reportando_scandaloh));
-	        pDialog.setIndeterminate(false);
-	        pDialog.setCancelable(false);
-	        pDialog.show();	
-		}
 		
 		@Override
 	    protected Integer doInBackground(Void... params) {
@@ -896,7 +883,6 @@ public class ScandalohFragment extends SherlockFragment {
 	             
 	             JSONObject dato = new JSONObject();
 	             
-	             dato.put("user", MyApplication.resource_uri);
 	             dato.put("photo", "/api/v1/photo/" + id +"/");
 	             dato.put("category", chosen_report);
 
@@ -930,35 +916,6 @@ public class ScandalohFragment extends SherlockFragment {
 		        // Devolvemos el resultado 
 		        return (response.getStatusLine().getStatusCode());
 	        }
-	    }
-
-		
-		@Override
-	    protected void onPostExecute(Integer result) {
-			
-			// Quitamos el ProgressDialog
-			if (pDialog.isShowing()) {
-		        pDialog.dismiss();
-		    }
-			
-			// Si hubo algún error mostramos un mensaje
-			if (any_error){
-				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-			else{
-				
-				// Si es codigo 2xx --> OK
-				if (result >= 200 && result <300){
-					Toast toast = Toast.makeText(mContext, R.string.report_enviado_correctamente, Toast.LENGTH_SHORT);
-					toast.show();      	
-		        }
-		        else{
-		        	Toast toast;
-		        	toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_LONG);
-		        	toast.show();        	
-		        }	      
-			}
 	    }
 	}
 	

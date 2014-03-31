@@ -5,10 +5,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -61,7 +63,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String written_title;
 	private Bitmap taken_photo;
 	private Uri mImageUri;
-	private ProgressDialog progress;
+	private ProgressDialog send_progress;
 	private Context mContext;
 	private Activity acti;
 	private File audio_file;
@@ -127,15 +129,11 @@ public class CreateScandalohActivity extends SherlockActivity {
 				// Se ha compartido un texto (url)
 				else if (photo_from == CoverActivity.FROM_SHARING_TEXT){
 					shared_url = data.getExtras().getString("shareUri");
+					new GetPreviewScandalFromUrlTask().execute();
 					Log.v("WE","share uri: " + shared_url);
 				}
 			}
 		}
-
-		progress = new ProgressDialog(this);
-		progress.setTitle(getResources().getString(R.string.subiendo_scandaloh));
-		progress.setMessage(getResources().getString(R.string.espera_por_favor));
-		progress.setCancelable(false);
 
 		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
 		txt_contador_titulo = (TextView) findViewById(R.id.txt_contador_caracteres_titulo);
@@ -389,21 +387,24 @@ public class CreateScandalohActivity extends SherlockActivity {
 	 * Envia un comentario
 	 * 
 	 */
-	/*
-	private class GetScandalFromUrlTask extends AsyncTask<Void, Integer, Integer> {
+	private class GetPreviewScandalFromUrlTask extends AsyncTask<Void, Integer, Integer> {
 
 		@Override
 		protected void onPreExecute() {
 			any_error = false;
 			// Mostramos el ProgressDialog
-			progress.show();
+			send_progress = new ProgressDialog(mContext);
+			send_progress.setTitle(getResources().getString(R.string.subiendo_scandaloh));
+			send_progress.setMessage(getResources().getString(R.string.espera_por_favor));
+			send_progress.setCancelable(false);
+			send_progress.show();
 		}
 
 		@Override
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/preview-news/";
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/preview-url/";
 
 			HttpResponse response = null;
 
@@ -411,11 +412,9 @@ public class CreateScandalohActivity extends SherlockActivity {
 				HttpClient client = new DefaultHttpClient();
 				HttpPost post = new HttpPost(urlString);
 				post.setHeader("Content-Type", "application/json");
-				post.setHeader("Session-Token", MyApplication.session_token);
 
 				JSONObject dato = new JSONObject();
-
-				dato.put("url", MyApplication.resource_uri);
+				dato.put("url", shared_url);
 
 				// Formato UTF-8 (ñ,á,ä,...)
 				StringEntity entity = new StringEntity(dato.toString(),HTTP.UTF_8);
@@ -425,23 +424,12 @@ public class CreateScandalohActivity extends SherlockActivity {
 				resEntity = response.getEntity();
 				final String response_str = EntityUtils.toString(resEntity);
 
-				Log.i("WE", response_str);
+				Log.i("WE", "respuesta al pedir preview noticia: " + response_str);
 			}
 
 			catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				any_error = true; // Indicamos que hubo algún error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
 			}
 
 			if (any_error) {
@@ -455,6 +443,12 @@ public class CreateScandalohActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
+			Log.v("WE","entra en onpostexecute y result vale: " + result);
+			// Quitamos el ProgressDialog
+			if (send_progress.isShowing()) {
+				send_progress.dismiss();
+			}
+			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error) {
 				Toast toast = Toast.makeText(mContext, getResources()
@@ -462,14 +456,14 @@ public class CreateScandalohActivity extends SherlockActivity {
 						Toast.LENGTH_SHORT);
 				toast.show();
 				// Quitamos el ProgressDialog
-				if (progress.isShowing()) {
-					progress.dismiss();
+				if (send_progress.isShowing()) {
+					send_progress.dismiss();
 				}
 
 			} else {
 				// Si es codigo 2xx --> OK
 				if (result >= 200 && result < 300) {
-					
+					Log.v("WE","Datos obtenidos");
 				} else {
 					Toast toast;
 					toast = Toast
@@ -480,14 +474,10 @@ public class CreateScandalohActivity extends SherlockActivity {
 													R.string.hubo_algun_error_enviando_comentario),
 									Toast.LENGTH_LONG);
 					toast.show();
-					// Quitamos el ProgressDialog
-					if (send_progress.isShowing()) {
-						send_progress.dismiss();
-					}
 				}
 			}
 		}
 	}
-	*/
+	
 
 }
