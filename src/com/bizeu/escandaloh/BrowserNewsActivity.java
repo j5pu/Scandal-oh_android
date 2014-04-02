@@ -1,5 +1,6 @@
 package com.bizeu.escandaloh;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -34,6 +35,7 @@ public class BrowserNewsActivity extends SherlockActivity {
 	/**
 	 * onCreate
 	 */
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,10 +45,10 @@ public class BrowserNewsActivity extends SherlockActivity {
 		if (getIntent() != null){
 			Intent i = getIntent();
 			url = i.getStringExtra("source");
-			
 			web = (WebView) findViewById(R.id.wb_browser_noticia);
 			web.getSettings().setBuiltInZoomControls(true);
 			web.setWebViewClient(new MyWebViewClient());
+
 			web.loadUrl(url);
 		}	
 		

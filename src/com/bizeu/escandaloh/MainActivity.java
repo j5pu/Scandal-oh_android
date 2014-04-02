@@ -15,7 +15,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -53,7 +52,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -80,7 +78,8 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 public class MainActivity extends SherlockFragmentActivity implements
 		OnClickListener, OnItemSelectedListener {
 
-	public static final int NUM_SCANDALS_TO_LOAD = 10;
+	public static final int NUM_SCANDALS_TO_LOAD = 15;
+	public static final int NUM_SCANDALS_TO_LOAD_FIRST_TIME = 10;
 	public static final int SHOW_CAMERA = 10;
 	private static final int CREATE_ESCANDALO = 11;
 	public static final int FROM_GALLERY = 12;
@@ -123,8 +122,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	ViewPager pager = null;
 	ProgressBar loading;
 	private boolean any_error;
-	private GetEscandalos getEscandalosAsync;
-	private GetNewEscandalos getNewEscandalosAsync;
+	private GetScandalsTask getEscandalosAsync;
+	private GetNewScandals getNewEscandalosAsync;
 	private String category;
 	private boolean getting_escandalos = true;
 	private boolean there_are_more_scandals = true;
@@ -198,15 +197,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onPageSelected(int position) {
 
-				// Si quedan 3 escándalos más para llegar al último y aún quedan
+				// Si quedan 5 escándalos más para llegar al último y aún quedan
 				// más escándalos (si hemos llegado
 				// a los últimos no se pedirán más): obtenemos los siguientes 10
-				if (position == adapter.getCount() - (NUM_SCANDALS_TO_LOAD-3)
+				if (position == adapter.getCount() - (NUM_SCANDALS_TO_LOAD-5)
 						&& there_are_more_scandals) {
 					// Usamos una llave de paso (sólo la primera vez entrará).
 					// Cuando se obtengan los 10 escándalos se volverá a abrir
 					if (!getting_escandalos) {
-						getEscandalosAsync = new GetEscandalos();
+						getEscandalosAsync = new GetScandalsTask();
 						getEscandalosAsync.execute();
 					}
 				}
@@ -250,8 +249,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		img_lateral_avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (MyApplication.logged_user){
-					
+				if (MyApplication.logged_user){				
 				}
 			}
 		});
@@ -319,7 +317,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							// Si hay conexión
 							if (Connectivity.isOnline(mContext)) {
 								cancelGetEscandalos();
-								refreshFinished();
+								hideLoadingFromMenu();
 								// Abrimos llave de hay más escandalos
 								there_are_more_scandals = true;
 								// Quitamos los escándalos actuales
@@ -334,7 +332,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								// Mostramos el progressBar y ocultamos la lista de escandalos
 								loading.setVisibility(View.VISIBLE);
 								pager.setVisibility(View.GONE);
-								getEscandalosAsync = new GetEscandalos();
+								getEscandalosAsync = new GetScandalsTask();
 								getEscandalosAsync.execute();
 							}
 
@@ -401,23 +399,20 @@ public class MainActivity extends SherlockFragmentActivity implements
         });
 
 		// Le asignamos la animación al pasar entre escándalos (API 11+)
-		pager.setPageTransformer(true, new ZoomOutPageTransformer());
+		//pager.setPageTransformer(true, new ZoomOutPageTransformer());
 		// Separación entre escándalos
 		pager.setPageMargin(3);
 		category = HAPPY;
 
 		// Si hay conexión: obtenemos los primeros escándalos
 		if (Connectivity.isOnline(mContext)) {
-			getEscandalosAsync = new GetEscandalos();
+			getEscandalosAsync = new GetScandalsTask();
 			getEscandalosAsync.execute();
 		} else {
 			Toast toast = Toast.makeText(mContext,
 					getResources().getString(R.string.no_dispones_de_conexion),
 					Toast.LENGTH_SHORT);
 			toast.show();
-			// Quitamos el progresbar y mostramos la lista de escandalos
-			loading.setVisibility(View.GONE);
-			pager.setVisibility(View.VISIBLE);
 		}
 	}
 	
@@ -735,22 +730,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 					// Si hay conexión
 					if (Connectivity.isOnline(mContext)) {
 						
-						// Cambiamos la imagen de actualizar por un loading
-						progress_refresh.setVisibility(View.VISIBLE);
-						img_update_list.setVisibility(View.GONE);
-						
 						// Obtenemos los escándalos:
 						// Si no hay ninguno mostrado obtenemos los primeros, si hay
 						// alguno obtenemos si hay nuevos escándalos subidos
 						getting_escandalos = true;
 
 						if (escandalos.size() > 0) {
-							getNewEscandalosAsync = new GetNewEscandalos();
+							getNewEscandalosAsync = new GetNewScandals();
 							getNewEscandalosAsync.execute();
 						} else {
 							no_hay_escandalos = true; // Indicamos que no hay
 														// escándalos aún
-							getEscandalosAsync = new GetEscandalos();
+							getEscandalosAsync = new GetScandalsTask();
 							getEscandalosAsync.execute();
 						}
 					}
@@ -772,7 +763,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * Obtiene los siguientes 10 escándalos anteriores a partir de uno dado
 	 * 
 	 */
-	private class GetEscandalos extends AsyncTask<Void, Integer, Integer> {
+	private class GetScandalsTask extends AsyncTask<Void, Integer, Integer> {
 
 		String c_date;
 		String c_id;
@@ -789,6 +780,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		protected void onPreExecute() {
 			getting_escandalos = true;
 			any_error = false;
+			// Cambiamos la imagen de actualizar por un loading
+			showLoadingOnMenu();		
 		}
 
 		@Override
@@ -822,8 +815,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 				url = MyApplication.SERVER_ADDRESS + meta_next_scandals;
 			}
 
-			Log.v("WE","Url: " + url);
-			Log.v("WE","meta_next_scandals: " + meta_next_scandals);
 			HttpResponse response = null;
 
 			try {
@@ -943,10 +934,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		@Override
 		protected void onPostExecute(Integer result) {
-
-			// Quitamos el progresbar y mostramos la lista de escandalos
-			loading.setVisibility(View.GONE);
+			
+			// Mostramos el botón actualizar
+			hideLoadingFromMenu();
+			
+			// Quitamos el loading y mostramos los escándalos
 			pager.setVisibility(View.VISIBLE);
+			loading.setVisibility(View.GONE);
 
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666) {
@@ -960,7 +954,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
 			if (no_hay_escandalos) {
-				refreshFinished();
+				hideLoadingFromMenu();
 				no_hay_escandalos = false;
 			}
 
@@ -975,7 +969,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * Obtiene (si hay) nuevos escandalos
 	 * 
 	 */
-	private class GetNewEscandalos extends AsyncTask<Void, Integer, Integer> {
+	private class GetNewScandals extends AsyncTask<Void, Integer, Integer> {
 
 		String c_date;
 		String c_id;
@@ -992,6 +986,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		protected void onPreExecute() {
 			getting_escandalos = true;
 			any_error = false;
+			// Mostramos el loading
+			showLoadingOnMenu();
 		}
 
 		@Override
@@ -1120,8 +1116,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		protected void onPostExecute(Integer result) {
 
 			// Quitamos el progresbar y mostramos la lista de escandalos
-			loading.setVisibility(View.GONE);
-			pager.setVisibility(View.VISIBLE);
+			hideLoadingFromMenu();
 
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666) {
@@ -1137,7 +1132,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// Si hemos llegado aqui porque no habían escándalos (y le dio a actualizar), paramos el loading del menu
 			if (no_hay_escandalos) {
-				refreshFinished();
+				hideLoadingFromMenu();
 				no_hay_escandalos = false;
 			}
 
@@ -1147,7 +1142,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			adapter.notifyDataSetChanged();
 			
 			// Indicamos a la actividad que ha terminado de actualizar
-			refreshFinished();
+			hideLoadingFromMenu();
 		}
 	}
 
@@ -1168,7 +1163,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)) {
 				cancelGetEscandalos();
-				refreshFinished();
+				hideLoadingFromMenu();
 				// Inhabilitamos el spinner
 				spinner_categorias.setClickable(false);
 				// Abrimos llave de hay más escandalos
@@ -1208,7 +1203,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Mostramos el progressBar y ocultamos la lista de escandalos
 				loading.setVisibility(View.VISIBLE);
 				pager.setVisibility(View.GONE);
-				getEscandalosAsync = new GetEscandalos();
+				getEscandalosAsync = new GetScandalsTask();
 				getEscandalosAsync.execute();
 			}
 
@@ -1267,14 +1262,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 
 
-	/**
-	 * Se llama cuando se ha terminado de actualizar el carrusel
-	 */
-	private void refreshFinished() {
-		// Cambiamos el loading del menu por el botón de actualizar
-		progress_refresh.setVisibility(View.GONE);
-		img_update_list.setVisibility(View.VISIBLE); 
-	}
+
 
 	/**
 	 * Cancela si hubiese alguna hebra obteniendo escándalos
@@ -1311,12 +1299,31 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Mostramos el progressBar y ocultamos la lista de escandalos
 		loading.setVisibility(View.VISIBLE);
 		pager.setVisibility(View.GONE);
-		getEscandalosAsync = new GetEscandalos();
+		getEscandalosAsync = new GetScandalsTask();
 		getEscandalosAsync.execute();
 		
 		// Cerramos llave
 		MyApplication.reset_scandals = false;
 	}
+	
+	/**
+	 * Oculta el botón actualizar y muestra el loading en el menu
+	 */
+	private void showLoadingOnMenu(){
+		// Cambiamos la imagen de actualizar por un loading
+		progress_refresh.setVisibility(View.VISIBLE);
+		img_update_list.setVisibility(View.GONE);
+	}
+	
+	/**
+	 * Oculta el loading del menu y muestra el botón actualizar
+	 */
+	private void hideLoadingFromMenu() {
+		// Cambiamos el loading del menu por el botón de actualizar
+		progress_refresh.setVisibility(View.GONE);
+		img_update_list.setVisibility(View.VISIBLE); 
+	}
+	
 	
 	
 	/**

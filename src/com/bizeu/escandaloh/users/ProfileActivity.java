@@ -46,8 +46,18 @@ public class ProfileActivity extends SherlockActivity {
 	public static final int CROP_PICTURE = 16;
 	public static final String PICTURE_BYTES = "picture_bytes";
 	
-	private FetchableImageView picture;
-	private TextView username;
+	private FetchableImageView img_picture;
+	private TextView txt_username;
+	private TextView txt_valoranos;
+	private TextView txt_compartir_twitter;
+	private TextView txt_compartir_facebook;
+	private TextView txt_invitar_correo;
+	private TextView txt_condiciones;
+	private TextView txt_politica;
+	private TextView txt_faq;
+	private TextView txt_feedback;
+	private TextView txt_soporte;
+	private TextView txt_desactivar_cuenta;
 	private Button but_logout;
 	
 	private Context mContext;
@@ -73,18 +83,28 @@ public class ProfileActivity extends SherlockActivity {
 		actBar.setIcon(R.drawable.logo_blanco);
 		actBar.setDisplayShowTitleEnabled(false);
 		
-		picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
-		username = (TextView) findViewById(R.id.txt_profile_username);
+		img_picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
+		txt_username = (TextView) findViewById(R.id.txt_profile_username);
+		txt_valoranos = (TextView) findViewById(R.id.txt_profile_valoranos);
+		txt_compartir_twitter = (TextView) findViewById(R.id.txt_profile_compartir_twitter);
+		txt_compartir_facebook = (TextView) findViewById(R.id.txt_profile_compartir_facebook);
+		txt_invitar_correo = (TextView) findViewById(R.id.txt_profile_invitar_correo);
+		txt_condiciones = (TextView) findViewById(R.id.txt_profile_condiciones);
+		txt_politica = (TextView) findViewById(R.id.txt_profile_politica);
+		txt_faq = (TextView) findViewById(R.id.txt_profile_faq);
+		txt_feedback = (TextView) findViewById(R.id.txt_profile_feedback);
+		txt_soporte = (TextView) findViewById(R.id.txt_profile_soporte);
+		txt_desactivar_cuenta = (TextView) findViewById(R.id.txt_profile_desactivar_cuenta);
 		but_logout = (Button) findViewById(R.id.but_profile_logout);
 		
 		if (MyApplication.avatar != null){
-			picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
+			img_picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
 		}
 		else{
-			picture.setImageResource(R.drawable.avatar_mas);
+			img_picture.setImageResource(R.drawable.avatar_mas);
 		}
 		
-		picture.setOnClickListener(new View.OnClickListener() {
+		img_picture.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -142,7 +162,60 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});	
 		
-		username.setText(MyApplication.user_name);
+		txt_username.setText(MyApplication.user_name);
+		
+		
+		txt_valoranos.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				rateOnPlayStore();	
+			}
+		});
+		
+		txt_invitar_correo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				shareByEmail();
+				
+			}
+		});
+		
+		txt_compartir_facebook.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				followOnFacebook(mContext);
+			}
+		});
+		
+		txt_compartir_twitter.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				followOnTwitter();		
+			}
+		});
+		
+		txt_soporte.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				sendEmail("support@scandaloh.com");
+				
+			}
+		});
+		
+		
+		txt_feedback.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				sendEmail("info@scandaloh.com");
+				
+			}
+		});
 		
 		but_logout.setOnClickListener(new View.OnClickListener() {
 			
@@ -220,7 +293,7 @@ public class ProfileActivity extends SherlockActivity {
 
 		// Crop de la foto
 		else if (requestCode == CROP_PICTURE) {
-			picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
+			img_picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
 		}
 	}
 	
@@ -361,6 +434,97 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		}
 	}
-
-
+	
+	
+	
+	/**
+	 * Abre la aplicación en Play Store
+	 */
+	private void rateOnPlayStore(){
+		final String appPackageName = getPackageName(); 
+		
+		try {
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+		} catch (android.content.ActivityNotFoundException anfe) {
+		    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+		}		
+	}
+	
+	
+	/**
+	 * Comparte ScandalOh por email
+	 */
+	private void shareByEmail(){
+		
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+		emailIntent.setData(Uri.parse("mailto:" + "")); 
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.sigueme_en_scandaloh));
+		//TODO emailIntent.putExtra(Intent.EXTRA_TEXT,  "Sígueme en ScandalOh: <url del usuario>  
+									// ¿No tienes ScandalOh? Consíguelo en Google Play: <url de la web>");
+		
+		try {
+		    startActivity(Intent.createChooser(emailIntent, getResources().getString(R.string.selecciona_cliente_de_correo)));
+		} catch (android.content.ActivityNotFoundException ex) {
+		    Toast.makeText(ProfileActivity.this, getResources().getString(R.string.no_hay_clientes_de_correo), Toast.LENGTH_SHORT).show();
+		}	
+	}
+	
+	
+	/**
+	 * Envía un email
+	 * @param to Destinatario
+	 */
+	private void sendEmail(String to){
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+		emailIntent.setData(Uri.parse("mailto:" + to)); 
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, "");
+		
+		try {
+		    startActivity(Intent.createChooser(emailIntent, getResources().getString(R.string.selecciona_cliente_de_correo)));
+		} catch (android.content.ActivityNotFoundException ex) {
+		    Toast.makeText(ProfileActivity.this, getResources().getString(R.string.no_hay_clientes_de_correo), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	
+	
+	/**
+	 * Abre la cuenta de ScandalOh de Facebook.
+	 * Si tiene la app instalada abre la app, si no abre el browser
+	 * @param context
+	 */
+	private void followOnFacebook(Context context) {
+		
+		Intent i ;
+		
+		try {
+			context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
+		    i = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/774948052530889"));
+		} catch (Exception e) {
+		    i =  new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/scandaloh")); 
+	    }
+		 
+		startActivity(i);
+	}
+	
+	
+	
+	/**
+	 * Abre la cuenta de ScandalOh de Twitter.
+	 * Si tiene la app instalada abre la app, si no abre el browser
+	 */
+	private void followOnTwitter(){
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW,
+			Uri.parse("twitter://user?user_id=2162938117"));
+			startActivity(intent);
+		}
+		catch (Exception e) {
+			startActivity(new Intent(Intent.ACTION_VIEW,
+			Uri.parse("https://twitter.com/#!/scandaloh"))); 
+		} 
+	}
+	
+	
+	
 }

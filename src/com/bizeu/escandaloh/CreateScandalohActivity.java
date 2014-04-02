@@ -37,6 +37,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
@@ -54,7 +55,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	public static final int REQUESTCODE_RECORDING = 50;
 	public static final int SHARING_NOT_LOGGED = 1;
 
-	private ImageView picture;
+	private FetchableImageView img_picture;
 	private ImageView img_subir_escandalo;
 	private EditText edit_title;
 	private RadioGroup radio_category;
@@ -63,7 +64,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String written_title;
 	private Bitmap taken_photo;
 	private Uri mImageUri;
-	private ProgressDialog send_progress;
+	private ProgressDialog share_progress;
 	private Context mContext;
 	private Activity acti;
 	private File audio_file;
@@ -73,6 +74,10 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String photo_string;
 	private Uri shareUri;
 	private String shared_url;
+	private String preview_source;
+	private String preview_img;
+	private String preview_favicon;
+	private String preview_title;
 
 	/**
 	 * OnCreate
@@ -92,7 +97,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 		// Quitamos el action bar
 		getSupportActionBar().hide();
 
-		picture = (ImageView) findViewById(R.id.img_new_escandalo_photo);
+		img_picture = (FetchableImageView) findViewById(R.id.img_new_escandalo_photo);
 
 		// Mostramos la foto
 		if (getIntent() != null) {
@@ -109,12 +114,12 @@ public class CreateScandalohActivity extends SherlockActivity {
 					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
 
 					// Mostramos la foto
-					picture.setImageBitmap(taken_photo);
+					img_picture.setImageBitmap(taken_photo);
 				}
 
 				// Se ha cogido de la galería
 				else if (photo_from == MainActivity.FROM_GALLERY) {
-					picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
+					img_picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
 					taken_photo = BitmapFactory.decodeFile(photo_string);
 				}
 
@@ -123,7 +128,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 					// Mostramos la foto
 					shareUri = Uri.parse(data.getExtras().getString("shareUri"));
 					taken_photo = ImageUtils.uriToBitmap(shareUri, this);
-					picture.setImageBitmap(taken_photo);
+					img_picture.setImageBitmap(taken_photo);
 				}
 				
 				// Se ha compartido un texto (url)
@@ -295,8 +300,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 			HttpEntity resEntity;
 			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/";		
-			
-			f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
 		
 			HttpResponse response = null;
 			try {
@@ -310,8 +313,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 					written_title = getResources().getString(R.string.foto_sin_titulo);
 				}
 				
-				int id_category_selected = radio_category
-						.getCheckedRadioButtonId();
+				int id_category_selected = radio_category.getCheckedRadioButtonId();
 				switch (id_category_selected) {
 					case R.id.rb_create_category_happy:
 						selected_category = HAPPY_CATEGORY;
@@ -330,16 +332,30 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 
 				StringBody categoryBody = new StringBody(selected_category);
-				FileBody bin1 = new FileBody(f);
 				StringBody titleBody = new StringBody(written_title);
-				StringBody userBody = new StringBody(MyApplication.resource_uri);
 				StringBody codeCountryBody = new StringBody(MyApplication.code_selected_country);
-
-				reqEntity.addPart("img", bin1);
+				
 				reqEntity.addPart("title", titleBody);
 				reqEntity.addPart("category", categoryBody);
-				reqEntity.addPart("user", userBody);
 				reqEntity.addPart("country", codeCountryBody);
+				
+				// Si se ha compartido un enlace añadimos el source(url), favicon, foto(url) y media_type=1
+				if (photo_from == CoverActivity.FROM_SHARING_TEXT){
+					StringBody imgBody = new StringBody(preview_img);
+					StringBody faviconBody = new StringBody(preview_favicon);
+					StringBody sourceBody = new StringBody(preview_source);
+					StringBody mediaBody = new StringBody("1");
+					reqEntity.addPart("img", imgBody);
+					reqEntity.addPart("favicon", faviconBody);
+					reqEntity.addPart("source", sourceBody);
+					reqEntity.addPart("media_type", mediaBody);				
+				}
+				// Si no añadimos la foto
+				else{
+					f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
+					FileBody bin1 = new FileBody(f);
+					reqEntity.addPart("img", bin1);
+				}
 
 				post.setEntity(reqEntity);
 				response = client.execute(post);
@@ -348,7 +364,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Comprobamos si ha habido algún error
 				if (response_str != null) {
-					Log.i("WE", response_str);
+					Log.i("WE", "response createEscandalo: " + response_str);
 					// Obtenemos el json devuelto
 					JSONObject respJSON = new JSONObject(response_str);
 
@@ -377,6 +393,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 			if (any_error) {
 				return 666;
 			} else {
+				Log.v("WE","response final: " + response.getStatusLine().getStatusCode());
 				return (response.getStatusLine().getStatusCode());
 			}
 		}	
@@ -384,20 +401,20 @@ public class CreateScandalohActivity extends SherlockActivity {
 	
 	
 	/**
-	 * Envia un comentario
+	 * Obtiene la preview de una url
 	 * 
 	 */
 	private class GetPreviewScandalFromUrlTask extends AsyncTask<Void, Integer, Integer> {
-
+		
 		@Override
 		protected void onPreExecute() {
 			any_error = false;
 			// Mostramos el ProgressDialog
-			send_progress = new ProgressDialog(mContext);
-			send_progress.setTitle(getResources().getString(R.string.subiendo_scandaloh));
-			send_progress.setMessage(getResources().getString(R.string.espera_por_favor));
-			send_progress.setCancelable(false);
-			send_progress.show();
+			share_progress = new ProgressDialog(mContext);
+			//share_progress.setTitle(getResources().getString(R.string.subiendo_scandaloh));
+			share_progress.setMessage(getResources().getString(R.string.preparando_para_compartir));
+			share_progress.setCancelable(false);
+			share_progress.show();
 		}
 
 		@Override
@@ -422,9 +439,46 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				response = client.execute(post);
 				resEntity = response.getEntity();
-				final String response_str = EntityUtils.toString(resEntity);
+				String response_str = EntityUtils.toString(resEntity);
+				
+				// Parseamos la preview obtenida
+				JSONObject respJson = new JSONObject(response_str);
+				
+				if (respJson.has("img")){
+					preview_img = respJson.getString("img");
+				}
+				
+				if (respJson.has("favicon")){
+					preview_favicon = respJson.getString("favicon");
+				}
 
-				Log.i("WE", "respuesta al pedir preview noticia: " + response_str);
+				if (respJson.has("title")){
+					preview_title = respJson.getString("title");
+				}
+
+				if (respJson.has("source")){
+					preview_source = respJson.getString("source");		
+				}
+				
+				if (respJson.has("status")){
+					String status = respJson.getString("status");
+					if (status.equals("error")){
+						any_error = true;
+					}
+				}
+				
+				// Comprobamos si ha habido algún error
+				if (response_str != null) {
+					Log.i("WE", "response createEscandalo: " + response_str);
+					// Obtenemos el json devuelto
+					JSONObject respJSON = new JSONObject(response_str);
+
+					if (respJSON.has("error")) {
+						any_error = true;
+					}
+				}
+
+				Log.i("WE", "preview: " + response_str);
 			}
 
 			catch (Exception ex) {
@@ -443,27 +497,30 @@ public class CreateScandalohActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			Log.v("WE","entra en onpostexecute y result vale: " + result);
 			// Quitamos el ProgressDialog
-			if (send_progress.isShowing()) {
-				send_progress.dismiss();
+			if (share_progress.isShowing()) {
+				share_progress.dismiss();
 			}
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error) {
 				Toast toast = Toast.makeText(mContext, getResources()
-						.getString(R.string.lo_sentimos_hubo),
-						Toast.LENGTH_SHORT);
+						.getString(R.string.lo_sentimos_dicho_contenido_no_se_puede_compartir),
+						Toast.LENGTH_LONG);
 				toast.show();
 				// Quitamos el ProgressDialog
-				if (send_progress.isShowing()) {
-					send_progress.dismiss();
+				if (share_progress.isShowing()) {
+					share_progress.dismiss();
 				}
+				// Cerramos la pantalla
+				finish();
 
 			} else {
 				// Si es codigo 2xx --> OK
 				if (result >= 200 && result < 300) {
-					Log.v("WE","Datos obtenidos");
+					// Mostramos la foto y el titulo
+					img_picture.setImage(preview_img,R.drawable.cargando);
+					edit_title.setText(preview_title);
 				} else {
 					Toast toast;
 					toast = Toast

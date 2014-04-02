@@ -76,7 +76,7 @@
                     android:src="@drawable/campana" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/txt_profile_compartir_twitter"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -108,8 +108,7 @@
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
-            
-            
+
             <LinearLayout
                 android:id="@+id/ll_mLateral_profile"
                 android:layout_width="match_parent"
@@ -123,7 +122,7 @@
                     android:src="@drawable/perfil_azulverdoso" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/txt_profile_compartir_twitter"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -132,7 +131,7 @@
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
-            
+
             <LinearLayout
                 android:id="@+id/ll_mLateral_login"
                 android:layout_width="match_parent"
@@ -146,7 +145,7 @@
                     android:src="@drawable/login" />
 
                 <TextView
-                    android:id="@+id/textView5"
+                    android:id="@+id/txt_profile_valoranos"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -179,34 +178,11 @@
                     android:textSize="22sp" />
             </LinearLayout>
 
-
-            
-
             <ExpandableListView
                 android:id="@+id/explist_mLateral_filtros"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
             </ExpandableListView>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:gravity="center_horizontal|center_vertical" >
-
-            <Button
-                android:id="@+id/but_crop_recortar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ayuda" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Compartir" />
         </LinearLayout>
     </LinearLayout>
 

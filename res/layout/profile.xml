@@ -22,7 +22,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="1"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
 
@@ -31,6 +31,95 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/compartir"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_profile_compartir_twitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/compartir_con_twitter" />
+
+        <TextView
+            android:id="@+id/txt_profile_compartir_facebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/compartir_con_facebook" />
+
+        <TextView
+            android:id="@+id/txt_profile_invitar_correo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/invitar_via_correo_elec" />
+
+        <TextView
+            android:id="@+id/txt_profile_valoranos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/valoranos" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ayuda"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_profile_soporte"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/soporte" />
+
+        <TextView
+            android:id="@+id/txt_profile_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/feedback" />
+
+        <TextView
+            android:id="@+id/txt_profile_condiciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/condiciones_de_uso" />
+
+        <TextView
+            android:id="@+id/txt_profile_politica"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/politica_de_privacidad" />
+
+        <TextView
+            android:id="@+id/txt_profile_faq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/faq" />
+
+        <TextView
+            android:id="@+id/txt_profile_desactivar_cuenta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/desactivar_cuenta" />
+
     </LinearLayout>
 
     <LinearLayout

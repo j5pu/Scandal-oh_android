@@ -44,7 +44,7 @@
         android:layout_weight="2.5"
         android:gravity="center" >
 
-        <ImageView
+        <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_new_escandalo_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
