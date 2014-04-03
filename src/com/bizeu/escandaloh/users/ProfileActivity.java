@@ -65,6 +65,7 @@ public class ProfileActivity extends SherlockActivity {
 	private ProgressDialog progress;
 	private boolean any_error;
 	private SharedPreferences prefs;
+	private boolean isDeletingUser = false;  // Nos indica si al hacer logout es porque se está borrando el usuario
 	
 	/**
 	 * OnCreate
@@ -225,9 +226,9 @@ public class ProfileActivity extends SherlockActivity {
 				alert_logout.setPositiveButton(R.string.confirmar,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialogo1, int id) {
-
 								// Avisamos al servidor
-								//new DeleteProfileTask().execute();
+								isDeletingUser = true;
+								new DeleteProfileTask().execute();
 							}
 						});
 				alert_logout.setNegativeButton(R.string.cancelar,
@@ -264,10 +265,6 @@ public class ProfileActivity extends SherlockActivity {
 		});
 		
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
-		
-		progress = new ProgressDialog(this);
-		progress.setMessage(getResources().getString(R.string.cerrando_sesion));
-		progress.setCancelable(false);
 	}
 	
 	
@@ -368,8 +365,13 @@ public class ProfileActivity extends SherlockActivity {
 		@Override
 		protected void onPreExecute() {
 			any_error = false;
-			// Mostramos el ProgressDialog
-			progress.show();
+			if (!isDeletingUser){
+				// Mostramos el ProgressDialog
+				progress = new ProgressDialog(mContext);
+				progress.setMessage(getResources().getString(R.string.cerrando_sesion));
+				progress.setCancelable(false);
+				progress.show();
+			}
 		}
 
 		@Override
@@ -456,6 +458,95 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		}
 	}
+	
+	
+	
+	
+	
+	 
+		/**
+		 * Elimina un usuario
+		 * 
+		 */
+		private class DeleteProfileTask extends AsyncTask<Void, Integer, Integer> {
+
+			@Override
+			protected void onPreExecute() {
+				any_error = false;
+				// Mostramos el ProgressDialog
+				progress = new ProgressDialog(mContext);
+				progress.setMessage(getResources().getString(R.string.eliminando_usuario));
+				progress.setCancelable(false);
+				progress.show();
+				progress.show();
+			}
+
+			@Override
+			protected Integer doInBackground(Void... params) {
+
+				HttpEntity resEntity;
+				String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/unsuscribe/";
+
+				HttpResponse response = null;
+				try {
+					HttpClient client = new DefaultHttpClient();
+					HttpPost post = new HttpPost(urlString);
+					post.setHeader("Session-Token", MyApplication.session_token);
+		
+					response = client.execute(post);
+					resEntity = response.getEntity();
+					final String response_str = EntityUtils.toString(resEntity);
+
+					// Comprobamos si ha habido algún error
+					if (response_str != null) {
+						Log.i("WE", response_str);
+						// Obtenemos el json devuelto
+						JSONObject respJSON = new JSONObject(response_str);
+
+						if (respJSON.has("error")) {
+							any_error = true;
+						}
+					}
+
+				} catch (Exception ex) {
+					Log.e("Debug", "error: " + ex.getMessage(), ex);
+					any_error = true;
+
+					// Mandamos la excepción a Google Analytics
+					EasyTracker easyTracker = EasyTracker.getInstance(mContext);
+					easyTracker.send(MapBuilder.createException(
+							new StandardExceptionParser(mContext, null) 
+									.getDescription(Thread.currentThread()
+											.getName(), // The name of the thread on
+														// which the exception
+														// occurred.
+											ex), // The exception.
+							false).build()); // False indicates a fatal exception
+				}
+				
+				// Si hubo algún error devolvemos 666
+				if (any_error) {
+					return 666;
+				} else {
+					// Devolvemos el código resultado
+					return (response.getStatusLine().getStatusCode());
+				}		
+			}
+					
+			@Override
+			protected void onPostExecute(Integer result) {
+				
+				// Si hubo algún error inesperado
+				if (result == 666) {
+					Toast toast = Toast.makeText(mContext,
+							R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+					toast.show();
+				}
+				else{	
+					new LogOutTask().execute();
+				}
+			}
+		}
 	
 	
 	

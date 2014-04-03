@@ -191,6 +191,7 @@
     <string name="selecciona_cliente_de_correo">Selecciona cliente de correo electrónico</string>
     <string name="no_hay_clientes_de_correo">No hay clientes de correo instalados en el dispositivo</string>
     <string name="eliminar_tu_cuenta">¿Eliminar tu cuenta?</string>
-    <string name="tu_perfil_y_su_contenido">Tu perfil y su contenido serán eliminados en un plazo de 30 días. Puedes reactivar tu cuenta iniciando sesión dentro de dicho plazo. Después de ese límite, tu cuenta será eliminada permanentemente.</string>
+    <string name="tu_perfil_y_su_contenido">Tu perfil y su contenido serán eliminados en un plazo de 30 días. Puedes reactivar tu cuenta iniciando sesión dentro de dicho plazo. Después de ese límite tu cuenta será eliminada permanentemente.</string>
+    <string name="eliminando_usuario">Eliminando usuario...</string>
 
 </resources>
