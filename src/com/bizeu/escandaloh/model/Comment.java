@@ -8,11 +8,11 @@ public class Comment implements Parcelable {
 
 	private String date;
 	private String id;
-	private String photo;
-	private String resource_uri;
+	//private String photo;
+	//private String resource_uri;
 	private String social_network;
 	private String text;
-	private String user;
+	//private String user;
 	private String user_id;
 	private String username;
 	private String avatar;
@@ -22,11 +22,11 @@ public class Comment implements Parcelable {
 					String social_network, String text, String user, String user_id, String username, String avatar){
 		this.date = date;
 		this.id = id;
-		this.photo = photo;
-		this.resource_uri = resource_uri;
+		//this.photo = photo;
+		//this.resource_uri = resource_uri;
 		this.social_network = social_network;
 		this.text = text;
-		this.user = user;
+		//this.user = user;
 		this.user_id = user_id;
 		this.username = username;
 		this.avatar = avatar;
@@ -34,18 +34,18 @@ public class Comment implements Parcelable {
 	
 
     public Comment(Parcel in){
-        String[] data = new String[10];
+        String[] data = new String[7];
         in.readStringArray(data);
         this.date = data[0];
         this.id = data[1];
-        this.photo = data[2];
-        this.resource_uri = data[3];
-        this.social_network = data[4];
-        this.text = data[5];
-        this.user = data[6];
-        this.user_id = data[7];
-        this.username = data[8];
-        this.avatar = data[9];
+        //this.photo = data[2];
+        //this.resource_uri = data[3];
+        this.social_network = data[2];
+        this.text = data[3];
+        //this.user = data[6];
+        this.user_id = data[4];
+        this.username = data[5];
+        this.avatar = data[6];
     }
 	
 	public String getDate(){
@@ -64,6 +64,7 @@ public class Comment implements Parcelable {
 		this.id = new_id;
 	}
 	
+	/*
 	public String getPhoto(){
 		return photo;
 	}
@@ -79,6 +80,7 @@ public class Comment implements Parcelable {
 	public void setResourceUri(String new_resource_uri){
 		this.resource_uri = new_resource_uri;
 	}
+	*/
 	
 	public String getSocialNetwork(){
 		return social_network;
@@ -96,6 +98,7 @@ public class Comment implements Parcelable {
 		this.text = new_text;
 	}
 	
+	/*
 	public String getUser(){
 		return user;
 	}
@@ -103,6 +106,7 @@ public class Comment implements Parcelable {
 	public void setUser(String new_user){
 		this.user = new_user;
 	}
+	*/
 
 	public String getUserId(){
 		return user_id;
@@ -138,11 +142,11 @@ public class Comment implements Parcelable {
         dest.writeStringArray(new String[]{
         		this.date,
                 this.id,
-                this.photo,
-                this.resource_uri,
+                //this.photo,
+                //this.resource_uri,
                 this.social_network,
                 this.text,
-                this.user,
+                //this.user,
                 this.user_id,
                 this.username,
                 this.avatar

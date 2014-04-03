@@ -46,6 +46,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.parse.ParseInstallation;
 
 public class LoginSelectActivity extends SherlockActivity {
 
@@ -265,11 +266,12 @@ public class LoginSelectActivity extends SherlockActivity {
 						social_network = 1;
 						break;
 				}		
-				
-				Log.v("WE","acceso token: " + access_token);
+
+				// Obtenemos el device token de parse
+	            String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	            dato.put("device_token", device_token);
 				dato.put("access_token", access_token);
 				dato.put("social_network", social_network);
-				dato.put("device_token", "");
 
 				// Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
 				StringEntity entity = new StringEntity(dato.toString(),

@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.parse.ParseInstallation;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -229,10 +230,12 @@ public class RegistrationActivity extends SherlockActivity {
 	             String password = edit_password_usuario.getText().toString();
 	             String email = edit_email_usuario.getText().toString();
 	             
+	             // Obtenemos el device token de parse
+	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	             dato.put("device_token", device_token);
 	             dato.put("username", username);
 	             dato.put("password", password);
 	             dato.put("email", email);
-	             dato.put("device_token", "");
 
 	             // Creamos el StringEntity como UTF-8 (Caracteres ñ,á, ...)
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);

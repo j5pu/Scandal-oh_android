@@ -246,11 +246,12 @@ public class CommentsActivity extends SherlockActivity {
 
 					c_date = escanObject.getString("date");
 					c_id = escanObject.getString("id");
-					c_photo = escanObject.getString("photo");
-					c_resource_uri = escanObject.getString("user");
+					c_photo = null;
+					//c_photo = escanObject.getString("photo");
+					//c_resource_uri = escanObject.getString("user");
 					c_social_network = escanObject.getString("social_network");
 					c_text = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-					c_user = escanObject.getString("user");
+					//c_user = escanObject.getString("user");
 					c_user_id = escanObject.getString("user_id");
 					c_username = escanObject.getString("username");
 					c_avatar = escanObject.getString("avatar");

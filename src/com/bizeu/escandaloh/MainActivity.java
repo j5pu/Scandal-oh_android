@@ -60,6 +60,7 @@ import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.*;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
+import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
@@ -74,6 +75,9 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+import com.parse.PushService;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnClickListener, OnItemSelectedListener {
@@ -244,13 +248,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-		// Avatar
-		img_lateral_avatar.setOnClickListener(new View.OnClickListener() {
+		
+		// Notificaciones
+		ll_lateral_notificaciones.setOnClickListener(new View.OnClickListener() {
+			
 			@Override
 			public void onClick(View v) {
-				if (MyApplication.logged_user){				
-				}
+				Intent i = new Intent(MainActivity.this, NotificationsActivity.class);
+				startActivity(i);			
 			}
 		});
 		
@@ -793,10 +798,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (escandalos.size() == 0){
 				
 				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD;
-				// HAPPY
+				// HUMOR
 				if (category.equals(MainActivity.HAPPY)) {
 					url += "&category__id=1";
 				}
+				// DENUNCIA
 				else{
 					url += "&category__id=2";
 				}

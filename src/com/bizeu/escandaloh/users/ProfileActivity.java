@@ -202,8 +202,7 @@ public class ProfileActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				sendEmail("support@scandaloh.com");
-				
+				sendEmail("support@scandaloh.com");			
 			}
 		});
 		
@@ -212,8 +211,31 @@ public class ProfileActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				sendEmail("info@scandaloh.com");
-				
+				sendEmail("info@scandaloh.com");		
+			}
+		});
+		
+		txt_desactivar_cuenta.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder alert_logout = new AlertDialog.Builder(mContext);
+				alert_logout.setTitle(R.string.eliminar_tu_cuenta);
+				alert_logout.setMessage(R.string.tu_perfil_y_su_contenido);
+				alert_logout.setPositiveButton(R.string.confirmar,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1, int id) {
+
+								// Avisamos al servidor
+								//new DeleteProfileTask().execute();
+							}
+						});
+				alert_logout.setNegativeButton(R.string.cancelar,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialogo1, int id) {
+							}
+						});
+				alert_logout.show();		
 			}
 		});
 		

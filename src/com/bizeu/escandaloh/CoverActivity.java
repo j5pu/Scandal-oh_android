@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.parse.ParseInstallation;
 
 public class CoverActivity extends Activity {
 

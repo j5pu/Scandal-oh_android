@@ -12,25 +12,32 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.GET_TASKS" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.mnopi.scandaloh_escandalo_humor_denuncia_social.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.mnopi.scandaloh_escandalo_humor_denuncia_social.permission.C2D_MESSAGE" />
 
     <application
         android:name="com.bizeu.escandaloh.MyApplication"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/icono_app"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/Theme.app"
-        android:hardwareAccelerated="true" >
+        android:theme="@style/Theme.app" >
         <activity
             android:name="com.bizeu.escandaloh.CoverActivity"
             android:label="@string/app_name" >
@@ -106,6 +113,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.bizeu.escandaloh.notifications.NotificationsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.bizeu.escandaloh.settings.SettingsActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -128,6 +139,26 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
+
+        <!-- Push notifications con Parse -->
+        <service android:name="com.parse.PushService" />
+
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.mnopi.scandaloh_escandalo_humor_denuncia_social" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

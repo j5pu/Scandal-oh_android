@@ -2,15 +2,26 @@ package com.bizeu.escandaloh;
 
 import java.util.ArrayList;
 import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.bizeu.escandaloh.users.LoginScandalohActivity;
+import com.parse.DeleteCallback;
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.PushService;
+import com.parse.SaveCallback;
 
 public class MyApplication extends Application {
 	public static int ALTO_TABS;
 	// Producción
 	//public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com" ;
 	// Desarrollo
-	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
+	//public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
 	// Local
-	//public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
+	public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";
@@ -22,6 +33,7 @@ public class MyApplication extends Application {
 	public static Boolean logged_user = false;
 	public static String code_selected_country = null;
 	public static String resource_uri = "";
+	public static String device_token;
 	public static String user_name = "";
 	public static String session_token = "";
 	public static String avatar = null;
@@ -38,5 +50,11 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		// Parse
+		Parse.initialize(this, "d0pwm3XnQrHZCrTmQuuE75SXrzr46001WWfH9uFv", "YGONYEJpspQOod64lA5xwkGaK4V3GgAnq1kHNpD2");
+		PushService.setDefaultPushCallback(this, LoginScandalohActivity.class);
+		
+
 	}
 }

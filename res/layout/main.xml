@@ -84,6 +84,15 @@
                     android:text="@string/notificaciones"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
+                
+                <TextView
+                    android:id="@+id/txt_mLateral_numNotificaciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/morado"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout

@@ -31,6 +31,10 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.SaveCallback;
 import com.bizeu.escandaloh.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -77,6 +81,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 		mContext = this;
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
+		
+		// Push notifications Parse
+		ParseAnalytics.trackAppOpened(getIntent());
 		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
@@ -212,7 +219,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 	             String username_email = edit_nombre_email.getText().toString();
 	             String password = edit_password.getText().toString();
              
-	             dato.put("device_token", "");
+	             // Obtenemos el device token de parse
+	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	             dato.put("device_token", device_token );
 	             dato.put("username_email", username_email);
 	             dato.put("password", password);
 
