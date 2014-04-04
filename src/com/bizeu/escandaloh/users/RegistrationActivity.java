@@ -268,8 +268,8 @@ public class RegistrationActivity extends SherlockActivity {
 	                	 }
 	                	 
 	                	 if (jsonReason.has("password")){
-	                		 JSONArray passwordErrors = (JSONArray) jsonReason.get("password");
-	                		 password_error = (String) passwordErrors.get(0);
+	                		 JSONArray jsonPasswordErrors = (JSONArray) jsonReason.get("password");
+	                		 password_error = (String) jsonPasswordErrors.get(0);
 	                		 has_password_error = true;	                		 
 	                	 }
 	                	 
@@ -327,14 +327,21 @@ public class RegistrationActivity extends SherlockActivity {
 				if (!has_name_error && !has_password_error && !has_email_error){
 					SharedPreferences prefs = getBaseContext().getSharedPreferences(
 		        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-					// Guardamos el session_token y el nombre de usuario
-		        	//prefs.edit().putString(MyApplication.USER_URI, user_uri).commit();
-					prefs.edit().putString(MyApplication.SESSION_TOKEN, session_token);
+					SharedPreferences.Editor editor = prefs.edit();
+					// Guardamos el session token 
+					editor.putString(MyApplication.SESSION_TOKEN, session_token);
 		        	MyApplication.session_token = session_token;
-		        	MyApplication.logged_user = true;
-		        	prefs.edit().putString(MyApplication.USER_NAME, edit_nombre_usuario.getText().toString()).commit();
+		        	// Guardamos el nombre de usuario
+		        	editor.putString(MyApplication.USER_NAME, edit_nombre_usuario.getText().toString());
 		        	MyApplication.user_name = edit_nombre_usuario.getText().toString();
+		        	// Indicamos que es usuario de scandaloh
+		        	editor.putInt(MyApplication.SOCIAL_NETWORK, 0);
+		        	MyApplication.social_network = 0;
+		        	// Indicamos que está logueado
+		        	MyApplication.logged_user = true;
 		        	Toast.makeText(getBaseContext(), R.string.usuario_registrado_correctamente, Toast.LENGTH_SHORT).show();
+		        	
+		        	editor.commit();
 		        	
 		        	// Debemos reiniciar los escándalos
 		        	MyApplication.reset_scandals = true;

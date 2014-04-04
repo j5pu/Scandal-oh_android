@@ -112,7 +112,6 @@ public class LoginScandalohActivity extends SherlockActivity {
 			public void onClick(View v) {
 				// Mostramos el dialog de pedir email para reenvío de la contraseña
 				RememberPasswordDialog rememberPass = new RememberPasswordDialog(mContext);
-				rememberPass.setCancelable(false);
 				rememberPass.show(); 		
 			}
 		});
@@ -334,10 +333,14 @@ public class LoginScandalohActivity extends SherlockActivity {
 			        	// Guardamos su avatar
 			        	editor.putString(MyApplication.AVATAR, avatar);
 			        	MyApplication.avatar = avatar;
+			        	// Indicamos que es usuario de scandaloh
+			        	editor.putInt(MyApplication.SOCIAL_NETWORK, 0);
+			        	MyApplication.social_network = 0;
 			        	// Indicamos que está logueado
 			        	MyApplication.logged_user = true;
-			        	editor.commit();
 			        	Toast.makeText(getBaseContext(), R.string.sesion_iniciada_exito, Toast.LENGTH_SHORT).show();
+			        	
+			        	editor.commit();
 			        	
 			        	// Debemos reiniciar los escándalos
 			        	MyApplication.reset_scandals = true;

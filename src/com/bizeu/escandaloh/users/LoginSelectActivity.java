@@ -11,15 +11,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -332,18 +329,24 @@ public class LoginSelectActivity extends SherlockActivity {
 				SharedPreferences prefs = mContext.getSharedPreferences(
 						"com.bizeu.escandaloh", Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = prefs.edit();
-				// Guardamos el session_token, nombre de usuario y avatar
+				// Guardamos el session token 
 				editor.putString(MyApplication.SESSION_TOKEN, session_token);
-				editor.putString(MyApplication.USER_NAME, username);
-				editor.putString(MyApplication.AVATAR, avatar);
-				editor.commit();
-				Log.v("WE", "Avatar de facebook: " + avatar);
-				MyApplication.user_name = username;
 				MyApplication.session_token = session_token;
+				// Guardamos el nombre de usuario
+				editor.putString(MyApplication.USER_NAME, username);
+				MyApplication.user_name = username;
+				// Guardamos el avatar
+				editor.putString(MyApplication.AVATAR, avatar);
 				MyApplication.avatar = avatar;
+				// Indicamos que es usuario de facebook
+				editor.putInt(MyApplication.SOCIAL_NETWORK, 1);
+				MyApplication.social_network = 1;	
+				// Indicamos que está logueado
 				MyApplication.logged_user = true;
 				Toast.makeText(mContext, R.string.sesion_iniciada_exito,
 						Toast.LENGTH_SHORT).show();
+				
+				editor.commit();
 				
 				// Reiniciamos los escándalos
 				MyApplication.reset_scandals = true;

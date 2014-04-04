@@ -110,6 +110,11 @@ public class ProfileActivity extends SherlockActivity {
 			img_picture.setImageResource(R.drawable.avatar_mas);
 		}
 		
+		// Si es usuario de Facebook ocultamos la opción de cambiar la contraseña
+		if (MyApplication.social_network == 1){
+			txt_cambiar_pass.setVisibility(View.GONE);
+		}
+		
 		img_picture.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -176,24 +181,6 @@ public class ProfileActivity extends SherlockActivity {
 			public void onClick(View v) {
 				// Mostramos el dialog de cambiar contraseña
 				ChangePasswordDialog record_audio = new ChangePasswordDialog(mContext);
-				/*record_audio.setDialogResult(new OnMyDialogResult() {
-					public void finish(String result) {
-						if (result.equals("OK")) {
-							con_audio = true;
-						} else if (result.equals("CANCELED")) {
-							con_audio = false;
-						}
-						// Mostramos un mensaje
-						Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
-						toast.show();
-						// Enviamos el escándalo en un hilo aparte
-						new SendScandalTask().execute();
-						// Cerramos la pantalla
-						acti.finish();
-					}
-				});
-				*/
-				//record_audio.setCancelable(false);
 				record_audio.show();
 				
 			}

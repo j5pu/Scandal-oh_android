@@ -42,6 +42,7 @@ public class CoverActivity extends Activity {
 		
 		// Obtenemos el código del pais 
 		MyApplication.code_selected_country = prefs.getString(MyApplication.CODE_COUNTRY, null);
+		
 		// Si es la primera vez que usa la app 
 		if (MyApplication.code_selected_country == null){
 			// Obtenemos el código del país por IP
@@ -51,22 +52,24 @@ public class CoverActivity extends Activity {
       		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 			prefs.edit().putString(MyApplication.CODE_COUNTRY, country_code).commit();
 			
+			MyApplication.logged_user = false;
 			// TODO Mostrar pantalla de bienvenida
 		}
-	
-		// Obtenemos el avatar
-		MyApplication.avatar = prefs.getString(MyApplication.AVATAR, null);
-		
-		// Obtenemos si el usuario estaba logueado
-		String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
-		if (session_token != null){
-			MyApplication.logged_user = true;
-			MyApplication.session_token = session_token;
-			MyApplication.user_name = prefs.getString(MyApplication.USER_NAME,  null);
-		}
 		else{
-			MyApplication.logged_user = false;
+			// Obtenemos si el usuario estaba logueado
+			String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
+			if (session_token != null){
+				MyApplication.logged_user = true;
+				MyApplication.session_token = session_token;
+				MyApplication.user_name = prefs.getString(MyApplication.USER_NAME,  null);
+				MyApplication.avatar = prefs.getString(MyApplication.AVATAR, null);
+				MyApplication.social_network = prefs.getInt(MyApplication.SOCIAL_NETWORK, 1);
+			}
+			else{
+				MyApplication.logged_user = false;
+			}
 		}
+			
 		
 		String shared = null;
 		int sharing_type = 0;

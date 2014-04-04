@@ -1,4 +1,4 @@
-package com.bizeu.escandaloh.users;
+package com.bizeu.escandaloh.dialogs;
 
 
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
