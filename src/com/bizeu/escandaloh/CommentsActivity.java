@@ -97,11 +97,21 @@ public class CommentsActivity extends SherlockActivity {
 		photo.setImage(url_photo, R.drawable.loading);
 		txt_title = (TextView) findViewById(R.id.txt_actionbar_comments_title);
 		txt_title.setText(title);
+		
+		// Volvemos al carrusel
 		ll_icon = (LinearLayout) findViewById(R.id.ll_actionbar_comments_icon);
 		ll_icon.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+				Intent returnIntent = new Intent();
+				if (array_comments.size() > 0){
+					// Devolvemos el último comentario
+					returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
+				 	// Devolvemos el nº de comentarios
+				 	returnIntent.putExtra(NUM_COMMENTS, array_comments.size());
+				}
+				setResult(RESULT_OK, returnIntent);
 				finish();			
 			}
 		});
