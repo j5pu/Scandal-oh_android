@@ -1,4 +1,4 @@
-package com.bizeu.escandaloh;
+package com.bizeu.escandaloh.dialogs;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -9,42 +9,35 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.Connectivity;
-import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
-public class RememberPasswordDialog extends Dialog{
+public class ChangePasswordDialog extends Dialog {
 
-	private TextView txt_mensaje;
-	private Button but_cancelar; 
-	private Button but_enviar;
-	private EditText edit_email;
-	private ProgressDialog progress;
-	private boolean any_error;
 	private Context mContext;
-	private String status = null;
-	private String msg = null;
-	private String reason = null;
-	private int reason_code;
-	private boolean result_ok;
-
-	public RememberPasswordDialog(Context con) {
+	private Button but_enviar;
+	private Button but_cancelar;
+	private EditText edit_contrasenia;
+	private EditText edit_repite;
+	
+	private boolean any_error = false;
+	
+	public ChangePasswordDialog(Context con) {
 		super(con);
 		this.mContext = con;
 	}
@@ -53,15 +46,12 @@ public class RememberPasswordDialog extends Dialog{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.recordar_contrasenia);
+		setContentView(R.layout.change_password);
 		
-		// Cambiamos la fuente de la pantalla
-		Fuente.cambiaFuente((ViewGroup)findViewById(R.id.lay_pantalla_recordar));
-		
-		txt_mensaje = (TextView) findViewById(R.id.txt_recordar_descripcion);
-		but_cancelar = (Button) findViewById(R.id.but_recordar_cancelar);
-		but_enviar = (Button) findViewById(R.id.but_recordar_enviar);
-		edit_email = (EditText) findViewById(R.id.edit_recordar_email);
+		but_enviar = (Button) findViewById(R.id.but_changepass_enviar);
+		but_cancelar = (Button) findViewById(R.id.but_changepass_cancelar);
+		edit_contrasenia = (EditText) findViewById(R.id.edit_changepass_nuevacontrasenia);
+		edit_repite = (EditText) findViewById(R.id.edit_changepass_repitenuevacontrasenia);
 		
 		but_cancelar.setOnClickListener(new View.OnClickListener() {
 			
@@ -76,42 +66,36 @@ public class RememberPasswordDialog extends Dialog{
 			@Override
 			public void onClick(View v) {
 				if (Connectivity.isOnline(mContext)){
-					// Comprobamos si el email tiene al menos un carácter
-					if (edit_email.getText().toString().length() > 0){
-						new RememberPassUser().execute();
-					}	
-					else{
-						edit_email.setError(mContext.getResources().getString(R.string.introduce_un_email_valido));
-					}
+					new ChangePassUser().execute();					
 				}
 				else{
 					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
 					toast.show();
-				}			
+				}
+				
 			}
 		});
-		
-		progress = new ProgressDialog(mContext);
-		progress.setTitle(R.string.solicitando_contrasenia);
-		progress.setMessage(mContext.getResources().getString(R.string.espera_por_favor));
 	}
-
-
 	
 	
 	
 
 	/**
-	 * Solicita el envio de la contraseña a partir de un email de registro
+	 * Cambia la contraseña de un usuario
 	 *
 	 */
-	private class RememberPassUser extends AsyncTask<Void,Integer,Void> {
+	private class ChangePassUser extends AsyncTask<Void,Integer,Void> {
 		 	
+		private String status = null;
+		private String reason = null;
+		private boolean result_ok;
+		private String mensaje_respuesta = null;
+		
 		@Override
 		protected void onPreExecute(){
 			// Mostramos el ProgressDialog
-			progress.setCancelable(false);
-			progress.show();	
+			//progress.setCancelable(false);
+			//progress.show();	
 			
 			// Reseteamos
 			any_error = false;
@@ -121,15 +105,18 @@ public class RememberPasswordDialog extends Dialog{
 	    protected Void doInBackground(Void... params) {
 	 
 	    	HttpEntity resEntity;
-	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/generate-new-password/";
+	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/change-password/";
 	
 	        try{
 	             HttpClient client = new DefaultHttpClient();
 	             HttpPost post = new HttpPost(urlString);
 	             post.setHeader("Content-Type", "application/json");
+	             post.setHeader("Session-Token", MyApplication.session_token);
 	             
 	             JSONObject dato = new JSONObject();	                        
-	             dato.put("email", edit_email.getText().toString());
+	             dato.put("new_password", edit_contrasenia.getText().toString());
+	             dato.put("new_password_repeated", edit_repite.getText().toString());
+
 
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);
@@ -149,24 +136,18 @@ public class RememberPasswordDialog extends Dialog{
 	                 // Si es OK obtenemos el msg
 	                 if (status.equals("ok")){
 	                	 result_ok = true;
+	                	 mensaje_respuesta = respJSON.getString("msg");
 	                 }
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
 	                	 result_ok = false;
-	                	 reason = respJSON.getString("reason");
-	                	 reason_code = respJSON.getInt("reason_code");       	
+	                	 reason = respJSON.getString("reason");      	
 	                 }
 	             }
 	        }
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
-				 // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-						                       ex),                                                             // The exception.
-						                       false).build());
 	        }
 	        
 	        return null;
@@ -176,30 +157,27 @@ public class RememberPasswordDialog extends Dialog{
 		@Override
 	    protected void onPostExecute(Void result) {
 
+			/*
 			// Quitamos el ProgressDialog
 			if (progress.isShowing()) {
 		        progress.dismiss();
 		    }
+		    */
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 			// Si no hubo ningún error extraño
 			else{
 				// Comprobamos si se hizo correctamente la petición
 				if (result_ok){
-		        	Toast.makeText(mContext, R.string.se_ha_enviando_un_email, Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(mContext, mensaje_respuesta, Toast.LENGTH_SHORT).show();
 				    dismiss();
 				}
 				else{
-					if (reason_code == 1){ // Email no registrado
-						txt_mensaje.setText(R.string.este_email_no_esta_registrado);
-					}
-					else if (reason_code == 2){ // Error al enviar email
-						txt_mensaje.setText(R.string.hubo_algun_error_peticion);
-					}
+		        	Toast.makeText(mContext, reason, Toast.LENGTH_SHORT).show();
 				}	
 			}				
 	    }

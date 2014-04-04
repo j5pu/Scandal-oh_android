@@ -167,7 +167,7 @@
             android:orientation="vertical" >
 
             <Button
-                android:id="@+id/but_recordar_enviar"
+                android:id="@+id/but_changepass_enviar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/blue_button_selector"

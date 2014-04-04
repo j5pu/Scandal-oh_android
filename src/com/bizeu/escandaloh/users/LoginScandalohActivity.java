@@ -35,7 +35,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.SaveCallback;
-import com.bizeu.escandaloh.RememberPasswordDialog;
+import com.bizeu.escandaloh.dialogs.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.google.analytics.tracking.android.EasyTracker;

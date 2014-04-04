@@ -10,7 +10,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -32,6 +31,10 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
+import com.bizeu.escandaloh.dialogs.ChangePasswordDialog;
+import com.bizeu.escandaloh.dialogs.RecordAudioDialog;
+import com.bizeu.escandaloh.dialogs.RecordAudioDialog.OnMyDialogResult;
+import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.Utils;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -55,6 +58,7 @@ public class ProfileActivity extends SherlockActivity {
 	private TextView txt_condiciones;
 	private TextView txt_politica;
 	private TextView txt_faq;
+	private TextView txt_cambiar_pass;
 	private TextView txt_feedback;
 	private TextView txt_soporte;
 	private TextView txt_desactivar_cuenta;
@@ -96,6 +100,7 @@ public class ProfileActivity extends SherlockActivity {
 		txt_feedback = (TextView) findViewById(R.id.txt_profile_feedback);
 		txt_soporte = (TextView) findViewById(R.id.txt_profile_soporte);
 		txt_desactivar_cuenta = (TextView) findViewById(R.id.txt_profile_desactivar_cuenta);
+		txt_cambiar_pass = (TextView) findViewById(R.id.txt_profile_change_pass);
 		but_logout = (Button) findViewById(R.id.but_profile_logout);
 		
 		if (MyApplication.avatar != null){
@@ -164,6 +169,35 @@ public class ProfileActivity extends SherlockActivity {
 		});	
 		
 		txt_username.setText(MyApplication.user_name);
+		
+		txt_cambiar_pass.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Mostramos el dialog de cambiar contraseña
+				ChangePasswordDialog record_audio = new ChangePasswordDialog(mContext);
+				/*record_audio.setDialogResult(new OnMyDialogResult() {
+					public void finish(String result) {
+						if (result.equals("OK")) {
+							con_audio = true;
+						} else if (result.equals("CANCELED")) {
+							con_audio = false;
+						}
+						// Mostramos un mensaje
+						Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
+						toast.show();
+						// Enviamos el escándalo en un hilo aparte
+						new SendScandalTask().execute();
+						// Cerramos la pantalla
+						acti.finish();
+					}
+				});
+				*/
+				//record_audio.setCancelable(false);
+				record_audio.show();
+				
+			}
+		});
 		
 		
 		txt_valoranos.setOnClickListener(new View.OnClickListener() {

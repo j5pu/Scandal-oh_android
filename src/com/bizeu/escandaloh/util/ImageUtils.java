@@ -214,20 +214,28 @@ public class ImageUtils {
 		float percentage;
 	
 		// Portrait
-		if (actual_height > actual_width){
+		if (actual_height >= actual_width){
 			if (actual_height > max_pixels){
 				percentage = max_pixels / actual_height;
 				new_height = max_pixels;
 				new_width = actual_width * percentage;	
 			}
+			else{
+				new_height = actual_height;
+				new_width = actual_width;
+			}
 		}
 		
 		// Landscape
 		else{
-			if (actual_width > max_pixels){
+			if (actual_width > max_pixels){			
 				percentage = max_pixels / actual_width;
 				new_width = max_pixels;
 				new_height = actual_height * percentage;
+			}
+			else{
+				new_height = actual_height;
+				new_width = actual_width;
 			}
 		} 
 		

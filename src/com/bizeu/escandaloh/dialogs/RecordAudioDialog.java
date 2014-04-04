@@ -1,4 +1,4 @@
-package com.bizeu.escandaloh;
+package com.bizeu.escandaloh.dialogs;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -141,7 +141,7 @@ public class RecordAudioDialog extends Dialog {
 		});
 
 		// Botón inferior de grabar/parar
-		but_abajo = (Button) findViewById(R.id.but_recordar_enviar);
+		but_abajo = (Button) findViewById(R.id.but_changepass_enviar);
 		but_abajo.setOnClickListener(new View.OnClickListener() {
 
 			@Override

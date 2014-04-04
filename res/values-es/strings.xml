@@ -193,5 +193,9 @@
     <string name="eliminar_tu_cuenta">¿Eliminar tu cuenta?</string>
     <string name="tu_perfil_y_su_contenido">Tu perfil y su contenido serán eliminados en un plazo de 30 días. Puedes reactivar tu cuenta iniciando sesión dentro de dicho plazo. Después de ese límite tu cuenta será eliminada permanentemente.</string>
     <string name="eliminando_usuario">Eliminando usuario...</string>
+    <string name="cambiar_contrasenia">Cambiar contraseña</string>
+    <string name="introduce_la_nueva_contrasenia">Introduce la nueva contraseña</string>
+    <string name="nueva_contrasenia">Nueva contraseña</string>
+    <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
 
 </resources>
