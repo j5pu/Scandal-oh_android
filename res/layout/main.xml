@@ -117,6 +117,29 @@
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
+            
+            <LinearLayout
+                android:id="@+id/ll_mLateral_buscar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp" >
+
+                <ImageView
+                    android:id="@+id/img_escandalo_dislike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/lupa" />
+
+                <TextView
+                    android:id="@+id/img_escandalo_fuente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="2dp"
+                    android:text="Buscar"
+                    android:textColor="@color/azul_verdoso"
+                    android:textSize="22sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/ll_mLateral_profile"

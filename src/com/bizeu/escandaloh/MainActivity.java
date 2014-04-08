@@ -101,6 +101,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageView img_take_photo;
 	private LinearLayout ll_lateral_notificaciones;
 	private LinearLayout ll_lateral_pais;
+	private LinearLayout ll_lateral_busqueda;
 	private LinearLayout ll_lateral_perfil;
 	private LinearLayout ll_lateral_ajustes;
 	private LinearLayout ll_lateral_login;
@@ -227,6 +228,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_notificaciones = (LinearLayout) findViewById(R.id.ll_mLateral_notificaciones);
 		ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
 		ll_lateral_perfil = (LinearLayout) findViewById(R.id.ll_mLateral_profile);
+		ll_lateral_busqueda = (LinearLayout) findViewById(R.id.ll_mLateral_buscar);
 		ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
@@ -260,7 +262,80 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 		
+		// Pais
+		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
+					
+			@Override
+			public void onClick(View v) {
+				// Cerramos el menu
+				mDrawerLayout.closeDrawer(ll_menu_lateral);
+						
+				final CountryPicker countryPicker = CountryPicker.newInstance(getResources().getString(R.string.selecciona_pais));
+				countryPicker.setListener(new CountryPickerListener() {
+
+					@Override
+					public void onSelectCountry(String name, String code) {
+								
+						// Si el país seleccionado es distinto al actual
+						if (!MyApplication.code_selected_country.equals(code)){
+							MyApplication.code_selected_country = code;
+							txt_code_country.setText(code);
+							SharedPreferences prefs = getBaseContext().getSharedPreferences(
+						      		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
+							// Guardamos el código del país
+						    prefs.edit().putString(MyApplication.CODE_COUNTRY, code).commit();
+									
+							// Si hay conexión
+							if (Connectivity.isOnline(mContext)) {
+								cancelGetEscandalos();
+								hideLoadingFromMenu();
+								// Abrimos llave de hay más escandalos
+								there_are_more_scandals = true;
+								// Quitamos los escándalos actuales
+								escandalos.clear();
+
+								pager.setCurrentItem(0);
+								adapter.clearFragments();
+								adapter = new ScandalohFragmentPagerAdapter(
+										getSupportFragmentManager());
+										pager.setAdapter(adapter);
+								// Obtenemos los 10 primeros escándalos para la categoría seleccionada
+								// Mostramos el progressBar y ocultamos la lista de escandalos
+								loading.setVisibility(View.VISIBLE);
+								pager.setVisibility(View.GONE);
+								getEscandalosAsync = new GetScandalsTask();
+								getEscandalosAsync.execute();
+							}
+
+							// No hay conexión
+							else {
+								Toast toast = Toast.makeText(mContext,
+										R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+								toast.show();
+							}
+						}
+					        	
+					     // Cerramos el dialog
+						countryPicker.dismiss();
+					}
+				});
+						
+				countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");		
+			}
+		});
 		
+		
+		// Búsqueda
+		ll_lateral_busqueda.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Cerramos el menu
+				mDrawerLayout.closeDrawer(ll_menu_lateral);		
+			}
+		});
+		
+				
 		// Perfil
 		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
 			
@@ -297,68 +372,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				mDrawerLayout.closeDrawer(ll_menu_lateral);
 			}
 		});
-		
-		// Pais
-		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// Cerramos el menu
-				mDrawerLayout.closeDrawer(ll_menu_lateral);
 				
-				final CountryPicker countryPicker = CountryPicker.newInstance(getResources().getString(R.string.selecciona_pais));
-				countryPicker.setListener(new CountryPickerListener() {
-
-					@Override
-					public void onSelectCountry(String name, String code) {
-						
-						// Si el país seleccionado es distinto al actual
-						if (!MyApplication.code_selected_country.equals(code)){
-							MyApplication.code_selected_country = code;
-							txt_code_country.setText(code);
-							SharedPreferences prefs = getBaseContext().getSharedPreferences(
-				        		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
-							// Guardamos el código del país
-				        	prefs.edit().putString(MyApplication.CODE_COUNTRY, code).commit();
-							
-							// Si hay conexión
-							if (Connectivity.isOnline(mContext)) {
-								cancelGetEscandalos();
-								hideLoadingFromMenu();
-								// Abrimos llave de hay más escandalos
-								there_are_more_scandals = true;
-								// Quitamos los escándalos actuales
-								escandalos.clear();
-
-								pager.setCurrentItem(0);
-								adapter.clearFragments();
-								adapter = new ScandalohFragmentPagerAdapter(
-										getSupportFragmentManager());
-								pager.setAdapter(adapter);
-								// Obtenemos los 10 primeros escándalos para la categoría seleccionada
-								// Mostramos el progressBar y ocultamos la lista de escandalos
-								loading.setVisibility(View.VISIBLE);
-								pager.setVisibility(View.GONE);
-								getEscandalosAsync = new GetScandalsTask();
-								getEscandalosAsync.execute();
-							}
-
-							// No hay conexión
-							else {
-								Toast toast = Toast.makeText(mContext,
-										R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
-								toast.show();
-							}
-						}
-			        	
-			        	// Cerramos el dialog
-						countryPicker.dismiss();
-					}
-				});
-				
-				countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");		
-			}
-		});
 		
 		// Filtros
 		// Los rellenamos
