@@ -113,11 +113,15 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.bizeu.escandaloh.notifications.NotificationsActivity"
+            android:name="com.bizeu.escandaloh.settings.SettingsActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.bizeu.escandaloh.settings.SettingsActivity"
+            android:name="com.bizeu.escandaloh.NotificationsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.bizeu.escandaloh.NotificationScandalActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

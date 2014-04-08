@@ -208,7 +208,7 @@ public class ScandalohFragment extends SherlockFragment {
 		    	// ACTUALIZAMOS EL ÚLTIMO COMENTARIO
 	 	        Comment last_comm = (Comment) data.getExtras().getParcelable(CommentsActivity.LST_COMMENT);
 	 	        // Actualizamos el adaptador
-	        	((MainActivity) getActivity()).updateLastComment(last_comm);
+	        	MainActivity.updateLastComment(last_comm);
 	        	// Actualizamos las vistas
 	        	comment_text.setText(last_comm.getText());
 	        	// Nombre de usuario
@@ -234,7 +234,7 @@ public class ScandalohFragment extends SherlockFragment {
 	            // ACTUALIZAMOS EL Nº DE COMENTARIOS
 	            int num_comments = data.getExtras().getInt(CommentsActivity.NUM_COMMENTS);
 	            // Actualizamos el adaptador
-	            ((MainActivity) getActivity()).updateNumComments(num_comments);
+	            MainActivity.updateNumComments(num_comments);
 	            // Actualizamos la vista
 	            num_com.setText(Integer.toString(num_comments));
 	    	} 
@@ -436,7 +436,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	// Decrementamos el nº de likes
         	        	tLikes.setText(Integer.toString(old_likes-1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(0, old_likes-1, old_dislikes);
+        	        	MainActivity.updateLikesDislikes(0, old_likes-1, old_dislikes);
         			}
         			// Habia puesto dislike: quitamos dislike y marcamos like
         			else if (already_voted == 2){
@@ -448,7 +448,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	tLikes.setText(Integer.toString(old_likes+1));
         	        	tDislikes.setText(Integer.toString(old_dislikes-1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes-1);
+        	        	MainActivity.updateLikesDislikes(1, old_likes+1, old_dislikes-1);
         			}
         			// No había puesto nada: marcamos like
         			else{
@@ -458,7 +458,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	// Incrementamos like
         	        	tLikes.setText(Integer.toString(old_likes+1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(1, old_likes+1, old_dislikes);
+        	        	MainActivity.updateLikesDislikes(1, old_likes+1, old_dislikes);
         			}
     			}
     			else{
@@ -487,7 +487,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	// Decrementamos dislike
         	        	tDislikes.setText(Integer.toString(old_dislikes-1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(0, old_likes, old_dislikes-1);
+        	        	MainActivity.updateLikesDislikes(0, old_likes, old_dislikes-1);
         				}
         			// Había puesto like: quitamos like y ponemos dislike
         			else if (already_voted == 1){
@@ -499,7 +499,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	tLikes.setText(Integer.toString(old_likes-1));
         	        	tDislikes.setText(Integer.toString(old_dislikes+1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(2, old_likes-1, old_dislikes+1);
+        	        	MainActivity.updateLikesDislikes(2, old_likes-1, old_dislikes+1);
         			}
         			// No había puesto nada: marcamos dislike
         			else{
@@ -509,7 +509,7 @@ public class ScandalohFragment extends SherlockFragment {
         	        	// Incrementamos nº dislikes
         	        	tDislikes.setText(Integer.toString(old_dislikes+1));
         	        	// Actualizamos el fragmento
-        	        	((MainActivity) getActivity()).updateLikesDislikes(2, old_likes, old_dislikes+1);
+        	        	MainActivity.updateLikesDislikes(2, old_likes, old_dislikes+1);
         			}
     			}
     			else{

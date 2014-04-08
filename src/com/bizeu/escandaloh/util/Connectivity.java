@@ -16,6 +16,11 @@ import android.net.NetworkInfo;
 
 public class Connectivity {
 
+	/**
+	 * Comprueba si hay una conexión existente
+	 * @param context
+	 * @return True en caso de que esté conectado, False en caso contrario
+	 */
 	public static boolean isOnline(Context context) {
 		ConnectivityManager cm = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);

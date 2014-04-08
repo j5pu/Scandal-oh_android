@@ -1,0 +1,222 @@
+package com.bizeu.escandaloh;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.model.Scandaloh;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+
+public class NotificationScandalActivity extends SherlockFragmentActivity {
+	
+	private boolean any_error;
+	private String photo_id;
+	private Context mContext;
+	private ScandalohFragment scandaloh_frag;
+	
+	/**
+	 * OnCreate
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.notification_scandal);
+		
+		mContext = this;
+		
+		if (getIntent() != null){
+			photo_id = getIntent().getStringExtra(NotificationsActivity.PHOTO_ID);
+		}
+		
+		// Action Bar
+		ActionBar actBar = getSupportActionBar();
+		actBar.setHomeButtonEnabled(true);
+		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setDisplayShowTitleEnabled(false);
+		actBar.setIcon(R.drawable.logo_blanco);
+		
+		// Obtenemos el escándalo
+		new GetScandal().execute();
+	}
+	
+	
+	
+	
+	/**
+	 * onOptionsItemSelected
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				finish();
+	    	break;
+		}
+		return true;
+	}
+	
+	
+
+	/**
+	 * Obtiene los siguientes 10 escándalos anteriores a partir de uno dado
+	 * 
+	 */
+	private class GetScandal extends AsyncTask<Void, Integer, Integer> {
+
+		String c_date;
+		String c_id;
+		String c_photo;
+		String c_resource_uri;
+		String c_social_network;
+		String c_text;
+		String c_user;
+		String c_user_id;
+		String c_username;
+		String c_avatar;
+
+		@Override
+		protected void onPreExecute() {
+			any_error = false;	
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			String url = null;
+			url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?id=" + photo_id;
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet getEscandalos = new HttpGet(url);
+				getEscandalos.setHeader("content-type", "application/json");
+				
+				// Si es con usuario le añadimos el session_token
+				if (MyApplication.logged_user){
+					getEscandalos.setHeader("Session-Token", MyApplication.session_token);
+				}
+
+				// Hacemos la petición al servidor
+				response = httpClient.execute(getEscandalos);
+				String respStr = EntityUtils.toString(response.getEntity());
+				Log.i("WE", "escandalo solo: " + respStr);
+
+				// Parseamos el escandalo devuelto
+				JSONObject respJson = new JSONObject(respStr);
+				JSONArray escandalosObject = respJson.getJSONArray("objects");
+				
+				// Obtenemos los datos de los escándalos
+				for (int i = 0; i < escandalosObject.length(); i++) {
+					final Comment last_comment;
+					
+					JSONObject escanObject = escandalosObject.getJSONObject(i);
+
+					final String category = escanObject.getString("category");
+					final String date = escanObject.getString("date");
+					final String id = escanObject.getString("id");
+					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
+					final String img = escanObject.getString("img");
+					final String comments_count = escanObject.getString("comments_count");
+					String latitude = escanObject.getString("latitude");
+					String longitude = escanObject.getString("longitude");
+					final String resource_uri = escanObject.getString("resource_uri");
+					final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
+					final String user = escanObject.getString("user");
+					String visits_count = escanObject.getString("visits_count");
+					final String sound = escanObject.getString("sound");
+					final String username = escanObject.getString("username");
+					final String avatar = escanObject.getString("avatar");
+					final String social_network = escanObject.getString("social_network");
+					final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
+					final int likes = Integer.parseInt(escanObject.getString("likes"));
+					final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
+					final int media_type = Integer.parseInt(escanObject.getString("media_type"));
+					final String favicon = escanObject.getString("favicon");
+					final String source = escanObject.getString("source");
+					final String source_name = escanObject.getString("source_name");
+
+					// Obtenemos el comentario más reciente
+					if (!escanObject.isNull("last_comment")){
+						JSONObject commentObject = escanObject.getJSONObject("last_comment");
+						c_date = commentObject.getString("date");
+						c_id = commentObject.getString("id");
+						c_photo = commentObject.getString("photo");
+						c_resource_uri = commentObject
+						.getString("resource_uri");
+						c_social_network = commentObject
+						.getString("social_network");
+						c_text = new String(commentObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+						c_user = commentObject.getString("user");
+						c_user_id = commentObject.getString("user_id");
+						c_username = commentObject.getString("username");
+						c_avatar = commentObject.getString("avatar");
+
+						last_comment = new Comment(c_date, c_id, c_photo,
+								c_resource_uri, c_social_network, c_text,
+							c_user, c_user_id, c_username, c_avatar);
+					}
+					else{
+						last_comment = null;
+					}
+					
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {							
+							Scandaloh scandal = new Scandaloh(id, title,
+									category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+									Integer.parseInt(comments_count),resource_uri,
+									MyApplication.DIRECCION_BUCKET + img_p,
+									MyApplication.DIRECCION_BUCKET + img, sound, username, date,
+									avatar, last_comment, social_network,
+									already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
+							scandaloh_frag = ScandalohFragment.newInstance(scandal);
+						}
+					});				
+				}
+			} catch (Exception ex) {
+				Log.e("ServicioRest",
+						"Error obteniendo escándalos o comentarios", ex);
+				// Hubo algún error inesperado
+				any_error = true;
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,
+						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			else{			
+				getSupportFragmentManager().beginTransaction().add(R.id.frag_notifications_scandal, scandaloh_frag).commit();
+			}
+		}
+	}
+}

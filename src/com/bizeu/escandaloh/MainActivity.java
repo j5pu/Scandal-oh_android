@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -34,7 +33,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,8 +57,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.*;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.model.Scandaloh;
-import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
@@ -75,9 +73,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
-import com.parse.PushService;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnClickListener, OnItemSelectedListener {
@@ -118,11 +114,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	DrawerLayout mDrawerLayout;
 	private FetchableImageView img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
+	private TextView txt_num_notifs;
 	
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private Context mContext;
-	ScandalohFragmentPagerAdapter adapter;
+	static ScandalohFragmentPagerAdapter adapter;
 	ViewPager pager = null;
 	ProgressBar loading;
 	private boolean any_error;
@@ -160,6 +157,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Cambiamos la fuente de la pantalla
 		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_main));
 
+		// Push notifications Parse
+		ParseAnalytics.trackAppOpened(getIntent());
+		
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
@@ -231,6 +231,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
 		explist_lateral_filtros = (ExpandableListView) findViewById(R.id.explist_mLateral_filtros);
+		txt_num_notifs = (TextView) findViewById(R.id.txt_mLateral_numNotificaciones);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
@@ -258,6 +259,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivity(i);			
 			}
 		});
+		
 		
 		// Perfil
 		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
@@ -448,7 +450,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onStart();
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);
-
+		if (MyApplication.logged_user){
+			// Actualizamos el nº de notificaciones
+			new GetNumNotificationsTask().execute();
+		}
+		//TODO obtener tambien num notificaciones cuando no esté logueado
 	}
 
 	/**
@@ -1154,6 +1160,73 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 
 	
+	
+	
+	
+
+
+	/**
+	 * Obtiene el nº de notificaciones
+	 * 
+	 */
+	private class GetNumNotificationsTask extends AsyncTask<Void, Integer, Integer> {
+
+		String num_notifs;
+
+		@Override
+		protected void onPreExecute() {
+			any_error = false;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			String url = MyApplication.SERVER_ADDRESS + "/api/v1/notification/count/" ;		
+			
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpGet del = new HttpGet(url);
+			del.setHeader("Content-Type", "application/json");
+			del.setHeader("Session-Token", MyApplication.session_token);
+			HttpResponse response = null;
+
+			try {
+				response = httpClient.execute(del);
+				String respStr = EntityUtils.toString(response.getEntity());
+				num_notifs = respStr.toString();
+				Log.i("WE", "num notis: " + respStr.toString());
+
+			} catch (Exception ex) {
+				Log.e("ServicioRest", "Error!", ex);
+				any_error = true; // Indicamos que hubo un error
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error) {
+				return 666;
+			} else {
+				// Devolvemos el nº de notificaciones
+				return (Integer.parseInt(num_notifs));
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Si hubo algún error
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext, getResources()
+						.getString(R.string.lo_sentimos_hubo),
+						Toast.LENGTH_SHORT);
+				toast.show();
+			}
+
+			// No hubo ningún error extraño
+			else {
+				txt_num_notifs.setText(result.toString());
+			}
+		}
+	}
+
 
 	
 
@@ -1336,7 +1409,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * Actualiza el already_voted del escandalo (fragmento) que esté actualmente visualizándose
 	 * @param already_voted
 	 */
-	public void updateLikesDislikes(int already_voted, int num_likes, int num_dislikes){
+	public  static void updateLikesDislikes(int already_voted, int num_likes, int num_dislikes){
 		adapter.updateFragmentLike(already_voted, num_likes, num_dislikes);
 	}
 	
@@ -1345,7 +1418,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * Actualiza el último comentario del escandalo (fragmento) que esté actualmente visualizándose
 	 * @param lst_comm
 	 */
-	public void updateLastComment(Comment lst_comm){
+	public static void updateLastComment(Comment lst_comm){
 		adapter.updateLastComment(lst_comm);
 	}
 	
@@ -1353,7 +1426,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * Actualiza el número de comentarios del escandalo (fragmento) que esté actualmente visualizándose
 	 * @param num_comments
 	 */
-	public void updateNumComments(int num_comments){
+	public static void updateNumComments(int num_comments){
 		adapter.updateNumComments(num_comments);
 	}
 	

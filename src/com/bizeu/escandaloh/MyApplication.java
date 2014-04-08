@@ -19,9 +19,9 @@ public class MyApplication extends Application {
 	// Producción
 	//public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com" ;
 	// Desarrollo
-	//public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
+	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
 	// Local
-	public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
+	//public static String SERVER_ADDRESS = "http://192.168.1.111:8000";
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";
@@ -55,8 +55,8 @@ public class MyApplication extends Application {
 		
 		// Parse
 		Parse.initialize(this, "d0pwm3XnQrHZCrTmQuuE75SXrzr46001WWfH9uFv", "YGONYEJpspQOod64lA5xwkGaK4V3GgAnq1kHNpD2");
-		PushService.setDefaultPushCallback(this, LoginScandalohActivity.class);
-		
+		PushService.setDefaultPushCallback(this, MainActivity.class);
+
 
 	}
 }

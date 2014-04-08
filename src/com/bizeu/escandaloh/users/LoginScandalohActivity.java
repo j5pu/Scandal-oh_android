@@ -82,9 +82,6 @@ public class LoginScandalohActivity extends SherlockActivity {
 		// Ocultamos el action bar
 		getSupportActionBar().hide();
 		
-		// Push notifications Parse
-		ParseAnalytics.trackAppOpened(getIntent());
-		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);

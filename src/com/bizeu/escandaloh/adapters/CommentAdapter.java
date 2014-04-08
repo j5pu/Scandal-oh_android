@@ -45,7 +45,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        CommentHolder holder ;
+    	CommentHolder holder ;
 
         comment = data.get(position);
         LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
