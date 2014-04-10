@@ -86,7 +86,8 @@ public class ProfileActivity extends SherlockActivity {
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setIcon(R.drawable.logo_blanco);
-		actBar.setDisplayShowTitleEnabled(false);
+		actBar.setDisplayShowTitleEnabled(true);
+		actBar.setTitle(getResources().getString(R.string.perfil));
 		
 		img_picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
 		txt_username = (TextView) findViewById(R.id.txt_profile_username);

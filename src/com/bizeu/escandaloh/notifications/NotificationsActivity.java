@@ -1,4 +1,4 @@
-package com.bizeu.escandaloh;
+package com.bizeu.escandaloh.notifications;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -21,12 +20,15 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.MyApplication;
+import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.NotificationAdapter;
 import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.util.Connectivity;
@@ -41,6 +43,8 @@ public class NotificationsActivity extends SherlockActivity {
 	private static int NUM_NOTIFICATIONS_TO_LOAD = 20;
 	
 	private ListView list_notifications;
+	private LinearLayout ll_loading;
+	private LinearLayout ll_list_notis;
 	
 	private ArrayList<Notification> array_notifications = new ArrayList<Notification>();
 	private NotificationAdapter notificationsAdapter;
@@ -48,6 +52,7 @@ public class NotificationsActivity extends SherlockActivity {
 	private boolean there_are_more_notifs = true;
 	private Context mContext;
 	private String meta_next_notifs = null;
+	private GetNotificationsTask getNotisAsync;
 	
 	/**
 	 * OnCreate
@@ -63,10 +68,15 @@ public class NotificationsActivity extends SherlockActivity {
 		ActionBar actBar = getSupportActionBar();
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setDisplayShowTitleEnabled(false);
+		actBar.setDisplayShowTitleEnabled(true);
+		actBar.setTitle(getResources().getString(R.string.notificaciones));
 		actBar.setIcon(R.drawable.logo_blanco);
 		
 		list_notifications = (ListView) findViewById(R.id.list_notifications);
+		ll_loading = (LinearLayout) findViewById(R.id.ll_notifications_loading);
+		ll_list_notis = (LinearLayout) findViewById(R.id.ll_notifications_listnotis);
+		notificationsAdapter = new NotificationAdapter(this, R.layout.notification, array_notifications);
+		list_notifications.setAdapter(notificationsAdapter);
 		
 		// Al seleccionar una notificación mostramos el escándalo al que referencia
 		list_notifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -75,20 +85,22 @@ public class NotificationsActivity extends SherlockActivity {
 			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 				  
 				  Notification n = (Notification) list_notifications.getItemAtPosition(position);
-				  Intent i = new Intent(NotificationsActivity.this, NotificationScandalActivity.class);
+				  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
 				  i.putExtra(PHOTO_ID, n.getPhotoId());
 				  startActivity(i);	     
 			  }
 		});
 		
+		// Obtener siguientes notificaciones
 		list_notifications.setOnScrollListener(new OnScrollListener() {
 			
 	        @Override
 	        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	           
-	        	if ((firstVisibleItem + visibleItemCount == totalItemCount - 3) && there_are_more_notifs) {
+	        	if ((firstVisibleItem + visibleItemCount == notificationsAdapter.getCount() - 3) && there_are_more_notifs) {
 	            	if (Connectivity.isOnline(mContext)){
-	            		new GetNotificationsTask().execute(); 
+						getNotisAsync = new GetNotificationsTask();
+						getNotisAsync.execute();
 	            	}
 	            	else{
 	            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
@@ -103,10 +115,12 @@ public class NotificationsActivity extends SherlockActivity {
 	        }
 	    });
 		
+		// Mostramos el loading
+		showLoading();
+		
 		// Obtenemos las notificaciones
-		notificationsAdapter = new NotificationAdapter(this, R.layout.notification, array_notifications);
-		list_notifications.setAdapter(notificationsAdapter);
-		new GetNotificationsTask().execute();
+		getNotisAsync = new GetNotificationsTask();
+		getNotisAsync.execute();
 	}
 	
 	
@@ -125,6 +139,16 @@ public class NotificationsActivity extends SherlockActivity {
 	    	break;
 		}
 		return true;
+	}
+	
+	
+	/**
+	 * onDestroy
+	 */
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		cancelGetNotifications();
 	}
 	
 	
@@ -227,6 +251,9 @@ public class NotificationsActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
+			// Mostramos el listado de notificaciones
+			showListNotifications();
+			
 			// Si hubo algún error
 			if (result == 666) {
 				Toast toast = Toast.makeText(mContext, getResources()
@@ -239,6 +266,39 @@ public class NotificationsActivity extends SherlockActivity {
 			else {
 				// Si es codigo 2xx --> OK 
 				notificationsAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * Muestra el loading en pantalla
+	 */
+	private void showLoading(){
+		ll_list_notis.setVisibility(View.GONE);
+		ll_loading.setVisibility(View.VISIBLE);
+	}
+	
+	
+	/**
+	 * Oculta el loading y muestra el listado de notificaciones
+	 */
+	private void showListNotifications(){
+		ll_list_notis.setVisibility(View.VISIBLE);
+		ll_loading.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo notificaciones
+	 */
+	private void cancelGetNotifications() {
+		if (getNotisAsync != null) {
+			if (getNotisAsync.getStatus() == AsyncTask.Status.PENDING|| getNotisAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				Log.v("WE","Cancelamos");
+				getNotisAsync.cancel(true);
 			}
 		}
 	}

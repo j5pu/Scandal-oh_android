@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_search_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/ll_notifications_loading"
+   <LinearLayout
+        android:id="@+id/ll_search_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical|center_horizontal"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="vertical"
         android:visibility="gone" >
@@ -20,14 +22,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_notifications_listnotis"
+        android:id="@+id/ll_search_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="visible" >
 
         <ListView
-            android:id="@+id/list_notifications"
+            android:id="@+id/list_search_scandaloh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>

@@ -40,7 +40,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -57,8 +56,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.*;
 import com.bizeu.escandaloh.model.Comment;
-import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.model.Scandaloh;
+import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
@@ -90,7 +89,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public static final String HAPPY = "Humor";
 	public static final String BOTH = "Todas";
 	public static final String NORMAL = "Normal";
-	public static final String ENVIAR_COMENTARIO = "Enviar_comentario";
 	private static final String FILTRO_RECIENTES = "-date";
 	private static final String FILTRO_COMENTADAS = "-comments_count";
 	private static final String FILTRO_VOTADAS = "-votes_count";
@@ -109,9 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
 	private TextView txt_code_country;
-	private EditText edit_escribir_comentario;
 	private Spinner spinner_categorias;
-	private ImageView img_send_comment;
 	DrawerLayout mDrawerLayout;
 	private FetchableImageView img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
@@ -141,6 +137,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     private List<String> filter_childs;
     private Map<String, List<String>> filterCollection;
     private String actual_filter = FILTRO_RECIENTES ;
+	private String action_bar_mode = NORMAL; // NORMAL o ENVIAR_COMENTARIO
 
 	/**
 	 * onCreate
@@ -287,7 +284,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									
 							// Si hay conexión
 							if (Connectivity.isOnline(mContext)) {
-								cancelGetEscandalos();
+								cancelGetScandals();
 								hideLoadingFromMenu();
 								// Abrimos llave de hay más escandalos
 								there_are_more_scandals = true;
@@ -330,6 +327,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			
 			@Override
 			public void onClick(View v) {
+				// Mostramos la pantalla de busqueda
+				Intent i = new Intent(MainActivity.this, SearchActivity.class);
+				startActivity(i);
 				// Cerramos el menu
 				mDrawerLayout.closeDrawer(ll_menu_lateral);		
 			}
@@ -484,7 +484,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			ll_lateral_perfil.setVisibility(View.VISIBLE);
 			txt_lateral_nombreusuario.setText(MyApplication.user_name);
 			if (MyApplication.avatar != null){
-				Log.v("WE","Myapplication.avatar: " + MyApplication.avatar);
 		        img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_mas);
 			}
 			else{
@@ -529,7 +528,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onDestroy() {
 		super.onDestroy();
 		// Cancelamos los escándalos que se estuvieran obteniendo
-		cancelGetEscandalos();
+		cancelGetScandals();
 	}
 
 	/**
@@ -546,7 +545,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			} else {
 				mDrawerLayout.openDrawer(ll_menu_lateral);
 			}
-		}
+		}		
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -935,7 +934,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 										avatar, last_comment, social_network,
 										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
 								escandalos.add(escanAux);
-								adapter.addFragment(ScandalohFragment.newInstance(escandalos.get(escandalos
+								adapter.addFragment(ScandalFragment.newInstance(escandalos.get(escandalos
 												.size() - 1)));
 								adapter.notifyDataSetChanged();
 							}
@@ -1117,7 +1116,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 										avatar, last_comment, social_network,
 										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
 								escandalos.add(0,escanAux);
-								adapter.addFragmentAtStart(ScandalohFragment.newInstance(escandalos.get(0)));
+								adapter.addFragmentAtStart(ScandalFragment.newInstance(escandalos.get(0)));
 								adapter.notifyDataSetChanged();
 							}
 						});
@@ -1236,12 +1235,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// No hubo ningún error extraño
 			else {
-				txt_num_notifs.setText(result.toString());
+				if (result > 0){
+					txt_num_notifs.setText(result.toString());
+				}
 			}
 		}
 	}
 
-
+	
+	
 	
 
 	/**
@@ -1255,7 +1257,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		if ((pos == 0 && category.equals(ANGRY))|| (pos == 1 && category.equals(HAPPY))) {
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)) {
-				cancelGetEscandalos();
+				cancelGetScandals();
 				hideLoadingFromMenu();
 				// Inhabilitamos el spinner
 				spinner_categorias.setClickable(false);
@@ -1360,7 +1362,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	/**
 	 * Cancela si hubiese alguna hebra obteniendo escándalos
 	 */
-	private void cancelGetEscandalos() {
+	private void cancelGetScandals() {
 		if (getEscandalosAsync != null) {
 			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING
 					|| getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING) {
@@ -1452,10 +1454,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		adapter.notifyDataSetChanged();
 	}
 	
-	
-	
-	
-	
 	// ---------------------------------------------------------------------------------------------------------
 	
 	
@@ -1466,7 +1464,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
 		// Lista de fragmentos con los escándalos
-		List<ScandalohFragment> fragments;
+		List<ScandalFragment> fragments;
 
 		/**
 		 * Constructor
@@ -1475,7 +1473,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 */
 		public ScandalohFragmentPagerAdapter(FragmentManager fm) {
 			super(fm);
-			this.fragments = new ArrayList<ScandalohFragment>();
+			this.fragments = new ArrayList<ScandalFragment>();
 		}
 
 	
@@ -1485,7 +1483,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 * @param position Posición
 		 */
 		@Override
-		public ScandalohFragment getItem(int position) {
+		public ScandalFragment getItem(int position) {
 			// return ScandalohFragment.newInstance(escandalos.get(position));
 			return fragments.get(position);
 		}
@@ -1503,7 +1501,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 */
 		@Override
 		public int getItemPosition(Object item) {
-			ScandalohFragment fragment = (ScandalohFragment) item;
+			ScandalFragment fragment = (ScandalFragment) item;
 			if (pager.getCurrentItem() == fragments.indexOf(fragment)) {
 				return fragments.indexOf(fragment);
 			} else {
@@ -1516,7 +1514,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 * Añade un fragmento al final de la lista
 		 * @param fragment Fragmento a añadir
 		 */
-		public void addFragment(ScandalohFragment fragment) {
+		public void addFragment(ScandalFragment fragment) {
 			this.fragments.add(fragment);
 		}
 
@@ -1524,7 +1522,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 * Añade un fragmento al principio de la lista
 		 * @param fragment
 		 */
-		public void addFragmentAtStart(ScandalohFragment fragment) {
+		public void addFragmentAtStart(ScandalFragment fragment) {
 			this.fragments.add(0, fragment);
 		}
 
@@ -1533,7 +1531,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 * @param position
 		 * @param fragment
 		 */
-		public void setFragment(int position, ScandalohFragment fragment) {
+		public void setFragment(int position, ScandalFragment fragment) {
 			this.fragments.set(position, fragment);
 		}
 		
@@ -1550,7 +1548,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			scan.setLikes(num_likes);
 			scan.setDislikes(num_dislikes);
 			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);
 		}
 		
@@ -1565,7 +1563,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Le modificamos el último comentario
 			scan.setLastComment(comm);
 			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);
 		}
 		
@@ -1580,7 +1578,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// Le modificamos el último comentario
 			scan.setNumComments(num_c);
 			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
 			this.fragments.set(pager.getCurrentItem(), sf2);
 		}
 		
@@ -1608,7 +1606,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					 }
 				 }
 				 
-				 ScandalohFragment sf2 = ScandalohFragment.newInstance(scan);
+				 ScandalFragment sf2 = ScandalFragment.newInstance(scan);
 				 this.fragments.set(i, sf2); 
 			 }
 		}
@@ -1618,7 +1616,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		 * @param position
 		 * @return
 		 */
-		public ScandalohFragment getFragment(int position) {
+		public ScandalFragment getFragment(int position) {
 			return this.fragments.get(position);
 		}
 		

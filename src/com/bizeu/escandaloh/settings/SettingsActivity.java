@@ -64,6 +64,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		// Título action bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setTitle(R.string.ajustes);
+		actBar.setIcon(R.drawable.logo_blanco);
 
 		checkP = (CheckBoxPreference) findPreference("autoreproduccion");
 		screen = (PreferenceScreen) findPreference("screen");

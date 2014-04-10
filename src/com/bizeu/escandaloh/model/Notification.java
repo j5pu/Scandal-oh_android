@@ -16,8 +16,7 @@ public class Notification {
 		}
 		else{
 			this.is_read = false;
-		}
-	
+		}	
 	}
 	
 	public String getAvatar(){

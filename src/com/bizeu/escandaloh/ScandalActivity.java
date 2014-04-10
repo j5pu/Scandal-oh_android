@@ -9,25 +9,27 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
+import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
-public class NotificationScandalActivity extends SherlockFragmentActivity {
+public class ScandalActivity extends SherlockFragmentActivity {
 	
 	private boolean any_error;
 	private String photo_id;
 	private Context mContext;
-	private ScandalohFragment scandaloh_frag;
+	private ScandalFragment scandaloh_frag;
+	private GetScandalTask getScandalAsync;
 	
 	/**
 	 * OnCreate
@@ -35,7 +37,7 @@ public class NotificationScandalActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.notification_scandal);
+		setContentView(R.layout.scandal_fragment);
 		
 		mContext = this;
 		
@@ -49,13 +51,25 @@ public class NotificationScandalActivity extends SherlockFragmentActivity {
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setDisplayShowTitleEnabled(false);
 		actBar.setIcon(R.drawable.logo_blanco);
-		
-		// Obtenemos el escándalo
-		new GetScandal().execute();
+
 	}
 	
 	
+	/**
+	 * onStart
+	 */
+	public void onStart(){
+		super.onStart();
+		// Obtenemos el escándalo
+		getScandalAsync = new GetScandalTask();
+		getScandalAsync.execute();
+	}
 	
+	public void onDestroy(){
+		super.onDestroy();
+		cancelGetScandal();
+	}
+
 	
 	/**
 	 * onOptionsItemSelected
@@ -76,7 +90,7 @@ public class NotificationScandalActivity extends SherlockFragmentActivity {
 	 * Obtiene los siguientes 10 escándalos anteriores a partir de uno dado
 	 * 
 	 */
-	private class GetScandal extends AsyncTask<Void, Integer, Integer> {
+	private class GetScandalTask extends AsyncTask<Void, Integer, Integer> {
 
 		String c_date;
 		String c_id;
@@ -185,7 +199,7 @@ public class NotificationScandalActivity extends SherlockFragmentActivity {
 									MyApplication.DIRECCION_BUCKET + img, sound, username, date,
 									avatar, last_comment, social_network,
 									already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
-							scandaloh_frag = ScandalohFragment.newInstance(scandal);
+							scandaloh_frag = ScandalFragment.newInstance(scandal);
 						}
 					});				
 				}
@@ -214,8 +228,23 @@ public class NotificationScandalActivity extends SherlockFragmentActivity {
 						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
 			}
-			else{			
-				getSupportFragmentManager().beginTransaction().add(R.id.frag_notifications_scandal, scandaloh_frag).commit();
+			else{	
+				// Si no se ha destruido la actividad mostramos el fragmento
+				if (!isCancelled()){
+					getSupportFragmentManager().beginTransaction().replace(R.id.frag__scandal, scandaloh_frag).commitAllowingStateLoss();;
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo el escándalo
+	 */
+	private void cancelGetScandal() {
+		if (getScandalAsync != null) {
+			if (getScandalAsync.getStatus() == AsyncTask.Status.PENDING|| getScandalAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getScandalAsync.cancel(true);
 			}
 		}
 	}

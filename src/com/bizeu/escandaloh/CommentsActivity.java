@@ -50,7 +50,7 @@ public class CommentsActivity extends SherlockActivity {
 	private LinearLayout ll_loading;
 	private LinearLayout ll_icon;
 	private EditText edit_comment;
-	private LinearLayout screen;
+	private LinearLayout ll_screen;
 	private FetchableImageView photo;
 	private TextView txt_title;
 
@@ -75,15 +75,15 @@ public class CommentsActivity extends SherlockActivity {
 		mContext = this;
 
 		if (getIntent() != null) {
-			id = getIntent().getExtras().getString(ScandalohFragment.ID);
-			title = getIntent().getExtras().getString(ScandalohFragment.TITLE);
-			url_photo = getIntent().getExtras().getString(ScandalohFragment.URL);
+			id = getIntent().getExtras().getString(ScandalFragment.ID);
+			title = getIntent().getExtras().getString(ScandalFragment.TITLE);
+			url_photo = getIntent().getExtras().getString(ScandalFragment.URL);
 		}
 
 		list_comments = (ListView) findViewById(R.id.list_comments_listcomments);
 		edit_comment = (EditText) findViewById(R.id.edit_comments_comment);
 		img_send = (LinearLayout) findViewById(R.id.ll_comments_send);
-		screen = (LinearLayout) findViewById(R.id.ll_comments_screen);
+		ll_screen = (LinearLayout) findViewById(R.id.ll_comments_screen);
 		ll_loading = (LinearLayout) findViewById(R.id.ll_comments_loading);
 		
 		// Action Bar
@@ -186,7 +186,7 @@ public class CommentsActivity extends SherlockActivity {
 	public void onPause() {
 		super.onPause();
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(screen.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(ll_screen.getWindowToken(), 0);
 	}
 	
 	

@@ -197,5 +197,6 @@
     <string name="introduce_la_nueva_contrasenia">Introduce la nueva contraseña</string>
     <string name="nueva_contrasenia">Nueva contraseña</string>
     <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
+    <string name="buscar_en_scandaloh">Buscar en ScandalOh</string>
 
 </resources>

@@ -19,5 +19,6 @@
     <color name="azul_verdoso">#3d99b7</color>
     <color name="negro_comentario">#999999</color>
     <color name="gris_comments">#cccccc</color>
+    <color name="gris_busqueda">#dddddd</color>
     
 </resources>

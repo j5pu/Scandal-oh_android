@@ -57,7 +57,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
-public class ScandalohFragment extends SherlockFragment {
+public class ScandalFragment extends SherlockFragment {
 
 	public static final String ID = "id";
     public static final String URL = "url";
@@ -80,6 +80,7 @@ public class ScandalohFragment extends SherlockFragment {
     public static final String SOURCE_NAME = "Source_name";
     private static final String MEDIA_TYPE = "Media_type";
     public static final int SHOW_COMMENTS = 343;
+    public static final int FROM_SCANDAL_FRAGMENT = 235;
 
     private ImageView aud;
 	private ImageView img_arrow;
@@ -89,6 +90,11 @@ public class ScandalohFragment extends SherlockFragment {
     private ImageView social_net;
 	private TextView txt_date;
 	private TextView num_com;
+	private LinearLayout ll_last_comment ;
+    private ImageView iLike;
+    private ImageView iDislike;
+    private TextView tLikes;
+    private TextView tDislikes;
  
     private String id;
     private String url;
@@ -124,9 +130,9 @@ public class ScandalohFragment extends SherlockFragment {
      * @param escan Escandalo para dicho fragmento
      * @return Fragmento con el escándalo
      */
-    public static ScandalohFragment newInstance(Scandaloh escan) {
+    public static ScandalFragment newInstance(Scandaloh escan) {
         // Instanciamos el fragmento
-        ScandalohFragment fragment = new ScandalohFragment();
+        ScandalFragment fragment = new ScandalFragment();
  
         // Guardamos los datos del fragmento (del escándalo)
         Bundle bundle = new Bundle();
@@ -265,12 +271,13 @@ public class ScandalohFragment extends SherlockFragment {
         }    
     }
     
+
     /**
      * onCreateView
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
- 
+
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
         }
@@ -397,10 +404,10 @@ public class ScandalohFragment extends SherlockFragment {
 
                       
         // LIKES
-        final ImageView iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
-        final ImageView iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
-        final TextView tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
-        final TextView tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
+        iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
+        iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
+        tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
+        tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
         tLikes.setText(Integer.toString(likes));
         tDislikes.setText(Integer.toString(dislikes));
       
@@ -621,84 +628,9 @@ public class ScandalohFragment extends SherlockFragment {
         img_avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
         social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
 		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
-        LinearLayout ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
-        
-        // Si se pulsa accedemos a los comentarios
-        ll_last_comment.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(getActivity(), CommentsActivity.class);
-				i.putExtra(SOURCE_NAME, source_name);
-				i.putExtra(ID, id);
-				i.putExtra(TITLE, title);
-				i.putExtra(URL, url);			
-				startActivityForResult(i,SHOW_COMMENTS);		
-			}
-		});       
-
-        // Si hay algún comentario
-        if (last_comment != null){
-        	// Texto
-    		comment_text.setText(last_comment.getText());
-    		
-    		// Nombre de usuario
-    		txt_user_name.setText(last_comment.getUsername());
-    		
-    		// Fecha (formato dd-mm-aaaa)
-            String date_without_time = (last_comment.getDate().split("T",2))[0];   
-            String year = date_without_time.split("-",3)[0];
-            String month = date_without_time.split("-",3)[1];
-            String day = date_without_time.split("-",3)[2];
-            String final_date = day + "-" + month + "-" + year;
-            txt_date.setText(final_date); 
-            
-            // Red social
-            int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
-            if (social_ne == 0){
-            	social_net.setImageResource(R.drawable.s_gris);
-            }
-            else if (social_ne == 1){
-            	social_net.setImageResource(R.drawable.facebook_gris);
-            }
-            
-            // Avatar
-            if (!last_comment.getAvatar().equals("")){
-                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
-            }
-        }
-        
-        // No hay comentarios
-        else{
-        	// Si el usuario está logueado
-        	if (MyApplication.logged_user){
-        		
-        		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
-        		txt_user_name.setText(MyApplication.user_name);
-        		txt_date.setText(Utils.getCurrentDate());
-        		
-                // Avatar
-                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
-                
-        	}
-        	// Si no está logueado
-        	else{
-        		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
-        		txt_user_name.setText(getResources().getString(R.string.invitado));
-        		txt_date.setText(Utils.getCurrentDate());
-        		// Le mandamos a la pantalla de login si pulsa
-                ll_last_comment.setOnClickListener(new View.OnClickListener() {
-        			
-        			@Override
-        			public void onClick(View v) {
-        				Intent i = new Intent(getActivity(), LoginSelectActivity.class);
-        				startActivity(i);		
-        			}
-        		});
-        	}
-        }
-   
-        
+        ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
+             
+        updateLastComment();
  		// Número de comentarios        
 		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
 		num_com.setText(Integer.toString(num_comments));
@@ -982,18 +914,6 @@ public class ScandalohFragment extends SherlockFragment {
 	
  	
  	
-    /**
-     * Convierte pixel en dp
-     * @param input
-     * @return
-     */
- 	private int convertToDp(int input) {
-        final float scale = getResources().getDisplayMetrics().density;
-        return (int) (input * scale + 0.5f);
- 	}
- 	
- 	
- 	
  	
  	/**
 	 * Envía un like o dislike al servidor a partir de un usuario y una foto
@@ -1041,9 +961,93 @@ public class ScandalohFragment extends SherlockFragment {
 	        
 	        return null;
 	    }
-			
-	    }
+		
+	}
  	
+	
+	/**
+	 * Actualiza en pantalla el último comentario del escándalo
+	 */
+	private void updateLastComment(){
+		
+		// Si se pulsa accedemos a los comentarios
+        ll_last_comment.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), CommentsActivity.class);
+				i.putExtra(SOURCE_NAME, source_name);
+				i.putExtra(ID, id);
+				i.putExtra(TITLE, title);
+				i.putExtra(URL, url);			
+				startActivityForResult(i,SHOW_COMMENTS);		
+			}
+		});
+        
+        // Si hay algún comentario
+        if (last_comment != null){
+        	
+        	// Texto
+    		comment_text.setText(last_comment.getText());
+    		
+    		// Nombre de usuario
+    		txt_user_name.setText(last_comment.getUsername());
+    		
+    		// Fecha (formato dd-mm-aaaa)
+            String date_without_time = (last_comment.getDate().split("T",2))[0];   
+            String year = date_without_time.split("-",3)[0];
+            String month = date_without_time.split("-",3)[1];
+            String day = date_without_time.split("-",3)[2];
+            String final_date = day + "-" + month + "-" + year;
+            txt_date.setText(final_date); 
+            
+            // Red social
+            int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
+            if (social_ne == 0){
+            	social_net.setImageResource(R.drawable.s_gris);
+            }
+            else if (social_ne == 1){
+            	social_net.setImageResource(R.drawable.facebook_gris);
+            }
+            
+            // Avatar
+            if (!last_comment.getAvatar().equals("")){
+                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + last_comment.getAvatar(), getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+            }
+        }
+        
+        // No hay comentarios
+        else{
+        	// Si el usuario está logueado
+        	if (MyApplication.logged_user){
+        		
+        		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
+        		txt_user_name.setText(MyApplication.user_name);
+        		txt_date.setText(Utils.getCurrentDate());
+        		
+                // Avatar
+                img_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, getActivity().getResources().getDrawable(R.drawable.avatar_defecto));
+                
+        	}
+        	
+        	// Si no está logueado
+        	else{
+        		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
+        		txt_user_name.setText(getResources().getString(R.string.invitado));
+        		txt_date.setText(Utils.getCurrentDate());
+        		
+        		// Le mandamos a la pantalla de login si pulsa
+                ll_last_comment.setOnClickListener(new View.OnClickListener() {
+        			
+        			@Override
+        			public void onClick(View v) {
+        				Intent i = new Intent(getActivity(), LoginSelectActivity.class);
+        				startActivityForResult(i,FROM_SCANDAL_FRAGMENT);		
+        			}
+        		});
+        	}
+        }
+	}
 	
 	
 
