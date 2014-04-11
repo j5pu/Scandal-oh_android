@@ -233,6 +233,7 @@ public class RegistrationActivity extends SherlockActivity {
 	             // Obtenemos el device token de parse
 	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
 	             dato.put("device_token", device_token);
+	             dato.put("device_type", 2); // Soy dispositivo android
 	             dato.put("username", username);
 	             dato.put("password", password);
 	             dato.put("email", email);

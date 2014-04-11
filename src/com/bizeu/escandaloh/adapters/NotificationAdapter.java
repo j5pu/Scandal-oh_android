@@ -65,6 +65,10 @@ public class NotificationAdapter extends ArrayAdapter<Notification> {
         if (!notification.isRead()){
         	holder.txtText.setTypeface(null, Typeface.BOLD);
         }
+        else{
+        	holder.txtText.setTypeface(null, Typeface.NORMAL);
+        }
+        
         holder.imgAvatar.setImage(MyApplication.DIRECCION_BUCKET + notification.getAvatar(), mContext.getResources().getDrawable(R.drawable.avatar_defecto));
              
         return convertView;

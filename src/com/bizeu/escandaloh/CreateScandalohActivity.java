@@ -394,10 +394,35 @@ public class CreateScandalohActivity extends SherlockActivity {
 			if (any_error) {
 				return 666;
 			} else {
-				Log.v("WE","response final: " + response.getStatusLine().getStatusCode());
 				return (response.getStatusLine().getStatusCode());
 			}
 		}	
+		
+		
+		@Override
+		protected void onPostExecute(Integer result) {
+			
+			// Si hubo algún error mostramos un mensaje
+			if (any_error) {
+				Toast toast = Toast.makeText(mContext, getResources()
+						.getString(R.string.lo_sentimos_hubo),
+						Toast.LENGTH_SHORT);
+				toast.show();
+
+			} else {
+				// Si es codigo 2xx --> OK
+				if (result >= 200 && result < 300) {
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.escandalo_enviado_con_exito),
+							Toast.LENGTH_LONG);
+					toast.show();
+				} else {
+					Toast toast;
+					toast = Toast.makeText(mContext,getResources().getString(R.string.lo_sentimos_se_ha_producido),
+									Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			}
+		}
 	}
 	
 	

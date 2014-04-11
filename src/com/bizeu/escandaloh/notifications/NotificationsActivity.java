@@ -2,9 +2,12 @@ package com.bizeu.escandaloh.notifications;
 
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -22,6 +25,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -45,6 +49,7 @@ public class NotificationsActivity extends SherlockActivity {
 	private ListView list_notifications;
 	private LinearLayout ll_loading;
 	private LinearLayout ll_list_notis;
+	private TextView txt_no_tienes_notis;
 	
 	private ArrayList<Notification> array_notifications = new ArrayList<Notification>();
 	private NotificationAdapter notificationsAdapter;
@@ -77,14 +82,21 @@ public class NotificationsActivity extends SherlockActivity {
 		ll_list_notis = (LinearLayout) findViewById(R.id.ll_notifications_listnotis);
 		notificationsAdapter = new NotificationAdapter(this, R.layout.notification, array_notifications);
 		list_notifications.setAdapter(notificationsAdapter);
+		txt_no_tienes_notis = (TextView) findViewById(R.id.txt_notifications_notienesnotis);
 		
 		// Al seleccionar una notificación mostramos el escándalo al que referencia
 		list_notifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			  @Override
 			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				  
 				  Notification n = (Notification) list_notifications.getItemAtPosition(position);
+							  
+				  // Marcamos la notificación como leída
+				  ((Notification) list_notifications.getItemAtPosition(position)).setIsRead(true);
+				  notificationsAdapter.notifyDataSetChanged();
+				  new MarkNotificationAsReadTask(n.getPhotoId()).execute();
+				  
+				  // Abrimos el escandalo
 				  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
 				  i.putExtra(PHOTO_ID, n.getPhotoId());
 				  startActivity(i);	     
@@ -99,6 +111,7 @@ public class NotificationsActivity extends SherlockActivity {
 	           
 	        	if ((firstVisibleItem + visibleItemCount == notificationsAdapter.getCount() - 3) && there_are_more_notifs) {
 	            	if (Connectivity.isOnline(mContext)){
+	            		
 						getNotisAsync = new GetNotificationsTask();
 						getNotisAsync.execute();
 	            	}
@@ -207,6 +220,10 @@ public class NotificationsActivity extends SherlockActivity {
 
 				// Parseamos el json para obtener los escandalos
 				JSONArray notificationsObject = null;
+				
+				// Obtenemos el meta
+				JSONObject respMetaJson = respJSON.getJSONObject("meta");
+				meta_next_notifs = respMetaJson.getString("next");
 
 				notificationsObject = respJSON.getJSONArray("objects");
 
@@ -215,9 +232,11 @@ public class NotificationsActivity extends SherlockActivity {
 
 					n_count = notiObject.getString("count");
 					n_is_read = notiObject.getString("is_read");
-					n_photo_img_p = notiObject.getString("photo_img_p");
+					n_photo_img_p = notiObject.getString("photo_img_small");
 					n_text = new String(notiObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 					n_photo_id = notiObject.getString("photo_id");
+					
+					Log.v("WE","is_read: " + n_is_read);
 
 					Notification notiAux = new Notification(n_text, n_photo_img_p, n_photo_id, n_is_read);
 					array_notifications.add(notiAux);
@@ -264,6 +283,9 @@ public class NotificationsActivity extends SherlockActivity {
 
 			// No hubo ningún error extraño
 			else {
+				if (array_notifications.size() == 0){
+					txt_no_tienes_notis.setVisibility(View.VISIBLE);
+				}
 				// Si es codigo 2xx --> OK 
 				notificationsAdapter.notifyDataSetChanged();
 			}
@@ -271,6 +293,53 @@ public class NotificationsActivity extends SherlockActivity {
 	}
 	
 	
+	
+	
+	
+ 	/**
+	 * Marca una notificación como leída
+	 *
+	 */
+	private class MarkNotificationAsReadTask extends AsyncTask<Void,Integer,Void> {
+	
+		private String photo_id;
+		
+		public MarkNotificationAsReadTask(String photo_id){
+			this.photo_id = photo_id;
+		}
+		
+		@Override
+	    protected Void doInBackground(Void... params) {
+	 
+	    	HttpEntity resEntity;
+	        String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/notification/mark-as-read/";
+	
+	        try{
+	             HttpClient client = new DefaultHttpClient();
+	             HttpPost post = new HttpPost(urlString);
+	             post.setHeader("Content-Type", "application/json");
+	             post.setHeader("Session-Token", MyApplication.session_token);
+
+	             JSONObject dato = new JSONObject();	                        
+	             dato.put("photo_id", photo_id);
+
+	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
+	             post.setEntity(entity);
+
+	             HttpResponse response = client.execute(post);
+	             resEntity = response.getEntity();
+	             final String response_str = EntityUtils.toString(resEntity);
+	                          
+	             if (resEntity != null) {
+	                 Log.i("RESPONSE",response_str);	            
+	             }
+	        }
+	        catch (Exception ex){
+	        }
+	        
+	        return null;
+	    }	
+	}
 	
 	
 	/**

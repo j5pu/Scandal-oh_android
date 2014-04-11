@@ -199,5 +199,8 @@
     <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
     <string name="buscar_en_scandaloh">Buscar en ScandalOh</string>
     <string name="actualizar_avatar">Actualizar avatar</string>
+    <string name="no_tienes_notificaciones">No tienes notificaciones.</string>
+    <string name="recibir_notificaciones">Recibir notificaciones</string>
+    <string name="escandalo_enviado_con_exito">¡Escándalo enviado con éxito!</string>
 
 </resources>

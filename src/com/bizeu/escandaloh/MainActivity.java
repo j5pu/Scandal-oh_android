@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -58,6 +59,7 @@ import com.bizeu.escandaloh.adapters.*;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.notifications.NotificationsActivity;
+import com.bizeu.escandaloh.notifications.PushReceiver;
 import com.bizeu.escandaloh.settings.SettingsActivity;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
@@ -112,7 +114,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private FetchableImageView img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
 	private TextView txt_num_notifs;
-	
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private Context mContext;
@@ -167,6 +168,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setIcon(R.drawable.logo_blanco);
+		
+		// Si viene de una notificación push abrimos la pantalla de notificaciones
+		if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
+			Intent i = new Intent(MainActivity.this, NotificationsActivity.class);
+			startActivity(i);
+		}
 
 		loading = (ProgressBar) findViewById(R.id.loading_escandalos);
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
@@ -464,11 +471,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onStart();
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);
-		if (MyApplication.logged_user){
-			// Actualizamos el nº de notificaciones
-			new GetNumNotificationsTask().execute();
-		}
-		//TODO obtener tambien num notificaciones cuando no esté logueado
 	}
 
 	/**
@@ -478,28 +480,37 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onResume() {
 		super.onResume();
 		
-		// Si está logueado ocultamos las opción de login  y mostramos su info y la opción de perfil
+		// Si está logueado
 		if (MyApplication.logged_user) {
-			ll_lateral_login.setVisibility(View.GONE);
-			ll_lateral_perfil.setVisibility(View.VISIBLE);
-			txt_lateral_nombreusuario.setText(MyApplication.user_name);
+			ll_lateral_login.setVisibility(View.GONE); // Ocultamos Login
+			ll_lateral_perfil.setVisibility(View.VISIBLE); // Mostramos Perfil
+			ll_lateral_notificaciones.setVisibility(View.VISIBLE); // Mostramos notificaciones
+			txt_lateral_nombreusuario.setText(MyApplication.user_name); // Nombre de usuario
+			
+			// Avatar
 			if (MyApplication.avatar != null){
 		        img_lateral_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
 			}
 			else{
-		        img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
+		        img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);
 			}
+			// Actualizamos el nº de notificaciones
+			new GetNumNotificationsTask().execute();
+			
+		// No está logueado
 		} else {
-			ll_lateral_login.setVisibility(View.VISIBLE);
-			ll_lateral_perfil.setVisibility(View.GONE);
-			img_lateral_avatar.setImageResource(R.drawable.avatar_mas);
-			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado));
-			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);		
+			ll_lateral_login.setVisibility(View.VISIBLE); // Mostramos Login
+			ll_lateral_perfil.setVisibility(View.GONE); // Ocultamos Perfil
+			ll_lateral_notificaciones.setVisibility(View.GONE); // Ocultamos notificaciones
+			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto); // Avatar por defecto
+			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado)); // Usuario invitado 
 		}
 		
-		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos
+		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos y eliminamos las push que hubiesen
 		if (MyApplication.reset_scandals){		
 			resetScandals();
+			NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+			mNotificationManager.cancel(PushReceiver.NOTIFICATION_ID);
 		}
 	}
 
@@ -1237,6 +1248,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			else {
 				if (result > 0){
 					txt_num_notifs.setText(result.toString());
+				}
+				else{
+					txt_num_notifs.setText("");
 				}
 			}
 		}

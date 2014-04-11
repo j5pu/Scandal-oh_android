@@ -10,5 +10,14 @@
             android:summary="@string/reproduce_el_audio_automaticamente"
             android:title="@string/autoreproduccion"/>
     </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:key="notificationsCategory"
+        android:title="@string/notificaciones" >
+        <CheckBoxPreference
+            android:key="notifications"
+            android:title="@string/recibir_notificaciones"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

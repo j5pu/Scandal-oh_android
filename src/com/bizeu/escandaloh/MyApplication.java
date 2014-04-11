@@ -29,6 +29,7 @@ public class MyApplication extends Application {
 	public static String SESSION_TOKEN = "session_token";
 	public static String USER_NAME = "user_name";
 	public static String AUTOPLAY_ACTIVATED = "autoplay_activated";
+	public static String NOTIFICATIONS_ACTIVATED = "notifications_activated";
 	public static String AVATAR = "avatar";
 	public static String SOCIAL_NETWORK = "social_network";
 	public static Boolean logged_user = false;

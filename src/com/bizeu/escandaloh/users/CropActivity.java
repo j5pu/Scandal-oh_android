@@ -137,8 +137,7 @@ public class CropActivity extends Activity {
 		protected Integer doInBackground(Void... params) {
 
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/logged/"
-					+ MyApplication.resource_uri;
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/logged/";
 			HttpResponse response = null;
 
 			try {

@@ -269,6 +269,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				// Obtenemos el device token de parse
 	            String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
 	            dato.put("device_token", device_token);
+	            dato.put("device_type", 2);
 				dato.put("access_token", access_token);
 				dato.put("social_network", social_network);
 

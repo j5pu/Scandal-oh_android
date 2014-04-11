@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.bizeu.escandaloh.notifications.PushReceiver;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseInstallation;
@@ -109,10 +110,15 @@ public class CoverActivity extends Activity {
 			finish();
 		}
 		
-		// La aplicación se ha iniciado por el método normal
 		else{
-			// Mostramos la pantalla del carrusel
 			Intent i = new Intent(CoverActivity.this, MainActivity.class);
+			// La aplicación se ha iniciado porque viene de una notificación push
+			if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
+				i.setAction(PushReceiver.PUSH_NOTIFICATION);
+			}
+			else{
+				i.setAction(Intent.ACTION_DEFAULT);
+			}
 			startActivity(i);
 			finish();
 		}			

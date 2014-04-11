@@ -11,7 +11,7 @@ public class Notification {
 		this.avatar = avatar;
 		this.text = text;
 		this.photo_id = photo_id;
-		if (is_read.equals(0)){
+		if (is_read.equals("true")){
 			this.is_read = true;
 		}
 		else{

@@ -217,7 +217,8 @@ public class LoginScandalohActivity extends SherlockActivity {
              
 	             // Obtenemos el device token de parse
 	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
-	             dato.put("device_token", device_token );
+	             dato.put("device_token", device_token);
+	             dato.put("device_type", 2);
 	             dato.put("username_email", username_email);
 	             dato.put("password", password);
 
