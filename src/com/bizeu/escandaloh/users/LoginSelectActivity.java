@@ -118,6 +118,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				startActivityForResult(i,REGISTRATION);	
 			}
 		});
+		
 
 		but_login_facebook.setOnErrorListener(new OnErrorListener() {
 
@@ -134,25 +135,34 @@ public class LoginSelectActivity extends SherlockActivity {
 			@Override
 			public void call(Session session, SessionState state,
 					Exception exception) {
-
+				progress.show();
 				if (session.isOpened()) {
 					Log.i(TAG_FACEBOOK, "Access Token" + session.getAccessToken());
 					access_token = session.getAccessToken();
 					Request.newMeRequest(session,new Request.GraphUserCallback() {
 								@Override
 								public void onCompleted(GraphUser user,Response response) {
-									if (user != null) {
-										
+									
+									if (user != null) {									
 										username = user.getUsername();
 										// Cerramos sesión facebook: sólo queremos el nombre e email
 										Session.getActiveSession().closeAndClearTokenInformation();
 										new LogInSocialNetwork().execute(LOGGING_FACEBOOK);
+									}
+									else{
+										if (progress.isShowing()) {
+											progress.dismiss();
+										}			
+										Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido,Toast.LENGTH_SHORT).show();
 									}
 								}
 							}).executeAsync();
 					
 				} else {
 					Log.i("WE", "Sesion no abierta");
+					if (progress.isShowing()) {
+						progress.dismiss();
+					}
 				}
 
 			}
@@ -162,13 +172,6 @@ public class LoginSelectActivity extends SherlockActivity {
 
 			@Override
 			public void onClick(View v) {
-				// Mandamos el evento a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createEvent("Acción UI",
-						"Boton clickeado", // Event action (required)
-						"Iniciar sesión con scandaloh", // Event label
-						null) // Event value
-						.build());
 
 				// Mostramos la pantalla de log in
 				Intent i = new Intent(mContext, LoginScandalohActivity.class);
@@ -239,7 +242,6 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		@Override
 		protected void onPreExecute() {
-			progress.show();
 			login_error = false;
 		}
 

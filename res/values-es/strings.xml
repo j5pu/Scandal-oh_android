@@ -198,5 +198,6 @@
     <string name="nueva_contrasenia">Nueva contraseña</string>
     <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
     <string name="buscar_en_scandaloh">Buscar en ScandalOh</string>
+    <string name="actualizar_avatar">Actualizar avatar</string>
 
 </resources>
