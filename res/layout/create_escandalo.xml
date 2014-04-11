@@ -8,41 +8,29 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/ll_create_audio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.2"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:layout_gravity="center_vertical" >
+        android:gravity="center_vertical|center_horizontal"
+        android:visibility="gone"
+        android:layout_marginTop="10dp" >
 
-        <ImageView
-            android:id="@+id/img_new_escandalo_subir"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:background="@drawable/subir_nube_selector"
-            android:paddingRight="5dp"
-            android:layout_marginRight="10dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.2"
-        android:orientation="vertical" >
-        
-        <View
+        <Button
+            android:id="@+id/but_create_play_audio"
             android:layout_width="wrap_content"
-            android:layout_height="0.2dp"
-            android:background="@color/gris_oscuro" 
-         />
+            android:layout_height="wrap_content"
+            android:text="@string/reproducir" />
+
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_create_foto"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2.5"
-        android:gravity="center" >
+        android:layout_weight="2"
+        android:gravity="center"
+        android:layout_marginTop="10dp" >
 
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_new_escandalo_photo"
@@ -63,7 +51,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1.1"
             android:orientation="vertical" >
-
         </LinearLayout>
 
         <LinearLayout
@@ -79,44 +66,29 @@
                 android:orientation="vertical"
                 android:paddingTop="10dp" >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <TextView
-                        android:id="@+id/txt_comment_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="5dp"
-                        android:text="@string/titulo_dospuntos"
-                        android:textColor="@color/gris_oscuro"
-                        android:textSize="20dp" />
-
-                    <TextView
-                        android:id="@+id/txt_contador_caracteres_titulo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="right|center_vertical"
-                        android:gravity="right|center_vertical"
-                        android:text="0/75"
-                        android:textColor="@color/gris_medio" />
-
-                </LinearLayout>
-
                 <EditText
                     android:id="@+id/edit_create_escandalo_title"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="70dp"
+                    android:layout_weight="1"
                     android:background="@color/blanco"
                     android:ems="10"
+                    android:hint="@string/introduce_un_titulo"
                     android:maxLength="75"
-                    android:minLines="4"
+                    android:minLines="3"
                     android:paddingLeft="5dp"
                     android:textColor="@color/azul"
-                    android:textSize="20dp" >
+                    android:textColorHint="@color/azul_hint"
+                    android:textSize="20dp" />
 
-                    <requestFocus />
-                </EditText>
+                <TextView
+                    android:id="@+id/txt_create_contadortitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="right|center_vertical"
+                    android:text="0/75"
+                    android:textColor="@color/gris_medio" />
 
             </LinearLayout>
 
@@ -141,9 +113,9 @@
                     android:id="@+id/rg_create_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:layout_gravity="center_horizontal" >
+                    android:orientation="horizontal" >
 
                     <RadioButton
                         android:id="@+id/rb_create_category_happy"
@@ -164,8 +136,31 @@
                         android:text="@string/denuncia"
                         android:textColor="@color/gris_oscuro"
                         android:textSize="18sp" />
-
                 </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_create_firstcomment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:orientation="vertical"
+                android:visibility="invisible" >
+
+                <EditText
+                    android:id="@+id/edit_create_firstcomment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blanco"
+                    android:ems="10"
+                    android:maxLength="75"
+                    android:minLines="3"
+                    android:paddingLeft="5dp"
+                    android:textColor="@color/azul"
+                    android:textSize="20dp"
+                    android:hint="@string/aniade_un_primer_comentario"
+                    android:textColorHint="@color/azul_hint" >
+                </EditText>
             </LinearLayout>
 
         </LinearLayout>
@@ -175,9 +170,25 @@
             android:layout_height="match_parent"
             android:layout_weight="1.1"
             android:orientation="vertical" >
-
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp" >
+
+        <ImageView
+            android:id="@+id/img_new_escandalo_subir"
+            android:layout_width="100dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/subir_nube_selector"
+            android:paddingRight="5dp" />
     </LinearLayout>
 
 </LinearLayout>

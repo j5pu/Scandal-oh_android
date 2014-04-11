@@ -35,6 +35,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseInstallation;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
+import com.bizeu.escandaloh.util.Utils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
@@ -392,7 +393,7 @@ public class RegistrationActivity extends SherlockActivity {
 			all_correct = false;
 		}
 		// Email incorrecto
-		if (!isEmailValid(edit_email_usuario.getText().toString())){
+		if (!Utils.isEmailValid(edit_email_usuario.getText().toString())){
 			edit_email_usuario.setError(getResources().getString(R.string.introduce_una_direccion_email_valida));
 			all_correct = false;
 		}	
@@ -415,24 +416,7 @@ public class RegistrationActivity extends SherlockActivity {
 	}
 	
 	
-	/**
-	 * Comprueba si un string tiene formato de email
-	 * @param email
-	 * @return
-	 */
-	public static boolean isEmailValid(String email) {
-	    boolean isValid = false;
 
-	    String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-	    CharSequence inputStr = email;
-
-	    Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-	    Matcher matcher = pattern.matcher(inputStr);
-	    if (matcher.matches()) {
-	        isValid = true;
-	    }
-	    return isValid;
-	}
 	
 }
 

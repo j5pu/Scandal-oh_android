@@ -55,6 +55,9 @@ import com.actionbarsherlock.view.MenuItem;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.*;
+import com.bizeu.escandaloh.dialogs.EnterUrlDialog;
+import com.bizeu.escandaloh.dialogs.RecordAudioDialog;
+import com.bizeu.escandaloh.dialogs.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.notifications.NotificationsActivity;
@@ -69,8 +72,6 @@ import com.bizeu.escandaloh.util.Utils;
 import com.countrypicker.CountryPicker;
 import com.countrypicker.CountryPickerListener;
 import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseAnalytics;
 
@@ -79,11 +80,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	public static final int NUM_SCANDALS_TO_LOAD = 15;
 	public static final int NUM_SCANDALS_TO_LOAD_FIRST_TIME = 10;
-	public static final int SHOW_CAMERA = 10;
+	public static final int FROM_CAMERA = 10;
 	private static final int CREATE_ESCANDALO = 11;
 	public static final int FROM_GALLERY = 12;
 	public static final int SHARING = 13;
 	public static final int SHOW_PROFILE = 14;
+	public static final int FROM_AUDIO = 16;
+	public static final int FROM_URL = 17;
 	public static final String CATEGORY = "Category";
 	public static final String ANGRY = "Denuncia";
 	public static final String HAPPY = "Humor";
@@ -96,7 +99,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private LinearLayout ll_refresh;
 	private LinearLayout ll_take_photo;
 	private ImageView img_update_list;
-	private ImageView img_take_photo;
 	private LinearLayout ll_lateral_notificaciones;
 	private LinearLayout ll_lateral_pais;
 	private LinearLayout ll_lateral_busqueda;
@@ -172,7 +174,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		img_update_list = (ImageView) findViewById(R.id.img_actionbar_updatelist);
 		ll_refresh = (LinearLayout) findViewById(R.id.ll_main_refresh);
 		ll_refresh.setOnClickListener(this);
-		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
@@ -557,7 +558,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		// Escándalo desde la cámara
-		if (requestCode == SHOW_CAMERA) {
+		if (requestCode == FROM_CAMERA) {
 			if (resultCode == RESULT_OK) {
 				if (mImageUri != null) {
 					// Guardamos la foto en la galería
@@ -566,13 +567,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 					// Mostramos la pantalla de subir escándalo
 					Intent i = new Intent(MainActivity.this,CreateScandalohActivity.class);
-					i.putExtra("photo_from", SHOW_CAMERA);
+					i.putExtra("photo_from", FROM_CAMERA);
 					i.putExtra("photoUri", mImageUri.toString());
 					startActivityForResult(i, CREATE_ESCANDALO);
 				} else {
-					Toast toast = Toast.makeText(mContext, getResources()
-							.getString(R.string.hubo_algun_error_camara),
-							Toast.LENGTH_LONG);
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.hubo_algun_error_camara),
+									Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}
@@ -622,90 +622,79 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Si está logueado
 				if (MyApplication.logged_user) {
 					
-					// Creamos un menu para elegir entre hacer foto con la
-					// cámara o cogerla de la galería
-					final CharSequence[] items = {
-							getResources().getString(
-									R.string.hacer_foto_con_camara),
-							getResources().getString(
-									R.string.seleccionar_foto_galeria) };
+					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+					final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara),
+												getResources().getString(R.string.seleccionar_foto_galeria),
+												getResources().getString(R.string.subir_audio),
+												getResources().getString(R.string.subir_desde_url)
+					};
+					
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							MainActivity.this);
-					builder.setTitle(R.string.aniadir_foto);
-					builder.setItems(items,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int item) {
+					builder.setTitle(R.string.subir_escandalo);
+					builder.setItems(items,new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog,int item) {
 
-									// Cámara
-									if (items[item]
-											.equals(getResources()
-													.getString(
-															R.string.hacer_foto_con_camara))) {
+							// SUBIR FOTO CON LA CAMARA
+							if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
 
-										// Mandamos el evento a Google Analytics
-										EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-										easyTracker.send(MapBuilder.createEvent(
-																"Acción UI",
-																"Selección realizada",
-																"Hacer foto desde la cámara",
-																null).build());
-
-										// Si dispone de cámara iniciamos la
-										// cámara
-										if (Utils.checkCameraHardware(mContext)) {
-											Intent takePictureIntent = new Intent(
-													"android.media.action.IMAGE_CAPTURE");
-											File photo = null;
-											photo = createFileTemporary(
-													"picture", ".png");
-											if (photo != null) {
-												mImageUri = Uri.fromFile(photo);
-												takePictureIntent.putExtra(
-																MediaStore.EXTRA_OUTPUT,
-																mImageUri);
-												startActivityForResult(
-														takePictureIntent,
-														SHOW_CAMERA);
-												photo.delete();
-											}
-										}
-										// El dispositivo no dispone de cámara
-										else {
-											Toast toast = Toast
-													.makeText(
-															mContext,
-															R.string.este_dispositivo_no_dispone_camara,
-															Toast.LENGTH_LONG);
-											toast.show();
-										}
-									}
-
-									// Galería
-									else if (items[item]
-											.equals(getResources()
-													.getString(
-															R.string.seleccionar_foto_galeria))) {
-
-										// Mandamos el evento a Google Analytics
-										EasyTracker easyTracker = EasyTracker
-												.getInstance(mContext);
-										easyTracker
-												.send(MapBuilder
-														.createEvent(
-																"Acción UI",
-																"Selección realizada",
-																"Subir foto desde la galería",
-																null).build());
-
-										Intent i = new Intent(
-												Intent.ACTION_PICK,
-												android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-										startActivityForResult(i, FROM_GALLERY);
+								// Si dispone de cámara iniciamos la cámara
+								if (Utils.checkCameraHardware(mContext)) {
+									Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+									File photo = null;
+									photo = createFileTemporary("picture", ".png");
+									if (photo != null) {mImageUri = Uri.fromFile(photo);
+										takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,mImageUri);
+										startActivityForResult(takePictureIntent,FROM_CAMERA);
+										photo.delete();
 									}
 								}
-							});
+										
+								// El dispositivo no dispone de cámara
+								else {
+									Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,
+												Toast.LENGTH_LONG);
+									toast.show();
+								}
+							}
+
+							// SUBIR FOTO DE LA GALERIA
+							else if (items[item].equals(getResources().getString(R.string.seleccionar_foto_galeria))) {
+
+								Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+								startActivityForResult(i, FROM_GALLERY);
+							}
+									
+							// SUBIR AUDIO
+							else if (items[item].equals(getResources().getString(R.string.subir_audio))){
+										
+								// Mostramos el dialog de grabación de audio
+								RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
+								record_audio.setDialogResult(new OnMyDialogResult() {
+									public void finish(String result) {
+										if (result.equals("OK")) {
+											Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
+											i.putExtra("photo_from", FROM_AUDIO);
+											startActivity(i);
+										}
+									}
+								});
+								record_audio.setCancelable(false);
+								record_audio.show();
+							}
+									
+							// SUBIR DESDE URL
+							else if (items[item].equals(getResources().getString(R.string.subir_desde_url))){
+										
+								// Mostramos el dialog de introducir url
+								EnterUrlDialog record_audio = new EnterUrlDialog(mContext);
+								record_audio.setCancelable(false);
+								record_audio.show();
+							}
+						}
+					});
 					builder.show();
 				}
 				
@@ -1269,22 +1258,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 				switch (pos) {
 				case 0: // Humor
 					if (category.equals(ANGRY)) {
-						// Mandamos el evento a Google Analytics
-						EasyTracker easyTracker2 = EasyTracker
-								.getInstance(mContext);
-						easyTracker2.send(MapBuilder.createEvent("Acción UI",
-								"Selección realizada", "Seleccionado humor",
-								null).build());
 						category = HAPPY;
 					}
 					break;
 				case 1: // Denuncia
-					// Mandamos el evento a Google Analytics
-					EasyTracker easyTracker3 = EasyTracker
-							.getInstance(mContext);
-					easyTracker3.send(MapBuilder.createEvent("Acción UI",
-							"Selección realizada", "Seleccionado denuncia",
-							null).build());
 					category = ANGRY;
 					break;
 				}
@@ -1340,13 +1317,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			e.printStackTrace();
 			Log.e(this.getClass().toString(),
 					"No se pudo crear el archivo temporal para la foto");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(mContext, null) 
-							.getDescription(Thread.currentThread().getName(),
-									e), // The exception.
-					false).build());
 			Toast toast = Toast.makeText(mContext,
 					R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
 			toast.show();

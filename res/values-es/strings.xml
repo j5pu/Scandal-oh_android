@@ -198,5 +198,16 @@
     <string name="nueva_contrasenia">Nueva contraseña</string>
     <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
     <string name="buscar_en_scandaloh">Buscar en ScandalOh</string>
+    <string name="subir_escandalo">Subir escándalo</string>
+    <string name="subir_audio">Subir grabación de audio</string>
+    <string name="subir_desde_url">Subir desde url</string>
+    <string name="aniadir_audio">Añadir audio</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="volver_a_grabar">Volver a grabar</string>
+    <string name="reproducir">Reproducir</string>
+    <string name="introduce_url">Introduce la url:</string>
+    <string name="url">URL</string>
+    <string name="aniade_un_primer_comentario">Añade un primer comentario (opcional):</string>
+    <string name="introduce_un_titulo">Introduce un título (opcional)</string>
 
 </resources>

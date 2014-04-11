@@ -1,6 +1,7 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -15,10 +16,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,15 +30,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.applidium.shutterbug.FetchableImageView;
-import com.bizeu.escandaloh.dialogs.RecordAudioDialog;
-import com.bizeu.escandaloh.dialogs.RecordAudioDialog.OnMyDialogResult;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -61,11 +61,17 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private EditText edit_title;
 	private RadioGroup radio_category;
 	private TextView txt_contador_titulo;
+	private ProgressDialog share_progress;
+	private LinearLayout ll_audio;
+	private LinearLayout ll_photo;
+	private Button but_play;
+	private LinearLayout ll_first_comment;
+	private EditText edit_first_comment;
+	
 	private String selected_category;
 	private String written_title;
 	private Bitmap taken_photo;
 	private Uri mImageUri;
-	private ProgressDialog share_progress;
 	private Context mContext;
 	private Activity acti;
 	private File audio_file;
@@ -79,6 +85,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String preview_img;
 	private String preview_favicon;
 	private String preview_title;
+	private String first_comment;
 
 	/**
 	 * OnCreate
@@ -99,6 +106,14 @@ public class CreateScandalohActivity extends SherlockActivity {
 		getSupportActionBar().hide();
 
 		img_picture = (FetchableImageView) findViewById(R.id.img_new_escandalo_photo);
+		ll_audio = (LinearLayout) findViewById(R.id.ll_create_audio);
+		ll_photo = (LinearLayout) findViewById(R.id.ll_create_foto);
+		but_play = (Button) findViewById(R.id.but_create_play_audio);
+		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
+		ll_first_comment = (LinearLayout) findViewById(R.id.ll_create_firstcomment);
+		edit_first_comment = (EditText) findViewById(R.id.edit_create_firstcomment);
+		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
+		txt_contador_titulo = (TextView) findViewById(R.id.txt_create_contadortitulo);
 
 		// Mostramos la foto
 		if (getIntent() != null) {
@@ -109,7 +124,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				photo_string = data.getExtras().getString("photoUri");
 
 				// Si se ha tomado de la cámara
-				if (photo_from == MainActivity.SHOW_CAMERA) {
+				if (photo_from == MainActivity.FROM_CAMERA) {
 					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
 					this.getContentResolver().notifyChange(mImageUri, null);
 					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
@@ -123,6 +138,26 @@ public class CreateScandalohActivity extends SherlockActivity {
 					img_picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
 					taken_photo = BitmapFactory.decodeFile(photo_string);
 				}
+				
+				// Subir audio
+				else if (photo_from == MainActivity.FROM_AUDIO){
+					// Ocultamos la foto y mostramos el audio
+					ll_audio.setVisibility(View.VISIBLE);
+					ll_photo.setVisibility(View.GONE);
+					con_audio = true;
+				}
+				
+				// Desde url
+				else if (photo_from == MainActivity.FROM_URL){
+					shared_url = data.getExtras().getString("shareUri");
+					// Hacemos que el título no parezca un edittext
+					edit_title.setKeyListener(null);
+					edit_title.setBackgroundColor(getResources().getColor(R.color.gris_claro));
+					txt_contador_titulo.setVisibility(View.INVISIBLE);			
+					// Mostramos el edit del primer comentario
+					ll_first_comment.setVisibility(View.VISIBLE);
+					new GetPreviewScandalFromUrlTask().execute();
+				}
 
 				// Se ha compartido una imagen (galería)
 				else if (photo_from == CoverActivity.FROM_SHARING_PICTURE) {
@@ -132,17 +167,21 @@ public class CreateScandalohActivity extends SherlockActivity {
 					img_picture.setImageBitmap(taken_photo);
 				}
 				
-				// Se ha compartido un texto (url)
+				// Se ha compartido una url
 				else if (photo_from == CoverActivity.FROM_SHARING_TEXT){
 					shared_url = data.getExtras().getString("shareUri");
+					// Hacemos que el título no parezca un edittext
+					edit_title.setKeyListener(null);
+					edit_title.setBackgroundColor(getResources().getColor(R.color.gris_claro));
+					txt_contador_titulo.setVisibility(View.INVISIBLE);
+					// Mostramos el edit del primer comentario
+					ll_first_comment.setVisibility(View.VISIBLE);
 					new GetPreviewScandalFromUrlTask().execute();
-					Log.v("WE","share uri: " + shared_url);
-				}
+				}				
+				
 			}
 		}
-
-		radio_category = (RadioGroup) findViewById(R.id.rg_create_category);
-		txt_contador_titulo = (TextView) findViewById(R.id.txt_contador_caracteres_titulo);
+		
 		// Cada vez que se modifique el titulo actualizamos el contador: x/75
 		edit_title = (EditText) findViewById(R.id.edit_create_escandalo_title);
 		edit_title.addTextChangedListener(new TextWatcher() {
@@ -172,7 +211,13 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Si hay conexión
 				if (Connectivity.isOnline(mContext)) {
-					uploadScandaloh();
+					// Mostramos el mensaje de subiendo escándalo
+					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
+					toast.show();
+					// Enviamos el escándalo en un hilo aparte
+					new SendScandalTask().execute();
+					// Cerramos la pantalla
+					acti.finish();
 				} else {
 					Toast toast;
 					toast = Toast.makeText(
@@ -184,8 +229,18 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 			}
 		});
+		
+		but_play.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Audio.getInstance(mContext).startPlaying();
+			}
+		});
 	}
 
+	
+	
 	/**
 	 * onStart
 	 */
@@ -195,6 +250,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 		EasyTracker.getInstance(mContext).activityStart(this);
 	}
 
+	
+	
 	/**
 	 * onStop. Liberamos los recursos del audio
 	 */
@@ -204,84 +261,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 		Audio.getInstance(mContext).releaseResources();
 	}
 
-
 	
-	
-	/**
-	 * Sube un escándalo
-	 */
-	private void uploadScandaloh() {
-
-		// Inicializamos el alert dialog
-		AlertDialog.Builder dialog_audio = new AlertDialog.Builder(mContext);
-		dialog_audio.setMessage(getResources().getString(
-				R.string.quieres_aniadir_un_audio));
-		dialog_audio.setPositiveButton(R.string.si,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogo1, int id) {
-
-						// Enviamos el evento a Google Analytics
-						EasyTracker easyTracker = EasyTracker
-								.getInstance(mContext);
-						easyTracker.send(MapBuilder.createEvent("Acción UI", // Event
-																				// category
-																				// (required)
-								"Botón clickeado", // Event action (required)
-								"Acepta agregar audio", // Event label
-								null) // Event value
-								.build());
-
-						// Mostramos el dialog del audio
-						RecordAudioDialog record_audio = new RecordAudioDialog(
-								mContext, Audio.getInstance(mContext));
-						record_audio.setDialogResult(new OnMyDialogResult() {
-							public void finish(String result) {
-								if (result.equals("OK")) {
-									con_audio = true;
-								} else if (result.equals("CANCELED")) {
-									con_audio = false;
-								}
-								// Mostramos un mensaje
-								Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
-								toast.show();
-								// Enviamos el escándalo en un hilo aparte
-								new SendScandalTask().execute();
-								// Cerramos la pantalla
-								acti.finish();
-							}
-						});
-						record_audio.setCancelable(false);
-						record_audio.show();
-					}
-				});
-		dialog_audio.setNegativeButton(R.string.no,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialogo1, int id) {
-
-						// Enviamos el evento a Google Analytics
-						EasyTracker easyTracker = EasyTracker
-								.getInstance(mContext);
-						easyTracker.send(MapBuilder.createEvent("Acción UI", // Event
-																				// category
-																				// (required)
-								"Botón clickeado", // Event action (required)
-								"Rechaza agregar audio", // Event label
-								null) // Event value
-								.build());
-
-						// Enviamos el escandalo sin audio
-						con_audio = false;
-						Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
-						toast.show();
-						new SendScandalTask().execute();
-						finish();
-					}
-				});
-
-		// Mostramos el dialog del audio
-		dialog_audio.show();
-
-	}
 
 	/**
 	 * Sube un escandalo al servidor
@@ -310,6 +290,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Obtenemos los datos y comprimimos en Multipart para su envío
 				written_title = edit_title.getText().toString();
+				first_comment = edit_first_comment.getText().toString();
+				
 				if (written_title.equals("")) {
 					written_title = getResources().getString(R.string.foto_sin_titulo);
 				}
@@ -328,6 +310,9 @@ public class CreateScandalohActivity extends SherlockActivity {
 				
 				if (con_audio) {
 					audio_file = new File(Audio.getInstance(mContext).getPath());
+					if (audio_file == null){
+						any_error = true;
+					}
 					FileBody audioBody = new FileBody(audio_file);
 					reqEntity.addPart("sound", audioBody);
 				}
@@ -340,8 +325,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 				reqEntity.addPart("category", categoryBody);
 				reqEntity.addPart("country", codeCountryBody);
 				
-				// Si se ha compartido un enlace añadimos el source(url), favicon, foto(url) y media_type=1
-				if (photo_from == CoverActivity.FROM_SHARING_TEXT){
+				// Si es a partir de una url añadimos el source(url), favicon, foto(url) y media_type=1
+				if (photo_from == CoverActivity.FROM_SHARING_TEXT || photo_from == MainActivity.FROM_URL){
 					StringBody imgBody = new StringBody(preview_img);
 					StringBody faviconBody = new StringBody(preview_favicon);
 					StringBody sourceBody = new StringBody(preview_source);
@@ -349,10 +334,17 @@ public class CreateScandalohActivity extends SherlockActivity {
 					reqEntity.addPart("img", imgBody);
 					reqEntity.addPart("favicon", faviconBody);
 					reqEntity.addPart("source", sourceBody);
-					reqEntity.addPart("media_type", mediaBody);				
+					reqEntity.addPart("media_type", mediaBody);	
+					
+					// Si hay un primer comentario lo añadimos
+					if (first_comment.length() > 0){
+						StringBody firstCommentBody = new StringBody(first_comment);
+						reqEntity.addPart("comment", firstCommentBody);
+					}
 				}
-				// Si no añadimos la foto
-				else{
+				
+				// Si viene de la cámara o la galería añadimos la foto
+				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY){
 					f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
 					FileBody bin1 = new FileBody(f);
 					reqEntity.addPart("img", bin1);
