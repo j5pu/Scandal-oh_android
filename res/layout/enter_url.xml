@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lay_pantalla_recordar"
+    android:layout_width="300dp"
+    android:layout_height="150dp"
+    android:background="@color/gris_claro"
+    android:orientation="vertical"
+    android:paddingBottom="23dp"
+    android:paddingLeft="23dp"
+    android:paddingRight="23dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:gravity="center_vertical|center_horizontal" >
+
+            <EditText
+                android:id="@+id/edit_enterurl_url"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:hint="@string/url"
+                android:textColorHint="@color/azul_hint"
+                android:textColor="@color/azul"
+                android:paddingLeft="5dp" >
+            </EditText>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/but_enterurl_cancelar"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@drawable/blue_button_selector"
+                android:text="@string/cancelar"
+                android:textSize="22dp"
+                android:textColor="@color/blanco" />
+
+            <Button
+                android:id="@+id/but_enterurl_aceptar"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="2"
+                android:background="@drawable/blue_button_selector"
+                android:clickable="true"
+                android:text="@string/aceptar"
+                android:textAlignment="center"
+                android:textSize="22dp"
+                android:textColor="@color/blanco" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical|left"
-                android:text="@string/subir_sin_audio"
+                android:text="@string/cancelar"
                 android:textColor="@color/azul"
                 android:textSize="20dp" />
 
@@ -36,19 +36,20 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="2"
-            android:gravity="center_vertical"
-            android:orientation="vertical" >
+            android:layout_height="match_parent"
+            android:layout_weight="3.5"
+            android:orientation="vertical"
+            android:gravity="right" >
 
-            <ImageView
-                android:id="@+id/img_subir_foto_audio"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:layout_gravity="right|center_vertical"
-                android:src="@drawable/nube"
-                android:visibility="gone" />
+            <TextView
+                android:id="@+id/txt_subir_foto_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|right"
+                android:text="@string/aceptar"
+                android:textColor="@color/azul"
+                android:textSize="20dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
     </LinearLayout>

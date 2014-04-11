@@ -43,6 +43,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 	private SharedPreferences prefs;
 	private CheckBoxPreference checkA;
 	private CheckBoxPreference checkN;
+	private PreferenceCategory prefN;
 
 
 	/**
@@ -60,10 +61,16 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 
 		checkA = (CheckBoxPreference) findPreference("autoreproduccion");
 		checkN = (CheckBoxPreference) findPreference("notifications");
+		prefN = (PreferenceCategory) findPreference("notificationsCategory");
 		
         actBar.setHomeButtonEnabled(true);
         actBar.setDisplayHomeAsUpEnabled(true);
 
+        if (!MyApplication.logged_user){
+        	PreferenceScreen preferenceScreen = getPreferenceScreen();
+        	preferenceScreen.removePreference(prefN);
+        }
+        
 		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 		
 		// Obtenemos si el usuario tiene activado o no las notificaciones

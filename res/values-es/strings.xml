@@ -202,5 +202,14 @@
     <string name="no_tienes_notificaciones">No tienes notificaciones.</string>
     <string name="recibir_notificaciones">Recibir notificaciones</string>
     <string name="escandalo_enviado_con_exito">¡Escándalo enviado con éxito!</string>
+    <string name="reproducir">Reproducir</string>
+    <string name="introduce_url">Introduce la url:</string>
+    <string name="url">URL</string>
+    <string name="aniade_un_primer_comentario">Añade un primer comentario (opcional):</string>
+    <string name="introduce_un_titulo">Introduce un título (opcional)</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="subir_escandalo">Subir escándalo</string>
+    <string name="subir_audio">Subir grabación de audio</string>
+    <string name="subir_desde_url">Subir desde url</string>
 
 </resources>

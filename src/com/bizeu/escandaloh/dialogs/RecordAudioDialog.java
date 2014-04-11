@@ -3,7 +3,6 @@ package com.bizeu.escandaloh.dialogs;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,14 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.Audio.PlayListener;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class RecordAudioDialog extends Dialog {
@@ -30,11 +26,11 @@ public class RecordAudioDialog extends Dialog {
 
 	private TextView txt_meter;
 	private Button but_reproducir; // Botón de empezar a reproducir
-	private Button but_abajo; // Botón de grabar y parar (tanto grabar como
-								// reproducir)
-	private TextView txt_subir_sin_audio;
+	private Button but_abajo; // Botón de grabar y parar (tanto grabar como reproducir)
+	private TextView txt_aceptar;
+	private TextView txt_cancelar;
 	private TextView txt_seg;
-	private ImageView img_subir_foto;
+
 	private TextView txt_description;
 	private LinearLayout ll_espacio_botones;
 
@@ -76,29 +72,19 @@ public class RecordAudioDialog extends Dialog {
 		txt_description = (TextView) findViewById(R.id.txt_recordar_descripcion);
 		txt_seg = (TextView) findViewById(R.id.txt_seg);
 
-		// Botón de subir sin audio
-		txt_subir_sin_audio = (TextView) findViewById(R.id.txt_cancelar_foto_audio);
-		txt_subir_sin_audio.setOnClickListener(new View.OnClickListener() {
+		// Botón de cancelar
+		txt_cancelar = (TextView) findViewById(R.id.txt_cancelar_foto_audio);
+		txt_cancelar.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-
-				// Enviamos el evento a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createEvent("Acción UI", // Event
-																		// category
-																		// (required)
-						"Botón clickeado", // Event action (required)
-						"Ha subido escándalo sin audio añadido", // Event label
-						null) // Event value
-						.build());
 
 				// Si estamos reproduciendo audio: lo paramos
 				if (Audio.getInstance(mContext).isPlaying()) {
 					Audio.getInstance(mContext).stopPlaying();
 				}
 
-				// Indicamos a la actividad que queremos subir sin audio
+				// Indicamos a la actividad que ha cancelado
 				if (mDialogResult != null) {
 					mDialogResult.finish("CANCELED");
 				}
@@ -108,22 +94,12 @@ public class RecordAudioDialog extends Dialog {
 			}
 		});
 
-		// Imagen de subir foto (con audio)
-		img_subir_foto = (ImageView) findViewById(R.id.img_subir_foto_audio);
-		img_subir_foto.setOnClickListener(new View.OnClickListener() {
+		// Aceptar
+		txt_aceptar = (TextView) findViewById(R.id.txt_subir_foto_audio);
+		txt_aceptar.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-
-				// Enviamos el evento a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createEvent("Acción UI", // Event
-																		// category
-																		// (required)
-						"Botón clickeado", // Event action (required)
-						"Ha subido escándalo con audio añadido", // Event label
-						null) // Event value
-						.build());
 
 				// Si estamos reproduciendo audio: lo paramos
 				if (Audio.getInstance(mContext).isPlaying()) {
@@ -167,11 +143,10 @@ public class RecordAudioDialog extends Dialog {
 						// grabación y el botón de reproducir
 						ll_espacio_botones.setVisibility(View.VISIBLE);
 						but_abajo.setText(R.string.grabar);
-						img_subir_foto.setVisibility(View.VISIBLE);
-						txt_subir_sin_audio.setVisibility(View.VISIBLE);
+						txt_aceptar.setVisibility(View.VISIBLE);
+						txt_cancelar.setVisibility(View.VISIBLE);
 						but_reproducir.setVisibility(View.VISIBLE);
-						txt_description
-								.setText(R.string.audio_grabado_dospuntos);
+						txt_description.setText(R.string.audio_grabado_dospuntos);
 						txt_seg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 						txt_meter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35F);
 						int recorded_seconds = RECORD_TIME - contador;
@@ -206,8 +181,8 @@ public class RecordAudioDialog extends Dialog {
 						txt_meter.setText("00:" + Integer.toString(contador));
 						but_abajo.setText(R.string.parar);
 						but_reproducir.setVisibility(View.GONE);
-						img_subir_foto.setVisibility(View.GONE);
-						txt_subir_sin_audio.setVisibility(View.GONE);
+						txt_aceptar.setVisibility(View.GONE);
+						txt_cancelar.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -258,8 +233,8 @@ public class RecordAudioDialog extends Dialog {
 						// Hacemos los cambios necesarios a la IU
 						ll_espacio_botones.setVisibility(View.VISIBLE);
 						but_abajo.setText(R.string.grabar);
-						img_subir_foto.setVisibility(View.VISIBLE);
-						txt_subir_sin_audio.setVisibility(View.VISIBLE);
+						txt_aceptar.setVisibility(View.VISIBLE);
+						txt_cancelar.setVisibility(View.VISIBLE);
 						but_reproducir.setVisibility(View.VISIBLE);
 						txt_description
 								.setText(R.string.audio_grabado_dospuntos);
