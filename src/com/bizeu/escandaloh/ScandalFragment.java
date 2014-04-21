@@ -208,6 +208,8 @@ public class ScandalFragment extends SherlockFragment {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
+		Log.v("WE","activity name: " + getActivity().getClass().getName().toString());
+		
 	    if(requestCode == SHOW_COMMENTS && resultCode == Activity.RESULT_OK) {
 	    	if (data.getExtras() != null){ 
 	    		

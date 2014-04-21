@@ -46,10 +46,8 @@ public class CoverActivity extends Activity {
 		
 		// Si es la primera vez que usa la app 
 		if (MyApplication.code_selected_country == null){
-			Log.v("WE","code null");
 			// Obtenemos el código del país por IP
 			String country_code = Locale.getDefault().getCountry();
-			Log.v("WE","country: " + country_code);
 			MyApplication.code_selected_country = country_code;
 			SharedPreferences prefs = getBaseContext().getSharedPreferences(
       		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
@@ -59,7 +57,6 @@ public class CoverActivity extends Activity {
 			// TODO Mostrar pantalla de bienvenida
 		}
 		else{
-			Log.v("WE","code no null");
 			// Obtenemos si el usuario estaba logueado
 			String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
 			if (session_token != null){

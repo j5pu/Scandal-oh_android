@@ -46,10 +46,18 @@ public class BrowserNewsActivity extends SherlockActivity {
 			Intent i = getIntent();
 			url = i.getStringExtra("source");
 			web = (WebView) findViewById(R.id.wb_browser_noticia);
-			web.getSettings().setBuiltInZoomControls(true);
+				
+			// Hacemos que funcione todo (instagram, vine, facebook, twitter, ... etc)
 			web.setWebViewClient(new MyWebViewClient());
-
+			web.setKeepScreenOn(true);
+			web.getSettings().setJavaScriptEnabled(true);
+			web.getSettings().setDomStorageEnabled(true);
+			web.getSettings().setBuiltInZoomControls(true);
+			web.setInitialScale(100);
+			web.getSettings().setUseWideViewPort(true);
+			web.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 			web.loadUrl(url);
+
 		}	
 		
 		// Action Bar
@@ -120,12 +128,13 @@ public class BrowserNewsActivity extends SherlockActivity {
 					i = new Intent(BrowserNewsActivity.this, LoginSelectActivity.class);
 				}
 				
-				// Mantamos la url actual
+				// Mandamos la url actual
 				WebBackForwardList mWebBackForwardList = web.copyBackForwardList();
 				String lastUrl = mWebBackForwardList.getItemAtIndex(mWebBackForwardList.getCurrentIndex()).getUrl();
 				i.putExtra("photo_from", CoverActivity.FROM_SHARING_TEXT);
 				i.putExtra("shareUri", lastUrl);
 				startActivity(i);
+				finish();
 			}
 		});
 	}
@@ -142,6 +151,17 @@ public class BrowserNewsActivity extends SherlockActivity {
 	    	break;
 		}
 		return true;
+	}
+	
+
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop(){
+		super.onStop();
+		// Liberamos el webview
+		web.destroy();
 	}
 	
 	/**
