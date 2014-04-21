@@ -259,6 +259,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
+		// Menu Lateral: si no toca una opción que no haga nada
+		ll_menu_lateral.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {		
+			}
+		});
+		
 		// Notificaciones
 		ll_lateral_notificaciones.setOnClickListener(new View.OnClickListener() {
 			
