@@ -117,6 +117,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	DrawerLayout mDrawerLayout;
 	private FetchableImageView img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
+	private TextView txt_action_bar_num_notis;
+	
 	private TextView txt_num_notifs;
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
@@ -187,6 +189,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
+		txt_action_bar_num_notis = (TextView) findViewById(R.id.txt_action_bar_num_notis);
 
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
@@ -452,6 +455,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 					getResources().getString(R.string.no_dispones_de_conexion),
 					Toast.LENGTH_SHORT);
 			toast.show();
+			// Quitamos el loading y mostramos los escándalos
+			pager.setVisibility(View.VISIBLE);
+			loading.setVisibility(View.GONE);
 		}
 	}
 	
@@ -1248,9 +1254,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			else {
 				if (result > 0){
 					txt_num_notifs.setText(result.toString());
+					txt_action_bar_num_notis.setText(result.toString());
 				}
 				else{
 					txt_num_notifs.setText("");
+					txt_action_bar_num_notis.setText("");
 				}
 			}
 		}

@@ -235,8 +235,6 @@ public class NotificationsActivity extends SherlockActivity {
 					n_photo_img_p = notiObject.getString("photo_img_small");
 					n_text = new String(notiObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 					n_photo_id = notiObject.getString("photo_id");
-					
-					Log.v("WE","is_read: " + n_is_read);
 
 					Notification notiAux = new Notification(n_text, n_photo_img_p, n_photo_id, n_is_read);
 					array_notifications.add(notiAux);
