@@ -48,13 +48,13 @@ public class BrowserNewsActivity extends SherlockActivity {
 			web = (WebView) findViewById(R.id.wb_browser_noticia);
 				
 			// Hacemos que funcione todo (instagram, vine, facebook, twitter, ... etc)
-			web.setWebViewClient(new MyWebViewClient());
-			web.setKeepScreenOn(true);
+			web.setKeepScreenOn(false);
 			web.getSettings().setJavaScriptEnabled(true);
 			web.getSettings().setDomStorageEnabled(true);
 			web.getSettings().setBuiltInZoomControls(true);
 			web.setInitialScale(100);
 			web.getSettings().setUseWideViewPort(true);
+			web.setWebViewClient(new MyWebViewClient());
 			web.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 			web.loadUrl(url);
 
@@ -152,17 +152,7 @@ public class BrowserNewsActivity extends SherlockActivity {
 		}
 		return true;
 	}
-	
 
-	/**
-	 * onStop
-	 */
-	@Override
-	public void onStop(){
-		super.onStop();
-		// Liberamos el webview
-		web.destroy();
-	}
 	
 	/**
 	 * Al pulsar el botón back vuelve a la noticia anterior o a la aplicación si no hay historial

@@ -75,20 +75,25 @@ public class CoverActivity extends Activity {
 		String shared = null;
 		int sharing_type = 0;
 		
+		Log.v("WE2","action: "+ getIntent().getAction());
+		
 		// La aplicación se ha iniciado porque se ha compartido desde otra app 
 		if (getIntent().getAction().equals(Intent.ACTION_SEND)){
+			Bundle extras = getIntent().getExtras();
 			Intent i = getIntent();
-			
+			Log.v("WE","type: " + i.getType());
+
 			// Es una foto
-			if (i.getType().equals("image/*")){	
+			if (extras.containsKey(Intent.EXTRA_STREAM)){
 				Uri shareUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
 				shared = shareUri.toString();
+				Log.v("WE","shared: " + shared);
 				sharing_type = FROM_SHARING_PICTURE;
 			}
-			
+
 			// Es texto (Url)
-			else if (i.getType().equals("text/plain")){
-				shared = i.getStringExtra(Intent.EXTRA_TEXT);
+			else if (extras.containsKey(Intent.EXTRA_TEXT)){
+				shared = (String) extras.getCharSequence(Intent.EXTRA_TEXT);
 				sharing_type = FROM_SHARING_TEXT;
 			}
 			

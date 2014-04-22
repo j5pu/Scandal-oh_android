@@ -344,7 +344,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 
 				// Si viene de la cámara o la galería añadimos la foto
-				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY){
+				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY || photo_from == CoverActivity.FROM_SHARING_PICTURE){
 					f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
 					FileBody bin1 = new FileBody(f);
 					reqEntity.addPart("img", bin1);
