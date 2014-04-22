@@ -136,8 +136,8 @@ public class LoginSelectActivity extends SherlockActivity {
 			public void call(Session session, SessionState state,
 					Exception exception) {
 				progress.show();
+				// Sesión abierta
 				if (session.isOpened()) {
-					Log.i(TAG_FACEBOOK, "Access Token" + session.getAccessToken());
 					access_token = session.getAccessToken();
 					Request.newMeRequest(session,new Request.GraphUserCallback() {
 								@Override
@@ -145,8 +145,6 @@ public class LoginSelectActivity extends SherlockActivity {
 									
 									if (user != null) {									
 										username = user.getUsername();
-										// Cerramos sesión facebook: sólo queremos el nombre e email
-										Session.getActiveSession().closeAndClearTokenInformation();
 										new LogInSocialNetwork().execute(LOGGING_FACEBOOK);
 									}
 									else{
@@ -156,12 +154,16 @@ public class LoginSelectActivity extends SherlockActivity {
 										Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido,Toast.LENGTH_SHORT).show();
 									}
 								}
-							}).executeAsync();
-					
-				} else {
-					Log.i("WE", "Sesion no abierta");
-					if (progress.isShowing()) {
-						progress.dismiss();
+							}).executeAsync();				
+				}
+				// Sesión cerrada
+				else {
+					// Usuario logueado: quitamos el loading
+					if (MyApplication.logged_user){
+						if (progress.isShowing()) {
+							progress.dismiss();
+						}
+						finish();
 					}
 				}
 
@@ -220,9 +222,10 @@ public class LoginSelectActivity extends SherlockActivity {
 				// Cerramos directamente la pantalla
 				finish();
 			}
-		} else {
-			Session.getActiveSession().onActivityResult(this, requestCode,
-					resultCode, data);
+			
+		} 
+		else {
+			Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 		}
 	}
 
@@ -247,7 +250,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		@Override
 		protected Void doInBackground(Integer... params) {
-
+			
 			HttpEntity resEntity;
 			String urlString = MyApplication.SERVER_ADDRESS
 					+ "/api/v1/user/login/";
@@ -320,12 +323,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 		@Override
 		protected void onPostExecute(Void result) {
-
-			// Quitamos el ProgressDialog
-			if (progress.isShowing()) {
-				progress.dismiss();
-			}
-
+						
 			// Si no ha habido algún error extraño
 			if (!login_error) {
 				// Logueamos al usuario en la aplicación
@@ -366,14 +364,19 @@ public class LoginSelectActivity extends SherlockActivity {
 					setResult(Activity.RESULT_OK);
 				}
 
-				finish();
 			}
 
 			// Ha habido algún error extraño: mostramos el mensaje
 			else {
 				Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido,
 						Toast.LENGTH_SHORT).show();
+				// Quitamos el ProgressDialog
+				if (progress.isShowing()) {
+					progress.dismiss();
+				}
 			}
+			// Cerramos sesión facebook
+			Session.getActiveSession().closeAndClearTokenInformation();
 		}
 	}
 }
