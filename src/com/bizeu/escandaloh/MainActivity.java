@@ -440,8 +440,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
         });
 
-		// Le asignamos la animación al pasar entre escándalos (API 11+)
-		//pager.setPageTransformer(true, new ZoomOutPageTransformer());
 		// Separación entre escándalos
 		pager.setPageMargin(3);
 		category = HAPPY;
@@ -724,6 +722,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (escandalos.size() == 0){
 				
 				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD;
+				
 				// HUMOR
 				if (category.equals(MainActivity.HAPPY)) {
 					url += "&category__id=1";
@@ -739,6 +738,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			
 			// Obtenemos los siguientes escándalos
 			else{
+				
 				// Fin del carrusel: meta nulo indica que no hay más escándalos
 				if (meta_next_scandals.equals("null")){
 					there_are_more_scandals = false;

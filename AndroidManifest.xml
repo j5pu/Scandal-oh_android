@@ -71,7 +71,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.bizeu.escandaloh.DetailPhotoActivity"
+            android:name="com.bizeu.escandaloh.PhotoDetailActivity"
             android:configChanges="orientation|screenSize" >
         </activity>
         <activity

@@ -1,21 +1,40 @@
 package com.bizeu.escandaloh;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
+import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 
-public class DetailPhotoActivity extends SherlockActivity {
+public class PhotoDetailActivity extends SherlockActivity {
 
 	private ImageViewTouch mImage;
 	
@@ -24,7 +43,9 @@ public class DetailPhotoActivity extends SherlockActivity {
 	private boolean played_already ;
 	private boolean orientation_changed ;
 	private Context mContext;
-	private String route_image;
+	private String url_big;
+	private GetBigPictureTask getBigPictureAsync;
+	private boolean any_error = false;
 	
 	
 	/**
@@ -43,16 +64,22 @@ public class DetailPhotoActivity extends SherlockActivity {
 		getSupportActionBar().hide();
 			
 		if (getIntent() != null){	
-			// Obtenemos y mostramos la foto		
+			// Obtenemos y mostramos la foto pequeña	
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
 			photo = ImageUtils.bytesToBitmap(bytes);
 			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
 			mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
 			mImage.setImageBitmap(photo);
 			
+			// Obtenemos y mostramos la foto grande
+			url_big = getIntent().getStringExtra("url_big");
+			Log.v("WE","Url big: " + url_big);
+			getBigPictureAsync = new GetBigPictureTask();
+			getBigPictureAsync.execute();
+
+			
 			// Obtenemos el audio
 			uri_audio = getIntent().getStringExtra("uri_audio");
-			
 			orientation_changed = false ;
 		}
 	}
@@ -163,6 +190,45 @@ public class DetailPhotoActivity extends SherlockActivity {
 	    	Audio.getInstance(mContext).startPlaying("http://scandaloh.s3.amazonaws.com/" + uri_audio);							
 	        return false;
 	    }	
+	}
+	
+	
+	
+
+	/**
+	 * Muestra la foto grande
+	 * 
+	 */
+	private class GetBigPictureTask extends AsyncTask<Void, Integer, Integer> {
+
+		Bitmap big_bitmap = null;
+
+		@Override
+		protected void onPreExecute() {
+			any_error = false;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			
+        	big_bitmap = ImageUtils.getBitmapFromURL(url_big);
+        	if (big_bitmap == null){
+        		any_error = true;
+        	}
+			return null;
+
+
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			Log.v("WE","any error: " + any_error);
+			if (!isCancelled() && !any_error){
+				Log.v("WE","CAmbiamos");
+				mImage.setImageBitmap(big_bitmap);
+			}			
+		}
 	}
 
 }

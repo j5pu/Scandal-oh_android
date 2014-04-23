@@ -339,13 +339,14 @@ public class ScandalFragment extends SherlockFragment {
     					Audio.getInstance(getActivity().getBaseContext()).releaseResources();
     					
     					// Mostramos la pantalla de la foto en detalle
-    					Intent i = new Intent(getActivity(), DetailPhotoActivity.class);
+    					Intent i = new Intent(getActivity(), PhotoDetailActivity.class);
     					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     					ImageView imView = (ImageView) v;
     					Bitmap bitm = ((BitmapDrawable)imView.getDrawable()).getBitmap();
     					byte[] bytes = ImageUtils.bitmapToBytes(bitm);
     					i.putExtra("bytes", bytes);
-    					i.putExtra("uri_audio", uri_audio);				
+    					i.putExtra("uri_audio", uri_audio);	
+    					i.putExtra("url_big", url_big);
     					getActivity().startActivity(i);				
     				}	
     			}
@@ -906,21 +907,6 @@ public class ScandalFragment extends SherlockFragment {
 	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
 	// ---------------------------------------------------------------------------------------------
 	
-    /**
-     * Transforma una fecha con formato AAAA-MM-DDTHH:MM:SS a formato DD-MM-AAAA
-     * @param date Fecha a transformar
-     * @return
-     */
-    private String changeFormatDate(String date){
-        String date_without_time = (date.split("T",2))[0];   
-        String year = date_without_time.split("-",3)[0];
-        String month = date_without_time.split("-",3)[1];
-        String day = date_without_time.split("-",3)[2];
-        String final_date = day + "-" + month + "-" + year;     
-        return final_date;
-    }
-    
-    
 
     /**
      * Devuelve el número de comentarios
