@@ -95,6 +95,13 @@ public class ScandalFragment extends SherlockFragment {
     private ImageView iDislike;
     private TextView tLikes;
     private TextView tDislikes;
+    private FetchableImageView img;
+    private FetchableImageView img_favicon;
+    private ImageView user_type;
+    private FetchableImageView emoticono;
+    private ImageView share;
+    private TextView tit;
+    private TextView user_na;
  
     private String id;
     private String url;
@@ -278,26 +285,44 @@ public class ScandalFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
+        final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.scandal, container, false);  
+    	
+        iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
+        iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
+        tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
+        tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
+        img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
+        img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
+        aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
+        user_type = (ImageView) rootView.findViewById(R.id.img_escandalo_tipo_usuario);
+        emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
+        share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
+        tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
+        user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
+        comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
+		txt_user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
+        img_avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
+        social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
+		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
+        ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
+		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
+        
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
-        }
-        final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.scandal, container, false);    
+        }  
         
         // FOTO
-        FetchableImageView img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img.setTag(109);
-        img.setImage(this.url, R.drawable.cargando);  
-        
+        img.setImage(this.url, R.drawable.cargando);    
         Paint mShadow = new Paint(); 
-        // radius=10, y-offset=2, color=black 
-        mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); 
+        mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); // radius=10, y-offset=2, color=black 
            
-        // NOTICIA 
-        final FetchableImageView img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
+        // TIPO DE ESCÁNDALO
     	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
     	
-    	// No es noticia
+    	// Escándalo normal
         if (media_type == 0){ 
+        	
         	txt_fuente.setVisibility(View.INVISIBLE);
         	
         	// Listeners del escándalo
@@ -327,8 +352,9 @@ public class ScandalFragment extends SherlockFragment {
     		});
         }
         
-        // Si es noticia
-        else{ 
+        // Noticia 
+        else if (media_type == 1){ 
+        	
         	// Fuente
         	txt_fuente.setText(source_name);
         	// Favicon
@@ -362,10 +388,31 @@ public class ScandalFragment extends SherlockFragment {
 				}
 			});
         }
-		
         
+        // Escándalo de mentira ("se el primero en subir un escándalo")
+        else if (media_type == -1){
+        	
+        	// Ocultamos la fuente, los likes y el último comentario
+        	txt_fuente.setVisibility(View.INVISIBLE); 	
+            iLike.setVisibility(View.INVISIBLE);
+            iDislike.setVisibility(View.INVISIBLE);
+            tLikes.setVisibility(View.INVISIBLE);
+            tDislikes.setVisibility(View.INVISIBLE);
+            share.setVisibility(View.INVISIBLE);
+            ll_last_comment.setVisibility(View.INVISIBLE);
+        	
+        	// Listeners del escándalo
+            img.setOnClickListener(new View.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v) {			
+    				((MainActivity) getActivity()).uploadScandal();	  				
+    			}
+    		});
+        }
+		
+                       
         // AUDIO    
-        aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
         // Si tiene audio mostramos el icono de audio
         if(has_audio){
         	aud.setVisibility(View.VISIBLE);
@@ -385,7 +432,6 @@ public class ScandalFragment extends SherlockFragment {
 		});
 	
         // SOCIAL NETWORK 
-        ImageView user_type = (ImageView) rootView.findViewById(R.id.img_escandalo_tipo_usuario);
         // Scandaloh
         if (Integer.parseInt(social_network) == 0){
         	user_type.setImageResource(R.drawable.s_rosa);
@@ -396,7 +442,6 @@ public class ScandalFragment extends SherlockFragment {
         }
 			
         // AVATAR
-        FetchableImageView emoticono = (FetchableImageView) rootView.findViewById(R.id.emoticono);
         // Si el usuario tiene avatar
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
@@ -404,10 +449,6 @@ public class ScandalFragment extends SherlockFragment {
 
                       
         // LIKES
-        iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
-        iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
-        tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
-        tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
         tLikes.setText(Integer.toString(likes));
         tDislikes.setText(Integer.toString(dislikes));
       
@@ -528,7 +569,6 @@ public class ScandalFragment extends SherlockFragment {
         
              
         // COMPARTIR 
-        final ImageView share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
         share.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -612,27 +652,18 @@ public class ScandalFragment extends SherlockFragment {
    				 dialog_compartir.show();			 		
 			}
 		});
-                
+        
         // TÍTULO
-        TextView tit = (TextView) rootView.findViewById(R.id.txt_escandalo_titulo);
         tit.setText(title);
        
         // NOMBRE DE USUARIO
-        TextView user_na = (TextView) rootView.findViewById(R.id.txt_escandalo_name_user);
         user_na.setText(Utils.limitaCaracteres(user_name, 25));      
         
         // COMENTARIOS
-        // Último comentario    
-        comment_text = (TextView) rootView.findViewById(R.id.txt_comment_text);
-		txt_user_name = (TextView) rootView.findViewById(R.id.txt_comment_username);
-        img_avatar = (FetchableImageView) rootView.findViewById(R.id.img_comment_avatar);
-        social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
-		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
-        ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
-             
+        
+        // Último comentario               
         updateLastComment();
  		// Número de comentarios        
-		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
 		num_com.setText(Integer.toString(num_comments));
    
         // Devolvemos la vista

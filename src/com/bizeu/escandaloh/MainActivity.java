@@ -641,118 +641,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Login/Subir escandalo
 		case R.id.ll_main_take_photo:
 
-			// Paramos si hubiera algún audio reproduciéndose
-			Audio.getInstance(mContext).releaseResources();
-
-			// Si dispone de conexión
-			if (Connectivity.isOnline(mContext)) {
-
-				// Si está logueado
-				if (MyApplication.logged_user) {
-
-					// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara),
-												getResources().getString(R.string.seleccionar_foto_galeria),
-												getResources().getString(R.string.subir_audio),
-												getResources().getString(R.string.subir_desde_url)
-					};
-
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							MainActivity.this);
-					builder.setTitle(R.string.subir_escandalo);
-					builder.setItems(items,new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog,int item) {
-
-							// SUBIR FOTO CON LA CAMARA
-							if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
-
-								// Si dispone de cámara iniciamos la cámara
-								if (Utils.checkCameraHardware(mContext)) {
-									Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-									File photo = null;
-									photo = createFileTemporary("picture", ".png");
-									if (photo != null) {mImageUri = Uri.fromFile(photo);
-										takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,mImageUri);
-										startActivityForResult(takePictureIntent,FROM_CAMERA);
-										photo.delete();
-									}
-								}
-
-								// El dispositivo no dispone de cámara
-								else {
-									Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,
-												Toast.LENGTH_LONG);
-									toast.show();
-								}
-							}
-
-							// SUBIR FOTO DE LA GALERIA
-							else if (items[item].equals(getResources().getString(R.string.seleccionar_foto_galeria))) {
-
-								Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-								startActivityForResult(i, FROM_GALLERY);
-							}
-
-							// SUBIR AUDIO
-							else if (items[item].equals(getResources().getString(R.string.subir_audio))){
-
-								// Mostramos el dialog de grabación de audio
-								RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
-								record_audio.setDialogResult(new OnMyDialogResult() {
-									public void finish(String result) {
-										if (result.equals("OK")) {
-											Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
-											i.putExtra("photo_from", FROM_AUDIO);
-											startActivity(i);
-										}
-									}
-								});
-								record_audio.setCancelable(false);
-								record_audio.show();
-							}
-
-							// SUBIR DESDE URL
-							else if (items[item].equals(getResources().getString(R.string.subir_desde_url))){
-
-								// Mostramos el dialog de introducir url
-								EnterUrlDialog record_audio = new EnterUrlDialog(mContext);
-								record_audio.setCancelable(false);
-								record_audio.show();
-							}
-						}
-					});
-					builder.show();
-				}
-
-				// No está logueado: mostramos un popup preguntando si quiere loguearse
-				else {
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setTitle(R.string.debes_iniciar_sesion_para_compartir);		
-					builder.setPositiveButton(R.string.iniciar_sesion, new DialogInterface.OnClickListener() {
-				           public void onClick(DialogInterface dialog, int id) {
-				               Intent i = new Intent(MainActivity.this, LoginSelectActivity.class);
-				               startActivity(i);
-				           }
-				       });
-					builder.setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
-				           public void onClick(DialogInterface dialog, int id) {
-				               dialog.dismiss();
-				           }
-				       });
-
-					AlertDialog dialog = builder.create();
-					dialog.show();
-				}
-			}
-
-			// No dispone de conexión
-			else {
-				Toast toast = Toast.makeText(mContext,
-						R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
-				toast.show();
-			}
+			uploadScandal();
+			
 			break;
 
 		// Actualizar carrusel: Le decimos al fragmento que actualice los
@@ -1475,6 +1365,125 @@ public class MainActivity extends SherlockFragmentActivity implements
 		adapter.updateUserAvatar();
 		adapter.notifyDataSetChanged();
 	}
+	
+	
+	public void uploadScandal(){
+		// Paramos si hubiera algún audio reproduciéndose
+		Audio.getInstance(mContext).releaseResources();
+
+		// Si dispone de conexión
+		if (Connectivity.isOnline(mContext)) {
+
+						// Si está logueado
+						if (MyApplication.logged_user) {
+
+							// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+							final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara),
+														getResources().getString(R.string.seleccionar_foto_galeria),
+														getResources().getString(R.string.subir_audio),
+														getResources().getString(R.string.subir_desde_url)
+							};
+
+							AlertDialog.Builder builder = new AlertDialog.Builder(
+									MainActivity.this);
+							builder.setTitle(R.string.subir_escandalo);
+							builder.setItems(items,new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,int item) {
+
+									// SUBIR FOTO CON LA CAMARA
+									if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
+
+										// Si dispone de cámara iniciamos la cámara
+										if (Utils.checkCameraHardware(mContext)) {
+											Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+											File photo = null;
+											photo = createFileTemporary("picture", ".png");
+											if (photo != null) {mImageUri = Uri.fromFile(photo);
+												takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,mImageUri);
+												startActivityForResult(takePictureIntent,FROM_CAMERA);
+												photo.delete();
+											}
+										}
+
+										// El dispositivo no dispone de cámara
+										else {
+											Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,
+														Toast.LENGTH_LONG);
+											toast.show();
+										}
+									}
+
+									// SUBIR FOTO DE LA GALERIA
+									else if (items[item].equals(getResources().getString(R.string.seleccionar_foto_galeria))) {
+
+										Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+										startActivityForResult(i, FROM_GALLERY);
+									}
+
+									// SUBIR AUDIO
+									else if (items[item].equals(getResources().getString(R.string.subir_audio))){
+
+										// Mostramos el dialog de grabación de audio
+										RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
+										record_audio.setDialogResult(new OnMyDialogResult() {
+											public void finish(String result) {
+												if (result.equals("OK")) {
+													Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
+													i.putExtra("photo_from", FROM_AUDIO);
+													startActivity(i);
+												}
+											}
+										});
+										record_audio.setCancelable(false);
+										record_audio.show();
+									}
+
+									// SUBIR DESDE URL
+									else if (items[item].equals(getResources().getString(R.string.subir_desde_url))){
+
+										// Mostramos el dialog de introducir url
+										EnterUrlDialog record_audio = new EnterUrlDialog(mContext);
+										record_audio.setCancelable(false);
+										record_audio.show();
+									}
+								}
+							});
+							builder.show();
+						}
+
+						// No está logueado: mostramos un popup preguntando si quiere loguearse
+						else {
+							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							builder.setTitle(R.string.debes_iniciar_sesion_para_compartir);		
+							builder.setPositiveButton(R.string.iniciar_sesion, new DialogInterface.OnClickListener() {
+						           public void onClick(DialogInterface dialog, int id) {
+						               Intent i = new Intent(MainActivity.this, LoginSelectActivity.class);
+						               startActivity(i);
+						           }
+						       });
+							builder.setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+						           public void onClick(DialogInterface dialog, int id) {
+						               dialog.dismiss();
+						           }
+						       });
+
+							AlertDialog dialog = builder.create();
+							dialog.show();
+						}
+						
+					}
+
+					// No dispone de conexión
+					else {
+						Toast toast = Toast.makeText(mContext,
+								R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
+						toast.show();
+					}
+	}
+	
+	
 	
 	// ---------------------------------------------------------------------------------------------------------
 	

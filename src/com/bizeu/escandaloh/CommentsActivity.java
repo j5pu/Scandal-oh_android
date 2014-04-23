@@ -62,6 +62,7 @@ public class CommentsActivity extends SherlockActivity {
 	private Context mContext;
 	private String title;
 	private String url_photo;
+	private GetCommentsTask getCommentsAsync;
 
 	/**
 	 * onCreate
@@ -121,7 +122,8 @@ public class CommentsActivity extends SherlockActivity {
 		commentsAdapter = new CommentAdapter(this, R.layout.comment_izquierda,
 				R.layout.comment_derecha, array_comments);
 		list_comments.setAdapter(commentsAdapter);
-		new GetCommentsTask().execute();
+		getCommentsAsync =  new GetCommentsTask();
+		getCommentsAsync.execute();
 
 		send_progress = new ProgressDialog(this);
 		send_progress.setTitle(R.string.enviando_comentario);
@@ -191,11 +193,23 @@ public class CommentsActivity extends SherlockActivity {
 	
 	
 	/**
+	 * onDestroy
+	 */
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		// Cancelamos los comentarios que se estuvieran obteniendo
+		cancelGetComments();
+	}
+	
+	/**
 	 * onBackPressed
 	 */
 	@Override
 	public void onBackPressed() {
 	   Intent returnIntent = new Intent();
+	   // Cancelamos si se estuviesen obteniendo comentarios
+	   cancelGetComments();
 	   if (array_comments.size() > 0){
 		   // Devolvemos el último comentario
 		   returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
@@ -205,6 +219,23 @@ public class CommentsActivity extends SherlockActivity {
 	   setResult(RESULT_OK, returnIntent);
 	   finish();
 	}
+	
+	
+	
+
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo comentarios
+	 */
+	private void cancelGetComments() {
+		if (getCommentsAsync != null) {
+			if (getCommentsAsync.getStatus() == AsyncTask.Status.PENDING
+					|| getCommentsAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getCommentsAsync.cancel(true);
+			}
+		}
+	}
+	
+	
 
 	/**
 	 * Muestra la lista de comentarios
@@ -275,17 +306,6 @@ public class CommentsActivity extends SherlockActivity {
 			} catch (Exception ex) {
 				Log.e("ServicioRest", "Error!", ex);
 				any_error = true; // Indicamos que hubo un error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
 			}
 
 			// Si hubo algún error devolvemos 666
@@ -300,34 +320,37 @@ public class CommentsActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			if (send_progress.isShowing()) {
-				send_progress.dismiss();
-			}
-			
-			// Ocultamos el loading y mostramos la lista de comentarios
-			ll_loading.setVisibility(View.GONE);
-			list_comments.setVisibility(View.VISIBLE);
+			if (!isCancelled()){
+				if (send_progress.isShowing()) {
+					send_progress.dismiss();
+				}
+				
+				// Ocultamos el loading y mostramos la lista de comentarios
+				ll_loading.setVisibility(View.GONE);
+				list_comments.setVisibility(View.VISIBLE);
 
-			// Si hubo algún error
-			if (result == 666) {
-				Toast toast = Toast.makeText(mContext, getResources()
-						.getString(R.string.lo_sentimos_hubo),
-						Toast.LENGTH_SHORT);
-				toast.show();
-			}
+				// Si hubo algún error
+				if (result == 666) {
+					Toast toast = Toast.makeText(mContext, getResources()
+							.getString(R.string.lo_sentimos_hubo),
+							Toast.LENGTH_SHORT);
+					toast.show();
+				}
 
-			// No hubo ningún error extraño
-			else {
-				// Si es codigo 2xx --> OK if (result >= 200 && result <300){
-				commentsAdapter.notifyDataSetChanged();
-				// Nos posicionamos en el último comentario
-				list_comments.setSelection(list_comments.getAdapter().getCount() - 1);
-			}
+				// No hubo ningún error extraño
+				else {
+					// Si es codigo 2xx --> OK if (result >= 200 && result <300){
+					commentsAdapter.notifyDataSetChanged();
+					// Nos posicionamos en el último comentario
+					list_comments.setSelection(list_comments.getAdapter().getCount() - 1);
+				}
 
-			if (array_comments.size() == 0) {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-			}
+				// Si no hay comentarios y aún seguimos en la pantalla: abrimos el teclado
+				if (array_comments.size() == 0 && !isCancelled()) {
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+				}
+			}			
 		}
 	}
 

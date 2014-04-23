@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh;
 
+import java.lang.reflect.InvocationTargetException;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -134,11 +136,43 @@ public class BrowserNewsActivity extends SherlockActivity {
 				i.putExtra("photo_from", CoverActivity.FROM_SHARING_TEXT);
 				i.putExtra("shareUri", lastUrl);
 				startActivity(i);
-				finish();
 			}
 		});
 	}
 	
+	
+	/**
+	 * onPause
+	 */
+	@Override
+	public void onPause() {
+	    super.onPause();
+
+	    try {
+	        Class.forName("android.webkit.WebView").getMethod("onPause", (Class[]) null).invoke(web, (Object[]) null);
+	    } catch(ClassNotFoundException cnfe) {
+	    } catch(NoSuchMethodException nsme) {
+	    } catch(InvocationTargetException ite) {
+	    } catch (IllegalAccessException iae) {
+	    }
+	}
+	
+	
+	/**
+	 * onResume
+	 */
+	@Override
+	public void onResume() {
+	    super.onResume();
+
+	    try {
+	        Class.forName("android.webkit.WebView").getMethod("onResume", (Class[]) null).invoke(web, (Object[]) null);
+	    } catch(ClassNotFoundException cnfe) {
+	    } catch(NoSuchMethodException nsme) {
+	    } catch(InvocationTargetException ite) {
+	    } catch (IllegalAccessException iae) {
+	    }
+	}
 	
 	/**
 	 * onOptionsItemSelected
