@@ -14,6 +14,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -122,6 +124,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private TextView txt_num_notifs;
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
+	private static Activity acti;
 	private Context mContext;
 	static ScandalohFragmentPagerAdapter adapter;
 	ViewPager pager = null;
@@ -145,6 +148,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     private Map<String, List<String>> filterCollection;
     private String actual_filter = FILTRO_RECIENTES ;
 	private String action_bar_mode = NORMAL; // NORMAL o ENVIAR_COMENTARIO
+	public static boolean activity_is_showing = false;
 
 	/**
 	 * onCreate
@@ -157,6 +161,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		no_hay_escandalos = false;
 		mContext = this;
+		acti = this;
 		escandalos = new ArrayList<Scandaloh>();
 
 		// Cambiamos la fuente de la pantalla
@@ -486,6 +491,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onStart();
 		// Activamos google analytics
 		EasyTracker.getInstance(this).activityStart(this);
+		// Indicamos que la actividad se está mostrando
+		activity_is_showing = true;
 	}
 
 	/**
@@ -510,10 +517,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 		        img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);
 			}
 			// Actualizamos el nº de notificaciones
-			new GetNumNotificationsTask().execute();
+			new UpdateNumNotificationsTask().execute();
+			
 			
 		// No está logueado
 		} else {
+			// Quitamos el nº de comentarios
+			txt_action_bar_num_notis.setText("");
+			
+			// Actualizamos el menu lateral
 			ll_lateral_login.setVisibility(View.VISIBLE); // Mostramos Login
 			ll_lateral_perfil.setVisibility(View.GONE); // Ocultamos Perfil
 			ll_lateral_notificaciones.setVisibility(View.GONE); // Ocultamos notificaciones
@@ -545,6 +557,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onStop();
 		// Paramos google analytics
 		EasyTracker.getInstance(this).activityStop(this);
+		// Indicamos que la actividad no se está mostrando
+		activity_is_showing = false;
 	}
 
 	/**
@@ -1086,10 +1100,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 
 	/**
-	 * Obtiene el nº de notificaciones
+	 * Actualiza el nº de notificaciones
 	 * 
 	 */
-	private class GetNumNotificationsTask extends AsyncTask<Void, Integer, Integer> {
+	private class UpdateNumNotificationsTask extends AsyncTask<Void, Integer, Integer> {
 
 		String num_notifs;
 
@@ -1485,6 +1499,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 	
 	
 	
+	/**
+	 * Actualiza el nº de notificaciones
+	 */
+	public static void updateNumNotifications(){
+		((MainActivity) acti).new  UpdateNumNotificationsTask().execute();
+	}
+	
+	
+	
 	// ---------------------------------------------------------------------------------------------------------
 	
 	
@@ -1659,5 +1682,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			this.fragments.clear();
 		}
 	}
+	
 
 }

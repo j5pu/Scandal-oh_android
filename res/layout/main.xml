@@ -113,7 +113,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="País"
+                    android:text="@string/mLateral_pais"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>
@@ -136,7 +136,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="2dp"
-                    android:text="Buscar"
+                    android:text="@string/mLateral_buscar"
                     android:textColor="@color/azul_verdoso"
                     android:textSize="22sp" />
             </LinearLayout>

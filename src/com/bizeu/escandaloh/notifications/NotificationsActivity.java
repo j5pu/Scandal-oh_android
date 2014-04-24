@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -84,6 +85,10 @@ public class NotificationsActivity extends SherlockActivity {
 		list_notifications.setAdapter(notificationsAdapter);
 		txt_no_tienes_notis = (TextView) findViewById(R.id.txt_notifications_notienesnotis);
 		
+		// Eliminamos si hubiese alguna notificación push sin leer
+		NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(PushReceiver.NOTIFICATION_ID);
+		
 		// Al seleccionar una notificación mostramos el escándalo al que referencia
 		list_notifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -134,6 +139,8 @@ public class NotificationsActivity extends SherlockActivity {
 		// Obtenemos las notificaciones
 		getNotisAsync = new GetNotificationsTask();
 		getNotisAsync.execute();
+		
+		
 	}
 	
 	

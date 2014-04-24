@@ -14,9 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.MainActivity;
+import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class PushReceiver extends BroadcastReceiver {
@@ -50,10 +52,10 @@ public class PushReceiver extends BroadcastReceiver {
 			// notificación es pequeña
 			String summary = null;
 			if (num_notificaciones.equals("1")){
-				summary = num_notificaciones + " nuevos aviso.";			
+				summary = num_notificaciones + " " + context.getResources().getString(R.string.nuevo_aviso);			
 			}
 			else{
-				summary = num_notificaciones + " nuevos avisos.";
+				summary = num_notificaciones + " " + context.getResources().getString(R.string.nuevos_avisos);
 				
 			}
 			
@@ -65,7 +67,7 @@ public class PushReceiver extends BroadcastReceiver {
 					.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
 					.setTicker(summary)
 					.setAutoCancel(true)
-					.setLights(0xb21b72, 3000, 3000);
+					.setLights(0xb21b72, 1000, 2000);
 			
 			// Configuración para la notificación grande (cuando está la primera de la lista)
 		    NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -94,6 +96,11 @@ public class PushReceiver extends BroadcastReceiver {
 			// Mandamos la notificación
 			NotificationManager mNotificationManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+			
+			// Si tenemos la pantalla del carrusel abierta actualizamos el nº de notificaciones
+			if (MainActivity.activity_is_showing){
+				MainActivity.updateNumNotifications();
+			}
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
