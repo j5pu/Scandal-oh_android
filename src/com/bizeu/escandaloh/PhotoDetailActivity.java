@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -81,6 +82,14 @@ public class PhotoDetailActivity extends SherlockActivity {
 			// Obtenemos el audio
 			uri_audio = getIntent().getStringExtra("uri_audio");
 			orientation_changed = false ;
+			
+			mImage.setSingleTapListener(new OnImageViewTouchSingleTapListener() {
+				
+				@Override
+				public void onSingleTapConfirmed() {
+					finish();	
+				}
+			});
 		}
 	}
 	
@@ -216,17 +225,21 @@ public class PhotoDetailActivity extends SherlockActivity {
         		any_error = true;
         	}
 			return null;
-
-
 		}
 
 		@Override
 		protected void onPostExecute(Integer result) {
-
-			Log.v("WE","any error: " + any_error);
 			if (!isCancelled() && !any_error){
-				Log.v("WE","CAmbiamos");
 				mImage.setImageBitmap(big_bitmap);
+				
+				mImage.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						Log.v("WE","entra lalala");
+						finish();		
+					}
+				});
 			}			
 		}
 	}

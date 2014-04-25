@@ -49,6 +49,7 @@ import com.applidium.shutterbug.FetchableImageView.FetchableImageViewListener;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
+import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.Utils;
@@ -60,6 +61,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 public class ScandalFragment extends SherlockFragment {
 
 	public static final String ID = "id";
+	public static final String USER_ID = "user_id";
     public static final String URL = "url";
     private static final String URL_BIG = "url_big";
     public static final String TITLE = "title";
@@ -104,6 +106,7 @@ public class ScandalFragment extends SherlockFragment {
     private TextView user_na;
  
     private String id;
+    private String user_id;
     private String url;
     private String url_big;
     private String title;
@@ -144,6 +147,7 @@ public class ScandalFragment extends SherlockFragment {
         // Guardamos los datos del fragmento (del escándalo)
         Bundle bundle = new Bundle();
         bundle.putString(ID, escan.getId());
+        bundle.putString(USER_ID, escan.getUserId());
         bundle.putString(URL, escan.getRouteImg());
         bundle.putString(URL_BIG, escan.getRouteImgBig());
         bundle.putString(TITLE, escan.getTitle());
@@ -182,6 +186,7 @@ public class ScandalFragment extends SherlockFragment {
         
         // Obtenemos los valores del fragmento (del escándalo)
         this.id = (getArguments() != null) ? getArguments().getString(ID) : null;
+        this.user_id = (getArguments() != null) ? getArguments().getString(USER_ID) : null;
         this.url = (getArguments() != null) ? getArguments().getString(URL) : null;
         this.url_big = (getArguments() != null) ? getArguments().getString(URL_BIG) : null;
         this.title = (getArguments() != null) ? getArguments().getString(TITLE) : null;
@@ -306,7 +311,8 @@ public class ScandalFragment extends SherlockFragment {
 		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
         ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
 		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
-        
+    	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
+    	
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
         }  
@@ -317,9 +323,7 @@ public class ScandalFragment extends SherlockFragment {
         Paint mShadow = new Paint(); 
         mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); // radius=10, y-offset=2, color=black 
            
-        // TIPO DE ESCÁNDALO
-    	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
-    	
+        // TIPO DE ESCÁNDALO	
     	// Escándalo normal
         if (media_type == 0){ 
         	
@@ -441,11 +445,29 @@ public class ScandalFragment extends SherlockFragment {
         else if (Integer.parseInt(social_network) == 1){
         	user_type.setImageResource(R.drawable.facebook_rosa);
         }
+        user_type.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), ProfileActivity.class);
+				i.putExtra(ProfileActivity.USER_ID, user_id);
+				startActivity(i);		
+			}
+		});
 			
         // AVATAR
         // Si el usuario tiene avatar
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
+            emoticono.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Intent i = new Intent(getActivity(), ProfileActivity.class);
+					i.putExtra(ProfileActivity.USER_ID, user_id);
+					startActivity(i);
+				}
+			});
         }
 
                       
@@ -658,10 +680,18 @@ public class ScandalFragment extends SherlockFragment {
         tit.setText(title);
        
         // NOMBRE DE USUARIO
-        user_na.setText(Utils.limitaCaracteres(user_name, 25));      
+        user_na.setText(Utils.limitaCaracteres(user_name, 25));  
+        user_na.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), ProfileActivity.class);
+				i.putExtra(ProfileActivity.USER_ID, user_id);
+				startActivity(i);		
+			}
+		});
         
-        // COMENTARIOS
-        
+        // COMENTARIOS    
         // Último comentario               
         updateLastComment();
  		// Número de comentarios        

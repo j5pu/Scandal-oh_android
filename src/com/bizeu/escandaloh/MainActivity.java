@@ -370,6 +370,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				// Almacenamos el avatar actual del usuario
 				actual_avatar = MyApplication.avatar;
 				Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+				i.putExtra(ProfileActivity.USER_ID, ProfileActivity.LOGGED);
 				startActivityForResult(i,SHOW_PROFILE);		
 			}
 		});
@@ -797,6 +798,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String category = escanObject.getString("category");
 					final String date = escanObject.getString("date");
 					final String id = escanObject.getString("id");
+					final String user_id = escanObject.getString("user_id");
 					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
 					final String img = escanObject.getString("img");
 					final String comments_count = escanObject.getString("comments_count");
@@ -847,7 +849,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							@Override
 							public void run() {							
 								// Añadimos el escandalo al ArrayList
-								Scandaloh escanAux = new Scandaloh(id, title,
+								Scandaloh escanAux = new Scandaloh(id, user_id, title,
 										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
 										Integer.parseInt(comments_count),resource_uri,
 										MyApplication.DIRECCION_BUCKET + img_p,
@@ -979,6 +981,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					final String category = escanObject.getString("category");
 					final String date = escanObject.getString("date");
 					final String id = escanObject.getString("id");
+					final String user_id = escanObject.getString("user_id");
 					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
 					final String img = escanObject.getString("img");
 					final String comments_count = escanObject.getString("comments_count");
@@ -1029,7 +1032,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							@Override
 							public void run() {							
 								// Añadimos el escandalo al ArrayList
-								Scandaloh escanAux = new Scandaloh(id, title,
+								Scandaloh escanAux = new Scandaloh(id, user_id, title,
 										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
 										Integer.parseInt(comments_count),resource_uri,
 										MyApplication.DIRECCION_BUCKET + img_p,

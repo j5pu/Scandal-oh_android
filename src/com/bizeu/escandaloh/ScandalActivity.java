@@ -144,6 +144,7 @@ public class ScandalActivity extends SherlockFragmentActivity {
 					final String category = escanObject.getString("category");
 					final String date = escanObject.getString("date");
 					final String id = escanObject.getString("id");
+					final String user_id = escanObject.getString("user_id");
 					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
 					final String img = escanObject.getString("img");
 					final String comments_count = escanObject.getString("comments_count");
@@ -192,7 +193,7 @@ public class ScandalActivity extends SherlockFragmentActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {							
-							Scandaloh scandal = new Scandaloh(id, title,
+							Scandaloh scandal = new Scandaloh(id, user_id, title,
 									category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
 									Integer.parseInt(comments_count),resource_uri,
 									MyApplication.DIRECCION_BUCKET + img_p,

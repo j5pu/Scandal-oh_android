@@ -11,6 +11,7 @@ public class Scandaloh {
 	public static final String HAPPY = "Happy";
 	
 	private String id;
+	private String user_id;
 	private String title;
 	private String category;
 	private Bitmap picture;
@@ -51,12 +52,13 @@ public class Scandaloh {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Scandaloh(String id, String title, String category, Bitmap picture, int num_comments, 
+	public Scandaloh(String id, String user_id, String title, String category, Bitmap picture, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
 						String user, String date, String avatar, Comment last_comment, String social_network,
 						int already_voted, int likes, int dislikes, int media_type, String favicon, String source, 
 						String source_name){
 		this.id = id;
+		this.user_id = user_id;
 		this.title = title;
 		if (category.equals(HAPPY_CATEGORY)){
 	        	this.category = HAPPY;
@@ -91,6 +93,14 @@ public class Scandaloh {
 	
 	public String getId(){
 		return id;
+	}
+	
+	public void setUserId(String new_user_id){
+		this.user_id = new_user_id;
+	}
+	
+	public String getUserId(){
+		return user_id;
 	}
 	
 	

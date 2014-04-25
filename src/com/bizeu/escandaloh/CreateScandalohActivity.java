@@ -403,10 +403,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 			} else {
 				// Si es codigo 2xx --> OK
 				if (result >= 200 && result < 300) {
-					Toast toast;
-					toast = Toast.makeText(mContext,getResources().getString(R.string.escandalo_enviado_con_exito),
-								Toast.LENGTH_LONG);
-					toast.show();
 				} 
 				
 				else {

@@ -215,4 +215,8 @@
     <string name="mLateral_buscar">Buscar</string>
     <string name="nuevo_aviso">nuevo aviso</string>
     <string name="nuevos_avisos">nuevos avisos</string>
+    <string name="dejar_de_seguir">Dejar de seguir</string>
+    <string name="seguir">Seguir</string>
+    <string name="seguidores">Seguidores</string>
+    <string name="siguiendo">Siguiendo</string>
 </resources>

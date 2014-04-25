@@ -15,15 +15,15 @@
 
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_profile_picture"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:src="@drawable/cargando" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="3"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
 
@@ -31,17 +31,52 @@
             android:id="@+id/txt_profile_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="username" />
 
-        <TextView
-            android:id="@+id/txt_profile_change_pass"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:id="@+id/txt_profile_followers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/seguidores"
+                android:paddingLeft="5dp" />
+
+            <TextView
+                android:id="@+id/txt_profile_following"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:paddingLeft="15dp" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/siguiendo"
+                android:paddingLeft="5dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/but_profile_follow_unfollow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cambiar_contrasenia" />
+            android:text="@string/seguir" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_profile_share"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
@@ -80,6 +115,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_profile_help"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
@@ -120,6 +156,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/faq" />
+
+        <TextView
+            android:id="@+id/txt_profile_change_pass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cambiar_contrasenia" />
 
         <TextView
             android:id="@+id/txt_profile_desactivar_cuenta"

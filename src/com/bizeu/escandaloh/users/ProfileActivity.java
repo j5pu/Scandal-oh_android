@@ -6,10 +6,12 @@ import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,20 +26,18 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.dialogs.ChangePasswordDialog;
-import com.bizeu.escandaloh.dialogs.RecordAudioDialog;
-import com.bizeu.escandaloh.dialogs.RecordAudioDialog.OnMyDialogResult;
-import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.Utils;
-import com.facebook.Session;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
@@ -48,7 +48,9 @@ public class ProfileActivity extends SherlockActivity {
 	public static final int AVATAR_FROM_CAMERA = 15;
 	public static final int AVATAR_FROM_GALLERY = 14;
 	public static final int CROP_PICTURE = 16;
+	public static final String USER_ID = "user_id";
 	public static final String PICTURE_BYTES = "picture_bytes";
+	public static final String LOGGED = "logged";
 	
 	private FetchableImageView img_picture;
 	private TextView txt_username;
@@ -64,11 +66,19 @@ public class ProfileActivity extends SherlockActivity {
 	private TextView txt_soporte;
 	private TextView txt_desactivar_cuenta;
 	private Button but_logout;
+	private Button but_follow_unfollow;
+	private TextView txt_followers;
+	private TextView txt_following;
+	private LinearLayout ll_share;
+	private LinearLayout ll_help;
 	
+	private boolean is_me = false; // Nos indica si soy el mismo que el del perfil
 	private Context mContext;
+	private String user_id;
 	private Uri mImageUri;
 	private ProgressDialog progress;
 	private boolean any_error;
+	private boolean any_error_user_info;
 	private SharedPreferences prefs;
 	private boolean isDeletingUser = false;  // Nos indica si al hacer logout es porque se está borrando el usuario
 	
@@ -104,78 +114,95 @@ public class ProfileActivity extends SherlockActivity {
 		txt_desactivar_cuenta = (TextView) findViewById(R.id.txt_profile_desactivar_cuenta);
 		txt_cambiar_pass = (TextView) findViewById(R.id.txt_profile_change_pass);
 		but_logout = (Button) findViewById(R.id.but_profile_logout);
+		but_follow_unfollow = (Button) findViewById(R.id.but_profile_follow_unfollow);
+		txt_followers = (TextView) findViewById(R.id.txt_profile_followers);
+		txt_following = (TextView) findViewById(R.id.txt_profile_following);
+		ll_share = (LinearLayout) findViewById(R.id.ll_profile_share);
+		ll_help = (LinearLayout) findViewById(R.id.ll_profile_help);
 		
+		// Mostramos el avatar
+		if (getIntent() != null){
+			user_id = getIntent().getStringExtra(USER_ID);
+			new ShowUserInformation().execute();
+			//img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
+		}
+		/*
 		if (MyApplication.avatar != null){
 			img_picture.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, R.drawable.avatar_defecto);
 		}
 		else{
 			img_picture.setImageResource(R.drawable.avatar_mas);
 		}
+		*/
 		
 		// Si es usuario de Facebook ocultamos la opción de cambiar la contraseña
 		if (MyApplication.social_network == 1){
 			txt_cambiar_pass.setVisibility(View.GONE);
 		}
 		
+		// Cambiar avatar
 		img_picture.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
-				final CharSequence[] items = {
-						getResources()
-								.getString(R.string.hacer_foto_con_camara),
-						getResources().getString(
-								R.string.seleccionar_foto_galeria) };
-				AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
-				builder.setTitle(R.string.avatar);
-				builder.setItems(items, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int item) {
+				
+				if (is_me){
+					// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
+					final CharSequence[] items = {
+							getResources()
+									.getString(R.string.hacer_foto_con_camara),
+							getResources().getString(
+									R.string.seleccionar_foto_galeria) };
+					AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+					builder.setTitle(R.string.avatar);
+					builder.setItems(items, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int item) {
 
-						// Cámara
-						if (items[item].equals(getResources().getString(
-								R.string.hacer_foto_con_camara))) {
+							// Cámara
+							if (items[item].equals(getResources().getString(
+									R.string.hacer_foto_con_camara))) {
 
-							// Si dispone de cámara iniciamos la cámara
-							if (Utils.checkCameraHardware(mContext)) {
-								Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-								File photo = null;
-								photo = createFileTemporary("picture", ".png");
-								if (photo != null) {
-									mImageUri = Uri.fromFile(photo);
-									takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-									startActivityForResult(takePictureIntent,AVATAR_FROM_CAMERA);
-									photo.delete();
+								// Si dispone de cámara iniciamos la cámara
+								if (Utils.checkCameraHardware(mContext)) {
+									Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+									File photo = null;
+									photo = createFileTemporary("picture", ".png");
+									if (photo != null) {
+										mImageUri = Uri.fromFile(photo);
+										takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+										startActivityForResult(takePictureIntent,AVATAR_FROM_CAMERA);
+										photo.delete();
+									}
+								}
+								// El dispositivo no dispone de cámara
+								else {
+									Toast toast = Toast
+											.makeText(
+													mContext,
+													R.string.este_dispositivo_no_dispone_camara,
+													Toast.LENGTH_LONG);
+									toast.show();
 								}
 							}
-							// El dispositivo no dispone de cámara
-							else {
-								Toast toast = Toast
-										.makeText(
-												mContext,
-												R.string.este_dispositivo_no_dispone_camara,
-												Toast.LENGTH_LONG);
-								toast.show();
+
+							// Galería
+							else if (items[item].equals(getResources().getString(
+									R.string.seleccionar_foto_galeria))) {
+
+								Intent i = new Intent(
+										Intent.ACTION_PICK,
+										android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+								startActivityForResult(i, AVATAR_FROM_GALLERY);
 							}
 						}
-
-						// Galería
-						else if (items[item].equals(getResources().getString(
-								R.string.seleccionar_foto_galeria))) {
-
-							Intent i = new Intent(
-									Intent.ACTION_PICK,
-									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-							startActivityForResult(i, AVATAR_FROM_GALLERY);
-						}
-					}
-				});
-				builder.show();		
+					});
+					builder.show();	
+				}			
 			}
 		});	
 		
-		txt_username.setText(MyApplication.user_name);
+		//txt_username.setText(MyApplication.user_name);
 		
 		txt_cambiar_pass.setOnClickListener(new View.OnClickListener() {
 			
@@ -661,6 +688,116 @@ public class ProfileActivity extends SherlockActivity {
 		} 
 	}
 	
+	
+	
+	
+	
+	/**
+	 * Muestra la información del usuario
+	 * 
+	 */
+	private class ShowUserInformation extends AsyncTask<Void, Integer, Integer> {
+
+		String username;
+		String avatar;
+		String followers_count;
+		String follows_count;
+		boolean is_following;
+
+		@Override
+		protected void onPreExecute() {
+			any_error_user_info= false;	
+			txt_username.setText("");
+		}
+
+		
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			Log.v("WE","User_id: " + user_id);
+			String url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/" + user_id + "/profile/" ;			
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet getEscandalos = new HttpGet(url);
+				getEscandalos.setHeader("content-type", "application/json");
+				
+				if (MyApplication.logged_user){
+					getEscandalos.setHeader("session-token", MyApplication.session_token);
+				}
+
+				// Hacemos la petición al servidor
+				response = httpClient.execute(getEscandalos);
+				String respStr = EntityUtils.toString(response.getEntity());
+				Log.i("WE", respStr);
+
+				// Parseamos el json devuelto
+				JSONObject respJson = new JSONObject(respStr);
+				
+				username = respJson.getString("username");
+				avatar = respJson.getString("avatar");
+				followers_count = respJson.getString("followers_count");
+				follows_count = respJson.getString("follows_count");
+				is_following = respJson.getBoolean("is_following");
+				is_me = respJson.getBoolean("is_me");
+				
+			} catch (Exception ex) {
+				Log.e("ServicioRest", "Error obteniendo información del usuario", ex);
+				// Hubo algún error inesperado
+				any_error_user_info = true;
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,
+						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			
+			// No hubo error: mostramos el avatar, nombre de usuario, seguidores y si le está siguiendo
+			else{
+				img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
+				txt_username.setText(username);
+				txt_followers.setText(followers_count);
+				txt_following.setText(follows_count);
+				
+				if (is_following){
+					but_follow_unfollow.setText(getResources().getString(R.string.dejar_de_seguir));
+				}
+				else{
+					Log.v("WE","Entra en false");
+					but_follow_unfollow.setText(getResources().getString(R.string.seguir));
+				}
+				
+				// Si soy el del perfil ocultamos el botón de seguir
+				if (is_me){
+					but_follow_unfollow.setVisibility(View.GONE);
+				}
+				
+				// Si no soy el usuario del perfil, ocultamos todas las opciones de feedback y ajustes de cuenta
+				if (!is_me && !username.equals(MyApplication.user_name)){
+					Log.v("WE","Entra porque username: " + username + " y myap: " + MyApplication.user_name);
+					ll_share.setVisibility(View.GONE);
+					ll_help.setVisibility(View.GONE);
+					but_logout.setVisibility(View.GONE);
+				}
+			}
+		}
+	}
 	
 	
 }
