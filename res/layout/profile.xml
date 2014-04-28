@@ -8,10 +8,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="5"
+        android:layout_marginTop="10dp"
+        android:layout_weight="2"
         android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp" >
+        android:orientation="vertical" >
 
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_profile_picture"
@@ -23,7 +23,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="1.5"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
 
@@ -48,23 +48,22 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/seguidores"
-                android:paddingLeft="5dp" />
+                android:paddingLeft="5dp"
+                android:text="@string/seguidores" />
 
             <TextView
                 android:id="@+id/txt_profile_following"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
-                android:paddingLeft="15dp" />
+                android:paddingLeft="15dp"
+                android:text="TextView" />
 
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/siguiendo"
-                android:paddingLeft="5dp" />
-
+                android:paddingLeft="5dp"
+                android:text="@string/siguiendo" />
         </LinearLayout>
 
         <Button
@@ -72,117 +71,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/seguir" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_profile_share"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/txt_mLateral_numNotificaciones"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/compartir"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txt_profile_compartir_twitter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/compartir_con_twitter" />
-
-        <TextView
-            android:id="@+id/txt_profile_compartir_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/compartir_con_facebook" />
-
-        <TextView
-            android:id="@+id/txt_profile_invitar_correo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/invitar_via_correo_elec" />
-
-        <TextView
-            android:id="@+id/txt_profile_valoranos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/valoranos" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_profile_help"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ayuda"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txt_profile_soporte"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/soporte" />
-
-        <TextView
-            android:id="@+id/txt_profile_feedback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/feedback" />
-
-        <TextView
-            android:id="@+id/txt_profile_condiciones"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/condiciones_de_uso" />
-
-        <TextView
-            android:id="@+id/txt_profile_politica"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/politica_de_privacidad" />
-
-        <TextView
-            android:id="@+id/txt_profile_faq"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/faq" />
-
-        <TextView
-            android:id="@+id/txt_profile_change_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cambiar_contrasenia" />
-
-        <TextView
-            android:id="@+id/txt_profile_desactivar_cuenta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/desactivar_cuenta" />
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
+        android:layout_weight="4"
         android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/but_profile_logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cerrar_sesion" />
+        <ListView
+            android:id="@+id/list_profile_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
     </LinearLayout>
 
 </LinearLayout>

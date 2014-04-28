@@ -995,6 +995,7 @@ public class ScandalFragment extends SherlockFragment {
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);
 
+	             // Hacemos la petición al servidor
 	             HttpResponse response = client.execute(post);
 	             resEntity = response.getEntity();
 	             final String response_str = EntityUtils.toString(resEntity);

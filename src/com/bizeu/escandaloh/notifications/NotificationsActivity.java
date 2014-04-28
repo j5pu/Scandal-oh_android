@@ -36,6 +36,7 @@ import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.NotificationAdapter;
 import com.bizeu.escandaloh.model.Notification;
+import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
@@ -94,17 +95,27 @@ public class NotificationsActivity extends SherlockActivity {
 
 			  @Override
 			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				  Notification n = (Notification) list_notifications.getItemAtPosition(position);
 							  
 				  // Marcamos la notificación como leída
-				  ((Notification) list_notifications.getItemAtPosition(position)).setIsRead(true);
+				  Notification notiAux =  ((Notification) list_notifications.getItemAtPosition(position));
+				  notiAux.setIsRead(true);
 				  notificationsAdapter.notifyDataSetChanged();
-				  new MarkNotificationAsReadTask(n.getPhotoId()).execute();
+				  new MarkNotificationAsReadTask(notiAux.getPhotoId()).execute();
 				  
-				  // Abrimos el escandalo
-				  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
-				  i.putExtra(PHOTO_ID, n.getPhotoId());
-				  startActivity(i);	     
+				  // Según el tipo de notificación: de escándalo o de usuario
+				  if (notiAux.getType() == 0){ // De tipo escándalo
+					  // Mostramos el escándalo
+					  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
+					  i.putExtra(PHOTO_ID, notiAux.getPhotoId());
+					  startActivity(i);	     
+				  }
+				  else{ // De tipo usuario
+					  // Mostramos el perfil del usuario
+					  Intent i = new Intent(NotificationsActivity.this, ProfileActivity.class);
+					  i.putExtra(ProfileActivity.USER_ID, notiAux.getPhotoId());
+					  startActivity(i);	     
+				  }
+				  
 			  }
 		});
 		
@@ -181,7 +192,8 @@ public class NotificationsActivity extends SherlockActivity {
 	private class GetNotificationsTask extends AsyncTask<Void, Integer, Integer> {
 
 		String n_text;
-		String n_photo_img_p;
+		String n_photo_img_p = null;
+		String n_avatar = null;
 		String n_photo_id;
 		String n_is_read;
 		String n_count;
@@ -235,32 +247,42 @@ public class NotificationsActivity extends SherlockActivity {
 				notificationsObject = respJSON.getJSONArray("objects");
 
 				for (int i = 0; i < notificationsObject.length(); i++) {
+					String n_user_id = null;
+					
 					JSONObject notiObject = notificationsObject.getJSONObject(i);
 
 					n_count = notiObject.getString("count");
 					n_is_read = notiObject.getString("is_read");
-					n_photo_img_p = notiObject.getString("photo_img_small");
-					n_text = new String(notiObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-					n_photo_id = notiObject.getString("photo_id");
+					if (notiObject.has("photo_img_small")){
+						n_photo_img_p = notiObject.getString("photo_img_small");
+					}
+					if (notiObject.has("avatar")){
+						n_avatar = notiObject.getString("avatar");
+					}
+					if (notiObject.has("user_id")){
+						n_user_id = notiObject.getString("user_id");
+					}	
+					if (notiObject.has("photo_id")){
+						n_photo_id = notiObject.getString("photo_id");
+					}	
 
-					Notification notiAux = new Notification(n_text, n_photo_img_p, n_photo_id, n_is_read);
+					n_text = new String(notiObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+
+					Notification notiAux = null;
+					
+					if (n_user_id != null){ // Notificación de tipo usuario
+						notiAux = new Notification(1, n_text, n_avatar, n_user_id, n_is_read);
+					}
+					else{ // Notificación de tipo escándalo
+						notiAux = new Notification(0, n_text, n_photo_img_p, n_photo_id, n_is_read);
+					}
+					
 					array_notifications.add(notiAux);
 				}
 
 			} catch (Exception ex) {
 				Log.e("ServicioRest", "Error!", ex);
 				any_error = true; // Indicamos que hubo un error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
 			}
 
 			// Si hubo algún error devolvemos 666

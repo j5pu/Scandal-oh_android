@@ -129,6 +129,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.bizeu.escandaloh.users.ProfileSettingsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.bizeu.escandaloh.CommentsActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" >

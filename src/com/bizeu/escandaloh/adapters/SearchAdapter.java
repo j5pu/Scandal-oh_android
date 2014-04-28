@@ -29,7 +29,7 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 	 * @param layoutResourceId
 	 * @param data
 	 */
-	public SearchAdapter(Context context, int layoutResourceId,ArrayList<Search> data) {
+	public SearchAdapter(Context context, int layoutResourceId, ArrayList<Search> data) {
 		super(context, layoutResourceId, data);
 		this.layoutResourceId = layoutResourceId;
 		this.mContext = context;
@@ -48,9 +48,9 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 			LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
 			convertView = inflater.inflate(layoutResourceId, null);
 			holder = new SearchHolder();
-			holder.txtTitle = (TextView) convertView.findViewById(R.id.txt_search_title);
-			holder.txtUserName = (TextView) convertView.findViewById(R.id.txt_search_username);
-			holder.imgScandaloh = (FetchableImageView) convertView.findViewById(R.id.img_search_scandaloh);
+			holder.txtTitle = (TextView) convertView.findViewById(R.id.txt_history_action);
+			holder.txtUserName = (TextView) convertView.findViewById(R.id.txt_history_text);
+			holder.imgScandaloh = (FetchableImageView) convertView.findViewById(R.id.img_history_scandaloh);
 			convertView.setTag(holder);
 		}
 

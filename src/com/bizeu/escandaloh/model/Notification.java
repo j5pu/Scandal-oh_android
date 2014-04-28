@@ -6,8 +6,9 @@ public class Notification {
 	private String text;          // Texto de la notificación
 	private String photo_id;      // ID del escándalo
 	private boolean is_read;       // Indica si la notificación ha sido ya leída
+	private int type; // 0: notificación de escándalo           1: notificación de usuario
 	
-	public Notification(String text, String avatar, String photo_id, String is_read){
+	public Notification(int type, String text, String avatar, String photo_id, String is_read){
 		this.avatar = avatar;
 		this.text = text;
 		this.photo_id = photo_id;
@@ -17,6 +18,15 @@ public class Notification {
 		else{
 			this.is_read = false;
 		}	
+		this.type = type;
+	}
+	
+	public int getType(){
+		return type;
+	}
+	
+	public void setType(int new_type){
+		type = new_type;
 	}
 	
 	public String getAvatar(){
