@@ -45,7 +45,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class NotificationsActivity extends SherlockActivity {
 
-	public static String PHOTO_ID = "photo_id";
+
 	private static int NUM_NOTIFICATIONS_TO_LOAD = 20;
 	
 	private ListView list_notifications;
@@ -100,22 +100,20 @@ public class NotificationsActivity extends SherlockActivity {
 				  Notification notiAux =  ((Notification) list_notifications.getItemAtPosition(position));
 				  notiAux.setIsRead(true);
 				  notificationsAdapter.notifyDataSetChanged();
-				  new MarkNotificationAsReadTask(notiAux.getPhotoId()).execute();
+				  new MarkNotificationAsReadTask(notiAux.getPhotoId(), notiAux.getType()).execute();
 				  
-				  // Según el tipo de notificación: de escándalo o de usuario
-				  if (notiAux.getType() == 0){ // De tipo escándalo
-					  // Mostramos el escándalo
-					  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
-					  i.putExtra(PHOTO_ID, notiAux.getPhotoId());
-					  startActivity(i);	     
-				  }
-				  else{ // De tipo usuario
-					  // Mostramos el perfil del usuario
+				  // Si es de tipo 6 le llevamos la perfil del usuario, si no le llevamos al escándalo
+				  if (notiAux.getType() == 6){ 
 					  Intent i = new Intent(NotificationsActivity.this, ProfileActivity.class);
 					  i.putExtra(ProfileActivity.USER_ID, notiAux.getPhotoId());
-					  startActivity(i);	     
+					  startActivity(i);	 
 				  }
 				  
+				  else{ 
+					  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
+					  i.putExtra(ScandalActivity.PHOTO_ID, notiAux.getPhotoId());
+					  startActivity(i);	  
+				  }		  
 			  }
 		});
 		
@@ -197,6 +195,8 @@ public class NotificationsActivity extends SherlockActivity {
 		String n_photo_id;
 		String n_is_read;
 		String n_count;
+		String n_user_id;
+		int type;
 
 		@Override
 		protected void onPreExecute() {
@@ -247,12 +247,12 @@ public class NotificationsActivity extends SherlockActivity {
 				notificationsObject = respJSON.getJSONArray("objects");
 
 				for (int i = 0; i < notificationsObject.length(); i++) {
-					String n_user_id = null;
 					
 					JSONObject notiObject = notificationsObject.getJSONObject(i);
 
 					n_count = notiObject.getString("count");
 					n_is_read = notiObject.getString("is_read");
+					
 					if (notiObject.has("photo_img_small")){
 						n_photo_img_p = notiObject.getString("photo_img_small");
 					}
@@ -265,16 +265,19 @@ public class NotificationsActivity extends SherlockActivity {
 					if (notiObject.has("photo_id")){
 						n_photo_id = notiObject.getString("photo_id");
 					}	
+					if (notiObject.has("type")){
+						type = notiObject.getInt("type");
+					}
 
 					n_text = new String(notiObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
 
 					Notification notiAux = null;
 					
-					if (n_user_id != null){ // Notificación de tipo usuario
-						notiAux = new Notification(1, n_text, n_avatar, n_user_id, n_is_read);
+					if (type == 6){ // Notificación de tipo usuario --> al clickear le llevamos al perfil
+						notiAux = new Notification(type, n_text, n_avatar, n_user_id, n_is_read);
 					}
-					else{ // Notificación de tipo escándalo
-						notiAux = new Notification(0, n_text, n_photo_img_p, n_photo_id, n_is_read);
+					else{ // Notificación de tipo escándalo --> al clickear le llevamos al escándalo
+						notiAux = new Notification(type, n_text, n_photo_img_p, n_photo_id, n_is_read);
 					}
 					
 					array_notifications.add(notiAux);
@@ -329,10 +332,12 @@ public class NotificationsActivity extends SherlockActivity {
 	 */
 	private class MarkNotificationAsReadTask extends AsyncTask<Void,Integer,Void> {
 	
-		private String photo_id;
+		private String id;
+		private int type;
 		
-		public MarkNotificationAsReadTask(String photo_id){
-			this.photo_id = photo_id;
+		public MarkNotificationAsReadTask(String id, int type){
+			this.id = id;
+			this.type = type;
 		}
 		
 		@Override
@@ -348,7 +353,18 @@ public class NotificationsActivity extends SherlockActivity {
 	             post.setHeader("Session-Token", MyApplication.session_token);
 
 	             JSONObject dato = new JSONObject();	                        
-	             dato.put("photo_id", photo_id);
+
+	             
+	             // Si es de tipo 6 mandamos el id del usuario y el tipo
+	             if (type == 6){
+	            	 dato.put("type", type);
+	            	 dato.put("user_id", id);
+	             }
+	             
+	             // Si no mandamos el id de la foto del escándalo
+	             else{
+		             dato.put("photo_id", id);
+	             }
 
 	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
 	             post.setEntity(entity);

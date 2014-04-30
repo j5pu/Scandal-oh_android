@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.model.History;
+import com.bizeu.escandaloh.util.Utils;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.app.Activity;
 import android.content.Context;
@@ -64,7 +65,7 @@ public class HistoryAdapter extends ArrayAdapter<History> {
 		history = data.get(position);
 
 		holder.txtAction.setText(history.getAction());
-		holder.txtDate.setText(history.getDate());
+		holder.txtDate.setText(Utils.changeDateFormat(history.getDate()));
 		holder.txtText.setText(history.getText());
 		holder.imgScandaloh.setImage(MyApplication.DIRECCION_BUCKET + history.getUrl(),
 				mContext.getResources().getDrawable(R.drawable.logo_blanco));

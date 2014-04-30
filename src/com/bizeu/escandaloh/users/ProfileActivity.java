@@ -2,6 +2,7 @@ package com.bizeu.escandaloh.users;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -24,17 +26,26 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.AbsListView.OnScrollListener;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
+import com.bizeu.escandaloh.ScandalActivity;
+import com.bizeu.escandaloh.adapters.HistoryAdapter;
+import com.bizeu.escandaloh.model.History;
+import com.bizeu.escandaloh.model.Notification;
+import com.bizeu.escandaloh.notifications.NotificationsActivity;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.Utils;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -61,6 +72,8 @@ public class ProfileActivity extends SherlockActivity {
 	private TextView txt_following;
 	private ImageView img_settings;
 	private ListView list_history;
+	private LinearLayout ll_list_historys;
+	private LinearLayout ll_loading;
 	
 	private boolean is_me = false; // Nos indica si soy el mismo que el del perfil
 	private Context mContext;
@@ -68,8 +81,12 @@ public class ProfileActivity extends SherlockActivity {
 	private Uri mImageUri;
 	private boolean any_error_user_info;
 	private boolean any_error_follow;
-
-	
+	private boolean any_error_history;
+	private ArrayList<History> array_history = new ArrayList<History>();
+	private HistoryAdapter historyAdapter;
+	private boolean there_are_more_historys = true;
+	private String meta_next_history = null;
+	private GetHistoryTask getHistoryAsync;
 	/**
 	 * OnCreate
 	 */
@@ -98,14 +115,18 @@ public class ProfileActivity extends SherlockActivity {
 		txt_following = (TextView) findViewById(R.id.txt_profile_following);
 		img_settings = (ImageView) findViewById(R.id.img_profile_settings);
 		list_history = (ListView) findViewById(R.id.list_profile_history);
+		ll_list_historys = (LinearLayout) findViewById(R.id.ll_profile_listhistory);
+		ll_loading = (LinearLayout) findViewById(R.id.ll_profile_loading);
+		
+		historyAdapter = new HistoryAdapter(mContext, R.layout.history, array_history);
+		list_history.setAdapter(historyAdapter);
 		
 		img_settings.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(ProfileActivity.this, ProfileSettingsActivity.class);
-				startActivityForResult(i, PROFILE_SETTINGS);
-				
+				startActivityForResult(i, PROFILE_SETTINGS);	
 			}
 		});
 		
@@ -177,6 +198,48 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});	
 		
+		// Al seleccionar una history mostramos el escándalo al que referencia
+		list_history.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			  @Override
+			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+					
+				  History historyAux = ((History) list_history.getItemAtPosition(position));
+				  Intent i = new Intent(ProfileActivity.this, ScandalActivity.class);
+				  i.putExtra(ScandalActivity.PHOTO_ID, historyAux.getId());	
+				  startActivity(i);
+			  }
+		});
+		
+		// Obtener siguientes historys
+		list_history.setOnScrollListener(new OnScrollListener() {
+					
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			           
+				if ((firstVisibleItem + visibleItemCount == historyAdapter.getCount() - 3) && there_are_more_historys) {
+					if (Connectivity.isOnline(mContext)){
+			            		
+						getHistoryAsync = new GetHistoryTask();
+						getHistoryAsync.execute();
+					}
+					else{
+						Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
+						toast.show();
+					}	     			    		
+				}   	
+			}
+			        
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				// TODO Auto-generated method stub
+			}
+		});
+		
+		// Obtenemos el historial (Mi Actividad)
+		getHistoryAsync = new GetHistoryTask();
+		getHistoryAsync.execute();
+		
 	}
 	
 	
@@ -193,6 +256,15 @@ public class ProfileActivity extends SherlockActivity {
 		return true;
 	}
 	
+	
+	/**
+	 * onDestroy
+	 */
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		cancelGetHistorys();
+	}
 	
 
 	/**
@@ -453,7 +525,7 @@ public class ProfileActivity extends SherlockActivity {
 				}
 							
 			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error siguiendo/dejando de dejar a un usuario", ex);
+				Log.e("ServicioRest", "Error siguiendo/dejando de seguir a un usuario", ex);
 				// Hubo algún error inesperado
 				any_error_follow = true;
 			}
@@ -479,6 +551,137 @@ public class ProfileActivity extends SherlockActivity {
 			// No hubo error: mostramos el avatar, nombre de usuario, seguidores y si le está siguiendo
 			else{
 				new ShowUserInformation().execute();
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Obtiene y muestra la actividad de un usuario
+	 * 
+	 */
+	private class GetHistoryTask extends AsyncTask<Void, Integer, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+			any_error_history = false;		
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			
+			String url = null;
+
+			// No hay historys: obtenemos los primeros
+			if (array_history.size() == 0){			
+				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/" + user_id + "/activity/" ;
+			}
+			
+			// Obtenemos los siguientes historys
+			else{
+				// Fin del carrusel: meta nulo indica que no hay más historys
+				if (meta_next_history.equals("null")){
+					there_are_more_historys = false;
+					return 5;
+				}
+				url = MyApplication.SERVER_ADDRESS + meta_next_history;
+			}
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet getHistorys = new HttpGet(url);
+				getHistorys.setHeader("content-type", "application/json");
+				getHistorys.setHeader("Session-Token", MyApplication.session_token);
+				
+				// Hacemos la petición al servidor
+				response = httpClient.execute(getHistorys);
+				String respStr = EntityUtils.toString(response.getEntity());
+				Log.i("WE", "History: " + respStr);
+				
+				// Parseamos los historys devueltos
+				JSONObject respJson = new JSONObject(respStr);
+
+				// Obtenemos el meta
+				JSONObject respMetaJson = respJson.getJSONObject("meta");
+				meta_next_history = respMetaJson.getString("next");
+
+				JSONArray historysObject = respJson.getJSONArray("objects");
+				
+				// Obtenemos los datos de los historys
+				for (int i = 0; i < historysObject.length(); i++) {
+
+					JSONObject historyObject = historysObject.getJSONObject(i);
+
+					final String action = historyObject.getString("action");
+					final String date = historyObject.getString("date");
+					final String photo_id = historyObject.getString("photo_id");
+					final String photo_img = historyObject.getString("photo_img");
+					final String text = new String(historyObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {							
+							// Añadimos el hostiry al ArrayList
+							History history_aux = new History(photo_id, photo_img, action, date, text);
+							array_history.add(history_aux);
+						}
+					});		
+				}
+				
+			} catch (Exception ex) {
+				Log.e("ServicioRest", "Error obteniendo history", ex);
+				// Hubo algún error inesperado
+				any_error_history = true;
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error_history) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Mostramos la lista de searchs
+			showListHistorys();
+			
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,
+						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			// No hubo ningún error extraño
+			else {
+				// Si es codigo 2xx --> OK 
+				historyAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+	
+	/**
+	 * Oculta el loading y muestra el listado de history
+	 */
+	private void showListHistorys(){
+		ll_list_historys.setVisibility(View.VISIBLE);
+		ll_loading.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo historys
+	 */
+	private void cancelGetHistorys() {
+		if (getHistoryAsync != null) {
+			if (getHistoryAsync.getStatus() == AsyncTask.Status.PENDING|| getHistoryAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getHistoryAsync.cancel(true);
 			}
 		}
 	}

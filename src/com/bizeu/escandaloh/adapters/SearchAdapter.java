@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.model.Search;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 

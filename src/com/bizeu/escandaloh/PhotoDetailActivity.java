@@ -1,17 +1,6 @@
 package com.bizeu.escandaloh;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
@@ -19,16 +8,11 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
-import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.google.analytics.tracking.android.EasyTracker;

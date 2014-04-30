@@ -18,7 +18,6 @@ import android.util.Log;
 
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.MainActivity;
-import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class PushReceiver extends BroadcastReceiver {

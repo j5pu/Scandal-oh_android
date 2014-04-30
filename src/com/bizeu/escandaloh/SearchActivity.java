@@ -13,9 +13,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.adapters.SearchAdapter;
-import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.model.Search;
-import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.content.Context;
@@ -257,12 +255,14 @@ public class SearchActivity extends SherlockActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
+	
+	
+	
 
 	/**
 	 * Búsqueda de escándalos
 	 * 
 	 */
-	
 	private class SearchScandalsTask extends AsyncTask<Void, Integer, Integer> {
 
 		String search;
@@ -312,7 +312,7 @@ public class SearchActivity extends SherlockActivity {
 				String respStr = EntityUtils.toString(response.getEntity());
 				Log.i("WE", respStr);
 				
-				// Parseamos los escándalos devueltos
+				// Parseamos los searchs devueltos
 				JSONObject respJson = new JSONObject(respStr);
 
 				// Obtenemos el meta
@@ -321,7 +321,7 @@ public class SearchActivity extends SherlockActivity {
 
 				JSONArray searchsObject = respJson.getJSONArray("objects");
 				
-				// Obtenemos los datos de los escándalos
+				// Obtenemos los datos de los searchs
 				for (int i = 0; i < searchsObject.length(); i++) {
 
 					JSONObject searchObject = searchsObject.getJSONObject(i);
@@ -342,7 +342,7 @@ public class SearchActivity extends SherlockActivity {
 				}
 				
 			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error obteniendo escándalos o comentarios", ex);
+				Log.e("ServicioRest", "Error en la búsqueda", ex);
 				// Hubo algún error inesperado
 				any_error = true;
 			}

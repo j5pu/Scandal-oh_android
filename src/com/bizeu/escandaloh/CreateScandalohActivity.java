@@ -86,6 +86,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private String preview_favicon;
 	private String preview_title;
 	private String first_comment;
+	private String url_without_img;
 
 	/**
 	 * OnCreate
@@ -331,6 +332,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 					StringBody faviconBody = new StringBody(preview_favicon);
 					StringBody sourceBody = new StringBody(preview_source);
 					StringBody mediaBody = new StringBody("1");
+					StringBody urlWithoutImgBody = new StringBody(url_without_img);
 					reqEntity.addPart("img", imgBody);
 					reqEntity.addPart("favicon", faviconBody);
 					reqEntity.addPart("source", sourceBody);
@@ -462,6 +464,10 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				if (respJson.has("img")){
 					preview_img = respJson.getString("img");
+				}
+				
+				if (respJson.has("url_without_img")){
+					url_without_img = respJson.getString("url_without_img");		
 				}
 
 				if (respJson.has("favicon")){

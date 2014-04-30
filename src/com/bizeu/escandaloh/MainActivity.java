@@ -1130,7 +1130,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 				response = httpClient.execute(del);
 				String respStr = EntityUtils.toString(response.getEntity());
 				num_notifs = respStr.toString();
-				Log.i("WE", "num notis: " + respStr.toString());
 
 			} catch (Exception ex) {
 				Log.e("ServicioRest", "Error!", ex);
@@ -1142,7 +1141,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 				return 666;
 			} else {
 				// Devolvemos el nº de notificaciones
-				return (Integer.parseInt(num_notifs));
+				try{
+					return (Integer.parseInt(num_notifs));
+				}
+				catch(NumberFormatException exception){
+					return 666;
+				}
 			}
 		}
 
@@ -1196,26 +1200,26 @@ public class MainActivity extends SherlockFragmentActivity implements
 				escandalos.clear();
 
 				switch (pos) {
-				case 0: // Humor
-					if (category.equals(ANGRY)) {
+					case 0: // Humor
+						if (category.equals(ANGRY)) {
+							// Mandamos el evento a Google Analytics
+							EasyTracker easyTracker2 = EasyTracker
+									.getInstance(mContext);
+							easyTracker2.send(MapBuilder.createEvent("Acción UI",
+									"Selección realizada", "Seleccionado humor",
+									null).build());
+							category = HAPPY;
+						}
+						break;
+					case 1: // Denuncia
 						// Mandamos el evento a Google Analytics
-						EasyTracker easyTracker2 = EasyTracker
+						EasyTracker easyTracker3 = EasyTracker
 								.getInstance(mContext);
-						easyTracker2.send(MapBuilder.createEvent("Acción UI",
-								"Selección realizada", "Seleccionado humor",
+						easyTracker3.send(MapBuilder.createEvent("Acción UI",
+								"Selección realizada", "Seleccionado denuncia",
 								null).build());
-						category = HAPPY;
-					}
-					break;
-				case 1: // Denuncia
-					// Mandamos el evento a Google Analytics
-					EasyTracker easyTracker3 = EasyTracker
-							.getInstance(mContext);
-					easyTracker3.send(MapBuilder.createEvent("Acción UI",
-							"Selección realizada", "Seleccionado denuncia",
-							null).build());
-					category = ANGRY;
-					break;
+						category = ANGRY;
+						break;
 				}
 
 				pager.setCurrentItem(0);

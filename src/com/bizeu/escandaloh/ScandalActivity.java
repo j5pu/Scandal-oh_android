@@ -9,7 +9,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +23,8 @@ import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ScandalActivity extends SherlockFragmentActivity {
+	
+	public static String PHOTO_ID = "photo_id";
 	
 	private boolean any_error;
 	private String photo_id;
@@ -42,7 +43,7 @@ public class ScandalActivity extends SherlockFragmentActivity {
 		mContext = this;
 		
 		if (getIntent() != null){
-			photo_id = getIntent().getStringExtra(NotificationsActivity.PHOTO_ID);
+			photo_id = getIntent().getStringExtra(PHOTO_ID);
 		}
 		
 		// Action Bar

@@ -2,11 +2,11 @@ package com.bizeu.escandaloh.model;
 
 public class Notification {
 
-	private String avatar;        // Avatar del usuario de la notificación
-	private String text;          // Texto de la notificación
-	private String photo_id;      // ID del escándalo
-	private boolean is_read;       // Indica si la notificación ha sido ya leída
-	private int type; // 0: notificación de escándalo           1: notificación de usuario
+	private String avatar;     // Avatar del usuario de la notificación
+	private String text;       // Texto de la notificación
+	private String photo_id;   // ID del escándalo
+	private boolean is_read;   // Indica si la notificación ha sido ya leída
+	private int type; 		   // Tipo de notificación {1,..,9} --> El tipo 6 es la notificación "Tal user te está siguiendo"
 	
 	public Notification(int type, String text, String avatar, String photo_id, String is_read){
 		this.avatar = avatar;

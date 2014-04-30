@@ -53,6 +53,23 @@ public class Utils {
     }
 
     
+	
+	/**
+	 * Cambia el formato de la fecha
+	 * @param old_date Fecha en formato "AAAA-MM-DDTHH:MM:SS"
+	 * @return fecha en formato "DD-MM-AAAA"
+	 */
+	public static String changeDateFormat(String old_date){
+        // La fecha tendrá el formato: dd-mm-aaaa
+        String date_without_time = (old_date.split("T",2))[0];   
+        String year = date_without_time.split("-",3)[0];
+        String month = date_without_time.split("-",3)[1];
+        String day = date_without_time.split("-",3)[2];
+        String final_date = day + "-" + month + "-" + year;
+        return final_date;
+	}
+    
+    
     
 	/**
 	 * Comprueba si el dispositivo dispone de cámara
@@ -68,4 +85,5 @@ public class Utils {
 			return false;
 		}
 	}
+	
 }

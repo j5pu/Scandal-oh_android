@@ -2,7 +2,6 @@ package com.bizeu.escandaloh;
 
 import java.lang.reflect.InvocationTargetException;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;

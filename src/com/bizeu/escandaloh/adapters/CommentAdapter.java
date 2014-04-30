@@ -14,6 +14,7 @@ import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.util.Utils;
 
 public class CommentAdapter extends ArrayAdapter<Comment> {
 
@@ -72,12 +73,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         holder.imgAvatar.setImage(MyApplication.DIRECCION_BUCKET + comment.getAvatar(), mContext.getResources().getDrawable(R.drawable.avatar_defecto));
      
         // La fecha tendrá el formato: dd-mm-aaaa
-        String date_without_time = (comment.getDate().split("T",2))[0];   
-        String year = date_without_time.split("-",3)[0];
-        String month = date_without_time.split("-",3)[1];
-        String day = date_without_time.split("-",3)[2];
-        String final_date = day + "-" + month + "-" + year;
-        holder.txtDate.setText(final_date); 
+        holder.txtDate.setText(Utils.changeDateFormat(comment.getDate())); 
         
         // El icono del usuario dependerá de la red social de éste
         // Scandaloh

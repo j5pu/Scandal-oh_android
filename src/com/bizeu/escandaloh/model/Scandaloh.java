@@ -1,7 +1,5 @@
 package com.bizeu.escandaloh.model;
 
-import java.util.ArrayList;
-
 import android.graphics.Bitmap;
 
 public class Scandaloh {
