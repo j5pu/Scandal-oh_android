@@ -38,13 +38,9 @@ import com.bizeu.escandaloh.adapters.NotificationAdapter;
 import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Connectivity;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class NotificationsActivity extends SherlockActivity {
-
 
 	private static int NUM_NOTIFICATIONS_TO_LOAD = 20;
 	
@@ -93,28 +89,28 @@ public class NotificationsActivity extends SherlockActivity {
 		// Al seleccionar una notificación mostramos el escándalo al que referencia
 		list_notifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-			  @Override
-			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 							  
-				  // Marcamos la notificación como leída
-				  Notification notiAux =  ((Notification) list_notifications.getItemAtPosition(position));
-				  notiAux.setIsRead(true);
-				  notificationsAdapter.notifyDataSetChanged();
-				  new MarkNotificationAsReadTask(notiAux.getPhotoId(), notiAux.getType()).execute();
+				// Marcamos la notificación como leída
+				Notification notiAux =  ((Notification) list_notifications.getItemAtPosition(position));
+				notiAux.setIsRead(true);
+				notificationsAdapter.notifyDataSetChanged();
+				new MarkNotificationAsReadTask(notiAux.getPhotoId(), notiAux.getType()).execute();
 				  
-				  // Si es de tipo 6 le llevamos la perfil del usuario, si no le llevamos al escándalo
-				  if (notiAux.getType() == 6){ 
-					  Intent i = new Intent(NotificationsActivity.this, ProfileActivity.class);
-					  i.putExtra(ProfileActivity.USER_ID, notiAux.getPhotoId());
-					  startActivity(i);	 
-				  }
+				// Si es de tipo 6 le llevamos la perfil del usuario, si no le llevamos al escándalo
+				if (notiAux.getType() == 6){ 
+					Intent i = new Intent(NotificationsActivity.this, ProfileActivity.class);
+					i.putExtra(ProfileActivity.USER_ID, notiAux.getPhotoId());
+					startActivity(i);	 
+				}
 				  
-				  else{ 
-					  Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
-					  i.putExtra(ScandalActivity.PHOTO_ID, notiAux.getPhotoId());
-					  startActivity(i);	  
-				  }		  
-			  }
+				else{ 
+					Intent i = new Intent(NotificationsActivity.this, ScandalActivity.class);
+					i.putExtra(ScandalActivity.PHOTO_ID, notiAux.getPhotoId());
+					startActivity(i);	  
+				}		  
+			}
 		});
 		
 		// Obtener siguientes notificaciones
@@ -147,9 +143,7 @@ public class NotificationsActivity extends SherlockActivity {
 		
 		// Obtenemos las notificaciones
 		getNotisAsync = new GetNotificationsTask();
-		getNotisAsync.execute();
-		
-		
+		getNotisAsync.execute();	
 	}
 	
 	
@@ -237,7 +231,7 @@ public class NotificationsActivity extends SherlockActivity {
 			
 				JSONObject respJSON = new JSONObject(respStr);
 
-				// Parseamos el json para obtener los escandalos
+				// Parseamos el json para obtener las notificaciones
 				JSONArray notificationsObject = null;
 				
 				// Obtenemos el meta
@@ -409,7 +403,6 @@ public class NotificationsActivity extends SherlockActivity {
 	private void cancelGetNotifications() {
 		if (getNotisAsync != null) {
 			if (getNotisAsync.getStatus() == AsyncTask.Status.PENDING|| getNotisAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				Log.v("WE","Cancelamos");
 				getNotisAsync.cancel(true);
 			}
 		}

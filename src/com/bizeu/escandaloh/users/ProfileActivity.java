@@ -74,6 +74,8 @@ public class ProfileActivity extends SherlockActivity {
 	private ListView list_history;
 	private LinearLayout ll_list_historys;
 	private LinearLayout ll_loading;
+	private LinearLayout ll_num_seguidores;
+	private LinearLayout ll_num_seguidos;
 	
 	private boolean is_me = false; // Nos indica si soy el mismo que el del perfil
 	private Context mContext;
@@ -87,6 +89,7 @@ public class ProfileActivity extends SherlockActivity {
 	private boolean there_are_more_historys = true;
 	private String meta_next_history = null;
 	private GetHistoryTask getHistoryAsync;
+	
 	/**
 	 * OnCreate
 	 */
@@ -111,12 +114,14 @@ public class ProfileActivity extends SherlockActivity {
 		img_picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
 		txt_username = (TextView) findViewById(R.id.txt_profile_username);
 		but_follow_unfollow = (Button) findViewById(R.id.but_profile_follow_unfollow);
-		txt_followers = (TextView) findViewById(R.id.txt_profile_followers);
-		txt_following = (TextView) findViewById(R.id.txt_profile_following);
+		txt_followers = (TextView) findViewById(R.id.txt_profile_num_seguidores);
+		txt_following = (TextView) findViewById(R.id.txt_profile_num_siguiendo);
 		img_settings = (ImageView) findViewById(R.id.img_profile_settings);
 		list_history = (ListView) findViewById(R.id.list_profile_history);
 		ll_list_historys = (LinearLayout) findViewById(R.id.ll_profile_listhistory);
 		ll_loading = (LinearLayout) findViewById(R.id.ll_profile_loading);
+		ll_num_seguidores = (LinearLayout) findViewById(R.id.ll_profile_numseguidores);
+		ll_num_seguidos = (LinearLayout) findViewById(R.id.ll_profile_numsiguiendo);
 		
 		historyAdapter = new HistoryAdapter(mContext, R.layout.history, array_history);
 		list_history.setAdapter(historyAdapter);
@@ -233,6 +238,30 @@ public class ProfileActivity extends SherlockActivity {
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				// TODO Auto-generated method stub
+			}
+		});
+		
+		// Mostramos la lista de seguidores
+		ll_num_seguidores.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
+				i.putExtra(FollowersActivity.USER_ID, user_id);
+				i.putExtra(FollowersActivity.FOLLOWERS, true);
+				startActivity(i);
+			}
+		});
+		
+		// Mostramos la lista de seguidos
+		ll_num_seguidos.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
+				i.putExtra(FollowersActivity.USER_ID, user_id);
+				i.putExtra(FollowersActivity.FOLLOWERS, false);
+				startActivity(i);	
 			}
 		});
 		
@@ -425,8 +454,8 @@ public class ProfileActivity extends SherlockActivity {
 			else{
 				img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
 				txt_username.setText(username);
-				txt_followers.setText(followers_count);
-				txt_following.setText(follows_count);
+				txt_followers.setText(follows_count);
+				txt_following.setText(followers_count);
 				
 				if (is_following){
 					but_follow_unfollow.setText(getResources().getString(R.string.dejar_de_seguir));
@@ -649,7 +678,7 @@ public class ProfileActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
-			// Mostramos la lista de searchs
+			// Mostramos la lista de historys
 			showListHistorys();
 			
 			// Si hubo algún error inesperado mostramos un mensaje
