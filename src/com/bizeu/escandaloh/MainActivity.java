@@ -147,7 +147,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     private List<String> filter_childs;
     private Map<String, List<String>> filterCollection;
     private String actual_filter = FILTRO_RECIENTES ;
-	private String action_bar_mode = NORMAL; // NORMAL o ENVIAR_COMENTARIO
 	public static boolean activity_is_showing = false;
 
 	/**
@@ -225,6 +224,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 					// Usamos una llave de paso (sólo la primera vez entrará).
 					// Cuando se obtengan los 10 escándalos se volverá a abrir
 					if (!getting_escandalos) {
+						// Cambiamos la imagen de actualizar por un loading
+						showLoadingOnMenu();	
 						getEscandalosAsync = new GetScandalsTask();
 						getEscandalosAsync.execute();
 					}
@@ -723,9 +724,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		@Override
 		protected void onPreExecute() {
 			getting_escandalos = true;
-			any_error = false;
-			// Cambiamos la imagen de actualizar por un loading
-			showLoadingOnMenu();		
+			any_error = false;	
 		}
 
 		@Override
