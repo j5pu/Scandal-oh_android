@@ -12,10 +12,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,8 +28,12 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
+import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.FollowAdapter;
 import com.bizeu.escandaloh.model.Follow;
+import com.bizeu.escandaloh.model.Notification;
+import com.bizeu.escandaloh.notifications.NotificationsActivity;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class FollowersActivity extends SherlockActivity {
@@ -85,6 +93,41 @@ public class FollowersActivity extends SherlockActivity {
 		
 		followAdapter = new FollowAdapter(this, R.layout.follow, array_follows);
 		list_followers_follows.setAdapter(followAdapter);
+		
+		list_followers_follows.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+				Follow followAux =  ((Follow) list_followers_follows.getItemAtPosition(position));
+				
+				Intent i = new Intent(FollowersActivity.this, ProfileActivity.class);
+				i.putExtra(ProfileActivity.USER_ID, followAux.getUserId());
+				startActivity(i);	
+			}
+		});
+		
+		list_followers_follows.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	        	if ((firstVisibleItem + visibleItemCount == followAdapter.getCount()) && there_are_more_follows) {
+	            	if (Connectivity.isOnline(mContext)){
+	            		// Obtenemos los siguientes follows
+	            		getFollowsAsync = new GetFollowsTask();
+	            		getFollowsAsync.execute();
+	            	}
+	            	else{
+	            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
+	            		toast.show();
+	            	}	     			    		
+	            } 	
+			}
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) { 	
+			}
+		});
+		
 		
 		// Mostramos el loading
 		showLoading();

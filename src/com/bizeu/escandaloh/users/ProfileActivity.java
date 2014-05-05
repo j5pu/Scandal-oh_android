@@ -43,8 +43,6 @@ import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.HistoryAdapter;
 import com.bizeu.escandaloh.model.History;
-import com.bizeu.escandaloh.model.Notification;
-import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.Utils;
@@ -52,6 +50,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R.id;
 
 public class ProfileActivity extends SherlockActivity {
 
@@ -76,6 +75,8 @@ public class ProfileActivity extends SherlockActivity {
 	private LinearLayout ll_loading;
 	private LinearLayout ll_num_seguidores;
 	private LinearLayout ll_num_seguidos;
+	private LinearLayout ll_userinfo_data;
+	private LinearLayout ll_userinfo_loading;
 	
 	private boolean is_me = false; // Nos indica si soy el mismo que el del perfil
 	private Context mContext;
@@ -122,6 +123,8 @@ public class ProfileActivity extends SherlockActivity {
 		ll_loading = (LinearLayout) findViewById(R.id.ll_profile_loading);
 		ll_num_seguidores = (LinearLayout) findViewById(R.id.ll_profile_numseguidores);
 		ll_num_seguidos = (LinearLayout) findViewById(R.id.ll_profile_numsiguiendo);
+		ll_userinfo_data = (LinearLayout) findViewById(R.id.ll_profile_userinfo_data);
+		ll_userinfo_loading = (LinearLayout) findViewById(R.id.ll_profile_userinfo_loading);
 		
 		historyAdapter = new HistoryAdapter(mContext, R.layout.history, array_history);
 		list_history.setAdapter(historyAdapter);
@@ -135,10 +138,9 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});
 		
-		// Mostramos el avatar
+		// Mostramos la información del usuario
 		if (getIntent() != null){
 			user_id = getIntent().getStringExtra(USER_ID);
-			new ShowUserInformation().execute();
 		}
 		
 		// Cambiar avatar
@@ -222,9 +224,9 @@ public class ProfileActivity extends SherlockActivity {
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			           
-				if ((firstVisibleItem + visibleItemCount == historyAdapter.getCount() - 3) && there_are_more_historys) {
-					if (Connectivity.isOnline(mContext)){
-			            		
+				if ((firstVisibleItem + visibleItemCount == historyAdapter.getCount() -1) && there_are_more_historys) {
+					
+					if (Connectivity.isOnline(mContext)){		         		
 						getHistoryAsync = new GetHistoryTask();
 						getHistoryAsync.execute();
 					}
@@ -246,10 +248,14 @@ public class ProfileActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
-				i.putExtra(FollowersActivity.USER_ID, user_id);
-				i.putExtra(FollowersActivity.FOLLOWERS, true);
-				startActivity(i);
+				
+				String followers_c = txt_followers.getText().toString().substring(0,1);
+				if (!followers_c.equals("0")){
+					Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
+					i.putExtra(FollowersActivity.USER_ID, user_id);
+					i.putExtra(FollowersActivity.FOLLOWERS, true);
+					startActivity(i);
+				}
 			}
 		});
 		
@@ -258,17 +264,32 @@ public class ProfileActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
-				i.putExtra(FollowersActivity.USER_ID, user_id);
-				i.putExtra(FollowersActivity.FOLLOWERS, false);
-				startActivity(i);	
+				
+				String following_c = txt_following.getText().toString().substring(0,1);
+				if (!following_c.equals("0")){
+					Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
+					i.putExtra(FollowersActivity.USER_ID, user_id);
+					i.putExtra(FollowersActivity.FOLLOWERS, false);
+					startActivity(i);	
+				}
 			}
 		});
 		
 		// Obtenemos el historial (Mi Actividad)
 		getHistoryAsync = new GetHistoryTask();
-		getHistoryAsync.execute();
-		
+		getHistoryAsync.execute();		
+	}
+	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart(){
+		super.onStart();
+		if (user_id != null){
+			new ShowUserInformation().execute();
+		}
 	}
 	
 	
@@ -444,6 +465,8 @@ public class ProfileActivity extends SherlockActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 
+			showUserInfo();
+			
 			// Si hubo algún error inesperado mostramos un mensaje
 			if (result == 666) {
 				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
@@ -454,8 +477,14 @@ public class ProfileActivity extends SherlockActivity {
 			else{
 				img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
 				txt_username.setText(username);
-				txt_followers.setText(follows_count);
-				txt_following.setText(followers_count);
+				if (followers_count.equals("1")){
+					txt_followers.setText(followers_count + " " + getResources().getString(R.string.seguidor));
+				}
+				else{
+					txt_followers.setText(followers_count + " " + getResources().getString(R.string.seguidores));
+
+				}
+				txt_following.setText(follows_count + " " + getResources().getString(R.string.siguiendo));
 				
 				if (is_following){
 					but_follow_unfollow.setText(getResources().getString(R.string.dejar_de_seguir));
@@ -701,6 +730,15 @@ public class ProfileActivity extends SherlockActivity {
 	private void showListHistorys(){
 		ll_list_historys.setVisibility(View.VISIBLE);
 		ll_loading.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Oculta el loading y muestra la información del usuario (nombre, nº seguidores y siguiendo y botón de seguir)
+	 */
+	private void showUserInfo(){
+		ll_userinfo_loading.setVisibility(View.GONE);
+		ll_userinfo_data.setVisibility(View.VISIBLE);
 	}
 	
 	

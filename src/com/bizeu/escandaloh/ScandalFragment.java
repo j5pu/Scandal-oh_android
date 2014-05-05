@@ -459,18 +459,17 @@ public class ScandalFragment extends SherlockFragment {
         // Si el usuario tiene avatar
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
-            emoticono.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(getActivity(), ProfileActivity.class);
-					i.putExtra(ProfileActivity.USER_ID, user_id);
-					startActivity(i);
-				}
-			});
         }
-
-                      
+        emoticono.setOnClickListener(new View.OnClickListener() {
+				
+        	@Override
+        	public void onClick(View v) {
+        		Intent i = new Intent(getActivity(), ProfileActivity.class);
+        		i.putExtra(ProfileActivity.USER_ID, user_id);
+        		startActivity(i);
+        	}
+        });
+                    
         // LIKES
         tLikes.setText(Integer.toString(likes));
         tDislikes.setText(Integer.toString(dislikes));

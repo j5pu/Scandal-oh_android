@@ -16,85 +16,92 @@
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_profile_picture"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/cargando" />
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal" >
-
-        <TextView
-            android:id="@+id/txt_profile_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="username" />
-
-    </LinearLayout>
-
-    <LinearLayout
+        android:id="@+id/ll_profile_userinfo_data"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal" >
+        android:layout_weight="1.7"
+        android:orientation="vertical"
+        android:visibility="gone" >
 
         <LinearLayout
-            android:id="@+id/ll_profile_numseguidores"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal" >
 
             <TextView
-                android:id="@+id/txt_profile_num_seguidores"
+                android:id="@+id/txt_profile_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/txt_profile_seguidores"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:text="@string/seguidores" />
-
+                android:text="username" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll_profile_numsiguiendo"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" >
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/txt_profile_num_siguiendo"
+            <LinearLayout
+                android:id="@+id/ll_profile_numseguidores"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="15dp"
-                android:text="TextView" />
+                android:gravity="center_horizontal" >
 
-            <TextView
-                android:id="@+id/txt_profile_siguiendo"
+                <TextView
+                    android:id="@+id/txt_profile_num_seguidores"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="X Seguidores" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_profile_numsiguiendo"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/txt_profile_num_siguiendo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="15dp"
+                    android:text="X Seguidos" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/but_profile_follow_unfollow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:text="@string/siguiendo" />
-
+                android:text="@string/seguir" />
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_profile_userinfo_loading"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1.7"
+        android:gravity="center_horizontal|center_vertical"
         android:orientation="vertical"
-        android:gravity="center_horizontal" >
+        android:visibility="visible" >
 
-        <Button
-            android:id="@+id/but_profile_follow_unfollow"
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyleSmall"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/seguir" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
