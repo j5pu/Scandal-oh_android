@@ -25,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,12 +48,13 @@ public class CommentsActivity extends SherlockActivity {
 	
 	private ListView list_comments;
 	private LinearLayout img_send;
-	private LinearLayout ll_loading;
 	private LinearLayout ll_icon;
 	private EditText edit_comment;
 	private LinearLayout ll_screen;
 	private FetchableImageView photo;
 	private TextView txt_title;
+	private FetchableImageView img_fondo;
+	private ProgressBar prog_loading;
 
 	private ArrayList<Comment> array_comments = new ArrayList<Comment>();
 	private CommentAdapter commentsAdapter;
@@ -85,7 +87,8 @@ public class CommentsActivity extends SherlockActivity {
 		edit_comment = (EditText) findViewById(R.id.edit_comments_comment);
 		img_send = (LinearLayout) findViewById(R.id.ll_comments_send);
 		ll_screen = (LinearLayout) findViewById(R.id.ll_comments_screen);
-		ll_loading = (LinearLayout) findViewById(R.id.ll_comments_loading);
+		img_fondo = (FetchableImageView) findViewById(R.id.img_comments_background);
+		prog_loading = (ProgressBar) findViewById(R.id.prog_comments_loading);
 		
 		// Action Bar
 		ActionBar actBar = getSupportActionBar();
@@ -98,6 +101,8 @@ public class CommentsActivity extends SherlockActivity {
 		photo.setImage(url_photo, R.drawable.loading);
 		txt_title = (TextView) findViewById(R.id.txt_actionbar_comments_title);
 		txt_title.setText(title);
+		
+		img_fondo.setImage(url_photo, R.drawable.loading);
 		
 		// Volvemos al carrusel
 		ll_icon = (LinearLayout) findViewById(R.id.ll_actionbar_comments_icon);
@@ -326,8 +331,7 @@ public class CommentsActivity extends SherlockActivity {
 				}
 				
 				// Ocultamos el loading y mostramos la lista de comentarios
-				ll_loading.setVisibility(View.GONE);
-				list_comments.setVisibility(View.VISIBLE);
+				prog_loading.setVisibility(View.GONE);
 
 				// Si hubo algún error
 				if (result == 666) {

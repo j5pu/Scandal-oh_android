@@ -7,34 +7,34 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/gris_comments" >
+        android:layout_height="match_parent" >
 
-        <LinearLayout
-            android:id="@+id/ll_comments_loading"
+        <com.applidium.shutterbug.FetchableImageView
+            android:id="@+id/img_comments_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical"
-            android:orientation="vertical"
-            android:layout_above="@+id/ll_comments_write_comment" >
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo" />
 
-            <ProgressBar
-                android:id="@+id/progressBar1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-        
         <com.bizeu.escandaloh.util.CommentsListView
             android:id="@+id/list_comments_listcomments"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/ll_comments_write_comment"
+            android:background="#99000000"
             android:descendantFocusability="afterDescendants"
-            android:divider="#00000000"
-            android:dividerHeight="0px"
-            android:visibility="gone" >
+            android:divider="#AAff0000"
+            android:dividerHeight="0px" >
+
         </com.bizeu.escandaloh.util.CommentsListView>
+
+        <ProgressBar
+            android:id="@+id/prog_comments_loading"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:id="@+id/ll_comments_write_comment"
@@ -49,8 +49,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="10"
                 android:layout_marginLeft="5dp"
+                android:layout_weight="10"
                 android:ems="10"
                 android:gravity="center_vertical"
                 android:hint="@string/escribe_un_comentario"
