@@ -1,42 +1,34 @@
 package com.bizeu.escandaloh.settings;
 
-import java.io.File;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.util.ImageUtils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.bizeu.escandaloh.util.Connectivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
+
 
 public class SettingsActivity extends SherlockPreferenceActivity {
 
@@ -45,6 +37,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 	private CheckBoxPreference checkN;
 	private PreferenceCategory prefN;
 
+	private Context mContext;
 
 	/**
 	 * onCreate
@@ -65,6 +58,8 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		
         actBar.setHomeButtonEnabled(true);
         actBar.setDisplayHomeAsUpEnabled(true);
+        
+        mContext = this;
 
         if (!MyApplication.logged_user){
         	PreferenceScreen preferenceScreen = getPreferenceScreen();
@@ -81,9 +76,13 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 			checkN.setChecked(false);
 		}
 		
+
+	
 		checkA.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
+	
 				// Guardamos la configuración nueva de autoplay
 				if (newValue.toString().equals("true")) {
 					prefs.edit().putBoolean(MyApplication.AUTOPLAY_ACTIVATED, true).commit();
@@ -95,25 +94,42 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 			}
 		});
 		
+		
 		checkN.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				// Avisamos al servidor
-				if (newValue.toString().equals("true")){
-					new ActivateNotificationsTask(true).execute();
-					prefs.edit().putBoolean(MyApplication.NOTIFICATIONS_ACTIVATED, true).commit();
+				
+				// Si hay conexión: cambiamos la configuración de las notis
+				if (Connectivity.isOnline(mContext)){
+					boolean to_activate;
+					
+					// Avisamos al servidor
+					if (newValue.toString().equals("true")){
+						to_activate = true;
+						prefs.edit().putBoolean(MyApplication.NOTIFICATIONS_ACTIVATED, true).commit();
+					}
+					else{
+						to_activate = false;
+						prefs.edit().putBoolean(MyApplication.NOTIFICATIONS_ACTIVATED, false).commit();
+					}
+					
+					new ActivateNotificationsTask(to_activate).execute();
 				}
+				
+				// Si no, deshabilitamosla opción
 				else{
-					new ActivateNotificationsTask(false).execute();
-					prefs.edit().putBoolean(MyApplication.NOTIFICATIONS_ACTIVATED, false).commit();
+					checkN.setEnabled(false);			
+					
+					Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+					toast.show();
 				}
+				
 				return true;
 			}
 		});
 	}
-	
-	
+
 	/**
 	 * onOptionsItemSelected
 	 */
@@ -169,7 +185,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 				resEntity = response.getEntity();
 				final String response_str = EntityUtils.toString(resEntity);
 				
-				Log.i("WE",response_str);
+				Log.i("WE","act/desct notificaciones " + response_str);
 				
 				JSONObject respJSON = new JSONObject(response_str);
 			}
@@ -178,7 +194,6 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 
 			}
-
 
 			// Devolvemos el resultado
 			return null;	
