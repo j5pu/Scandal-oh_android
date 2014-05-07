@@ -191,8 +191,7 @@ public class ProfileSettingsActivity extends SherlockActivity {
 
 			@Override
 			public void onClick(View v) {
-				AlertDialog.Builder alert_logout = new AlertDialog.Builder(
-						mContext);
+				AlertDialog.Builder alert_logout = new AlertDialog.Builder(mContext);
 				alert_logout.setTitle(R.string.cerrar_sesion_usuario);
 				alert_logout.setMessage(R.string.seguro_que_quieres_cerrar);
 				alert_logout.setPositiveButton(R.string.confirmar,

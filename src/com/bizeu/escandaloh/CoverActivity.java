@@ -115,6 +115,7 @@ public class CoverActivity extends Activity {
 			if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
 				i.setAction(PushReceiver.PUSH_NOTIFICATION);
 			}
+			// Modo normal
 			else{
 				i.setAction(Intent.ACTION_DEFAULT);
 			}

@@ -220,4 +220,6 @@
     <string name="seguidores">Seguidores</string>
     <string name="siguiendo">Siguiendo</string>
     <string name="seguidor">Seguidor</string>
+    <string name="debes_tener_una_cuenta_de_google">Debes tener una cuenta de Google asociada al dispositivo</string>
+    <string name="quieres_aniadir_una">¿Quieres añadir una ahora?</string>
 </resources>

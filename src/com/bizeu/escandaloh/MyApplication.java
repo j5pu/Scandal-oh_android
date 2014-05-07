@@ -47,8 +47,11 @@ public class MyApplication extends Application {
 		super.onCreate();
 		
 		// Parse
+		Log.v("WE","Antes de initialize");
 		Parse.initialize(this, "d0pwm3XnQrHZCrTmQuuE75SXrzr46001WWfH9uFv", "YGONYEJpspQOod64lA5xwkGaK4V3GgAnq1kHNpD2");
+		Log.v("WE","Despues de initialize");
 		PushService.setDefaultPushCallback(this, MainActivity.class);
+		Log.v("WE","Despues de setDefaultPushCallback");
 
 
 	}

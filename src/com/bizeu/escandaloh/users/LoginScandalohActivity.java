@@ -14,11 +14,16 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -91,9 +96,52 @@ public class LoginScandalohActivity extends SherlockActivity {
 			
 			@Override
 			public void onClick(View v) {
+				
 				if (Connectivity.isOnline(mContext)){
+					
 					if (checkFields()){
-						new LogInUser().execute();	
+						
+						// Pedimos login si tenemos device token
+						if (ParseInstallation.getCurrentInstallation().getString("deviceToken") != null){
+							new LogInUser().execute();	
+						}
+						
+						// Si no mostramos un dialog pidiendo añadir una cuenta de Google
+						else{
+							AlertDialog.Builder alert_accounts = new AlertDialog.Builder(mContext);
+							alert_accounts.setTitle(R.string.debes_tener_una_cuenta_de_google);
+							alert_accounts.setMessage(R.string.quieres_aniadir_una);
+							alert_accounts.setPositiveButton(R.string.confirmar,
+									new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialogo1, int id) {
+											
+											// Intent hacia pantalla de cuentas
+											Intent i_accounts = new Intent(Settings.ACTION_ADD_ACCOUNT);
+											// Si es API 18+ le llevamos directamente a la pantalla de cuenta de Google
+											if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+												i_accounts.putExtra(Settings.EXTRA_ACCOUNT_TYPES, new String[] {"com.google"});
+											}
+											PackageManager pm = mContext.getPackageManager();
+											
+											// Si es nulo es que no hay actividad para dicho intent (el dispositivo no lo acepta)
+											if (pm.resolveActivity(i_accounts, PackageManager.MATCH_DEFAULT_ONLY) != null){
+												// Usamos ACTION_ADD_ACCOUNT
+												startActivity(i_accounts);
+											}
+											else{
+												// Usamos ACTION_SETTINGS
+												startActivity(new Intent(Settings.ACTION_SETTINGS));
+
+											}	
+										}
+									});
+							alert_accounts.setNegativeButton(R.string.cancelar,
+									new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialogo1, int id) {
+										}
+									});
+							alert_accounts.show();
+						}
 					}		
 				}
 				else{
@@ -184,6 +232,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 		private String avatar;
 		private String username;
 		private String session_token;
+		private String device_token;
 		
 		@Override
 		protected void onPreExecute(){
@@ -216,7 +265,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	             String password = edit_password.getText().toString();
              
 	             // Obtenemos el device token de parse
-	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	             device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
 	             dato.put("device_token", device_token);
 	             dato.put("device_type", 2);
 	             dato.put("username_email", username_email);
@@ -245,6 +294,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	                	 username = respJSON.getString("username");
 	                	 session_token = respJSON.getString("session_token");
 	                 }
+	                 
 	                 // Si no es OK obtenemos la razón
 	                 else if (status.equals("error")){
 	                	 if (respJSON.has("reason_code")){
@@ -281,6 +331,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	                 }
 	             }
 	        }
+	        
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
@@ -291,6 +342,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 					                       ex),                                                             // The exception.
 					                       false).build()); 
 	        }
+	        
 			return null;
 	      
 	    }
@@ -306,8 +358,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast.makeText(getBaseContext(), R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT).show();	
 			}
+			
 			else{
 				// Si no ha habido algún error extraño 
 				 if (!login_error){
@@ -351,8 +404,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 				
 				// Ha habido algún error extraño: mostramos el mensaje
 				else{
-		        	Toast.makeText(getBaseContext(), loginMessageError, Toast.LENGTH_SHORT)
-					.show();
+		        	Toast.makeText(getBaseContext(), loginMessageError, Toast.LENGTH_SHORT).show();
 				}
 			}								
 	    }

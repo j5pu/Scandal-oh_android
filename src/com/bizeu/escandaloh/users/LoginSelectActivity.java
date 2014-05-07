@@ -12,13 +12,17 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +78,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	private String access_token;
 	private String shared;
 	private int sharing_type;
+	private String device_token;
 
 	/**
 	 * onCreate
@@ -158,13 +163,19 @@ public class LoginSelectActivity extends SherlockActivity {
 				}
 				// Sesión cerrada
 				else {
-					// Usuario logueado: quitamos el loading
-					if (MyApplication.logged_user){
-						if (progress.isShowing()) {
-							progress.dismiss();
+					// Si existe device_token
+					if (device_token != null){
+						// Si el usuario está logueado 
+						if (MyApplication.logged_user || login_error){
+							finish();
 						}
-						finish();
 					}
+					
+					// Quitamos el loading
+					if (progress.isShowing()) {
+						progress.dismiss();
+					}
+
 				}
 
 			}
@@ -270,7 +281,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				}		
 
 				// Obtenemos el device token de parse
-	            String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	            device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
 	            dato.put("device_token", device_token);
 	            dato.put("device_type", 2);
 				dato.put("access_token", access_token);
@@ -293,6 +304,10 @@ public class LoginSelectActivity extends SherlockActivity {
 					// Comprobamos el campo status del json
 					status = respJSON.getString("status");
 
+	                 if (device_token == null){
+	                	 login_error = true;
+                 }				        
+					
 					// Si es OK obtenemos el user_uri
 					if (status.equals("ok")) {
 						//user_uri = respJSON.getString("user_uri");
@@ -367,14 +382,50 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 
 			// Ha habido algún error extraño: mostramos el mensaje
-			else {
-				Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido,
-						Toast.LENGTH_SHORT).show();
-				// Quitamos el ProgressDialog
-				if (progress.isShowing()) {
-					progress.dismiss();
+			else {		
+				
+				if (device_token  == null){
+					// Si el device token es nulo es porque no tiene cuenta de Google: mostramos un dialog
+					AlertDialog.Builder alert_accounts = new AlertDialog.Builder(mContext);
+					alert_accounts.setTitle(R.string.debes_tener_una_cuenta_de_google);
+					alert_accounts.setMessage(R.string.quieres_aniadir_una);
+					alert_accounts.setPositiveButton(R.string.confirmar,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1, int id) {
+									
+									// Intent hacia pantalla de cuentas
+									Intent i_accounts = new Intent(Settings.ACTION_ADD_ACCOUNT);
+									// Si es API 18+ le llevamos directamente a la pantalla de cuenta de Google
+									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+										i_accounts.putExtra(Settings.EXTRA_ACCOUNT_TYPES, new String[] {"com.google"});
+									}
+									PackageManager pm = mContext.getPackageManager();
+									
+									// Si es nulo es que no hay actividad para dicho intent (el dispositivo no lo acepta)
+									if (pm.resolveActivity(i_accounts, PackageManager.MATCH_DEFAULT_ONLY) != null){
+										// Usamos ACTION_ADD_ACCOUNT
+										startActivity(i_accounts);
+									}
+									else{
+										// Usamos ACTION_SETTINGS
+										startActivity(new Intent(Settings.ACTION_SETTINGS));
+
+									}	
+								}
+							});
+					alert_accounts.setNegativeButton(R.string.cancelar,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1, int id) {
+								}
+							});
+					alert_accounts.show();
+				}
+				
+				else{
+					Toast.makeText(getBaseContext(), R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT).show();
 				}
 			}
+			
 			// Cerramos sesión facebook
 			Session.getActiveSession().closeAndClearTokenInformation();
 		}

@@ -175,7 +175,8 @@
                 <category android:name="com.mnopi.scandaloh_escandalo_humor_denuncia_social" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.bizeu.escandaloh.notifications.PushReceiver" >
+        <receiver 
+            android:name="com.bizeu.escandaloh.notifications.PushReceiver" >
             <intent-filter>
                 <action android:name="alex_action" >
                 </action>

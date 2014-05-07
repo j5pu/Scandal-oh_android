@@ -15,11 +15,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,7 +33,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
@@ -53,7 +57,6 @@ public class RegistrationActivity extends SherlockActivity {
 	private String password_error;
 	private String email_error; 
 	private String status = null;
-	private String user_uri ;
 	private ProgressDialog progress;
 	private Context mContext;
 	private boolean any_error;
@@ -87,9 +90,51 @@ public class RegistrationActivity extends SherlockActivity {
 			public void onClick(View v) {
 				
 				if (Connectivity.isOnline(mContext)){
+					
 					// Si todos los campos son correctos hacemos la petición de registro
 					if (checkFields()){
-						new SignInUser().execute();
+						
+						// Pedimos registro si tenemos device token
+						if (ParseInstallation.getCurrentInstallation().getString("deviceToken") != null){
+							new SignInUser().execute();	
+						}
+						
+						// Si no mostramos un dialog pidiendo añadir una cuenta de Google
+						else{
+							AlertDialog.Builder alert_accounts = new AlertDialog.Builder(mContext);
+							alert_accounts.setTitle(R.string.debes_tener_una_cuenta_de_google);
+							alert_accounts.setMessage(R.string.quieres_aniadir_una);
+							alert_accounts.setPositiveButton(R.string.confirmar,
+									new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialogo1, int id) {
+											
+											// Intent hacia pantalla de cuentas
+											Intent i_accounts = new Intent(Settings.ACTION_ADD_ACCOUNT);
+											// Si es API 18+ le llevamos directamente a la pantalla de cuenta de Google
+											if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+												i_accounts.putExtra(Settings.EXTRA_ACCOUNT_TYPES, new String[] {"com.google"});
+											}
+											PackageManager pm = mContext.getPackageManager();
+											
+											// Si es nulo es que no hay actividad para dicho intent (el dispositivo no lo acepta)
+											if (pm.resolveActivity(i_accounts, PackageManager.MATCH_DEFAULT_ONLY) != null){
+												// Usamos ACTION_ADD_ACCOUNT
+												startActivity(i_accounts);
+											}
+											else{
+												// Usamos ACTION_SETTINGS
+												startActivity(new Intent(Settings.ACTION_SETTINGS));
+
+											}	
+										}
+									});
+							alert_accounts.setNegativeButton(R.string.cancelar,
+									new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialogo1, int id) {
+										}
+									});
+							alert_accounts.show();
+						}
 					}
 				}
 				else{
@@ -193,6 +238,7 @@ public class RegistrationActivity extends SherlockActivity {
 	private class SignInUser extends AsyncTask<Void,Integer,Void> {
 		 	
 		private String session_token;
+		private String device_token;
 		
 		@Override
 		protected void onPreExecute(){
@@ -231,7 +277,7 @@ public class RegistrationActivity extends SherlockActivity {
 	             String email = edit_email_usuario.getText().toString();
 	             
 	             // Obtenemos el device token de parse
-	             String device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
+	             device_token = ParseInstallation.getCurrentInstallation().getString("deviceToken");
 	             dato.put("device_token", device_token);
 	             dato.put("device_type", 2); // Soy dispositivo android
 	             dato.put("username", username);
@@ -307,9 +353,9 @@ public class RegistrationActivity extends SherlockActivity {
 			
 			// Si hubo algún error mostramos un mensaje
 			if (any_error){
-				Toast toast = Toast.makeText(mContext, R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT);
-				toast.show();
+				Toast.makeText(getBaseContext(), R.string.lo_sentimos_se_ha_producido, Toast.LENGTH_SHORT).show();			
 			}
+			
 			// Si no hubo ningún error
 			else{
 				if (has_name_error){
