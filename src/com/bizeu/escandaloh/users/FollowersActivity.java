@@ -10,7 +10,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,16 +22,12 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.FollowAdapter;
 import com.bizeu.escandaloh.model.Follow;
-import com.bizeu.escandaloh.model.Notification;
-import com.bizeu.escandaloh.notifications.NotificationsActivity;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
@@ -52,6 +47,7 @@ public class FollowersActivity extends SherlockActivity {
 	private boolean any_error = false;
 	private String user_id;
 	private boolean there_are_more_follows = true;
+	private boolean getting_follows = false;
 	private Context mContext;
 	private String meta_next_follows = null;
 	
@@ -110,11 +106,14 @@ public class FollowersActivity extends SherlockActivity {
 			
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-	        	if ((firstVisibleItem + visibleItemCount == followAdapter.getCount()) && there_are_more_follows) {
+				
+				if ((firstVisibleItem + visibleItemCount == followAdapter.getCount()) && there_are_more_follows) {
 	            	if (Connectivity.isOnline(mContext)){
-	            		// Obtenemos los siguientes follows
-	            		getFollowsAsync = new GetFollowsTask();
-	            		getFollowsAsync.execute();
+	            		if (!getting_follows){
+		            		// Obtenemos los siguientes follows
+		            		getFollowsAsync = new GetFollowsTask();
+		            		getFollowsAsync.execute();
+	            		}
 	            	}
 	            	else{
 	            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
@@ -131,10 +130,6 @@ public class FollowersActivity extends SherlockActivity {
 		
 		// Mostramos el loading
 		showLoading();
-		
-		// Obtenemos los follows
-		getFollowsAsync = new GetFollowsTask();
-		getFollowsAsync.execute();
 		
 	}
 	
@@ -178,6 +173,7 @@ public class FollowersActivity extends SherlockActivity {
 		@Override
 		protected void onPreExecute() {
 			any_error = false;
+			getting_follows = true;
 		}
 
 		@Override
@@ -278,6 +274,9 @@ public class FollowersActivity extends SherlockActivity {
 				// Si es codigo 2xx --> OK 
 				followAdapter.notifyDataSetChanged();
 			}
+			
+			// Ya no se está obteniendo follows: abrimos la llave
+			getting_follows = false;
 		}
 	}
 	

@@ -52,6 +52,7 @@ public class NotificationsActivity extends SherlockActivity {
 	private ArrayList<Notification> array_notifications = new ArrayList<Notification>();
 	private NotificationAdapter notificationsAdapter;
 	private boolean any_error = false;
+	private boolean getting_notifications = false;
 	private boolean there_are_more_notifs = true;
 	private Context mContext;
 	private String meta_next_notifs = null;
@@ -119,11 +120,12 @@ public class NotificationsActivity extends SherlockActivity {
 	        @Override
 	        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	           
-	        	if ((firstVisibleItem + visibleItemCount == notificationsAdapter.getCount() - 3) && there_are_more_notifs) {
+	        	if ((firstVisibleItem + visibleItemCount == notificationsAdapter.getCount()) && there_are_more_notifs) {
 	            	if (Connectivity.isOnline(mContext)){
-	            		
-						getNotisAsync = new GetNotificationsTask();
-						getNotisAsync.execute();
+	            		if (!getting_notifications){
+							getNotisAsync = new GetNotificationsTask();
+							getNotisAsync.execute();
+	            		}
 	            	}
 	            	else{
 	            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
@@ -139,11 +141,7 @@ public class NotificationsActivity extends SherlockActivity {
 	    });
 		
 		// Mostramos el loading
-		showLoading();
-		
-		// Obtenemos las notificaciones
-		getNotisAsync = new GetNotificationsTask();
-		getNotisAsync.execute();	
+		showLoading();	
 	}
 	
 	
@@ -195,6 +193,7 @@ public class NotificationsActivity extends SherlockActivity {
 		@Override
 		protected void onPreExecute() {
 			any_error = false;
+			getting_notifications = true;
 		}
 
 		@Override
@@ -313,6 +312,9 @@ public class NotificationsActivity extends SherlockActivity {
 				// Si es codigo 2xx --> OK 
 				notificationsAdapter.notifyDataSetChanged();
 			}
+			
+			// Ya no se están obteniendo notificaciones: abrimos la llave
+			getting_notifications = false;
 		}
 	}
 	

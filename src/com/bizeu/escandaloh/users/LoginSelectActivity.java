@@ -161,6 +161,7 @@ public class LoginSelectActivity extends SherlockActivity {
 								}
 							}).executeAsync();				
 				}
+				
 				// Sesión cerrada
 				else {
 					// Si existe device_token

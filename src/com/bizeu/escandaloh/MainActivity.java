@@ -218,7 +218,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 				// Si quedan 5 escándalos más para llegar al último y aún quedan
 				// más escándalos (si hemos llegado
-				// a los últimos no se pedirán más): obtenemos los siguientes 10
+				// a los últimos no se pedirán más): obtenemos los siguientes 
 				if (position == adapter.getCount() - (NUM_SCANDALS_TO_LOAD-5)
 						&& there_are_more_scandals) {
 					// Usamos una llave de paso (sólo la primera vez entrará).

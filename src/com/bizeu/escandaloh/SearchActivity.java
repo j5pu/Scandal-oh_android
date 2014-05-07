@@ -52,6 +52,7 @@ public class SearchActivity extends SherlockActivity {
 	private SearchAdapter searchAdapter;
 	private boolean any_error = false;
 	private boolean there_are_more_searchs = true;
+	private boolean waiting_first_search = true;  // Utilizado para que hasta que no pulse buscar no haga ninguna búsqueda
 	private Context mContext;
 	private String meta_next_search = null;
 	private SearchScandalsTask getSearchsAsync;
@@ -176,7 +177,7 @@ public class SearchActivity extends SherlockActivity {
 	        @Override
 	        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	           
-	        	if ((firstVisibleItem + visibleItemCount == searchAdapter.getCount() - 3) && there_are_more_searchs) {
+	        	if ((firstVisibleItem + visibleItemCount == searchAdapter.getCount()) && there_are_more_searchs && !waiting_first_search) {
 	        		
 	            	if (Connectivity.isOnline(mContext)){
 						getSearchsAsync = new SearchScandalsTask(edit_search.getText().toString());
@@ -373,6 +374,9 @@ public class SearchActivity extends SherlockActivity {
 				// Si es codigo 2xx --> OK 
 				searchAdapter.notifyDataSetChanged();
 			}
+			
+			// Ya se ha realizado una búsqueda: permitimos a onScroll funcionar
+			waiting_first_search = false;
 		}
 	}
 	
