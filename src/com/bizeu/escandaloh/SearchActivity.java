@@ -1,5 +1,7 @@
 package com.bizeu.escandaloh;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,6 +25,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -47,6 +50,7 @@ public class SearchActivity extends SherlockActivity {
 	private ListView list_searches;
 	private LinearLayout ll_loading;
 	private LinearLayout ll_list_searchs;
+	private TextView txt_not_found;
 	
 	private ArrayList<Search> array_search = new ArrayList<Search>();
 	private SearchAdapter searchAdapter;
@@ -84,6 +88,7 @@ public class SearchActivity extends SherlockActivity {
 		list_searches = (ListView) findViewById(R.id.list_search_scandaloh);
 		ll_loading = (LinearLayout) findViewById(R.id.ll_search_loading);
 		ll_list_searchs = (LinearLayout) findViewById(R.id.ll_search_list);
+		txt_not_found = (TextView) findViewById(R.id.txt_search_notfound);
 		
 		searchAdapter = new SearchAdapter(mContext, R.layout.search, array_search);
 		list_searches.setAdapter(searchAdapter);
@@ -126,6 +131,8 @@ public class SearchActivity extends SherlockActivity {
 					// Si hay conexión
 					if (Connectivity.isOnline(mContext)) {
 						if (edit_search.getText().toString().length() > 0){
+							// Ocultamos el mensaje de "No se encontró ningún resultado"
+							hideSearchNotFound();
 							// Cancelamos si se estuviesen obteniendo otros searchs
 							cancelGetSearchs();
 							// Mostramos el loading
@@ -286,8 +293,17 @@ public class SearchActivity extends SherlockActivity {
 			// No hay searchs: obtenemos los primeros
 			if (array_search.size() == 0){
 				
+				String search_query = null;
+				try {
+					// Codificamos la búsqueda (para espacio en blanco)
+					search_query = URLEncoder.encode(search, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/";
-				url += "?q=" + search;	
+				url += "?q=" + search_query;	
 				url += "&limit=" + NUM_SEARCHS_TO_LOAD;
 			}
 			
@@ -373,6 +389,13 @@ public class SearchActivity extends SherlockActivity {
 			else {
 				// Si es codigo 2xx --> OK 
 				searchAdapter.notifyDataSetChanged();
+				
+				Log.v("WE","arraysearch size: " + array_search.size());
+				// 0 resultados: mostramos un mensaje
+				if (array_search.isEmpty()){
+					Log.v("WE","Esta vacio");
+					showSearchNotFound();
+				}
 			}
 			
 			// Ya se ha realizado una búsqueda: permitimos a onScroll funcionar
@@ -380,6 +403,24 @@ public class SearchActivity extends SherlockActivity {
 		}
 	}
 	
+	
+	/**
+	 * Muestra un texto indicando que la búsqueda no encontró ningún resultado y oculta el listado
+	 */
+	private void showSearchNotFound(){
+		txt_not_found.setVisibility(View.VISIBLE);
+		list_searches.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Oculta el texto de "No se encontró ningún resultado" y muestra el listado
+	 */
+	private void hideSearchNotFound(){
+		txt_not_found.setVisibility(View.GONE);
+		list_searches.setVisibility(View.VISIBLE);
+		ll_list_searchs.setGravity(Gravity.TOP);
+	}
 	
 	/**
 	 * Muestra el loading en pantalla
@@ -397,6 +438,7 @@ public class SearchActivity extends SherlockActivity {
 		ll_list_searchs.setVisibility(View.VISIBLE);
 		ll_loading.setVisibility(View.GONE);
 	}
+	
 	
 	/**
 	 * Oculta el teclado

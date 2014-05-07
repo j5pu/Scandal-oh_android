@@ -222,4 +222,5 @@
     <string name="seguidor">Seguidor</string>
     <string name="debes_tener_una_cuenta_de_google">Debes tener una cuenta de Google asociada al dispositivo</string>
     <string name="quieres_aniadir_una">¿Quieres añadir una ahora?</string>
+    <string name="no_se_ha_encontrado_ningun">No se ha encontrado ningún resultado</string>
 </resources>
