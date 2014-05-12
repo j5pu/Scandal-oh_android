@@ -457,6 +457,7 @@ public class ScandalFragment extends SherlockFragment {
 			
         // AVATAR
         // Si el usuario tiene avatar
+        
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
         }
@@ -469,6 +470,7 @@ public class ScandalFragment extends SherlockFragment {
         		startActivity(i);
         	}
         });
+      	
                     
         // LIKES
         tLikes.setText(Integer.toString(likes));
