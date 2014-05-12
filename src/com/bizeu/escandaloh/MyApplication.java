@@ -8,12 +8,10 @@ import com.parse.PushService;
 
 public class MyApplication extends Application {
 	public static int ALTO_TABS;
-	// Producción
-	//public static String SERVER_ADDRESS = "http://ec2-23-22-159-14.compute-1.amazonaws.com" ;
-	// Desarrollo
-	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ;
-	// Local
-	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001";
+
+	//public static String SERVER_ADDRESS = "http://host.scandaloh.com"; 	// Producción
+	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ; 	// Desarrollo
+	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001"; 	// Local
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";
@@ -47,11 +45,8 @@ public class MyApplication extends Application {
 		super.onCreate();
 		
 		// Parse
-		Log.v("WE","Antes de initialize");
 		Parse.initialize(this, "d0pwm3XnQrHZCrTmQuuE75SXrzr46001WWfH9uFv", "YGONYEJpspQOod64lA5xwkGaK4V3GgAnq1kHNpD2");
-		Log.v("WE","Despues de initialize");
 		PushService.setDefaultPushCallback(this, MainActivity.class);
-		Log.v("WE","Despues de setDefaultPushCallback");
 
 
 	}

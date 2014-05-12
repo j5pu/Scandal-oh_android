@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
-          android:drawable="@drawable/recarga_blanca" /> <!-- pressed -->
+          android:drawable="@drawable/recargar_blanco" /> <!-- pressed -->
     <item android:state_focused="true"
-          android:drawable="@drawable/recarga_blanca" /> <!-- focused -->
+          android:drawable="@drawable/recargar_blanco" /> <!-- focused -->
     <item android:state_hovered="true"
-          android:drawable="@drawable/recarga_blanca" /> <!-- hovered -->
-    <item android:drawable="@drawable/recarga_blanca" /> <!-- default -->
+          android:drawable="@drawable/recargar_blanco" /> <!-- hovered -->
+    <item android:drawable="@drawable/recargar_blanco" /> <!-- default -->
 </selector>

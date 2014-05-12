@@ -116,7 +116,7 @@
             android:layout_alignLeft="@+id/img_escandalo_dislike"
             android:layout_below="@+id/img_escandalo_dislike"
             android:layout_marginTop="13dp"
-            android:src="@drawable/compartir" />
+            android:src="@drawable/compartir_azul" />
 
         <LinearLayout
             android:id="@+id/ll_escandalo_lastcomment"
@@ -181,7 +181,7 @@
                                 android:id="@+id/img_lastcomment_socialnetwork"
                                 android:layout_width="11dp"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/s_gris"  />
+                                android:src="@drawable/facebook_gris"  />
 
                             <TextView
                                 android:id="@+id/txt_comment_username"
@@ -189,10 +189,12 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="1dp"
                                 android:gravity="center_vertical"
-                                android:text="alejandro.leonrodriguez.7"
+                                android:text="alejandro.leonrodriguez.7asdfvasdfasdfadfs"
                                 android:textColor="#aaaaaa"
                                 android:textSize="12sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:ellipsize="end"  />
 
                         </LinearLayout>
 
@@ -205,7 +207,7 @@
                             android:paddingBottom="4dp"
                             android:paddingTop="4dp"
                             android:paddingLeft="1dp"
-                            android:text="coscosff sdfdfdsd dsfsdf"
+                            android:text="coscosff sdfdfdsd asdfadsasdfadfafddfadfafsdf"
                             android:textColor="@color/blanco"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -242,7 +244,7 @@
                                 android:layout_alignParentLeft="true"
                                 android:layout_centerVertical="true"
                                 android:layout_marginLeft="29dp"
-                                android:src="@drawable/arrow_right" />
+                                android:src="@drawable/flecha_blanca_derecha" />
 
                             <ImageView
                                 android:id="@+id/imageView2"
@@ -310,7 +312,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="13dp"
             android:background="@drawable/avatar_circular"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             android:src="@drawable/avatar_defecto" />
 
     </RelativeLayout>

@@ -108,7 +108,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/cam_micro" />
+                        android:src="@drawable/cam_micro_blanco" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

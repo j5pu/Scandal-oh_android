@@ -72,7 +72,7 @@
                     android:layout_height="35dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:paddingRight="5dp"
-                    android:src="@drawable/avion" />
+                    android:src="@drawable/avion_azul" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

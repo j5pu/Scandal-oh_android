@@ -1,8 +1,6 @@
 package com.bizeu.escandaloh.util;
 
 import com.applidium.shutterbug.FetchableImageView;
-import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,7 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 public class CircularImageView extends FetchableImageView
 {

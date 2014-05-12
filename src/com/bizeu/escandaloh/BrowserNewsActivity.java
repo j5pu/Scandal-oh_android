@@ -218,14 +218,14 @@ public class BrowserNewsActivity extends SherlockActivity {
 	    @Override
 	    public void onPageStarted(WebView view, String url, Bitmap facIcon) {
 	         is_loading = true;
-	         img_cancel.setImageResource(R.drawable.cancel);
+	         img_cancel.setImageResource(R.drawable.cancel_blanco);
 	     }
 
 	    // Mostramos el icono de refrescar
 	    @Override
 	    public void onPageFinished(WebView view, String url) {
 	    	is_loading = false;
-	    	img_cancel.setImageResource(R.drawable.recarga_blanca);
+	    	img_cancel.setImageResource(R.drawable.recargar_blanco);
 	     }
 	}
 	

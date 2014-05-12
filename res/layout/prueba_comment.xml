@@ -53,7 +53,7 @@
                     android:id="@+id/img_escandalo_like"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:src="@drawable/campana" />
+                    android:src="@drawable/campana_azul" />
 
                 <TextView
                     android:id="@+id/txt_profile_compartir_twitter"
@@ -155,7 +155,7 @@
                     android:id="@+id/img_escandalo_compartir"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:src="@drawable/ajustes" />
+                    android:src="@drawable/ajustes_azul" />
 
                 <TextView
                     android:id="@+id/txt_mLateral_ajustes"
