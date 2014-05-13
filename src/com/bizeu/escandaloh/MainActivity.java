@@ -72,6 +72,7 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 import com.countrypicker.CountryPicker;
 import com.countrypicker.CountryPickerListener;
@@ -117,7 +118,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private TextView txt_code_country;
 	private Spinner spinner_categorias;
 	DrawerLayout mDrawerLayout;
-	private FetchableImageView img_lateral_avatar;
+	private ImageViewRounded img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
 	private TextView txt_action_bar_num_notis;
 	
@@ -240,7 +241,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// MENU LATERAL
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.lay_pantalla_main);
 		ll_menu_lateral = (LinearLayout) findViewById(R.id.ll_menu_lateral);
-		img_lateral_avatar = (FetchableImageView) findViewById(R.id.img_mLateral_avatar);
+		img_lateral_avatar = (ImageViewRounded) findViewById(R.id.img_mLateral_avatar);
 		ll_lateral_notificaciones = (LinearLayout) findViewById(R.id.ll_mLateral_notificaciones);
 		ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
 		ll_lateral_perfil = (LinearLayout) findViewById(R.id.ll_mLateral_profile);

@@ -152,7 +152,7 @@
                         android:gravity="center_horizontal|center_vertical"
                         android:orientation="vertical" >
 
-                        <com.applidium.shutterbug.FetchableImageView
+                        <com.bizeu.escandaloh.util.ImageViewRounded
                             android:id="@+id/img_comment_avatar"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
@@ -304,15 +304,14 @@
             android:layout_toRightOf="@+id/emoticono"
             android:background="#CCCCCC" />
 
-        <com.applidium.shutterbug.FetchableImageView
+        <com.bizeu.escandaloh.util.ImageViewRounded
             android:id="@+id/emoticono"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_above="@+id/txt_escandalo_num_likes"
             android:layout_alignParentLeft="true"
-            android:layout_marginBottom="13dp"
-            android:background="@drawable/avatar_circular"
-            android:scaleType="centerCrop"
+            android:layout_marginBottom="25dp"
+            android:scaleType="fitXY"
             android:src="@drawable/avatar_defecto" />
 
     </RelativeLayout>

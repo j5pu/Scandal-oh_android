@@ -45,6 +45,7 @@ import com.bizeu.escandaloh.adapters.HistoryAdapter;
 import com.bizeu.escandaloh.model.History;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
@@ -64,7 +65,7 @@ public class ProfileActivity extends SherlockActivity {
 	public static final String FOLLOW = "follow";
 	public static final String UNFOLLOW = "unfollow";
 	
-	private FetchableImageView img_picture;
+	private ImageViewRounded img_picture;
 	private TextView txt_username;
 	private Button but_follow_unfollow;
 	private TextView txt_followers;
@@ -112,7 +113,7 @@ public class ProfileActivity extends SherlockActivity {
 		actBar.setDisplayShowTitleEnabled(true);
 		actBar.setTitle(getResources().getString(R.string.perfil));
 	
-		img_picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
+		img_picture = (ImageViewRounded) findViewById(R.id.img_profile_picture);
 		txt_username = (TextView) findViewById(R.id.txt_profile_username);
 		but_follow_unfollow = (Button) findViewById(R.id.but_profile_follow_unfollow);
 		txt_followers = (TextView) findViewById(R.id.txt_profile_num_seguidores);
@@ -475,7 +476,12 @@ public class ProfileActivity extends SherlockActivity {
 			
 			// No hubo error: mostramos el avatar, nombre de usuario, seguidores y si le está siguiendo
 			else{
-				img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
+				if (is_me){
+					img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_mas);
+				}
+				else{
+					img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
+				}
 				txt_username.setText(username);
 				if (followers_count.equals("1")){
 					txt_followers.setText(followers_count + " " + getResources().getString(R.string.seguidor));

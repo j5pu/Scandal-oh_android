@@ -19,12 +19,14 @@
             android:gravity="top|center_horizontal"
             android:orientation="vertical" >
 
-            <com.bizeu.escandaloh.util.CircularImageView
+            <com.bizeu.escandaloh.util.ImageViewRounded
                 android:id="@+id/img_comment_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/icono_app"
-                android:gravity="top" />
+                android:gravity="top"
+                android:scaleType="fitXY"
+                android:src="@drawable/icono_app" />
+
         </LinearLayout>
 
         <LinearLayout

@@ -10,10 +10,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 
 public class CommentAdapter extends ArrayAdapter<Comment> {
@@ -64,7 +64,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         holder.txtText = (TextView)convertView.findViewById(R.id.txt_comment_text);
         holder.txtUsername = (TextView)convertView.findViewById(R.id.txt_comment_username);
         holder.txtDate = (TextView)convertView.findViewById(R.id.txt_comment_date);
-        holder.imgAvatar = (FetchableImageView)convertView.findViewById(R.id.img_comment_avatar);
+        holder.imgAvatar = (ImageViewRounded)convertView.findViewById(R.id.img_comment_avatar);
         holder.imgUser = (ImageView)convertView.findViewById(R.id.img_comment_socialnetwork);                                 
 
         // Rellenamos los datos	        
@@ -102,7 +102,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         TextView txtDate; 
         ImageView imgUser;
         ImageView imgClock;
-        FetchableImageView imgAvatar;
+        ImageViewRounded imgAvatar;
         LinearLayout info_comment_user;
         LinearLayout info_comment_text;
         
