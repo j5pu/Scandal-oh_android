@@ -189,12 +189,10 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="1dp"
                                 android:gravity="center_vertical"
-                                android:text="alejandro.leonrodriguez.7asdfvasdfasdfadfs"
+                                android:text="joseantonio.puertolasmontanes"
                                 android:textColor="#aaaaaa"
                                 android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:maxLines="1"
-                                android:ellipsize="end"  />
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 

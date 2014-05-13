@@ -1041,7 +1041,7 @@ public class ScandalFragment extends SherlockFragment {
     		comment_text.setText(last_comment.getText());
     		
     		// Nombre de usuario
-    		txt_user_name.setText(last_comment.getUsername());
+    		txt_user_name.setText(Utils.limitaCaracteres(last_comment.getUsername(), 25));
     		
     		// Fecha (formato dd-mm-aaaa)
             String date_without_time = (last_comment.getDate().split("T",2))[0];   
