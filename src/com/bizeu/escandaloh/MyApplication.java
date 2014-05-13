@@ -29,6 +29,7 @@ public class MyApplication extends Application {
 	public static String user_name = "";
 	public static String session_token = "";
 	public static String avatar = null;
+	public static String FLURRY_KEY = "VQ28Y4ZX5QCXQ9NS6TJS";
 	public static int social_network;
 	public static boolean FIRST_TIME_HAPPY = true;
 	public static boolean FIRST_TIME_ANGRY = true;

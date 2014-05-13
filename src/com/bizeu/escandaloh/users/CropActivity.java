@@ -28,9 +28,7 @@ import android.widget.Toast;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.edmodo.cropper.CropImageView;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CropActivity extends Activity {
@@ -100,10 +98,32 @@ public class CropActivity extends Activity {
 					new UpdateAvatarTask(mContext, cropped_picture).execute();
 				}
 			});
-		}
-		
+		}		
 	}
 	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
+	
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
 	
 	
 	/**
@@ -164,17 +184,6 @@ public class CropActivity extends Activity {
 			catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				any_error = true; // Indicamos que hubo algún error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) 
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
 			}
 
 			if (any_error) {

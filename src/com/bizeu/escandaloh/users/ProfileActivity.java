@@ -47,9 +47,7 @@ import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R.id;
 
@@ -282,16 +280,24 @@ public class ProfileActivity extends SherlockActivity {
 	}
 	
 	
+	
+	
 	/**
 	 * onStart
 	 */
 	@Override
 	public void onStart(){
 		super.onStart();
+		
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+		
 		if (user_id != null){
 			new ShowUserInformation().execute();
 		}
 	}
+	
+	
 	
 	
 	/**
@@ -305,6 +311,18 @@ public class ProfileActivity extends SherlockActivity {
 	    	break;
 		}
 		return true;
+	}
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 	}
 	
 	
@@ -381,13 +399,6 @@ public class ProfileActivity extends SherlockActivity {
 			e.printStackTrace();
 			Log.e(this.getClass().toString(),
 					"No se pudo crear el archivo temporal para la foto");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(mContext, null)
-							.getDescription(Thread.currentThread().getName(), 
-									e), // The exception.
-					false).build());
 			Toast toast = Toast.makeText(mContext,
 					R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
 			toast.show();

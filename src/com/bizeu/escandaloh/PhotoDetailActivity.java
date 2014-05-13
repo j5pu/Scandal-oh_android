@@ -15,7 +15,7 @@ import android.view.View;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.google.analytics.tracking.android.EasyTracker;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 
@@ -100,8 +100,10 @@ public class PhotoDetailActivity extends SherlockActivity {
 	@Override 
 	public void onStart(){
 		super.onStart();
-		EasyTracker.getInstance(this).activityStart(this);
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 	}
+	
 	
 	
 	
@@ -125,7 +127,8 @@ public class PhotoDetailActivity extends SherlockActivity {
 	@Override
 	public void onStop(){
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this);
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);	
 	}
 	
 	

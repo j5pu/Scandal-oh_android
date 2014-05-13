@@ -76,9 +76,7 @@ import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 import com.countrypicker.CountryPicker;
 import com.countrypicker.CountryPickerListener;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseAnalytics;
 
@@ -492,8 +490,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onStart() {
 		super.onStart();
-		// Activamos google analytics
-		EasyTracker.getInstance(this).activityStart(this);
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 		// Indicamos que la actividad se está mostrando
 		activity_is_showing = true;
 	}
@@ -544,13 +542,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	/**
-	 * onPause
-	 */
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
 
 	/**
 	 * onStop
@@ -558,8 +549,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onStop() {
 		super.onStop();
-		// Paramos google analytics
-		EasyTracker.getInstance(this).activityStop(this);
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 		// Indicamos que la actividad no se está mostrando
 		activity_is_showing = false;
 	}
@@ -1202,22 +1193,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 				switch (pos) {
 					case 0: // Humor
 						if (category.equals(ANGRY)) {
-							// Mandamos el evento a Google Analytics
-							EasyTracker easyTracker2 = EasyTracker
-									.getInstance(mContext);
-							easyTracker2.send(MapBuilder.createEvent("Acción UI",
-									"Selección realizada", "Seleccionado humor",
-									null).build());
 							category = HAPPY;
 						}
 						break;
 					case 1: // Denuncia
-						// Mandamos el evento a Google Analytics
-						EasyTracker easyTracker3 = EasyTracker
-								.getInstance(mContext);
-						easyTracker3.send(MapBuilder.createEvent("Acción UI",
-								"Selección realizada", "Seleccionado denuncia",
-								null).build());
 						category = ANGRY;
 						break;
 				}
@@ -1273,13 +1252,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 			e.printStackTrace();
 			Log.e(this.getClass().toString(),
 					"No se pudo crear el archivo temporal para la foto");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(mContext, null) 
-							.getDescription(Thread.currentThread().getName(),
-									e), // The exception.
-					false).build());
 			Toast toast = Toast.makeText(mContext,
 					R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
 			toast.show();

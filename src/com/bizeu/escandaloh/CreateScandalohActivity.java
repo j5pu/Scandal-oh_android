@@ -44,9 +44,7 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CreateScandalohActivity extends SherlockActivity {
@@ -248,22 +246,27 @@ public class CreateScandalohActivity extends SherlockActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		EasyTracker.getInstance(mContext).activityStart(this);
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 	}
 
 
 
+	
 	/**
 	 * onStop. Liberamos los recursos del audio
 	 */
 	@Override
 	protected void onStop() {
 		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 		Audio.getInstance(mContext).releaseResources();
 	}
 
 
 
+	
 	/**
 	 * Sube un escandalo al servidor
 	 * 
@@ -372,17 +375,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				// Hubo algún error
 				any_error = true;
-
-				// Mandamos la excepción a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null) 
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build()); // False indicates a fatal exception
 			}
 
 			if (any_error) {

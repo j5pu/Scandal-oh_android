@@ -39,9 +39,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseInstallation;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 
 public class RegistrationActivity extends SherlockActivity {
 
@@ -212,7 +210,8 @@ public class RegistrationActivity extends SherlockActivity {
 	@Override
 	public void onStart() {
 	    super.onStart();
-	    EasyTracker.getInstance(this).activityStart(this); 
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 	}
 
 	
@@ -223,7 +222,8 @@ public class RegistrationActivity extends SherlockActivity {
 	@Override
 	public void onStop() {
 	    super.onStop();
-	    EasyTracker.getInstance(this).activityStop(this);  
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 	}
 	
 	
@@ -331,12 +331,6 @@ public class RegistrationActivity extends SherlockActivity {
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
-				 // Mandamos la excepcion a Google Analytics
-				 EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			     easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-						                       ex),                                                             // The exception.
-						                       false).build()); 
 	        }
 	        
 	        return null;

@@ -20,6 +20,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.notifications.NotificationsActivity;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ScandalActivity extends SherlockFragmentActivity {
@@ -61,11 +62,33 @@ public class ScandalActivity extends SherlockFragmentActivity {
 	 */
 	public void onStart(){
 		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+		
 		// Obtenemos el escándalo
 		getScandalAsync = new GetScandalTask();
 		getScandalAsync.execute();
 	}
 	
+	
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+	
+	
+	
+	/**
+	 * onDestroy
+	 */
 	public void onDestroy(){
 		super.onDestroy();
 		cancelGetScandal();

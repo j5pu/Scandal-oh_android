@@ -15,6 +15,7 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -129,6 +130,23 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		});
 	}
 
+	
+	
+	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
+	
+	
+	
+	
 	/**
 	 * onOptionsItemSelected
 	 */
@@ -143,7 +161,19 @@ public class SettingsActivity extends SherlockPreferenceActivity {
     }
        
     
-
+    
+    
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+    
+    
 	/**
 	 * Activa/Desactiva las notificaciones
 	 * 

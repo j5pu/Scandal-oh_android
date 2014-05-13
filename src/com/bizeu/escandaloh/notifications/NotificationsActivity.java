@@ -38,6 +38,7 @@ import com.bizeu.escandaloh.adapters.NotificationAdapter;
 import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class NotificationsActivity extends SherlockActivity {
@@ -57,6 +58,8 @@ public class NotificationsActivity extends SherlockActivity {
 	private Context mContext;
 	private String meta_next_notifs = null;
 	private GetNotificationsTask getNotisAsync;
+	
+	
 	
 	/**
 	 * OnCreate
@@ -147,8 +150,18 @@ public class NotificationsActivity extends SherlockActivity {
 	
 	
 	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
 	
 	
+
 	/**
 	 * onOptionsItemSelected
 	 */
@@ -161,6 +174,21 @@ public class NotificationsActivity extends SherlockActivity {
 		}
 		return true;
 	}
+	
+	
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+	
 	
 	
 	/**

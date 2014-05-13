@@ -26,9 +26,6 @@ import android.widget.Toast;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class RememberPasswordDialog extends Dialog{
@@ -163,12 +160,6 @@ public class RememberPasswordDialog extends Dialog{
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
 	             any_error = true;
-				 // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-						                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-						                       ex),                                                             // The exception.
-						                       false).build());
 	        }
 	        
 	        return null;

@@ -3,10 +3,6 @@ package com.bizeu.escandaloh.util;
 import java.io.File;
 import java.io.IOException;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
-
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -85,12 +81,6 @@ public class Audio{
 			} catch (IOException e) {
 				Log.e("Audio.java","Error intentando montar el sistema de archivos");
 				e.printStackTrace();
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       e),                                                             // The exception.
-					                       false).build()); 
 			}
 		}
 
@@ -101,12 +91,6 @@ public class Audio{
 			} catch (IOException e) {
 				Log.e("Audio.java","Error creando el archivo de audio");
 				e.printStackTrace();
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       e),                                                             // The exception.
-					                       false).build()); 
 			}
 		}
 		
@@ -131,13 +115,7 @@ public class Audio{
 
         } 
 		catch (IOException e) {
-            Log.e("WE", "Error MediaRecorder en prepare() o start()");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
+            Log.e("WE", "Error MediaRecorder en prepare() o start()"); 
         }		
 	}
 
@@ -199,12 +177,6 @@ public class Audio{
             
 		} catch (IOException e) {
 			Log.e("WE", "Error preparando para reproducir el audio");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
 		}
     }
 
@@ -244,12 +216,6 @@ public class Audio{
  
                  } catch (IOException e) {
                     Log.e("WE", "error al reproducir el audio");
-    				// Mandamos la excepcion a Google Analytics
-    				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-    				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-    					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-    					                       e),                                                             // The exception.
-    					                       false).build()); 
                  }       
     }
 	

@@ -54,9 +54,6 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ScandalFragment extends SherlockFragment {
@@ -764,14 +761,7 @@ public class ScandalFragment extends SherlockFragment {
 	            fos.close();
 
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	            
-	             // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build());		                       
+	            e.printStackTrace();	                       
 	        }
 
 	        return null;
@@ -825,14 +815,7 @@ public class ScandalFragment extends SherlockFragment {
             	bitma = ImageUtils.getBitmapFromURL(args[0]);
 
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	                     
-	             // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build());		 
+	            e.printStackTrace();	 
 	        }
 
 	        return null;
@@ -895,14 +878,7 @@ public class ScandalFragment extends SherlockFragment {
 	        
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
-	             any_error = true; // Indicamos que hubo algún error
-	                          
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       ex),                                                             // The exception.
-					                       false).build());  			
+	             any_error = true; // Indicamos que hubo algún error 			
 	        }
 	        
 	        if (any_error){
