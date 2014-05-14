@@ -24,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -313,9 +314,13 @@ public class CreateScandalohActivity extends SherlockActivity {
 				MultipartEntity reqEntity = new MultipartEntity();				
 
 				if (con_audio) {
-					audio_file = new File(Audio.getInstance(mContext).getPath());
+					audio_file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScándalOh/Audio/audio.3gp");
 					if (audio_file == null){
+						Log.v("WE","any error es nulo");
 						any_error = true;
+					}
+					else{
+						Log.v("WE","No es nulo");
 					}
 					FileBody audioBody = new FileBody(audio_file);
 					reqEntity.addPart("sound", audioBody);

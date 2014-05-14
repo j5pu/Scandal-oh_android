@@ -44,6 +44,8 @@ public class BrowserNewsActivity extends SherlockActivity {
 
 		setContentView(R.layout.browser_news);
 		
+		mContext = this;
+		
 		if (getIntent() != null){
 			Intent i = getIntent();
 			url = i.getStringExtra("source");

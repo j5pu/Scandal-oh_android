@@ -9,9 +9,9 @@ import com.parse.PushService;
 public class MyApplication extends Application {
 	public static int ALTO_TABS;
 
-	//public static String SERVER_ADDRESS = "http://host.scandaloh.com"; 	// Producción
-	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ; 	// Desarrollo
-	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001"; 	// Local
+	public static String SERVER_ADDRESS = "http://host.scandaloh.com"; 	                     // Producción
+	//public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ; 	 // Desarrollo
+	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001"; 	                     // Local
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";
