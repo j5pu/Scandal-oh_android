@@ -284,6 +284,12 @@ public class RecordAudioDialog extends Dialog {
 				// Actualizamos la interfaz
 				changeIUPlayFinised();
 			}
+
+			@Override
+			public void onPlayPrepared() {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 	}
 

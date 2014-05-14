@@ -25,9 +25,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 
 public class ImageUtils {
 
@@ -327,13 +324,6 @@ public class ImageUtils {
 			fOut = new FileOutputStream(return_file);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(context, null) 
-							.getDescription(Thread.currentThread().getName(), 
-									e), // The exception.
-					false).build());
 		}
 
 		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
@@ -343,13 +333,6 @@ public class ImageUtils {
 			fOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(context);
-			easyTracker.send(MapBuilder.createException(
-					new StandardExceptionParser(context, null) 
-							.getDescription(Thread.currentThread().getName(), 
-									e), // The exception.
-					false).build());
 		}
 
 		return return_file;

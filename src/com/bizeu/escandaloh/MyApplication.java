@@ -9,9 +9,9 @@ import com.parse.PushService;
 public class MyApplication extends Application {
 	public static int ALTO_TABS;
 
-	//public static String SERVER_ADDRESS = "http://host.scandaloh.com"; 	// Producción
-	public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ; 	// Desarrollo
-	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001"; 	// Local
+	public static String SERVER_ADDRESS = "http://host.scandaloh.com"; 	                     // Producción
+	//public static String SERVER_ADDRESS = "http://ec2-54-225-46-222.compute-1.amazonaws.com" ; 	 // Desarrollo
+	//public static String SERVER_ADDRESS = "http://192.168.1.111:8001"; 	                     // Local
 	
 	public static String DIRECCION_BUCKET = "http://scandaloh.s3.amazonaws.com/";
 	public static String CODE_COUNTRY = "Code country";
@@ -29,6 +29,7 @@ public class MyApplication extends Application {
 	public static String user_name = "";
 	public static String session_token = "";
 	public static String avatar = null;
+	public static String FLURRY_KEY = "VQ28Y4ZX5QCXQ9NS6TJS";
 	public static int social_network;
 	public static boolean FIRST_TIME_HAPPY = true;
 	public static boolean FIRST_TIME_ANGRY = true;

@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -51,12 +52,10 @@ import com.bizeu.escandaloh.model.Scandaloh;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.Audio.PlayListener;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ScandalFragment extends SherlockFragment {
@@ -85,7 +84,7 @@ public class ScandalFragment extends SherlockFragment {
     public static final int SHOW_COMMENTS = 343;
     public static final int FROM_SCANDAL_FRAGMENT = 235;
 
-    private ImageView aud;
+    private ImageView img_aud;
 	private ImageView img_arrow;
 	private TextView comment_text;
 	private TextView txt_user_name; 
@@ -105,6 +104,7 @@ public class ScandalFragment extends SherlockFragment {
     private ImageView share;
     private TextView tit;
     private TextView user_na;
+    private ProgressBar prog_loading_audio;
  
     private String id;
     private String user_id;
@@ -134,6 +134,7 @@ public class ScandalFragment extends SherlockFragment {
 	private String source;
 	private String source_name;
 	private CharSequence[] opciones_compartir;
+	private boolean play_when_viewcreated = false;
 
     
     /**
@@ -267,23 +268,31 @@ public class ScandalFragment extends SherlockFragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser); 
-       
+
         if (isVisibleToUser) {   
         	// Si tiene audio 
             if(has_audio){
             	 // Si tiene autoreproducir activado reproducimos el audio          	
-                autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, false);
+                autoplay = prefs.getBoolean(MyApplication.AUTOPLAY_ACTIVATED, true);
                 if (autoplay){
-                	reproduciendo = true;
-        			// Paramos si hubiera algún audio reproduciéndose
-        			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
-        			// Reproducimos
-                	new PlayAudioTask().execute(uri_audio);
+                	// Si ya se ha cargado la vista reproducimos el audio, sino lo reproducimos cuando esté cargada
+                	if (prog_loading_audio != null){
+                		play_when_viewcreated = false;
+                		reproduciendo = true;
+            			// Paramos si hubiera algún audio reproduciéndose
+            			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+            			// Reproducimos
+                    	new PlayAudioTask().execute(uri_audio);
+                	}
+                	// Indicamos que se debe reproducir al cargarse la vista
+                	else{
+                		play_when_viewcreated = true;
+                	}
                 }
             }
         }    
     }
-    
+   
 
     /**
      * onCreateView
@@ -299,7 +308,7 @@ public class ScandalFragment extends SherlockFragment {
         tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
         img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
-        aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
+        img_aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
         user_type = (ImageView) rootView.findViewById(R.id.img_escandalo_tipo_usuario);
         emoticono = (ImageViewRounded) rootView.findViewById(R.id.emoticono);
         share = (ImageView) rootView.findViewById(R.id.img_escandalo_compartir);
@@ -313,10 +322,12 @@ public class ScandalFragment extends SherlockFragment {
         ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
 		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
     	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
+    	prog_loading_audio = (ProgressBar) rootView.findViewById(R.id.prog_escandalo_loading_audio);
     	
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
         }  
+       
         
         // FOTO
         img.setTag(109);
@@ -421,10 +432,18 @@ public class ScandalFragment extends SherlockFragment {
         // AUDIO    
         // Si tiene audio mostramos el icono de audio
         if(has_audio){
-        	aud.setVisibility(View.VISIBLE);
+        	img_aud.setVisibility(View.VISIBLE);
         }
         
-        aud.setOnClickListener(new View.OnClickListener() {
+        if (play_when_viewcreated){
+    		reproduciendo = true;
+			// Paramos si hubiera algún audio reproduciéndose
+			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+			// Reproducimos
+        	new PlayAudioTask().execute(uri_audio);
+        }
+        
+        img_aud.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {			
@@ -764,14 +783,7 @@ public class ScandalFragment extends SherlockFragment {
 	            fos.close();
 
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	            
-	             // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build());		                       
+	            e.printStackTrace();	                       
 	        }
 
 	        return null;
@@ -825,14 +837,7 @@ public class ScandalFragment extends SherlockFragment {
             	bitma = ImageUtils.getBitmapFromURL(args[0]);
 
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	                     
-	             // Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(context);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(context, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build());		 
+	            e.printStackTrace();	 
 	        }
 
 	        return null;
@@ -895,14 +900,7 @@ public class ScandalFragment extends SherlockFragment {
 	        
 	        catch (Exception ex){
 	             Log.e("Debug", "error: " + ex.getMessage(), ex);
-	             any_error = true; // Indicamos que hubo algún error
-	                          
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       ex),                                                             // The exception.
-					                       false).build());  			
+	             any_error = true; // Indicamos que hubo algún error 			
 	        }
 	        
 	        if (any_error){
@@ -920,14 +918,40 @@ public class ScandalFragment extends SherlockFragment {
 	 * Reproduce el audio
 	 *
 	 */
-	private class PlayAudioTask extends AsyncTask<String,Integer,Boolean> {
+	private class PlayAudioTask extends AsyncTask<String,Integer,Integer> {
+		
+		private Audio audio;
 		
 		@Override
-	    protected Boolean doInBackground(String... params) {
-	    	
-	    	Audio.getInstance(getActivity().getBaseContext()).startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);							
-	        return false;
+		protected void onPreExecute() {
+			// Mostramos el loading y quitamos la imagen del audio
+			prog_loading_audio.setVisibility(View.VISIBLE);
+			img_aud.setVisibility(View.GONE);
+			
+			audio = Audio.getInstance(getActivity().getBaseContext());
+		}
+		
+		@Override
+	    protected Integer doInBackground(String... params) {
+	    			
+	    	//Audio.getInstance(getActivity().getBaseContext()).startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);							
+	        audio.setOnPlayListener(new PlayListener() {
+
+				@Override
+				public void onPlayPrepared() {
+					// Mostramos el audio y quitamos el loading
+					prog_loading_audio.setVisibility(View.GONE);
+					img_aud.setVisibility(View.VISIBLE);
+				}
+
+				@Override
+				public void onPlayFinished() {			
+				}
+			});
+			audio.startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);
+	    	return null;
 	    }	
+
 	}
 	
 	
@@ -1041,7 +1065,7 @@ public class ScandalFragment extends SherlockFragment {
     		comment_text.setText(last_comment.getText());
     		
     		// Nombre de usuario
-    		txt_user_name.setText(last_comment.getUsername());
+    		txt_user_name.setText(Utils.limitaCaracteres(last_comment.getUsername(), 25));
     		
     		// Fecha (formato dd-mm-aaaa)
             String date_without_time = (last_comment.getDate().split("T",2))[0];   
@@ -1099,7 +1123,5 @@ public class ScandalFragment extends SherlockFragment {
         }
 	}
 	
-	
-
    
 }

@@ -3,9 +3,7 @@ package com.bizeu.escandaloh.util;
 import java.io.File;
 import java.io.IOException;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -14,6 +12,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Audio{
 
@@ -21,7 +20,7 @@ public class Audio{
 	private MediaRecorder mRecord;
 	private MediaPlayer  mPlayer;
 	private boolean is_recording = false;
-	private String path = null;
+	private String path;
 	private static Audio singleton;
 	private static boolean yaCreado = false; // Este atributo nos dice si ya fue creada o no una instancia de esta clase
 	private Context mContext;
@@ -32,6 +31,7 @@ public class Audio{
 	
 	public static interface PlayListener {
         void onPlayFinished();
+        void onPlayPrepared();
     }
 
 	
@@ -75,48 +75,26 @@ public class Audio{
 		
 		mRecord = new MediaRecorder();
 		
-		// ESTADO Initial: Inicializamos el grabador	
-		this.path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio_record_scandaloh.3gp";
-		String state = android.os.Environment.getExternalStorageState();
-		if (!state.equals(android.os.Environment.MEDIA_MOUNTED)) {
-			try {
-				throw new IOException("SD Card is not mounted.  It is " + state
-						+ ".");
-			} catch (IOException e) {
-				Log.e("Audio.java","Error intentando montar el sistema de archivos");
-				e.printStackTrace();
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       e),                                                             // The exception.
-					                       false).build()); 
-			}
+		// Creamos el directorio para el audio (si no existe)
+		File scandaloh_dir = Environment.getExternalStorageDirectory();
+		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()
+				+ "/ScándalOh/Audio");
+		if (!scandaloh_dir.exists()) {
+			scandaloh_dir.mkdirs();
 		}
-
-		File directory = new File(path).getParentFile();
-		if (!directory.exists() && !directory.mkdirs()) {
-			try {
-				throw new IOException("Path to file could not be created.");
-			} catch (IOException e) {
-				Log.e("Audio.java","Error creando el archivo de audio");
-				e.printStackTrace();
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-					                       e),                                                             // The exception.
-					                       false).build()); 
-			}
-		}
+		
+		// Creamos el archivo para el audio
+		File file = new File( Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScándalOh/Audio/audio.3gp");
+		file.createNewFile();
+		path = file.getPath();
 		
 		mRecord.setAudioSource(MediaRecorder.AudioSource.MIC);
 		
-		// ESTADO Initialized: Indiamos el formato
+		// ESTADO Initialized: Indicamos el formato
 		mRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		mRecord.setAudioChannels(1);
-		mRecord.setAudioSamplingRate(8);
-		mRecord.setAudioEncodingBitRate(8);
+		//mRecord.setAudioChannels(1);
+		//mRecord.setAudioSamplingRate(8);
+		//mRecord.setAudioEncodingBitRate(8);
 		
 		// ESTADO DataSourceConfigured
 		mRecord.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -131,13 +109,7 @@ public class Audio{
 
         } 
 		catch (IOException e) {
-            Log.e("WE", "Error MediaRecorder en prepare() o start()");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
+            Log.e("WE", "Error MediaRecorder en prepare() o start(): " + e); 
         }		
 	}
 
@@ -178,6 +150,11 @@ public class Audio{
 			// Estado Initialized: preparamos el reproductor
 			mPlayer.prepare();
 			
+			// Indicamos que el audio está preparado y va a comenzar la reproduccion
+			if (playListener != null){
+				playListener.onPlayPrepared();
+			}
+			
 			// Estado Prepared: comenzamos la reproducción
 			mPlayer.start();
 			
@@ -190,7 +167,7 @@ public class Audio{
 					mp.stop();
 					mp.reset();	
 					
-					// Indicamos al dialog que se ha terminado de reproducción
+					// Indicamos que se ha terminado de reproducir
 					if (playListener != null){
 						playListener.onPlayFinished();
 					}			
@@ -199,12 +176,6 @@ public class Audio{
             
 		} catch (IOException e) {
 			Log.e("WE", "Error preparando para reproducir el audio");
-			// Mandamos la excepcion a Google Analytics
-			EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-			easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-				                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-				                       e),                                                             // The exception.
-				                       false).build()); 
 		}
     }
 
@@ -226,6 +197,12 @@ public class Audio{
          				
          				@Override
          				public void onPrepared(MediaPlayer mp) {
+         					
+         					// Indicamos que el audio está preparado y va a comenzar la reproduccion
+         					if (playListener != null){
+         						playListener.onPlayPrepared();
+         					}
+         					
          					// Estado Prepared: comenzamos la reproducción
          					mp.start();	
          					mp.setOnCompletionListener(new OnCompletionListener() {
@@ -234,7 +211,12 @@ public class Audio{
          						public void onCompletion(MediaPlayer mp) {
          							// Estado Started: paramos la reproducción
          							mp.stop();
-         							mp.reset();								
+         							mp.reset();			
+         							
+         							// Indicamos que ha terminado la reproducción
+         							if (playListener != null){
+         								playListener.onPlayFinished();
+         							}	
          						}
          					});					
          				}
@@ -244,12 +226,6 @@ public class Audio{
  
                  } catch (IOException e) {
                     Log.e("WE", "error al reproducir el audio");
-    				// Mandamos la excepcion a Google Analytics
-    				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-    				easyTracker.send(MapBuilder.createException(new StandardExceptionParser(mContext, null) // Context and optional collection of package names to be used in reporting the exception.
-    					                       .getDescription(Thread.currentThread().getName(),                // The name of the thread on which the exception occurred.
-    					                       e),                                                             // The exception.
-    					                       false).build()); 
                  }       
     }
 	
@@ -300,12 +276,7 @@ public class Audio{
 			mPlayer = null;
 			
 		}
-		
-		// Eliminamos el archivo creado
-		if (path != null){
-			File file = new File(path);
-			file.delete();
-		}	
+	
 		
 		yaCreado = false;
 	}

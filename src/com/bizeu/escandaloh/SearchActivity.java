@@ -17,6 +17,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.adapters.SearchAdapter;
 import com.bizeu.escandaloh.model.Search;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.content.Context;
 import android.content.Intent;
@@ -220,6 +221,18 @@ public class SearchActivity extends SherlockActivity {
 
 	
 	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
+	
+	
 	/**
 	 * onPause
 	 */
@@ -228,6 +241,20 @@ public class SearchActivity extends SherlockActivity {
 		super.onPause();
 		// Ocultamos el teclado
 		hideKeyboard();
+	}
+	
+	
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 	}
 	
 	

@@ -43,9 +43,7 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.LoginButton.OnErrorListener;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.parse.ParseInstallation;
 
@@ -201,18 +199,23 @@ public class LoginSelectActivity extends SherlockActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		EasyTracker.getInstance(this).activityStart(this);
-
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 	}
 
+	
+	
 	/**
 	 * onStop
 	 */
 	@Override
 	public void onStop() {
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this);
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 	}
+	
+	
 	
 
 	/**
@@ -322,16 +325,6 @@ public class LoginSelectActivity extends SherlockActivity {
 			} catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				login_error = true;
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred
-										ex), // The exception.
-						false).build());
 			}
 			return null;
 

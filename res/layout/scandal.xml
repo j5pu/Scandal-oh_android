@@ -40,7 +40,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="6dp"
-            android:text="soyunafuentelarga"
+            android:text=""
             android:textColor="@color/morado"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -63,6 +63,15 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:src="@drawable/altavoz_azul"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/prog_escandalo_loading_audio"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:visibility="gone" />
 
         <ImageView
@@ -189,12 +198,10 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="1dp"
                                 android:gravity="center_vertical"
-                                android:text="alejandro.leonrodriguez.7asdfvasdfasdfadfs"
+                                android:text="joseantonio.puertolasmontanes"
                                 android:textColor="#aaaaaa"
                                 android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:maxLines="1"
-                                android:ellipsize="end"  />
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 

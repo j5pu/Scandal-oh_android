@@ -36,9 +36,7 @@ import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.util.Connectivity;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CommentsActivity extends SherlockActivity {
@@ -141,6 +139,9 @@ public class CommentsActivity extends SherlockActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
+		
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 
 		// Si está logueado puede escribir comentarios
 		if (MyApplication.logged_user) {
@@ -184,7 +185,9 @@ public class CommentsActivity extends SherlockActivity {
 			});
 		}
 	}
+	
 
+	
 	
 	/**
 	 * onPause
@@ -194,6 +197,18 @@ public class CommentsActivity extends SherlockActivity {
 		super.onPause();
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(ll_screen.getWindowToken(), 0);
+	}
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
 	}
 	
 	
@@ -411,17 +426,6 @@ public class CommentsActivity extends SherlockActivity {
 			catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				any_error = true; // Indicamos que hubo algún error
-
-				// Mandamos la excepcion a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build());
 			}
 
 			if (any_error) {

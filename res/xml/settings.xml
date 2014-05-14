@@ -8,7 +8,8 @@
         <CheckBoxPreference
             android:key="autoreproduccion"
             android:summary="@string/reproduce_el_audio_automaticamente"
-            android:title="@string/autoreproduccion"/>
+            android:title="@string/autoreproduccion"
+            android:defaultValue="true"/>
     </PreferenceCategory>
     
     <PreferenceCategory

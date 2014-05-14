@@ -30,9 +30,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.dialogs.ChangePasswordDialog;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.StandardExceptionParser;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ProfileSettingsActivity extends SherlockActivity {
@@ -211,6 +209,32 @@ public class ProfileSettingsActivity extends SherlockActivity {
 			}
 		});
 	}
+	
+	
+	
+	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+	
 
 	/**
 	 * onOptionsItemSelected
@@ -275,17 +299,6 @@ public class ProfileSettingsActivity extends SherlockActivity {
 			} catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				any_error = true;
-
-				// Mandamos la excepción a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build()); // False indicates a fatal exception
 			}
 
 			// Si hubo algún error devolvemos 666
@@ -383,17 +396,6 @@ public class ProfileSettingsActivity extends SherlockActivity {
 			} catch (Exception ex) {
 				Log.e("Debug", "error: " + ex.getMessage(), ex);
 				any_error = true;
-
-				// Mandamos la excepción a Google Analytics
-				EasyTracker easyTracker = EasyTracker.getInstance(mContext);
-				easyTracker.send(MapBuilder.createException(
-						new StandardExceptionParser(mContext, null)
-								.getDescription(Thread.currentThread()
-										.getName(), // The name of the thread on
-													// which the exception
-													// occurred.
-										ex), // The exception.
-						false).build()); // False indicates a fatal exception
 			}
 
 			// Si hubo algún error devolvemos 666

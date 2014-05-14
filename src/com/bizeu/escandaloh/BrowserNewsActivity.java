@@ -2,6 +2,7 @@ package com.bizeu.escandaloh;
 
 import java.lang.reflect.InvocationTargetException;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -18,6 +19,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.users.LoginSelectActivity;
+import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class BrowserNewsActivity extends SherlockActivity {
@@ -30,18 +32,19 @@ public class BrowserNewsActivity extends SherlockActivity {
 	
 	private String url;
 	private boolean is_loading = true; // Nos indica si está cargando una web
+	private Context mContext;
 	
-	
-	
+		
 	/**
 	 * onCreate
 	 */
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.browser_news);
+		
+		mContext = this;
 		
 		if (getIntent() != null){
 			Intent i = getIntent();
@@ -140,6 +143,20 @@ public class BrowserNewsActivity extends SherlockActivity {
 	}
 	
 	
+	
+	
+	/**
+	 * onStart
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		// Iniciamos Flurry
+		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
+	}
+	
+	
+	
 	/**
 	 * onPause
 	 */
@@ -155,6 +172,20 @@ public class BrowserNewsActivity extends SherlockActivity {
 	    } catch (IllegalAccessException iae) {
 	    }
 	}
+	
+	
+	
+	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+	
+
 	
 	
 	/**
