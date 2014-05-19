@@ -1241,11 +1241,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 */
 	private File createFileTemporary(String part, String ext) {
 		File scandaloh_dir = Environment.getExternalStorageDirectory();
-		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()
-				+ "/ScándalOh/");
+		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath() + "/ScandalOh/");
 		if (!scandaloh_dir.exists()) {
 			scandaloh_dir.mkdirs();
 		}
+		
+		
 		try {
 			return File.createTempFile(part, ext, scandaloh_dir);
 		} catch (IOException e) {
@@ -1393,7 +1394,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 											Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
 											File photo = null;
 											photo = createFileTemporary("picture", ".png");
-											if (photo != null) {mImageUri = Uri.fromFile(photo);
+											if (photo != null) {
+												mImageUri = Uri.fromFile(photo);
 												takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,mImageUri);
 												startActivityForResult(takePictureIntent,FROM_CAMERA);
 												photo.delete();

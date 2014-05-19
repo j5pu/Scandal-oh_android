@@ -389,7 +389,7 @@ public class ProfileActivity extends SherlockActivity {
 	private File createFileTemporary(String part, String ext) {
 		File scandaloh_dir = Environment.getExternalStorageDirectory();
 		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()
-				+ "/ScándalOh/");
+				+ "/ScandalOh/");
 		if (!scandaloh_dir.exists()) {
 			scandaloh_dir.mkdirs();
 		}

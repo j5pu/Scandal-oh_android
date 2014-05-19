@@ -371,8 +371,7 @@ public class ImageUtils {
 	 *            Contexto
 	 */
 	public static void saveBitmapIntoGallery(Bitmap bmp, Context context) {
-		File imageFileFolder = new File(
-				Environment.getExternalStorageDirectory(), "ScándalOh");
+		File imageFileFolder = new File(Environment.getExternalStorageDirectory(), "ScandalOh");
 		imageFileFolder.mkdirs();
 		FileOutputStream out = null;
 

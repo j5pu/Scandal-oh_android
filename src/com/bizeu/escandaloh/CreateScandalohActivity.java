@@ -314,14 +314,11 @@ public class CreateScandalohActivity extends SherlockActivity {
 				MultipartEntity reqEntity = new MultipartEntity();				
 
 				if (con_audio) {
-					audio_file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScándalOh/Audio/audio.3gp");
+					audio_file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScandalOh/Audio/audio.3gp");
 					if (audio_file == null){
-						Log.v("WE","any error es nulo");
 						any_error = true;
 					}
-					else{
-						Log.v("WE","No es nulo");
-					}
+					
 					FileBody audioBody = new FileBody(audio_file);
 					reqEntity.addPart("sound", audioBody);
 				}

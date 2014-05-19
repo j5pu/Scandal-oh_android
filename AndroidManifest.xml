@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mnopi.scandaloh_escandalo_humor_denuncia_social"
-    android:versionCode="4"
+    android:versionCode="6"
     android:versionName="2.2.2" >
 
     <uses-sdk
         android:minSdkVersion="10"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <uses-feature android:name="android.hardware.camera" />
 
