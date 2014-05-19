@@ -1,20 +1,27 @@
 package com.bizeu.escandaloh.adapters;
 
 import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.bizeu.escandaloh.MyApplication;
-import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import com.bizeu.escandaloh.model.Comment;
+import com.bizeu.escandaloh.users.FollowersActivity;
+import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CommentAdapter extends ArrayAdapter<Comment> {
 
@@ -67,11 +74,27 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         holder.imgAvatar = (ImageViewRounded)convertView.findViewById(R.id.img_comment_avatar);
         holder.imgUser = (ImageView)convertView.findViewById(R.id.img_comment_socialnetwork);                                 
 
-        // Rellenamos los datos	        
+        // Rellenamos los datos	 y asignamos onClick
+        OnClickListener onClickLisPerfil = new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Le llevamos al perfil del usuario
+				Intent i = new Intent(mContext, ProfileActivity.class);
+				i.putExtra(ProfileActivity.USER_ID, v.getTag().toString());
+				mContext.startActivity(i);		
+			}
+		};
+        
         holder.txtText.setText(comment.getText());
         holder.txtUsername.setText(comment.getUsername());
+        holder.txtUsername.setTag(comment.getUserId());
+        holder.txtUsername.setOnClickListener(onClickLisPerfil);
         holder.imgAvatar.setImage(MyApplication.DIRECCION_BUCKET + comment.getAvatar(), mContext.getResources().getDrawable(R.drawable.avatar_defecto));
-     
+        holder.imgAvatar.setTag(comment.getUserId());
+        holder.imgAvatar.setOnClickListener(onClickLisPerfil);
+        
+        
         // La fecha tendrá el formato: dd-mm-aaaa
         holder.txtDate.setText(Utils.changeDateFormat(comment.getDate())); 
         
@@ -85,6 +108,9 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         else if (social_net == 1){
         	holder.imgUser.setImageResource(R.drawable.facebook_rosa);
         }  
+        
+        holder.imgUser.setTag(comment.getUserId());
+        holder.imgUser.setOnClickListener(onClickLisPerfil);
              
         return convertView;
     }

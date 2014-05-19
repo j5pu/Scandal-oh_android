@@ -25,6 +25,7 @@
             android:layout_above="@+id/ll_comments_write_comment"
             android:background="#99000000"
             android:descendantFocusability="afterDescendants"
+            android:listSelector="@android:color/transparent"
             android:divider="#AAff0000"
             android:dividerHeight="0px" >
 
