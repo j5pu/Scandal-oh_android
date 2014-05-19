@@ -113,12 +113,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private TextView txt_lateral_nombreusuario;
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
+	private LinearLayout ll_lateral_info_user;
 	private TextView txt_code_country;
 	private Spinner spinner_categorias;
 	DrawerLayout mDrawerLayout;
 	private ImageViewRounded img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
 	private TextView txt_action_bar_num_notis;
+
 	
 	private TextView txt_num_notifs;
 	private Uri mImageUri;
@@ -178,8 +180,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setIcon(R.drawable.logo_blanco);
 		
-		// Si viene de una notificación push abrimos la pantalla de notificaciones
-		if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
+		// Si viene de una notificación push y el usuario está logueado abrimos la pantalla de notificaciones
+		if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION) && MyApplication.logged_user){
 			Intent i = new Intent(MainActivity.this, NotificationsActivity.class);
 			startActivity(i);
 		}
@@ -249,6 +251,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
 		explist_lateral_filtros = (ExpandableListView) findViewById(R.id.explist_mLateral_filtros);
 		txt_num_notifs = (TextView) findViewById(R.id.txt_mLateral_numNotificaciones);
+		ll_lateral_info_user = (LinearLayout) findViewById(R.id.ll_mLateral_info_user);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
@@ -369,11 +372,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 			public void onClick(View v) {		
 				// Almacenamos el avatar actual del usuario
 				actual_avatar = MyApplication.avatar;
+				// Mostramos la pantalla de perfil
 				Intent i = new Intent(MainActivity.this, ProfileActivity.class);
 				i.putExtra(ProfileActivity.USER_ID, ProfileActivity.LOGGED);
 				startActivityForResult(i,SHOW_PROFILE);		
 			}
 		});
+		
+		
 
 		// Ajustes
 		ll_lateral_ajustes.setOnClickListener(new View.OnClickListener() {

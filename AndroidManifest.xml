@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mnopi.scandaloh_escandalo_humor_denuncia_social"
-    android:versionCode="6"
-    android:versionName="2.2.2" >
+    android:versionCode="8"
+    android:versionName="2.2.5" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -175,11 +175,10 @@
                 <category android:name="com.mnopi.scandaloh_escandalo_humor_denuncia_social" />
             </intent-filter>
         </receiver>
-        <receiver 
-            android:name="com.bizeu.escandaloh.notifications.PushReceiver" >
+        <receiver android:name="com.bizeu.escandaloh.notifications.PushReceiver"
+            android:exported="true" >
             <intent-filter>
-                <action android:name="alex_action" >
-                </action>
+                <action android:name="alex_action" /> 
             </intent-filter>
         </receiver>
     </application>
