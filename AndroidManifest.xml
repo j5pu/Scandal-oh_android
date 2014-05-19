@@ -5,7 +5,7 @@
     android:versionName="2.2.5" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="9"
         android:targetSdkVersion="19" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -135,6 +135,9 @@
         <activity
             android:name="com.bizeu.escandaloh.users.ProfileSettingsActivity"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.bizeu.escandaloh.users.ProfilePhotoActivity" >
         </activity>
         <activity
             android:name="com.bizeu.escandaloh.CommentsActivity"

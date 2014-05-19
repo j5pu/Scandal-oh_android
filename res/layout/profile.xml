@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/ll_profile_screen"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -120,6 +121,14 @@
             android:layout_height="wrap_content" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_profile_expanded"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logout"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/ll_profile_listhistory"

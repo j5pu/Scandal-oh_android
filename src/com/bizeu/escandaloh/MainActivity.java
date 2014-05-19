@@ -367,6 +367,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			
 			@Override
 			public void onClick(View v) {
+				// Si está logueado vamos a la pantalla del perfil
 				if (MyApplication.logged_user){
 					// Almacenamos el avatar actual del usuario
 					actual_avatar = MyApplication.avatar;
@@ -375,6 +376,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 					i.putExtra(ProfileActivity.USER_ID, ProfileActivity.LOGGED);
 					startActivityForResult(i,SHOW_PROFILE);	
 				}	
+				
+				// Si no, vamos a la pantalla de iniciar sesión
+				else{
+					Intent i = new Intent(MainActivity.this,LoginSelectActivity.class);
+					startActivity(i);
+				}
 			}
 		};
 		
@@ -399,11 +406,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(MainActivity.this,
-						LoginSelectActivity.class);
+				Intent i = new Intent(MainActivity.this,LoginSelectActivity.class);
 				startActivity(i);
-				// Cerramos el menu
-				mDrawerLayout.closeDrawer(ll_menu_lateral);
 			}
 		});
 				
