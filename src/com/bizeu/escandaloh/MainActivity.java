@@ -113,7 +113,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private TextView txt_lateral_nombreusuario;
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
-	private LinearLayout ll_lateral_info_user;
 	private TextView txt_code_country;
 	private Spinner spinner_categorias;
 	DrawerLayout mDrawerLayout;
@@ -251,7 +250,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
 		explist_lateral_filtros = (ExpandableListView) findViewById(R.id.explist_mLateral_filtros);
 		txt_num_notifs = (TextView) findViewById(R.id.txt_mLateral_numNotificaciones);
-		ll_lateral_info_user = (LinearLayout) findViewById(R.id.ll_mLateral_info_user);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
@@ -364,22 +362,25 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 		
-				
-		// Perfil
-		ll_lateral_perfil.setOnClickListener(new View.OnClickListener() {
+		// Avatar, Nombre de usuario y Perfil
+		OnClickListener onClickLisPerfil = new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {		
-				// Almacenamos el avatar actual del usuario
-				actual_avatar = MyApplication.avatar;
-				// Mostramos la pantalla de perfil
-				Intent i = new Intent(MainActivity.this, ProfileActivity.class);
-				i.putExtra(ProfileActivity.USER_ID, ProfileActivity.LOGGED);
-				startActivityForResult(i,SHOW_PROFILE);		
+			public void onClick(View v) {
+				if (MyApplication.logged_user){
+					// Almacenamos el avatar actual del usuario
+					actual_avatar = MyApplication.avatar;
+					// Mostramos la pantalla de perfil
+					Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+					i.putExtra(ProfileActivity.USER_ID, ProfileActivity.LOGGED);
+					startActivityForResult(i,SHOW_PROFILE);	
+				}	
 			}
-		});
+		};
 		
-		
+		img_lateral_avatar.setOnClickListener(onClickLisPerfil);
+		txt_lateral_nombreusuario.setOnClickListener(onClickLisPerfil);
+		ll_lateral_perfil.setOnClickListener(onClickLisPerfil);
 
 		// Ajustes
 		ll_lateral_ajustes.setOnClickListener(new View.OnClickListener() {
