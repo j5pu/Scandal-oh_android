@@ -58,7 +58,6 @@ public class PhotoDetailActivity extends SherlockActivity {
 			
 			// Obtenemos y mostramos la foto grande
 			url_big = getIntent().getStringExtra("url_big");
-			Log.v("WE","Url big: " + url_big);
 			getBigPictureAsync = new GetBigPictureTask();
 			getBigPictureAsync.execute();
 

@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.Utils;
 import com.edmodo.cropper.CropImageView;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
@@ -43,7 +44,7 @@ public class CropActivity extends Activity {
 	private int photo_from;
 	private String photo_string;
 	private Uri mImageUri;
-	private Bitmap taken_photo;
+	private Bitmap taken_bitmap;
 	
 	
 	/**
@@ -71,13 +72,13 @@ public class CropActivity extends Activity {
 				if (photo_from == ProfileActivity.AVATAR_FROM_CAMERA) {
 					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
 					this.getContentResolver().notifyChange(mImageUri, null);
-					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
-					img_crop_picture.setImageBitmap(taken_photo);
+					taken_bitmap = ImageUtils.decodeSampledBitmapFromUri(mContext, mImageUri, Utils.dpToPx(250, mContext),  Utils.dpToPx(250, mContext));
+					img_crop_picture.setImageBitmap(taken_bitmap);
 				}
 
 				// Se ha cogido de la galería
 				else if (photo_from == ProfileActivity.AVATAR_FROM_GALLERY) {
-					img_crop_picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
+					img_crop_picture.setImageBitmap(ImageUtils.decodeSampledBitmapFromString(photo_string, Utils.dpToPx(250, mContext),  Utils.dpToPx(250, mContext)));
 				}
 			}
 

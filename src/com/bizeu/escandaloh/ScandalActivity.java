@@ -218,7 +218,7 @@ public class ScandalActivity extends SherlockFragmentActivity {
 						@Override
 						public void run() {							
 							Scandaloh scandal = new Scandaloh(id, user_id, title,
-									category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+									category, BitmapFactory.decodeResource(getResources(),R.drawable.cargando),
 									Integer.parseInt(comments_count),resource_uri,
 									MyApplication.DIRECCION_BUCKET + img_p,
 									MyApplication.DIRECCION_BUCKET + img, sound, username, date,

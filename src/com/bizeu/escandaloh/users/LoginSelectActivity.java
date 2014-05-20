@@ -89,7 +89,7 @@ public class LoginSelectActivity extends SherlockActivity {
 		
 		// Si tiene datos, obtenemos si viene de haber compartido desde la galería
 		if (getIntent().getExtras() != null){
-			shared = getIntent().getExtras().getString("shareUri");
+			shared = getIntent().getExtras().getString("photoUri");
 			sharing_type = getIntent().getExtras().getInt("photo_from");
 		}
 		
@@ -231,7 +231,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				if (sharing_type == CoverActivity.FROM_SHARING_PICTURE || sharing_type == CoverActivity.FROM_SHARING_TEXT){
 					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
 					in.putExtra("photo_from", sharing_type);
-					in.putExtra("shareUri", shared);
+					in.putExtra("photoUri", shared);
 					startActivity(in);
 				}
 				// Cerramos directamente la pantalla
@@ -365,7 +365,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				if (sharing_type == CoverActivity.FROM_SHARING_PICTURE || sharing_type == CoverActivity.FROM_SHARING_TEXT){
 					Intent in = new Intent(LoginSelectActivity.this, CreateScandalohActivity.class);
 					in.putExtra("photo_from", sharing_type);
-					in.putExtra("shareUri", shared);
+					in.putExtra("photoUri", shared);
 					startActivity(in);
 				}
 				else{

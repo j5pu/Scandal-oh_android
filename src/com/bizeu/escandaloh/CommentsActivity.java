@@ -96,11 +96,12 @@ public class CommentsActivity extends SherlockActivity {
 		actBar.setDisplayShowHomeEnabled(false);
 		actBar.setDisplayShowTitleEnabled(false);
 		photo = (FetchableImageView) findViewById(R.id.img_actionbar_comments_photo);
-		photo.setImage(url_photo, R.drawable.loading);
+		photo.setImage(url_photo, R.drawable.cargando);
 		txt_title = (TextView) findViewById(R.id.txt_actionbar_comments_title);
 		txt_title.setText(title);
 		
-		img_fondo.setImage(url_photo, R.drawable.loading);
+		// Fondo de la pantalla
+		img_fondo.setImage(url_photo, R.drawable.cargando);
 		
 		// Volvemos al carrusel
 		ll_icon = (LinearLayout) findViewById(R.id.ll_actionbar_comments_icon);

@@ -45,6 +45,7 @@ import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
+import com.bizeu.escandaloh.util.Utils;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
@@ -69,7 +70,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 	private String selected_category;
 	private String written_title;
-	private Bitmap taken_photo;
+	private Bitmap taken_bitmap;
 	private Uri mImageUri;
 	private Context mContext;
 	private Activity acti;
@@ -78,7 +79,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 	private int photo_from;
 	private boolean any_error;
 	private String photo_string;
-	private Uri shareUri;
 	private String shared_url;
 	private String preview_source;
 	private String preview_img;
@@ -123,20 +123,18 @@ public class CreateScandalohActivity extends SherlockActivity {
 			if (data != null) {
 				photo_string = data.getExtras().getString("photoUri");
 
-				// Si se ha tomado de la cámara
-				if (photo_from == MainActivity.FROM_CAMERA) {
-					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
+				// Si se ha tomado de la cámara o viene de la galería (Uri)
+				if (photo_from == MainActivity.FROM_CAMERA || photo_from == CoverActivity.FROM_SHARING_PICTURE) {
+					mImageUri = Uri.parse(photo_string);
 					this.getContentResolver().notifyChange(mImageUri, null);
-					taken_photo = ImageUtils.uriToBitmap(mImageUri, this);
-
-					// Mostramos la foto
-					img_picture.setImageBitmap(taken_photo);
+					taken_bitmap = ImageUtils.decodeSampledBitmapFromUri(mContext, mImageUri, Utils.dpToPx(300, mContext), Utils.dpToPx(120, mContext));
+					img_picture.setImageBitmap(taken_bitmap);
 				}
 
-				// Se ha cogido de la galería
+				// Se ha cogido de la galería (Path)
 				else if (photo_from == MainActivity.FROM_GALLERY) {
-					img_picture.setImageBitmap(BitmapFactory.decodeFile(photo_string));
-					taken_photo = BitmapFactory.decodeFile(photo_string);
+					taken_bitmap = ImageUtils.decodeSampledBitmapFromString(photo_string, Utils.dpToPx(300, mContext), Utils.dpToPx(120, mContext));
+					img_picture.setImageBitmap(taken_bitmap);
 				}
 
 				// Subir audio
@@ -148,8 +146,8 @@ public class CreateScandalohActivity extends SherlockActivity {
 				}
 
 				// Desde url
-				else if (photo_from == MainActivity.FROM_URL){
-					shared_url = data.getExtras().getString("shareUri");
+				else if (photo_from == MainActivity.FROM_URL || photo_from == CoverActivity.FROM_SHARING_TEXT){
+					shared_url = data.getExtras().getString("photoUri");
 					// Hacemos que el título no parezca un edittext
 					edit_title.setKeyListener(null);
 					edit_title.setBackgroundColor(getResources().getColor(R.color.gris_claro));
@@ -158,27 +156,6 @@ public class CreateScandalohActivity extends SherlockActivity {
 					ll_first_comment.setVisibility(View.VISIBLE);
 					new GetPreviewScandalFromUrlTask().execute();
 				}
-
-				// Se ha compartido una imagen (galería)
-				else if (photo_from == CoverActivity.FROM_SHARING_PICTURE) {
-					// Mostramos la foto
-					shareUri = Uri.parse(data.getExtras().getString("shareUri"));
-					taken_photo = ImageUtils.uriToBitmap(shareUri, this);
-					img_picture.setImageBitmap(taken_photo);
-				}
-
-				// Se ha compartido una url
-				else if (photo_from == CoverActivity.FROM_SHARING_TEXT){
-					shared_url = data.getExtras().getString("shareUri");
-					// Hacemos que el título no parezca un edittext
-					edit_title.setKeyListener(null);
-					edit_title.setBackgroundColor(getResources().getColor(R.color.gris_claro));
-					txt_contador_titulo.setVisibility(View.INVISIBLE);
-					// Mostramos el edit del primer comentario
-					ll_first_comment.setVisibility(View.VISIBLE);
-					new GetPreviewScandalFromUrlTask().execute();
-				}				
-
 			}
 		}
 
@@ -352,7 +329,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Si viene de la cámara o la galería añadimos la foto
 				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY || photo_from == CoverActivity.FROM_SHARING_PICTURE){
-					f = ImageUtils.reduceSizeBitmap(taken_photo, 200, mContext);
+					f = ImageUtils.reduceBitmapSize(taken_bitmap, 200, mContext);
 					FileBody bin1 = new FileBody(f);
 					reqEntity.addPart("img", bin1);
 				}
@@ -539,13 +516,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 					edit_title.setText(preview_title);
 				} else {
 					Toast toast;
-					toast = Toast
-							.makeText(
-									mContext,
-									getResources()
-											.getString(
-													R.string.hubo_algun_error_enviando_comentario),
-									Toast.LENGTH_LONG);
+					toast = Toast.makeText(mContext,getResources().getString(R.string.hubo_algun_error_enviando_comentario),Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}

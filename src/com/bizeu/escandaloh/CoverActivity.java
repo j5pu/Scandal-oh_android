@@ -80,8 +80,8 @@ public class CoverActivity extends Activity {
 
 			// Es una foto
 			if (extras.containsKey(Intent.EXTRA_STREAM)){
-				Uri shareUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
-				shared = shareUri.toString();
+				Uri photoUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+				shared = photoUri.toString();
 				sharing_type = FROM_SHARING_PICTURE;
 			}
 
@@ -104,7 +104,7 @@ public class CoverActivity extends Activity {
 			}	
 			
 			in.putExtra("photo_from", sharing_type);
-			in.putExtra("shareUri", shared);			
+			in.putExtra("photoUri", shared);			
 			startActivity(in);
 			finish();
 		}

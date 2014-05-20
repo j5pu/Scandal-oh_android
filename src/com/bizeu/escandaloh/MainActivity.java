@@ -610,7 +610,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					ImageUtils.saveBitmapIntoGallery(bitAux, mContext);
 
 					// Mostramos la pantalla de subir escándalo
-					Intent i = new Intent(MainActivity.this,CreateScandalohActivity.class);
+					Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
 					i.putExtra("photo_from", FROM_CAMERA);
 					i.putExtra("photoUri", mImageUri.toString());
 					startActivityForResult(i, CREATE_ESCANDALO);
@@ -852,7 +852,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							public void run() {							
 								// Añadimos el escandalo al ArrayList
 								Scandaloh escanAux = new Scandaloh(id, user_id, title,
-										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+										category, BitmapFactory.decodeResource(getResources(),R.drawable.cargando),
 										Integer.parseInt(comments_count),resource_uri,
 										MyApplication.DIRECCION_BUCKET + img_p,
 										MyApplication.DIRECCION_BUCKET + img, sound, username, date,
@@ -1035,7 +1035,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							public void run() {							
 								// Añadimos el escandalo al ArrayList
 								Scandaloh escanAux = new Scandaloh(id, user_id, title,
-										category, BitmapFactory.decodeResource(getResources(),R.drawable.loading),
+										category, BitmapFactory.decodeResource(getResources(),R.drawable.cargando),
 										Integer.parseInt(comments_count),resource_uri,
 										MyApplication.DIRECCION_BUCKET + img_p,
 										MyApplication.DIRECCION_BUCKET + img, sound, username, date,

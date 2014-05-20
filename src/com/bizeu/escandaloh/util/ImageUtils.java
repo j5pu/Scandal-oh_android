@@ -14,6 +14,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -110,64 +111,14 @@ public class ImageUtils {
 		return bitmap;
 	}
 
+	
+	
 	/**
-	 * Crea un Bitmap a partir de una Uri
-	 * 
+	 * Crea un bitmap a partir de una uri
 	 * @param selectedImage
+	 * @param context
 	 * @return
 	 */
-	
-	/*
-	public static Bitmap uriToBitmap(Uri selectedImage, Context context) {
-		Bitmap bm = null;
-		AssetFileDescriptor fileDescriptor = null;
-		BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-
-		try {
-			fileDescriptor = context.getContentResolver()
-					.openAssetFileDescriptor(selectedImage, "r");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				BitmapFactory.decodeFileDescriptor(
-						fileDescriptor.getFileDescriptor(), null, options);
-				fileDescriptor.close();
-				
-			    // Calculate inSampleSize
-			    options.inSampleSize = calculateInSampleSize(options, 200, 200);
-			    
-			    // Decode bitmap with inSampleSize set
-			    options.inJustDecodeBounds = false;
-			    
-			    try {
-					fileDescriptor = context.getContentResolver()
-							.openAssetFileDescriptor(selectedImage, "r");
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} finally {
-					try {
-						bm = BitmapFactory.decodeFileDescriptor(
-								fileDescriptor.getFileDescriptor(), null, options);
-						fileDescriptor.close();
-					    
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			    
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return bm;
-	}
-	
-	*/
-	
-	
-	
 	public static Bitmap uriToBitmap(Uri selectedImage, Context context) {
 		Bitmap bm = null;
 		AssetFileDescriptor fileDescriptor = null;
@@ -250,7 +201,7 @@ public class ImageUtils {
 	 * @param mContext Contexto
 	 * @return File reducido en tamaño
 	 */
-	public static File reduceSizeBitmap(Bitmap bitm, int max_kb, Context mContext){
+	public static File reduceBitmapSize(Bitmap bitm, int max_kb, Context mContext){
 		Bitmap reduced_bitmap = bitm;
 		Bitmap resized_bitmap;
 		File f = null;
@@ -351,8 +302,7 @@ public class ImageUtils {
 			String[] proj = { MediaStore.Images.Media.DATA };
 			cursor = context.getContentResolver().query(contentUri, proj, null,
 					null, null);
-			int column_index = cursor
-					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 			cursor.moveToFirst();
 			return cursor.getString(column_index);
 		} finally {
@@ -430,6 +380,104 @@ public class ImageUtils {
 
 	
 	
+	
+	/**
+	 * Decodifica una Uri en un Bitmap
+	 * @param res
+	 * @param resId
+	 * @param reqWidth
+	 * @param reqHeight
+	 * @return Bitmap en caso de éxito, nulo en caso de error
+	 */
+	public static Bitmap decodeSampledBitmapFromUri(Context context, Uri uri, int reqWidth, int reqHeight) {
+		
+		Bitmap bm = null;
+		AssetFileDescriptor fileDescriptor = null;
+		
+		try{
+		    // First decode with inJustDecodeBounds=true to check dimensions
+		    final BitmapFactory.Options options = new BitmapFactory.Options();
+		    options.inJustDecodeBounds = true;
+			fileDescriptor = context.getContentResolver().openAssetFileDescriptor(uri, "r");
+		    BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
+		    fileDescriptor.close();
+		    
+		    // Calculate inSampleSize
+		    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight); 
+		    
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+			fileDescriptor = context.getContentResolver().openAssetFileDescriptor(uri, "r");
+		    bm = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
+		    fileDescriptor.close();
+		}
+		catch (Exception e){
+			if (e instanceof FileNotFoundException){
+				
+			}
+			else if (e instanceof IOException){
+			}
+		}
+	
+	    return bm;
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Dedofica un String (path) en un Bitmap
+	 * @param res
+	 * @param resId
+	 * @param reqWidth
+	 * @param reqHeight
+	 * @return
+	 */
+	public static Bitmap decodeSampledBitmapFromString(String path, int reqWidth, int reqHeight) {
+
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeFile(path,options);
+
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    return BitmapFactory.decodeFile(path, options);
+	}
 
 
+	
+	/**
+	 * Calcula en options.inSampleSize en base de dos
+	 * @param options
+	 * @param reqWidth
+	 * @param reqHeight
+	 * @return
+	 */
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    // Raw height and width of image
+    final int height = options.outHeight;
+    final int width = options.outWidth;
+    int inSampleSize = 1;
+
+    if (height > reqHeight || width > reqWidth) {
+
+        final int halfHeight = height / 2;
+        final int halfWidth = width / 2;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while ((halfHeight / inSampleSize) > reqHeight
+                && (halfWidth / inSampleSize) > reqWidth) {
+            inSampleSize *= 2;
+        }
+    }
+
+    return inSampleSize;
+}
 }
