@@ -82,7 +82,7 @@ public class CropActivity extends Activity {
 				}
 			}
 
-	        img_crop_picture.setAspectRatio(180, 180);   
+	        img_crop_picture.setAspectRatio(200, 200);   
 	        img_crop_picture.setFixedAspectRatio(true);
 	        
 	        but_crop.setOnClickListener(new View.OnClickListener() {
@@ -91,10 +91,6 @@ public class CropActivity extends Activity {
 				public void onClick(View v) {
 					// Obtenemos la foto después del crop
 					cropped_picture = img_crop_picture.getCroppedImage();
-					// Escalamos la foto a 180 px x 180 px
-					cropped_picture = ImageUtils.scaleBitmap(cropped_picture, 180, 180);
-					//cropped_picture = ImageUtils.getResizedBitmap(cropped_picture, 180, 180);
-					//cropped_picture = ImageUtils.compressBitmapToJpg(cropped_picture, 80);
 					// Actualizamos el avatar
 					new UpdateAvatarTask(mContext, cropped_picture).execute();
 				}
@@ -167,7 +163,9 @@ public class CropActivity extends Activity {
 				put.setHeader("Session-Token", MyApplication.session_token);
 				MultipartEntity reqEntity = new MultipartEntity();
 				
-				File f = ImageUtils.bitmapToFileTemp(photo_avatar, mContext, "avatar.jpg");
+				// Escalamos la foto a 200 px x 200 px
+				Bitmap reduced_bitmap = ImageUtils.scaleBitmap(photo_avatar, 200, 200);
+				File f = ImageUtils.reduceBitmapSize(reduced_bitmap, 5, mContext);
 				
 				FileBody fb_avatar = new FileBody(f);
 				reqEntity.addPart("avatar", fb_avatar);

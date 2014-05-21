@@ -1,6 +1,9 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -14,13 +17,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -123,7 +125,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 			if (data != null) {
 				photo_string = data.getExtras().getString("photoUri");
 
-				// Si se ha tomado de la cámara o viene de la galería (Uri)
+				// Si se ha tomado de la cámara o compartido foto (Uri)
 				if (photo_from == MainActivity.FROM_CAMERA || photo_from == CoverActivity.FROM_SHARING_PICTURE) {
 					mImageUri = Uri.parse(photo_string);
 					this.getContentResolver().notifyChange(mImageUri, null);
@@ -145,7 +147,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 					con_audio = true;
 				}
 
-				// Desde url
+				// Compartido url
 				else if (photo_from == MainActivity.FROM_URL || photo_from == CoverActivity.FROM_SHARING_TEXT){
 					shared_url = data.getExtras().getString("photoUri");
 					// Hacemos que el título no parezca un edittext
@@ -191,17 +193,13 @@ public class CreateScandalohActivity extends SherlockActivity {
 					// Mostramos el mensaje de subiendo escándalo
 					Toast toast = Toast.makeText(mContext, getResources().getString(R.string.subiendo_scandaloh) , Toast.LENGTH_SHORT);
 					toast.show();
-					// Enviamos el escándalo en un hilo aparte
+					// Enviamos el escándalo en un hilo a parte
 					new SendScandalTask().execute();
 					// Cerramos la pantalla
 					acti.finish();
 				} else {
 					Toast toast;
-					toast = Toast.makeText(
-							mContext,
-							getResources().getString(
-									R.string.no_dispones_de_conexion),
-							Toast.LENGTH_LONG);
+					toast = Toast.makeText(mContext,getResources().getString(R.string.no_dispones_de_conexion),Toast.LENGTH_LONG);
 					toast.show();
 				}
 			}
@@ -327,16 +325,24 @@ public class CreateScandalohActivity extends SherlockActivity {
 					}
 				}
 
-				// Si viene de la cámara o la galería añadimos la foto
-				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY || photo_from == CoverActivity.FROM_SHARING_PICTURE){
+				// Si viene de la cámara o la galería 
+				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY){
 					f = ImageUtils.reduceBitmapSize(taken_bitmap, 200, mContext);
 					FileBody bin1 = new FileBody(f);
 					reqEntity.addPart("img", bin1);
 				}
-
+				
+				// Si se ha compartido una foto
+				else if (photo_from == CoverActivity.FROM_SHARING_PICTURE){
+					f = ImageUtils.reduceBitmapSize(mImageUri, 200, mContext);
+					FileBody bin1 = new FileBody(f);
+					reqEntity.addPart("img", bin1);
+				}
+				
+				
 				post.setEntity(reqEntity);
 				response = client.execute(post);
-				resEntity = response.getEntity();
+				resEntity = response.getEntity();				
 				final String response_str = EntityUtils.toString(resEntity);
 
 				// Comprobamos si ha habido algún error

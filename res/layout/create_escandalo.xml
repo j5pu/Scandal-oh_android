@@ -26,15 +26,15 @@
 
     <LinearLayout
         android:id="@+id/ll_create_foto"
-        android:layout_width="300dp"
-        android:layout_height="120dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center|center_horizontal" >
 
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_new_escandalo_photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="300dp"
+            android:layout_height="120dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="fitCenter"
             android:src="@drawable/s_rosa" />

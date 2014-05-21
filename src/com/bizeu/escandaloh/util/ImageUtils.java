@@ -10,7 +10,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -152,7 +156,7 @@ public class ImageUtils {
 	 * @param max_pixels
 	 * @return
 	 */
-	public static Bitmap resizePicture(Bitmap bit, int max_pixels){
+	public static Bitmap scaleBitmap(Bitmap bit, int max_pixels){
 		Bitmap resized_bitmap = bit;
 		
 		float actual_height = bit.getHeight();
@@ -194,6 +198,8 @@ public class ImageUtils {
 	
 	
 	
+	
+	
 	/**
 	 * Reduce significativamente el tamaño de un bitmap y lo devuelve como File
 	 * @param bitm Bitmap original
@@ -203,28 +209,29 @@ public class ImageUtils {
 	 */
 	public static File reduceBitmapSize(Bitmap bitm, int max_kb, Context mContext){
 		Bitmap reduced_bitmap = bitm;
-		Bitmap resized_bitmap;
-		File f = null;
-		float tamaño_file_k;
+		Bitmap scaled_bitmap;
+		File reduced_file = null;
+		float tamanio_file;
 		int compression_factor;
 		
 		// Escalamos la foto a 700 pixeles (de su lado mayor)
-		resized_bitmap = ImageUtils.resizePicture(reduced_bitmap, 700);	
+		scaled_bitmap = ImageUtils.scaleBitmap(reduced_bitmap, 700);	
 		
 		try {
 			// Obtenemos el factor de compresión para obtener el máximo de kb
-			f = ImageUtils.bitmapToFileTemp(resized_bitmap, mContext, "scandal_picture.jpg");
-			tamaño_file_k = (float) f.length() / (MEGABYTE);
-			compression_factor = (int) (max_kb * 100 / tamaño_file_k);
+			reduced_file = ImageUtils.bitmapToFileTemp(scaled_bitmap, 100, mContext);
+			tamanio_file = (float) reduced_file.length() / (MEGABYTE);
+			compression_factor = (int) (max_kb * 100 / tamanio_file);
+			Log.v("WE","Tamanio file: " + tamanio_file);
 			
 			// Mientras no lleguemos al máximo de tamaño requerido comprimimos más
-			while (tamaño_file_k > max_kb){
-				f.delete();	
-				reduced_bitmap = ImageUtils.compressBitmapToJpg(resized_bitmap,  compression_factor);
-				f = ImageUtils.bitmapToFileTemp(reduced_bitmap, mContext, "scandal_picture.jpg");
-				tamaño_file_k = (float) f.length() / (MEGABYTE);
+			while (tamanio_file > max_kb){
+				reduced_file.delete();	
+				reduced_file = ImageUtils.bitmapToFileTemp(scaled_bitmap, compression_factor, mContext);
+				tamanio_file = (float) reduced_file.length() / (MEGABYTE);
 				// Reducimos el factor de compresión
 				compression_factor =  (int) ((int) compression_factor / 1.5);
+				Log.v("WE","Nuevo tamanio file: " + tamanio_file);
 			}
 			
 		} catch (IOException e) {
@@ -232,8 +239,91 @@ public class ImageUtils {
 			e.printStackTrace();
 		}
 		
-		return f;
+		return reduced_file;	
 	}
+	
+	
+	
+	
+	
+
+	/**
+	 * Reduce significativamente el tamaño de un file a partir de una Uri y lo devuelve como file
+	 * @param bitm Bitmap original
+	 * @param max_kb Tamaño máximo aceptado en kilobytes
+	 * @param mContext Contexto
+	 * @return File reducido en tamaño
+	 */
+	public static File reduceBitmapSize(Uri uri, int max_kb, Context mContext){
+		File reduced_file = null;
+		int size_original_file = 0;
+		float tamanio_file;
+		int compression_factor;
+		Bitmap original_bitmap;
+		Bitmap scaled_bitmap;
+				
+		ContentResolver cr = mContext.getContentResolver();
+		InputStream is = null;
+		try {
+			is = cr.openInputStream(uri);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			size_original_file = is.available() / 1024 ;
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Si el archivo ocupa menos del máximo permitido lo mandamos tal cual
+		if (size_original_file <= max_kb){
+			byte[] data;
+			try {
+				data = IOUtils.toByteArray(is);
+				reduced_file = File.createTempFile("tmp", "jpg",mContext.getCacheDir());
+				FileUtils.writeByteArrayToFile(reduced_file, data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		// Si ocupa más, entonces escalamos y comprimimos
+		else{
+			// Obtenemos el bitmap original
+			original_bitmap = BitmapFactory.decodeStream(is);
+			
+			// Escalamos la foto a 700 pixeles (de su lado mayor)
+			scaled_bitmap = ImageUtils.scaleBitmap(original_bitmap, 700);	
+			
+			try {
+				// Obtenemos el factor de compresión para obtener el máximo de kb
+				reduced_file = ImageUtils.bitmapToFileTemp(scaled_bitmap, 100, mContext);		
+				tamanio_file= (float) reduced_file.length() / (MEGABYTE);
+				compression_factor = (int) (max_kb * 100 / tamanio_file);
+				
+				// Mientras no lleguemos al máximo de tamaño requerido comprimimos más
+				while (tamanio_file > max_kb){
+					reduced_file.delete();	
+					reduced_file = ImageUtils.bitmapToFileTemp(scaled_bitmap, compression_factor, mContext);
+					tamanio_file = (float) reduced_file.length() / (MEGABYTE);
+					// Reducimos el factor de compresión
+					compression_factor =  (int) ((int) compression_factor / 1.5);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return reduced_file;
+	}
+	
+	
 	
 	
 	/**
@@ -244,12 +334,12 @@ public class ImageUtils {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static File bitmapToFileTemp(Bitmap bitm, Context context, String file_name) throws IOException{
-		File f = new File(context.getCacheDir(), "avatar.jpg");
-		f.createNewFile();
+	public static File bitmapToFileTemp(Bitmap bitm, int quality, Context context) throws IOException{
+		
+		File f = File.createTempFile("tmp", "jpg", context.getCacheDir());
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitm.compress(CompressFormat.JPEG, 100, bos);
+		bitm.compress(CompressFormat.JPEG, quality, bos);
 		byte[] bitmapdata = bos.toByteArray();
 		FileOutputStream fos = new FileOutputStream(f);
 		fos.write(bitmapdata);
@@ -260,34 +350,6 @@ public class ImageUtils {
 	
 	
 
-	/**
-	 * Crea un File a partir de un bitmap
-	 * 
-	 * @param bitm
-	 * @return
-	 */
-	public static File bitmapToFile(Bitmap bitm, Context context) {
-		String file_path = Environment.getExternalStorageDirectory()
-				.getAbsolutePath();
-		File return_file = new File(file_path, "tmp.png");
-		FileOutputStream fOut = null;
-		try {
-			fOut = new FileOutputStream(return_file);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		bitm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-
-		try {
-			fOut.flush();
-			fOut.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return return_file;
-	}
 
 	/**
 	 * Obtiene un string a partir de una uri
