@@ -850,6 +850,10 @@ public class ScandalFragment extends SherlockFragment {
 	        
 	        // Guardamos la foto en la galería
 			ImageUtils.saveBitmapIntoGallery(bitma, context);	
+			
+			// Mostramos un mensaje
+			Toast toast = Toast.makeText(context, R.string.foto_guardada_en_este_dispositivo, Toast.LENGTH_SHORT);
+			toast.show();
 	    }
 	}	
 	
@@ -971,21 +975,7 @@ public class ScandalFragment extends SherlockFragment {
     	return num_comments;
     }
     
-    
-    /**
-     * Cambia la dirección de la flecha de los comentarios
-     * @param top True indica flecha hacia arriba. False hacia abajo
-     */
- 	public void changeArrowDirection(boolean top){
- 		if (top){
- 	 		img_arrow.setImageDrawable(getResources().getDrawable(R.drawable.flecha_arriba));
- 		}
- 		else{
- 	 		img_arrow.setImageDrawable(getResources().getDrawable(R.drawable.flecha_abajo));
- 		}
- 	}
-	
- 	
+ 
  	
  	
  	/**
@@ -1098,6 +1088,12 @@ public class ScandalFragment extends SherlockFragment {
         		comment_text.setText(getResources().getString(R.string.se_el_primero_en_comentar));
         		txt_user_name.setText(MyApplication.user_name);
         		txt_date.setText(Utils.getCurrentDate());
+        		if (MyApplication.social_network == 0){
+        			social_net.setImageResource(R.drawable.s_gris);
+        		}
+        		else{
+        			social_net.setImageResource(R.drawable.facebook_gris);
+        		}
         		
                 // Avatar
                 img_avatar.setImage(MyApplication.DIRECCION_BUCKET + MyApplication.avatar, getActivity().getResources().getDrawable(R.drawable.avatar_defecto));

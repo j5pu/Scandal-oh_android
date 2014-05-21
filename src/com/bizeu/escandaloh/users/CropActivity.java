@@ -72,17 +72,17 @@ public class CropActivity extends Activity {
 				if (photo_from == ProfileActivity.AVATAR_FROM_CAMERA) {
 					mImageUri = Uri.parse(data.getExtras().getString("photoUri"));
 					this.getContentResolver().notifyChange(mImageUri, null);
-					taken_bitmap = ImageUtils.decodeSampledBitmapFromUri(mContext, mImageUri, Utils.dpToPx(250, mContext),  Utils.dpToPx(250, mContext));
+					taken_bitmap = ImageUtils.decodeSampledBitmapFromUri(mContext, mImageUri, 300,  300);
 					img_crop_picture.setImageBitmap(taken_bitmap);
 				}
 
 				// Se ha cogido de la galería
 				else if (photo_from == ProfileActivity.AVATAR_FROM_GALLERY) {
-					img_crop_picture.setImageBitmap(ImageUtils.decodeSampledBitmapFromString(photo_string, Utils.dpToPx(250, mContext),  Utils.dpToPx(250, mContext)));
+					img_crop_picture.setImageBitmap(ImageUtils.decodeSampledBitmapFromString(photo_string, 300,  300));
 				}
 			}
 
-	        img_crop_picture.setAspectRatio(200, 200);   
+	        img_crop_picture.setAspectRatio(300, 300);   
 	        img_crop_picture.setFixedAspectRatio(true);
 	        
 	        but_crop.setOnClickListener(new View.OnClickListener() {
@@ -163,9 +163,8 @@ public class CropActivity extends Activity {
 				put.setHeader("Session-Token", MyApplication.session_token);
 				MultipartEntity reqEntity = new MultipartEntity();
 				
-				// Escalamos la foto a 200 px x 200 px
-				Bitmap reduced_bitmap = ImageUtils.scaleBitmap(photo_avatar, 200, 200);
-				File f = ImageUtils.reduceBitmapSize(reduced_bitmap, 5, mContext);
+				// Comprimimos la foto para que ocupe como máximo 70 kb
+				File f = ImageUtils.reduceBitmapSize(cropped_picture, 70, mContext);
 				
 				FileBody fb_avatar = new FileBody(f);
 				reqEntity.addPart("avatar", fb_avatar);

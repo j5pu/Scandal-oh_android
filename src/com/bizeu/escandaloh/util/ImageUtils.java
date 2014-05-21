@@ -222,7 +222,6 @@ public class ImageUtils {
 			reduced_file = ImageUtils.bitmapToFileTemp(scaled_bitmap, 100, mContext);
 			tamanio_file = (float) reduced_file.length() / (MEGABYTE);
 			compression_factor = (int) (max_kb * 100 / tamanio_file);
-			Log.v("WE","Tamanio file: " + tamanio_file);
 			
 			// Mientras no lleguemos al máximo de tamaño requerido comprimimos más
 			while (tamanio_file > max_kb){
@@ -231,7 +230,6 @@ public class ImageUtils {
 				tamanio_file = (float) reduced_file.length() / (MEGABYTE);
 				// Reducimos el factor de compresión
 				compression_factor =  (int) ((int) compression_factor / 1.5);
-				Log.v("WE","Nuevo tamanio file: " + tamanio_file);
 			}
 			
 		} catch (IOException e) {
@@ -283,7 +281,7 @@ public class ImageUtils {
 			byte[] data;
 			try {
 				data = IOUtils.toByteArray(is);
-				reduced_file = File.createTempFile("tmp", "jpg",mContext.getCacheDir());
+				reduced_file = File.createTempFile("tmp", ".jpg",mContext.getCacheDir());
 				FileUtils.writeByteArrayToFile(reduced_file, data);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -336,7 +334,7 @@ public class ImageUtils {
 	 */
 	public static File bitmapToFileTemp(Bitmap bitm, int quality, Context context) throws IOException{
 		
-		File f = File.createTempFile("tmp", "jpg", context.getCacheDir());
+		File f = File.createTempFile("tmp", ".jpg", context.getCacheDir());
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		bitm.compress(CompressFormat.JPEG, quality, bos);

@@ -135,7 +135,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Se ha cogido de la galería (Path)
 				else if (photo_from == MainActivity.FROM_GALLERY) {
-					taken_bitmap = ImageUtils.decodeSampledBitmapFromString(photo_string, Utils.dpToPx(300, mContext), Utils.dpToPx(120, mContext));
+					taken_bitmap = ImageUtils.decodeSampledBitmapFromString(photo_string, 300, 120);
 					img_picture.setImageBitmap(taken_bitmap);
 				}
 
