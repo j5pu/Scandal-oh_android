@@ -46,10 +46,8 @@ public class RecordAudioDialog extends Dialog {
 	/**
 	 * Constructor
 	 * 
-	 * @param con
-	 *            Contexto
-	 * @param record
-	 *            Audio
+	 * @param con Contexto
+	 * @param record Audio
 	 */
 	public RecordAudioDialog(Context con, Audio record) {
 		super(con);
@@ -83,6 +81,9 @@ public class RecordAudioDialog extends Dialog {
 				if (Audio.getInstance(mContext).isPlaying()) {
 					Audio.getInstance(mContext).stopPlaying();
 				}
+				
+				// Borramos si hubiese algún audio grabado
+				Audio.getInstance(mContext).deleteAudio();
 
 				// Indicamos a la actividad que ha cancelado
 				if (mDialogResult != null) {

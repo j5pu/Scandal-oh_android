@@ -224,4 +224,7 @@
     <string name="quieres_aniadir_una">¿Quieres añadir una ahora?</string>
     <string name="no_se_ha_encontrado_ningun">No se ha encontrado ningún resultado</string>
     <string name="foto_guardada_en_este_dispositivo">Foto guardada en este dispositivo</string>
+    <string name="desconecta_el_modo_multimedia">Desconecta el modo multimedia y vuelve a intentarlo</string>
+    <string name="no_se_puede_acceder_al_sistema_de_archivos">No se puede acceder al sistema de archivos</string>
+    <string name="hubo_algun_error_creando_archivo">Hubo algún error creando el archivo</string>
 </resources>

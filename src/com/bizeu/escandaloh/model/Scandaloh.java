@@ -12,7 +12,6 @@ public class Scandaloh {
 	private String user_id;
 	private String title;
 	private String category;
-	private Bitmap picture;
 	private String picture_url;
 	private int num_comments;
 	private String resource_uri; // Uri de la foto
@@ -50,7 +49,7 @@ public class Scandaloh {
 	 * @param titulo
 	 * @param numero_comentarios
 	 */
-	public Scandaloh(String id, String user_id, String title, String category, Bitmap picture, int num_comments, 
+	public Scandaloh(String id, String user_id, String title, String category, int num_comments, 
 						String resource_uri, String route_img, String route_img_big, String uri_audio,
 						String user, String date, String avatar, Comment last_comment, String social_network,
 						int already_voted, int likes, int dislikes, int media_type, String favicon, String source, 
@@ -64,7 +63,6 @@ public class Scandaloh {
 		else{
 			this.category = ANGRY;
 		}
-		this.picture = picture;
 		this.num_comments = num_comments;
 		this.resource_uri = resource_uri;
 		this.route_img = route_img;
@@ -117,15 +115,7 @@ public class Scandaloh {
 	public String getCategory(){
 		return category;
 	}
-	
-	public void setPicture(Bitmap new_picture){
-		this.picture = new_picture;
-	}
-	
-	public Bitmap getPicture(){
-		return picture;
-	}
-	
+		
 	public void setNumComments(int new_num_comments){
 		this.num_comments = new_num_comments;
 	}

@@ -1,6 +1,7 @@
 package com.bizeu.escandaloh.users;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,9 +22,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -43,12 +46,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.PhotoDetailActivity;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.HistoryAdapter;
 import com.bizeu.escandaloh.model.History;
@@ -162,10 +163,8 @@ public class ProfileActivity extends SherlockActivity {
 				if (is_me){
 					// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
 					final CharSequence[] items = {
-							getResources()
-									.getString(R.string.hacer_foto_con_camara),
-							getResources().getString(
-									R.string.seleccionar_foto_galeria) };
+						getResources().getString(R.string.hacer_foto_con_camara),
+						getResources().getString(R.string.seleccionar_foto_galeria) };
 					AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
 					builder.setTitle(R.string.avatar);
 					builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -173,30 +172,42 @@ public class ProfileActivity extends SherlockActivity {
 						public void onClick(DialogInterface dialog, int item) {
 
 							// Cámara
-							if (items[item].equals(getResources().getString(
-									R.string.hacer_foto_con_camara))) {
+							if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
 
-								// Si dispone de cámara iniciamos la cámara
+								// Comprobamos disponibilidad de la cámara
 								if (Utils.checkCameraHardware(mContext)) {
-									Intent takePictureIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-									File photo = null;
-									photo = createFileTemporary("picture", ".png");
-									if (photo != null) {
-										mImageUri = Uri.fromFile(photo);
-										takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-										startActivityForResult(takePictureIntent,AVATAR_FROM_CAMERA);
-										photo.delete();
+									
+									// Comprobamos disponibilidad del almacenamiento externo
+									if (Utils.isExternalStorageWritable(mContext)){
+										
+										Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+										
+										// Nos aseguramos que hay una actividad para la cámara
+									    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+									    	
+									        File photoFile = null;
+									        photoFile = Utils.createProfilePhotoScandalOh(mContext);
+			        						       
+									        if (photoFile != null) {
+									        	mImageUri = Uri.fromFile(photoFile);
+									            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+									            startActivityForResult(takePictureIntent, AVATAR_FROM_CAMERA);
+									        }
+									    }
 									}
+									
+									// Almacenamiento externo no disponible
+									else{
+										Toast toast = Toast.makeText(mContext,R.string.no_se_puede_acceder_al_sistema_de_archivos,Toast.LENGTH_LONG);
+										toast.show();
+									}											
 								}
-								// El dispositivo no dispone de cámara
+
+								// Cámara no disponible
 								else {
-									Toast toast = Toast
-											.makeText(
-													mContext,
-													R.string.este_dispositivo_no_dispone_camara,
-													Toast.LENGTH_LONG);
+									Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,Toast.LENGTH_LONG);
 									toast.show();
-								}
+								}															
 							}
 
 							// Galería
@@ -231,6 +242,29 @@ public class ProfileActivity extends SherlockActivity {
 				}
 			}
 		});	
+		
+		img_picture.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// Creamos un popup para poder guardar la foto en galería
+				final CharSequence[] items = {
+					getResources().getString(R.string.guardar_foto_galeria) };
+				AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int item) {
+
+						// Guardar foto en galería
+						if (items[item].equals(getResources().getString(R.string.guardar_foto_galeria))) {	
+							new SaveImageTask(mContext).execute(MyApplication.DIRECCION_BUCKET + avatar);			
+						}
+					}
+				});
+				builder.show();	
+				return false;
+			}
+		});
 		
 		// Al seleccionar una history mostramos el escándalo al que referencia
 		list_history.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -372,8 +406,11 @@ public class ProfileActivity extends SherlockActivity {
 		
 		// Avatar desde la cámara
 		if (requestCode == AVATAR_FROM_CAMERA) {
+			
 			if (resultCode == RESULT_OK) {
+				
 				if (mImageUri != null) {
+					
 					Intent i = new Intent(ProfileActivity.this, CropActivity.class);
 					i.putExtra("photo_from", AVATAR_FROM_CAMERA);
 					i.putExtra("photoUri", mImageUri.toString());
@@ -405,34 +442,6 @@ public class ProfileActivity extends SherlockActivity {
 				finish();
 			}
 		}
-	}
-	
-	
-	
-	
-	
-	/**
-	 * Crea un archivo temporal en una ruta con un formato específico
-	 */
-	private File createFileTemporary(String part, String ext) {
-		File scandaloh_dir = Environment.getExternalStorageDirectory();
-		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()
-				+ "/ScandalOh/");
-		if (!scandaloh_dir.exists()) {
-			scandaloh_dir.mkdirs();
-		}
-		try {
-			return File.createTempFile(part, ext, scandaloh_dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-			Log.e(this.getClass().toString(),
-					"No se pudo crear el archivo temporal para la foto");
-			Toast toast = Toast.makeText(mContext,
-					R.string.no_se_puede_acceder_camara, Toast.LENGTH_SHORT);
-			toast.show();
-		}
-
-		return null;
 	}
 	
 
@@ -838,8 +847,7 @@ public class ProfileActivity extends SherlockActivity {
 	    // stretching during the animation. Also calculate the start scaling
 	    // factor (the end scaling factor is always 1.0).
 	    float startScale;
-	    if ((float) finalBounds.width() / finalBounds.height()
-	            > (float) startBounds.width() / startBounds.height()) {
+	    if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / startBounds.height()) {
 	        // Extend start bounds horizontally
 	        startScale = (float) startBounds.height() / finalBounds.height();
 	        float startWidth = startScale * finalBounds.width();
@@ -940,6 +948,96 @@ public class ProfileActivity extends SherlockActivity {
 	            mCurrentAnimator = set;
 	        }
 	    });
+	    
+	    expandedImageView.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// Creamos un popup para poder guardar la foto en galería
+				final CharSequence[] items = {
+					getResources().getString(R.string.guardar_foto_galeria) };
+				AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int item) {
+
+						// Guardar foto en galería
+						if (items[item].equals(getResources().getString(R.string.guardar_foto_galeria))) {	
+							new SaveImageTask(mContext).execute(MyApplication.DIRECCION_BUCKET + avatar);			
+						}
+					}
+				});
+				builder.show();	
+				return false;
+			}
+		});
+	}
+	
+	
+	/**
+	 * Guarda una foto en la galería
+	 *
+	 */
+	private class SaveImageTask extends AsyncTask<String, String, String> {
+	    private Context context;
+	    private ProgressDialog pDialog;
+	    private boolean any_error;
+	    private File file = null;
+
+	    public SaveImageTask(Context context) {
+	        this.context = context;
+	    }
+
+	    @Override
+	    protected void onPreExecute() {
+	        super.onPreExecute();
+	        
+	        any_error = false;
+
+	        pDialog = new ProgressDialog(context);
+	        pDialog.setMessage(getResources().getString(R.string.guardando_dospuntos));
+	        pDialog.setIndeterminate(false);
+	        pDialog.setCancelable(false);
+	        pDialog.show();		     
+	    }
+
+	    @Override
+	    protected String doInBackground(String... args) {
+	        try {
+		    	// Obtenemos la foto desde la url
+            	Bitmap bitma = ImageUtils.getBitmapFromURL(args[0]);
+            	file = Utils.createProfilePhotoScandalOh(context);
+            	if (file != null){        	
+                	FileOutputStream fOut = new FileOutputStream(file);
+                	bitma.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                	fOut.flush();
+                	fOut.close();
+            	}
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            any_error = true;
+	        }
+
+	        return null;
+	    }
+
+	    @Override
+	    protected void onPostExecute(String args) {
+	    	
+	    	// Quitamos el progress dialog
+	        pDialog.dismiss();  
+	        
+	        if (!any_error){    
+	        	
+		        // Guardamos la foto en la galería  
+	        	Utils.galleryAddPic(file.getAbsolutePath(), context);
+				
+				// Mostramos un mensaje
+				Toast toast = Toast.makeText(context, R.string.foto_guardada_en_este_dispositivo, Toast.LENGTH_SHORT);
+				toast.show();
+	        }
+	    }
 	}
 	
 }

@@ -1,14 +1,163 @@
 package com.bizeu.escandaloh.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Environment;
+import android.widget.Toast;
 
 public class Utils {
+	
+	
+	
+	/**
+	 * Crea un archivo para una foto en la carpeta de ScandalOh
+	 * @param context Contexto
+	 * @return File o nulo si hubo algún error creando el archivo
+	 */
+	public static File createPhotoScandalOh(Context context) {
+		
+		File photo = null;
+		
+		// Obtenemos (o creamos) la carpeta ScandalOh
+		File scandaloh_dir = Environment.getExternalStorageDirectory();
+		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath() + "/ScandalOh/ScandalOh Images/");
+		if (!scandaloh_dir.exists()) {
+			scandaloh_dir.mkdirs();
+		}
+		
+		// Creamos el archivo
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    String imageFileName = "IMG_" + timeStamp + "_";
+		try {
+			photo = File.createTempFile(imageFileName, ".jpg", scandaloh_dir);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast toast = Toast.makeText(context, R.string.hubo_algun_error_creando_archivo, Toast.LENGTH_LONG);
+			toast.show();
+		}
+
+		return photo;
+	}
+	
+	
+	
+	
+	/**
+	 * Crea un archivo para una foto de perfil en la carpeta de ScandalOh
+	 * @param context Contexto
+	 * @return File o nulo si hubo algún error creando el archivo
+	 */
+	public static File createProfilePhotoScandalOh(Context context) {
+		
+		File photo = null;
+		
+		// Obtenemos (o creamos) la carpeta ScandalOh
+		File scandaloh_dir = Environment.getExternalStorageDirectory();
+		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath() + "/ScandalOh/ScandalOh Profile Photos/");
+		if (!scandaloh_dir.exists()) {
+			scandaloh_dir.mkdirs();
+		}
+		
+		// Creamos el archivo
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    String imageFileName = "IMG_" + timeStamp + "_";
+		try {
+			photo = File.createTempFile(imageFileName, ".jpg", scandaloh_dir);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast toast = Toast.makeText(context, R.string.hubo_algun_error_creando_archivo, Toast.LENGTH_LONG);
+			toast.show();
+		}
+
+		return photo;
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Crea un archivo para un audio en la carpeta de ScandalOh
+	 * @param context Contexto
+	 * @return File o nulo si hubo algún error creando el archivo
+	 */
+	public static File createAudioScandalOh(Context context) {
+		
+		File photo = null;
+		
+		// Obtenemos (o creamos) la carpeta ScandalOh
+		File scandaloh_dir = Environment.getExternalStorageDirectory();
+		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath() + "/ScandalOh/ScandalOh Audio/");
+		if (!scandaloh_dir.exists()) {
+			scandaloh_dir.mkdirs();
+		}
+		
+		// Creamos el archivo
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    String imageFileName = "AUD_" + timeStamp + "_";
+		try {
+			photo = File.createTempFile(imageFileName, ".3gp", scandaloh_dir);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast toast = Toast.makeText(context, R.string.hubo_algun_error_creando_archivo, Toast.LENGTH_LONG);
+			toast.show();
+		}
+
+		return photo;
+	}
+	
+	
+	
+	/**
+	 * Comprueba si el almacenamiento externo está disponible para lectura y escritura
+	 * @param Context contexto
+	 * @return true si está disponible, false en caso contrario
+	 */
+	public static boolean isExternalStorageWritable(Context context) {
+	    String state = Environment.getExternalStorageState();
+	    
+	    // El sistema no está montado porque el dispositivo está en modo almacenamiento masivo
+	    if (state.equals(Environment.MEDIA_SHARED)){
+	    	Toast toast = Toast.makeText(context,R.string.desconecta_el_modo_multimedia,Toast.LENGTH_LONG);
+			toast.show();
+			return false;
+	    }
+	    if (Environment.MEDIA_MOUNTED.equals(state)) {
+	        return true;
+	    }
+	    return false;
+	}
+	
+	
+	/**
+	 * Añade un archivo a la galeria
+	 * @param path Path donde se encuentra el archivo
+	 * @param context Contexto
+	 */
+	public static void galleryAddPic(String path, Context context) {
+	    File f = new File(path);
+	    Uri contentUri = Uri.fromFile(f);
+	    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+	    mediaScanIntent.setData(contentUri);
+	    context.sendBroadcast(mediaScanIntent);
+	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * Limita un string a un nº de caracteres + tres puntos suspensivos

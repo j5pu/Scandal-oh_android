@@ -288,8 +288,9 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				MultipartEntity reqEntity = new MultipartEntity();				
 
+				// Si lleva audio se lo añadimos
 				if (con_audio) {
-					audio_file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScandalOh/Audio/audio.3gp");
+					audio_file = new File(Audio.getInstance(mContext).getPath());
 					if (audio_file == null){
 						any_error = true;
 					}
@@ -306,7 +307,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 				reqEntity.addPart("category", categoryBody);
 				reqEntity.addPart("country", codeCountryBody);
 
-				// Si es a partir de una url añadimos el source(url), favicon, foto(url) y media_type=1
+				// A PARTIR DE UNA URL: añadimos el source(url), favicon, foto(url) y media_type=1
 				if (photo_from == CoverActivity.FROM_SHARING_TEXT || photo_from == MainActivity.FROM_URL){
 					StringBody imgBody = new StringBody(preview_img);
 					StringBody faviconBody = new StringBody(preview_favicon);
@@ -325,14 +326,14 @@ public class CreateScandalohActivity extends SherlockActivity {
 					}
 				}
 
-				// Si viene de la cámara o la galería 
+				// CÁMARA O GALERIA 
 				else if (photo_from == MainActivity.FROM_CAMERA | photo_from == MainActivity.FROM_GALLERY){
 					f = ImageUtils.reduceBitmapSize(taken_bitmap, 200, mContext);
 					FileBody bin1 = new FileBody(f);
 					reqEntity.addPart("img", bin1);
 				}
 				
-				// Si se ha compartido una foto
+				// FOTO COMPARTIDA
 				else if (photo_from == CoverActivity.FROM_SHARING_PICTURE){
 					f = ImageUtils.reduceBitmapSize(mImageUri, 200, mContext);
 					FileBody bin1 = new FileBody(f);
@@ -347,7 +348,7 @@ public class CreateScandalohActivity extends SherlockActivity {
 
 				// Comprobamos si ha habido algún error
 				if (response_str != null) {
-					Log.i("WE", "response createEscandalo: " + response_str);
+					Log.i(mContext.getClass().getSimpleName(), "response createEscandalo: " + response_str);
 					// Obtenemos el json devuelto
 					JSONObject respJSON = new JSONObject(response_str);
 

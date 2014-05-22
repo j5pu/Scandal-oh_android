@@ -331,7 +331,7 @@ public class ScandalFragment extends SherlockFragment {
         
         // FOTO
         img.setTag(109);
-        img.setImage(this.url, R.drawable.cargando);    
+        img.setImage(this.url);    
         Paint mShadow = new Paint(); 
         mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); // radius=10, y-offset=2, color=black 
            
@@ -476,8 +476,7 @@ public class ScandalFragment extends SherlockFragment {
 		});
 			
         // AVATAR
-        // Si el usuario tiene avatar
-        
+        // Si el usuario tiene avatar     
         if (!avatar.equals("")){
             emoticono.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);	
         }
@@ -689,6 +688,7 @@ public class ScandalFragment extends SherlockFragment {
    			                
    			                // Guardar foto en la galería
    			                else if (opciones_compartir[item].equals(getResources().getString(R.string.guardar_foto_galeria))) {
+   			                	Log.v("WE","url_big: " + url_big);
    			                	new SaveImageTask(getActivity()).execute(url_big);
    			                }
    			            }
@@ -814,6 +814,8 @@ public class ScandalFragment extends SherlockFragment {
 	private class SaveImageTask extends AsyncTask<String, String, String> {
 	    private Context context;
 	    private ProgressDialog pDialog;
+	    private boolean any_error;
+	    private File file = null;
 
 	    public SaveImageTask(Context context) {
 	        this.context = context;
@@ -822,6 +824,8 @@ public class ScandalFragment extends SherlockFragment {
 	    @Override
 	    protected void onPreExecute() {
 	        super.onPreExecute();
+	        
+	        any_error = false;
 
 	        pDialog = new ProgressDialog(context);
 	        pDialog.setMessage(getResources().getString(R.string.guardando_dospuntos));
@@ -835,9 +839,17 @@ public class ScandalFragment extends SherlockFragment {
 	        try {
 		    	// Obtenemos la foto desde la url
             	bitma = ImageUtils.getBitmapFromURL(args[0]);
+            	file = Utils.createPhotoScandalOh(context);
+            	if (file != null){        	
+                	FileOutputStream fOut = new FileOutputStream(file);
+                	bitma.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                	fOut.flush();
+                	fOut.close();
+            	}
 
 	        } catch (Exception e) {
-	            e.printStackTrace();	 
+	            e.printStackTrace();
+	            any_error = true;
 	        }
 
 	        return null;
@@ -845,15 +857,19 @@ public class ScandalFragment extends SherlockFragment {
 
 	    @Override
 	    protected void onPostExecute(String args) {
+	    	
 	    	// Quitamos el progress dialog
 	        pDialog.dismiss();  
 	        
-	        // Guardamos la foto en la galería
-			ImageUtils.saveBitmapIntoGallery(bitma, context);	
-			
-			// Mostramos un mensaje
-			Toast toast = Toast.makeText(context, R.string.foto_guardada_en_este_dispositivo, Toast.LENGTH_SHORT);
-			toast.show();
+	        if (!any_error){    
+	        	
+		        // Guardamos la foto en la galería  
+	        	Utils.galleryAddPic(file.getAbsolutePath(), context);
+				
+				// Mostramos un mensaje
+				Toast toast = Toast.makeText(context, R.string.foto_guardada_en_este_dispositivo, Toast.LENGTH_SHORT);
+				toast.show();
+	        }
 	    }
 	}	
 	
@@ -1105,6 +1121,7 @@ public class ScandalFragment extends SherlockFragment {
         		comment_text.setText(getResources().getString(R.string.inicia_sesion_para_comentar_este_escandalo));
         		txt_user_name.setText(getResources().getString(R.string.invitado));
         		txt_date.setText(Utils.getCurrentDate());
+        		social_net.setImageResource(R.drawable.s_gris);
         		
         		// Le mandamos a la pantalla de login si pulsa
                 ll_last_comment.setOnClickListener(new View.OnClickListener() {

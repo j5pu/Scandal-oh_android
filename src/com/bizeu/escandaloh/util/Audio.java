@@ -75,18 +75,8 @@ public class Audio{
 		
 		mRecord = new MediaRecorder();
 		
-		// Creamos el directorio para el audio (si no existe)
-		File scandaloh_dir = Environment.getExternalStorageDirectory();
-		scandaloh_dir = new File(scandaloh_dir.getAbsolutePath()
-				+ "/ScándalOh/Audio");
-		if (!scandaloh_dir.exists()) {
-			scandaloh_dir.mkdirs();
-		}
-		
-		// Creamos el archivo para el audio
-		File file = new File( Environment.getExternalStorageDirectory().getAbsolutePath() + "/ScándalOh/Audio/audio.3gp");
-		file.createNewFile();
-		path = file.getPath();
+		File audio_file = Utils.createAudioScandalOh(mContext);
+		path = audio_file.getPath();
 		
 		mRecord.setAudioSource(MediaRecorder.AudioSource.MIC);
 		
@@ -109,7 +99,7 @@ public class Audio{
 
         } 
 		catch (IOException e) {
-            Log.e("WE", "Error MediaRecorder en prepare() o start(): " + e); 
+            Log.e(mContext.getClass().getSimpleName(), "Error MediaRecorder en prepare() o start(): " + e); 
         }		
 	}
 
@@ -252,6 +242,24 @@ public class Audio{
 		return path;
 	}
 	
+	
+
+	/**
+	 * Borra el último audio grabado
+	 */
+	public void deleteAudio(){
+		try{
+			if (path != null){
+				File f = new File(path);
+				if (f != null){
+					f.delete();
+				}
+			}
+		}	
+		catch(Exception e){
+			Log.e(mContext.getClass().getSimpleName(), "Error borrando archivo de audio");
+		}
+	}
 	
 	
 	/**

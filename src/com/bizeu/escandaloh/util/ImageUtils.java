@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -29,11 +33,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 
 public class ImageUtils {
 
 	private static float MEGABYTE = (float) 1024.0;
+	
 	
 	/**
 	 * Transforma un Bitmap en un array de bytes (JPEG)
@@ -123,20 +129,18 @@ public class ImageUtils {
 	 * @param context
 	 * @return
 	 */
-	public static Bitmap uriToBitmap(Uri selectedImage, Context context) {
+	public static Bitmap uriToBitmap(Uri uri, Context context) {
 		Bitmap bm = null;
 		AssetFileDescriptor fileDescriptor = null;
 		BitmapFactory.Options options = new BitmapFactory.Options();
 
 		try {
-			fileDescriptor = context.getContentResolver()
-					.openAssetFileDescriptor(selectedImage, "r");
+			fileDescriptor = context.getContentResolver().openAssetFileDescriptor(uri, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
 			try {				
-				bm = BitmapFactory.decodeFileDescriptor(
-						fileDescriptor.getFileDescriptor(), null, options);
+				bm = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
 				fileDescriptor.close();		
 			    
 			} catch (IOException e) {
@@ -371,49 +375,8 @@ public class ImageUtils {
 			}
 		}
 	}
+	
 
-	/**
-	 * Guarda un bitmap como una foto en la galería del dispositivo
-	 * 
-	 * @param bmp
-	 *            Bitmap de la foto a guardar
-	 * @param context
-	 *            Contexto
-	 */
-	public static void saveBitmapIntoGallery(Bitmap bmp, Context context) {
-		File imageFileFolder = new File(Environment.getExternalStorageDirectory(), "ScandalOh");
-		imageFileFolder.mkdirs();
-		FileOutputStream out = null;
-
-		// El nombre de la foto se obtiene a partir de la fecha y hora exacta
-		// actual
-		Calendar c = Calendar.getInstance();
-		String date = String.valueOf(c.get(Calendar.MONTH))
-				+ String.valueOf(c.get(Calendar.DAY_OF_MONTH))
-				+ String.valueOf(c.get(Calendar.YEAR))
-				+ String.valueOf(c.get(Calendar.HOUR_OF_DAY))
-				+ String.valueOf(c.get(Calendar.MINUTE))
-				+ String.valueOf(c.get(Calendar.SECOND));
-		File imageFileName = new File(imageFileFolder, "IMG-" + date.toString()
-				+ ".jpg");
-
-		try {
-			out = new FileOutputStream(imageFileName);
-			bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-			out.flush();
-			out.close();
-
-			Intent mediaScanIntent = new Intent(
-					Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-			Uri contentUri = Uri.fromFile(imageFileName);
-			mediaScanIntent.setData(contentUri);
-			context.sendBroadcast(mediaScanIntent);
-
-			out = null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	
 	
