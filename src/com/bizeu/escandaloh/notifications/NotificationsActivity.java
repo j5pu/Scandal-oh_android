@@ -58,6 +58,7 @@ public class NotificationsActivity extends SherlockActivity {
 	private Context mContext;
 	private String meta_next_notifs = null;
 	private GetNotificationsTask getNotisAsync;
+	private boolean connection_available = true;
 	
 	
 	
@@ -123,17 +124,23 @@ public class NotificationsActivity extends SherlockActivity {
 	        @Override
 	        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	           
+	        	
 	        	if ((firstVisibleItem + visibleItemCount == notificationsAdapter.getCount()) && there_are_more_notifs) {
-	            	if (Connectivity.isOnline(mContext)){
-	            		if (!getting_notifications){
-							getNotisAsync = new GetNotificationsTask();
-							getNotisAsync.execute();
-	            		}
-	            	}
-	            	else{
-	            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
-	            		toast.show();
-	            	}	     			    		
+	            	
+	        		// Sólo comprobará la conexión una vez, si no hay conexión no vuelve a entrar
+	        		if (connection_available){ 
+		        		if (Connectivity.isOnline(mContext)){
+		            		if (!getting_notifications){
+								getNotisAsync = new GetNotificationsTask();
+								getNotisAsync.execute();
+		            		}
+		            	}
+		            	else{
+		            		connection_available = false;
+		            		Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+		            		toast.show();
+		            	}
+	        		}		    		
 	            }   		
 	        }
 	        
@@ -143,8 +150,10 @@ public class NotificationsActivity extends SherlockActivity {
 	        }
 	    });
 		
-		// Mostramos el loading
-		showLoading();	
+		if (Connectivity.isOnline(mContext)){
+			showLoading();	
+		}
+
 	}
 	
 	

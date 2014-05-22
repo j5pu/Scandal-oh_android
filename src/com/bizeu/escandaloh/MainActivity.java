@@ -530,7 +530,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		        img_lateral_avatar.setImageResource(R.drawable.avatar_defecto);
 			}
 			// Actualizamos el nº de notificaciones
-			new UpdateNumNotificationsTask().execute();
+			if (Connectivity.isOnline(mContext)){
+				new UpdateNumNotificationsTask().execute();
+			}
 			
 			
 		// No está logueado
