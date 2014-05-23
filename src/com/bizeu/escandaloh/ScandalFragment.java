@@ -955,7 +955,7 @@ public class ScandalFragment extends SherlockFragment {
 	    protected Integer doInBackground(String... params) {
 	    			
 	    	//Audio.getInstance(getActivity().getBaseContext()).startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);							
-	        audio.setOnPlayListener(new PlayListener() {
+			audio.setOnPlayListener(new PlayListener() {
 
 				@Override
 				public void onPlayPrepared() {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_profile_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/ll_profile_screen"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -18,7 +18,6 @@
             android:id="@+id/img_profile_picture"
             android:layout_width="90dp"
             android:layout_height="90dp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -27,7 +26,7 @@
         android:layout_height="0dp"
         android:layout_weight="1.7"
         android:orientation="vertical"
-        android:visibility="gone" >
+        android:visibility="visible" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -87,7 +86,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/seguir" />
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -97,14 +95,13 @@
         android:layout_weight="1.7"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="vertical"
-        android:visibility="visible" >
+        android:visibility="gone" >
 
         <ProgressBar
             android:id="@+id/progressBar2"
             style="?android:attr/progressBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -113,13 +110,13 @@
         android:layout_height="0dp"
         android:layout_weight="4"
         android:gravity="center_horizontal|center_vertical"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:visibility="gone" >
 
         <ProgressBar
             android:id="@+id/prog_comments_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
     </LinearLayout>
 
     <ImageView
@@ -131,19 +128,44 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/ll_profile_listhistory"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
-        android:orientation="vertical"
-        android:visibility="gone" >
+        android:orientation="vertical" >
 
-        <ListView
-            android:id="@+id/list_profile_history"
-            android:layout_width="match_parent"
+        <TabHost
+            android:id="@android:id/tabhost"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
-        </ListView>
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:orientation="horizontal" >
+                </TabWidget>
+
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="0" >
+                </FrameLayout>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom" >
+                </android.support.v4.view.ViewPager>
+            </LinearLayout>
+        </TabHost>
     </LinearLayout>
 
 </LinearLayout>

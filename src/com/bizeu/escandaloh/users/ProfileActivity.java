@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -15,7 +16,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -34,11 +34,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -48,10 +53,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.HistoryAdapter;
+import com.bizeu.escandaloh.adapters.HistoryPageAdapter;
 import com.bizeu.escandaloh.model.History;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
@@ -60,7 +67,7 @@ import com.bizeu.escandaloh.util.Utils;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
-public class ProfileActivity extends SherlockActivity {
+public class ProfileActivity extends SherlockFragmentActivity implements OnTabChangeListener, OnPageChangeListener{
 
 	public static final int AVATAR_FROM_CAMERA = 15;
 	public static final int AVATAR_FROM_GALLERY = 14;
@@ -78,9 +85,6 @@ public class ProfileActivity extends SherlockActivity {
 	private TextView txt_followers;
 	private TextView txt_following;
 	private ImageView img_settings;
-	private ListView list_history;
-	private LinearLayout ll_list_historys;
-	private LinearLayout ll_loading;
 	private LinearLayout ll_num_seguidores;
 	private LinearLayout ll_num_seguidos;
 	private LinearLayout ll_userinfo_data;
@@ -92,15 +96,12 @@ public class ProfileActivity extends SherlockActivity {
 	private Uri mImageUri;
 	private boolean any_error_user_info;
 	private boolean any_error_follow;
-	private boolean any_error_history;
-	private ArrayList<History> array_history = new ArrayList<History>();
-	private HistoryAdapter historyAdapter;
-	private boolean there_are_more_historys = true;
-	private String meta_next_history = null;
-	private GetHistoryTask getHistoryAsync;
 	private String avatar;
     private Animator mCurrentAnimator;
     private int mShortAnimationDuration = 500;
+    private ViewPager mViewPager;
+    HistoryPageAdapter pageAdapter;
+    private TabHost mTabHost;
 	
 	/**
 	 * OnCreate
@@ -129,17 +130,14 @@ public class ProfileActivity extends SherlockActivity {
 		txt_followers = (TextView) findViewById(R.id.txt_profile_num_seguidores);
 		txt_following = (TextView) findViewById(R.id.txt_profile_num_siguiendo);
 		img_settings = (ImageView) findViewById(R.id.img_profile_settings);
-		list_history = (ListView) findViewById(R.id.list_profile_history);
-		ll_list_historys = (LinearLayout) findViewById(R.id.ll_profile_listhistory);
-		ll_loading = (LinearLayout) findViewById(R.id.ll_profile_loading);
 		ll_num_seguidores = (LinearLayout) findViewById(R.id.ll_profile_numseguidores);
 		ll_num_seguidos = (LinearLayout) findViewById(R.id.ll_profile_numsiguiendo);
 		ll_userinfo_data = (LinearLayout) findViewById(R.id.ll_profile_userinfo_data);
-		ll_userinfo_loading = (LinearLayout) findViewById(R.id.ll_profile_userinfo_loading);
+		ll_userinfo_loading = (LinearLayout) findViewById(R.id.ll_profile_userinfo_loading);		
 		
-		historyAdapter = new HistoryAdapter(mContext, R.layout.history, array_history);
-		list_history.setAdapter(historyAdapter);
+		mViewPager = (ViewPager) findViewById(R.id.pager);
 		
+        // Settings del usuario
 		img_settings.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -153,6 +151,13 @@ public class ProfileActivity extends SherlockActivity {
 		if (getIntent() != null){
 			user_id = getIntent().getStringExtra(USER_ID);
 		}
+		
+		// Inicializamos "Mi actividad" del usuario
+        initialiseTabHost();
+        List<Fragment> fragments = getFragments();
+        pageAdapter = new HistoryPageAdapter(getSupportFragmentManager(), fragments);
+        mViewPager.setAdapter(pageAdapter);
+        mViewPager.setOnPageChangeListener(this);
 		
 		// Cambiar avatar
 		img_picture.setOnClickListener(new View.OnClickListener() {
@@ -266,43 +271,7 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});
 		
-		// Al seleccionar una history mostramos el escándalo al que referencia
-		list_history.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-			  @Override
-			  public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-					
-				  History historyAux = ((History) list_history.getItemAtPosition(position));
-				  Intent i = new Intent(ProfileActivity.this, ScandalActivity.class);
-				  i.putExtra(ScandalActivity.PHOTO_ID, historyAux.getId());	
-				  startActivity(i);
-			  }
-		});
-		
-		// Obtener siguientes historys
-		list_history.setOnScrollListener(new OnScrollListener() {
-					
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-			           
-				if ((firstVisibleItem + visibleItemCount == historyAdapter.getCount() -1) && there_are_more_historys) {
-					
-					if (Connectivity.isOnline(mContext)){		         		
-						getHistoryAsync = new GetHistoryTask();
-						getHistoryAsync.execute();
-					}
-					else{
-						Toast toast = Toast.makeText(mContext, R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
-						toast.show();
-					}	     			    		
-				}   	
-			}
-			        
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				// TODO Auto-generated method stub
-			}
-		});
 		
 		// Mostramos la lista de seguidores
 		ll_num_seguidores.setOnClickListener(new View.OnClickListener() {
@@ -336,9 +305,6 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		});
 		
-		// Obtenemos el historial (Mi Actividad)
-		getHistoryAsync = new GetHistoryTask();
-		getHistoryAsync.execute();		
 	}
 	
 	
@@ -391,11 +357,13 @@ public class ProfileActivity extends SherlockActivity {
 	/**
 	 * onDestroy
 	 */
+	/*
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
 		cancelGetHistorys();
 	}
+	*/
 	
 
 	/**
@@ -443,6 +411,17 @@ public class ProfileActivity extends SherlockActivity {
 			}
 		}
 	}
+	
+	
+	
+	/**
+	 * Oculta el loading y muestra la información del usuario (nombre, nº seguidores y siguiendo y botón de seguir)
+	 */
+	private void showUserInfo(){
+		ll_userinfo_loading.setVisibility(View.GONE);
+		ll_userinfo_data.setVisibility(View.VISIBLE);
+	}
+	
 	
 
 	
@@ -667,145 +646,48 @@ public class ProfileActivity extends SherlockActivity {
 	}
 	
 	
-	
 	/**
-	 * Obtiene y muestra la actividad de un usuario
-	 * 
+	 * Añade los tabs de Mi Actividad
+	 * @param activity
+	 * @param tabHost
+	 * @param tabSpec
 	 */
-	private class GetHistoryTask extends AsyncTask<Void, Integer, Integer> {
-
-		@Override
-		protected void onPreExecute() {
-			any_error_history = false;		
-		}
-
-		@Override
-		protected Integer doInBackground(Void... params) {
-			
-			String url = null;
-
-			// No hay historys: obtenemos los primeros
-			if (array_history.size() == 0){			
-				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/" + user_id + "/activity/" ;
-			}
-			
-			// Obtenemos los siguientes historys
-			else{
-				// Fin del carrusel: meta nulo indica que no hay más historys
-				if (meta_next_history.equals("null")){
-					there_are_more_historys = false;
-					return 5;
-				}
-				url = MyApplication.SERVER_ADDRESS + meta_next_history;
-			}
-
-			HttpResponse response = null;
-
-			try {
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet getHistorys = new HttpGet(url);
-				getHistorys.setHeader("content-type", "application/json");
-				getHistorys.setHeader("Session-Token", MyApplication.session_token);
-				
-				// Hacemos la petición al servidor
-				response = httpClient.execute(getHistorys);
-				String respStr = EntityUtils.toString(response.getEntity());
-				Log.i("WE", "History: " + respStr);
-				
-				// Parseamos los historys devueltos
-				JSONObject respJson = new JSONObject(respStr);
-
-				// Obtenemos el meta
-				JSONObject respMetaJson = respJson.getJSONObject("meta");
-				meta_next_history = respMetaJson.getString("next");
-
-				JSONArray historysObject = respJson.getJSONArray("objects");
-				
-				// Obtenemos los datos de los historys
-				for (int i = 0; i < historysObject.length(); i++) {
-
-					JSONObject historyObject = historysObject.getJSONObject(i);
-
-					final String action = historyObject.getString("action");
-					final String date = historyObject.getString("date");
-					final String photo_id = historyObject.getString("photo_id");
-					final String photo_img = historyObject.getString("photo_img");
-					final String text = new String(historyObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {							
-							// Añadimos el hostiry al ArrayList
-							History history_aux = new History(photo_id, photo_img, action, date, text);
-							array_history.add(history_aux);
-						}
-					});		
-				}
-				
-			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error obteniendo history", ex);
-				// Hubo algún error inesperado
-				any_error_history = true;
-			}
-
-			// Si hubo algún error devolvemos 666
-			if (any_error_history) {
-				return 666;
-			} else {
-				// Devolvemos el código resultado
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Mostramos la lista de historys
-			showListHistorys();
-			
-			// Si hubo algún error inesperado mostramos un mensaje
-			if (result == 666) {
-				Toast toast = Toast.makeText(mContext,
-						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-			// No hubo ningún error extraño
-			else {
-				// Si es codigo 2xx --> OK 
-				historyAdapter.notifyDataSetChanged();
-			}
-		}
-	}
+    private static void AddTab(ProfileActivity activity, TabHost tabHost, TabHost.TabSpec tabSpec) {
+        tabSpec.setContent(new MyTabFactory(activity));
+        tabHost.addTab(tabSpec);
+    }
+    
 	
-	/**
-	 * Oculta el loading y muestra el listado de history
-	 */
-	private void showListHistorys(){
-		ll_list_historys.setVisibility(View.VISIBLE);
-		ll_loading.setVisibility(View.GONE);
-	}
-	
-	
-	/**
-	 * Oculta el loading y muestra la información del usuario (nombre, nº seguidores y siguiendo y botón de seguir)
-	 */
-	private void showUserInfo(){
-		ll_userinfo_loading.setVisibility(View.GONE);
-		ll_userinfo_data.setVisibility(View.VISIBLE);
-	}
-	
-	
-	/**
-	 * Cancela si hubiese alguna hebra obteniendo historys
-	 */
-	private void cancelGetHistorys() {
-		if (getHistoryAsync != null) {
-			if (getHistoryAsync.getStatus() == AsyncTask.Status.PENDING|| getHistoryAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				getHistoryAsync.cancel(true);
-			}
-		}
-	}
-	
+    /**
+     * Devuelve los fragmentos correspondientes a Mi Actividad
+     * @return
+     */
+    private List<Fragment> getFragments(){
+        List<Fragment> fList = new ArrayList<Fragment>();
+
+        HistoryFragment f1 = HistoryFragment.newInstance(user_id, HistoryFragment.ESCANDALOS);
+        HistoryFragment f2 = HistoryFragment.newInstance(user_id, HistoryFragment.COMENTARIOS);
+        HistoryFragment f3 = HistoryFragment.newInstance(user_id, HistoryFragment.LIKES);
+        fList.add(f1);
+        fList.add(f2);
+        fList.add(f3);
+
+        return fList;
+    }
+
+    /**
+     * Inicializa los tabs
+     */
+    private void initialiseTabHost() {
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+        mTabHost.setup();
+
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.escandalos)).setIndicator(getResources().getString(R.string.escandalos)));
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.comentarios)).setIndicator(getResources().getString(R.string.comentarios)));
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.likes)).setIndicator(getResources().getString(R.string.likes)));
+
+        mTabHost.setOnTabChangedListener(this);
+    }
 	
 	
 	/**
@@ -1039,5 +921,30 @@ public class ProfileActivity extends SherlockActivity {
 	        }
 	    }
 	}
+	
+	
+	// --------------------- LISTENERS VIEWPAGER Y TABS ------------------------------
+	
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+    }
+
+    @Override
+    public void onPageScrolled(int arg0, float arg1, int arg2) {
+        int pos = this.mViewPager.getCurrentItem();
+        this.mTabHost.setCurrentTab(pos);
+    }
+
+    @Override
+        public void onPageSelected(int arg0) {
+    }
+
+	@Override
+	public void onTabChanged(String tag) {
+		int pos = this.mTabHost.getCurrentTab();
+        this.mViewPager.setCurrentItem(pos);	
+	}
+	
+	// --------------------------------------------------------------------------------
 	
 }
