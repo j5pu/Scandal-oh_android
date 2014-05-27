@@ -388,9 +388,7 @@ public class ScandalFragment extends SherlockFragment {
 				}
 				
 				@Override
-				public void onImageFailure(String url) {
-					// TODO Auto-generated method stub
-					
+				public void onImageFailure(String url) {			
 				}
 			});
         	
@@ -954,7 +952,6 @@ public class ScandalFragment extends SherlockFragment {
 		@Override
 	    protected Integer doInBackground(String... params) {
 	    			
-	    	//Audio.getInstance(getActivity().getBaseContext()).startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);							
 			audio.setOnPlayListener(new PlayListener() {
 
 				@Override
@@ -1071,7 +1068,7 @@ public class ScandalFragment extends SherlockFragment {
     		comment_text.setText(last_comment.getText());
     		
     		// Nombre de usuario
-    		txt_user_name.setText(Utils.limitaCaracteres(last_comment.getUsername(), 25));
+    		txt_user_name.setText(last_comment.getUsername());
     		
     		// Fecha (formato dd-mm-aaaa)
             String date_without_time = (last_comment.getDate().split("T",2))[0];   

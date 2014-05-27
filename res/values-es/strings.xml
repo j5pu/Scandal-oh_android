@@ -229,4 +229,10 @@
     <string name="hubo_algun_error_creando_archivo">Hubo algún error creando el archivo</string>
     <string name="likes">Likes</string>
     <string name="escandalos">Escándalos</string>
+    <string name="quieres_borrar_el_escandalo_selec">¿Quieres borrar el escándalo seleccionado?</string>
+    <string name="borrar">Borrar</string>
+    <string name="escandalo_borrado">Escándalo borrado con éxito</string>
+    <string name="borrando_escandalo">Borrando escándalo ...</string>
+    <string name="ese_escandalo_ha_sido_borrado">Ese escándalo ha sido borrado</string>
+
 </resources>

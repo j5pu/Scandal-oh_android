@@ -423,6 +423,14 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	}
 	
 	
+	/**
+	 * Devuelve el tab seleccionado actualmente
+	 * @return Posición del tab actual
+	 */
+	public int getCurrentTab(){
+		return mTabHost.getCurrentTab();
+	}
+	
 
 	
 	/**

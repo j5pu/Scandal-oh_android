@@ -2,15 +2,18 @@ package com.bizeu.escandaloh.users;
 
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.HistoryAdapter;
@@ -18,6 +21,9 @@ import com.bizeu.escandaloh.model.History;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -53,6 +60,8 @@ public class HistoryFragment extends Fragment {
 	private String user_id;
 	private String history_type;
 	private Activity acti;
+	private boolean any_error_deleting;
+	private ProgressDialog delete_progress;
 
     public static final HistoryFragment newInstance(String user_id, String history_type) {
         HistoryFragment f = new HistoryFragment();
@@ -112,6 +121,35 @@ public class HistoryFragment extends Fragment {
 			  }
 		});
 		
+		list_historys.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) {
+            	
+				if (user_id.equals(ProfileActivity.LOGGED) && ((ProfileActivity) getActivity()).getCurrentTab() == 0){
+					AlertDialog.Builder alert_delete_scand = new AlertDialog.Builder(acti);
+					alert_delete_scand.setTitle(R.string.quieres_borrar_el_escandalo_selec);
+					alert_delete_scand.setPositiveButton(R.string.borrar,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1, int id) {
+									History historyAux = ((History) list_historys.getItemAtPosition(pos));
+									Log.v("WE","Voy a borrarlo: " + historyAux.getId());
+									new DeleteScandalTask(historyAux.getId()).execute();
+								}
+							});
+					alert_delete_scand.setNegativeButton(R.string.cancelar,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialogo1, int id) {
+								}
+							});
+					alert_delete_scand.show();
+					return true;
+				}
+                else{
+                    return false;
+                }
+            }
+        }); 
+		
 		// Obtener siguientes historys
 		list_historys.setOnScrollListener(new OnScrollListener() {
 					
@@ -133,7 +171,6 @@ public class HistoryFragment extends Fragment {
 			        
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				// TODO Auto-generated method stub
 			}
 		});
 		
@@ -141,9 +178,6 @@ public class HistoryFragment extends Fragment {
         return mView;
     }
     
-    
-    
-
 	
 	
 	/**
@@ -195,9 +229,8 @@ public class HistoryFragment extends Fragment {
 					url += "?action=comment";
 				}
 				else if (history_type.equals(LIKES)){
-					url += "?action=upvote";
+					url += "?action=vote";
 				}
-
 			}
 			
 			// Obtenemos los siguientes historys
@@ -283,6 +316,90 @@ public class HistoryFragment extends Fragment {
 			else {
 				// Si es codigo 2xx --> OK 
 				historyAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+	
+	
+
+	
+	/**
+	 * Borra un escándalo
+	 * 
+	 */
+	private class DeleteScandalTask extends AsyncTask<Void, Integer, Integer> {
+
+		private String id_to_delete;
+		
+		public DeleteScandalTask(String id_photo_to_delete){
+			id_to_delete = id_photo_to_delete;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			any_error_deleting = false;
+			// Mostramos el ProgressDialog
+			delete_progress = new ProgressDialog(acti);
+			delete_progress.setMessage(getResources().getString(R.string.borrando_escandalo));
+			delete_progress.setCancelable(false);
+			delete_progress.show();
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			HttpEntity resEntity;
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/photo/" + id_to_delete + "/";
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient client = new DefaultHttpClient();
+				HttpDelete delete = new HttpDelete(urlString);
+				delete.setHeader("Session-Token", MyApplication.session_token);
+				
+				response = client.execute(delete);
+			}
+
+			catch (Exception ex) {
+				Log.e("Debug", "error: " + ex.getMessage(), ex);
+				any_error_deleting = true; // Indicamos que hubo algún error
+			}
+
+			if (any_error_deleting) {
+				return 666;
+			} else {
+				// Devolvemos el resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			
+			// Quitamos el ProgressDialog
+			if (delete_progress.isShowing()) {
+				delete_progress.dismiss();
+			}
+			
+			// Si hubo algún error mostramos un mensaje
+			if (any_error_deleting || result != 204) {
+				Toast toast = Toast.makeText(acti, getResources().getString(R.string.lo_sentimos_hubo),Toast.LENGTH_SHORT);
+				toast.show();
+			} 
+			
+			else {
+				// Volvemos a cargar el historial
+				array_history.clear();
+				historyAdapter.notifyDataSetChanged();
+				getHistoryAsync = new GetHistoryTask();
+				getHistoryAsync.execute();	
+				
+				// Indicamos que debe reiniciarse el carrusel
+				MyApplication.reset_scandals = true;
+				
+				Toast toast = Toast.makeText(acti, getResources().getString(R.string.escandalo_borrado),Toast.LENGTH_SHORT);
+				toast.show();
 			}
 		}
 	}

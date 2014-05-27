@@ -159,74 +159,85 @@ public class ScandalActivity extends SherlockFragmentActivity {
 				JSONObject respJson = new JSONObject(respStr);
 				JSONArray escandalosObject = respJson.getJSONArray("objects");
 				
-				// Obtenemos los datos de los escándalos
-				for (int i = 0; i < escandalosObject.length(); i++) {
-					final Comment last_comment;
-					
-					JSONObject escanObject = escandalosObject.getJSONObject(i);
+				// Si hay escándalo (existe)
+				if (escandalosObject.length() > 0){
+					// Obtenemos los datos de los escándalos
+					for (int i = 0; i < escandalosObject.length(); i++) {
+						final Comment last_comment;
+						
+						JSONObject escanObject = escandalosObject.getJSONObject(i);
 
-					final String category = escanObject.getString("category");
-					final String date = escanObject.getString("date");
-					final String id = escanObject.getString("id");
-					final String user_id = escanObject.getString("user_id");
-					final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
-					final String img = escanObject.getString("img");
-					final String comments_count = escanObject.getString("comments_count");
-					String latitude = escanObject.getString("latitude");
-					String longitude = escanObject.getString("longitude");
-					final String resource_uri = escanObject.getString("resource_uri");
-					final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
-					final String user = escanObject.getString("user");
-					String visits_count = escanObject.getString("visits_count");
-					final String sound = escanObject.getString("sound");
-					final String username = escanObject.getString("username");
-					final String avatar = escanObject.getString("avatar");
-					final String social_network = escanObject.getString("social_network");
-					final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
-					final int likes = Integer.parseInt(escanObject.getString("likes"));
-					final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
-					final int media_type = Integer.parseInt(escanObject.getString("media_type"));
-					final String favicon = escanObject.getString("favicon");
-					final String source = escanObject.getString("source");
-					final String source_name = escanObject.getString("source_name");
+						final String category = escanObject.getString("category");
+						final String date = escanObject.getString("date");
+						final String id = escanObject.getString("id");
+						final String user_id = escanObject.getString("user_id");
+						final String img_p = escanObject.getString("img_p"); // Fotos pequeñas sin marca de agua
+						final String img = escanObject.getString("img");
+						final String comments_count = escanObject.getString("comments_count");
+						String latitude = escanObject.getString("latitude");
+						String longitude = escanObject.getString("longitude");
+						final String resource_uri = escanObject.getString("resource_uri");
+						final String title = new String(escanObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
+						final String user = escanObject.getString("user");
+						String visits_count = escanObject.getString("visits_count");
+						final String sound = escanObject.getString("sound");
+						final String username = escanObject.getString("username");
+						final String avatar = escanObject.getString("avatar");
+						final String social_network = escanObject.getString("social_network");
+						final int already_voted = Integer.parseInt(escanObject.getString("already_voted"));
+						final int likes = Integer.parseInt(escanObject.getString("likes"));
+						final int dislikes = Integer.parseInt(escanObject.getString("dislikes"));
+						final int media_type = Integer.parseInt(escanObject.getString("media_type"));
+						final String favicon = escanObject.getString("favicon");
+						final String source = escanObject.getString("source");
+						final String source_name = escanObject.getString("source_name");
 
-					// Obtenemos el comentario más reciente
-					if (!escanObject.isNull("last_comment")){
-						JSONObject commentObject = escanObject.getJSONObject("last_comment");
-						c_date = commentObject.getString("date");
-						c_id = commentObject.getString("id");
-						c_photo = commentObject.getString("photo");
-						c_resource_uri = commentObject
-						.getString("resource_uri");
-						c_social_network = commentObject
-						.getString("social_network");
-						c_text = new String(commentObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-						c_user = commentObject.getString("user");
-						c_user_id = commentObject.getString("user_id");
-						c_username = commentObject.getString("username");
-						c_avatar = commentObject.getString("avatar");
+						// Obtenemos el comentario más reciente
+						if (!escanObject.isNull("last_comment")){
+							JSONObject commentObject = escanObject.getJSONObject("last_comment");
+							c_date = commentObject.getString("date");
+							c_id = commentObject.getString("id");
+							c_photo = commentObject.getString("photo");
+							c_resource_uri = commentObject
+							.getString("resource_uri");
+							c_social_network = commentObject
+							.getString("social_network");
+							c_text = new String(commentObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
+							c_user = commentObject.getString("user");
+							c_user_id = commentObject.getString("user_id");
+							c_username = commentObject.getString("username");
+							c_avatar = commentObject.getString("avatar");
 
-						last_comment = new Comment(c_date, c_id, c_photo,
-								c_resource_uri, c_social_network, c_text,
-							c_user, c_user_id, c_username, c_avatar);
-					}
-					else{
-						last_comment = null;
-					}
-					
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {							
-							Scandaloh scandal = new Scandaloh(id, user_id, title,category,
-									Integer.parseInt(comments_count),resource_uri,
-									MyApplication.DIRECCION_BUCKET + img_p,
-									MyApplication.DIRECCION_BUCKET + img, sound, username, date,
-									avatar, last_comment, social_network,
-									already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
-							scandaloh_frag = ScandalFragment.newInstance(scandal);
+							last_comment = new Comment(c_date, c_id, c_photo,
+									c_resource_uri, c_social_network, c_text,
+								c_user, c_user_id, c_username, c_avatar);
 						}
-					});				
+						else{
+							last_comment = null;
+						}
+						
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {							
+								Scandaloh scandal = new Scandaloh(id, user_id, title,category,
+										Integer.parseInt(comments_count),resource_uri,
+										MyApplication.DIRECCION_BUCKET + img_p,
+										MyApplication.DIRECCION_BUCKET + img, sound, username, date,
+										avatar, last_comment, social_network,
+										already_voted, likes, dislikes, media_type, MyApplication.DIRECCION_BUCKET + favicon, source, source_name);
+								scandaloh_frag = ScandalFragment.newInstance(scandal);
+							}
+						});				
+					}
 				}
+				
+				// No hay escándalo --> objects:[]
+				else{
+					// Devolvemos un código para saber que no hay escándalo
+					return 555;
+				}
+				
+				
 			} catch (Exception ex) {
 				Log.e("ServicioRest",
 						"Error obteniendo escándalos o comentarios", ex);
@@ -251,6 +262,15 @@ public class ScandalActivity extends SherlockFragmentActivity {
 				Toast toast = Toast.makeText(mContext,
 						R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
 				toast.show();
+			}
+			
+			// No hay escándalo (se ha borrado)
+			else if (result == 555){
+				Toast toast = Toast.makeText(mContext,
+						R.string.ese_escandalo_ha_sido_borrado, Toast.LENGTH_SHORT);
+				toast.show();
+				// Terminamos la actividad
+				finish();
 			}
 			else{	
 				// Si no se ha destruido la actividad mostramos el fragmento
