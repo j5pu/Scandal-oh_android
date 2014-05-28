@@ -119,10 +119,6 @@ public class ImageViewRounded extends FetchableImageView {
 
         Bitmap result = Bitmap.createBitmap(bitmap.getWidth(),
                 bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        
-        
-        
-        
 
         
         Canvas canvas = new Canvas(result);

@@ -457,11 +457,11 @@ public class ScandalFragment extends SherlockFragment {
         // SOCIAL NETWORK 
         // Scandaloh
         if (Integer.parseInt(social_network) == 0){
-        	user_type.setImageResource(R.drawable.s_rosa);
+        	user_type.setImageResource(R.drawable.s_blanca);
         }
         // Facebook
         else if (Integer.parseInt(social_network) == 1){
-        	user_type.setImageResource(R.drawable.facebook_rosa);
+        	user_type.setImageResource(R.drawable.f_blanca);
         }
         user_type.setOnClickListener(new View.OnClickListener() {
 			
@@ -498,10 +498,10 @@ public class ScandalFragment extends SherlockFragment {
         	// Mostramos si ya había marcado likes/dislikes anteriormente
             if (already_voted != 0){ // Si ya ha votado
             	if (already_voted == 1){ // Ha hecho like
-            		iLike.setImageResource(R.drawable.like_rosa);
+            		iLike.setImageResource(R.drawable.like_azul);
             	}
             	else if (already_voted == 2){ // Ha hecho dislike
-            		iDislike.setImageResource(R.drawable.dislike_rosa);
+            		iDislike.setImageResource(R.drawable.dislike_azul);
             	}
             }
         }
@@ -520,7 +520,7 @@ public class ScandalFragment extends SherlockFragment {
         			// Había puesto like: quitamos like
         			if (already_voted == 1){
         				// Indicamos que no hay likes/dislikes marcados
-        				iLike.setImageResource(R.drawable.like_azul);
+        				iLike.setImageResource(R.drawable.like_blanco);
         	        	already_voted = 0;
         	        	// Decrementamos el nº de likes
         	        	tLikes.setText(Integer.toString(old_likes-1));
@@ -530,8 +530,8 @@ public class ScandalFragment extends SherlockFragment {
         			// Habia puesto dislike: quitamos dislike y marcamos like
         			else if (already_voted == 2){
         				// Indicamos que está marcado like
-        				iDislike.setImageResource(R.drawable.dislike_azul);
-        				iLike.setImageResource(R.drawable.like_rosa);
+        				iDislike.setImageResource(R.drawable.dislike_blanco);
+        				iLike.setImageResource(R.drawable.like_azul);
         	        	already_voted = 1;
         	        	// Incrementamos like y decrementamos dislike
         	        	tLikes.setText(Integer.toString(old_likes+1));
@@ -542,7 +542,7 @@ public class ScandalFragment extends SherlockFragment {
         			// No había puesto nada: marcamos like
         			else{
         				// Indicamos que está marcado like
-        				iLike.setImageResource(R.drawable.like_rosa);
+        				iLike.setImageResource(R.drawable.like_azul);
         	        	already_voted = 1;
         	        	// Incrementamos like
         	        	tLikes.setText(Integer.toString(old_likes+1));
@@ -571,7 +571,7 @@ public class ScandalFragment extends SherlockFragment {
         			// Había puesto dislike: quitamos dislike
         			if (already_voted == 2){
         				// Indicamos que está marcado dislike
-        				iDislike.setImageResource(R.drawable.dislike_azul);
+        				iDislike.setImageResource(R.drawable.dislike_blanco);
         	        	already_voted = 0;
         	        	// Decrementamos dislike
         	        	tDislikes.setText(Integer.toString(old_dislikes-1));
@@ -581,8 +581,8 @@ public class ScandalFragment extends SherlockFragment {
         			// Había puesto like: quitamos like y ponemos dislike
         			else if (already_voted == 1){
         				// Indicamos que está marcado dislike
-        				iLike.setImageResource(R.drawable.like_azul);
-        				iDislike.setImageResource(R.drawable.dislike_rosa);
+        				iLike.setImageResource(R.drawable.like_blanco);
+        				iDislike.setImageResource(R.drawable.dislike_azul);
         	        	already_voted = 2;
         	        	// Decrementamos nº likes e incrementamos nº dislikes
         	        	tLikes.setText(Integer.toString(old_likes-1));
@@ -593,7 +593,7 @@ public class ScandalFragment extends SherlockFragment {
         			// No había puesto nada: marcamos dislike
         			else{
         				// Indicamos que está marcado dislike
-        				iDislike.setImageResource(R.drawable.dislike_rosa);
+        				iDislike.setImageResource(R.drawable.dislike_azul);
         	        	already_voted = 2;
         	        	// Incrementamos nº dislikes
         	        	tDislikes.setText(Integer.toString(old_dislikes+1));
@@ -699,7 +699,7 @@ public class ScandalFragment extends SherlockFragment {
         tit.setText(title);
        
         // NOMBRE DE USUARIO
-        user_na.setText(Utils.limitaCaracteres(user_name, 25));  
+        user_na.setText(user_name);  
         user_na.setOnClickListener(new View.OnClickListener() {
 			
 			@Override

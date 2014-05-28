@@ -22,7 +22,7 @@
     <style name="MyActionBarStyle" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
-        <item name="android:background">@color/azul_verdoso</item>
+        <item name="android:background">@color/negro</item>
 
     </style>
     

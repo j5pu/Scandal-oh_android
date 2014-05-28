@@ -20,5 +20,7 @@
     <color name="negro_comentario">#999999</color>
     <color name="gris_comments">#cccccc</color>
     <color name="gris_busqueda">#dddddd</color>
+    <color name="info_usuario_escandalo">#cccccc</color>
+    <color name="line_scandal">#359ce3</color>
     
 </resources>

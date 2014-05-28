@@ -70,6 +70,7 @@ import com.bizeu.escandaloh.users.LoginSelectActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.DepthPageTransformer;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
 import com.bizeu.escandaloh.util.ImageViewRounded;
@@ -173,7 +174,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-		View view = getLayoutInflater().inflate(R.layout.action_bar, null);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_negro, null);
 		actBar.setCustomView(view);
 		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
@@ -237,6 +238,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			public void onPageScrollStateChanged(int state) {
 			}
 		});
+		
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
+			pager.setPageTransformer(true, new DepthPageTransformer());
+		}
 
 		// MENU LATERAL
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.lay_pantalla_main);
@@ -1668,6 +1674,5 @@ public class MainActivity extends SherlockFragmentActivity implements
 			this.fragments.clear();
 		}
 	}
-	
 
 }
