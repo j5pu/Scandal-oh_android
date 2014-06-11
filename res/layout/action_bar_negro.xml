@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill_horizontal"
-    android:background="@color/negro" >
+    android:background="@color/blanco" >
 
     <LinearLayout
         android:id="@+id/ll_browser_action_bar"
@@ -36,7 +36,7 @@
                     android:gravity="bottom|left"
                     android:paddingBottom="3dp"
                     android:text="ES"
-                    android:textColor="@color/blanco" />
+                    android:textColor="@color/gris_info" />
 
             </LinearLayout>
 
@@ -76,7 +76,7 @@
                         android:id="@+id/img_actionbar_updatelist"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/recarga_selector"
+                        android:background="@drawable/recargar_gris"
                         android:visibility="visible" />
 
                     <ProgressBar
@@ -108,7 +108,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/cam_micro_blanco" />
+                        android:src="@drawable/cam_micro_gris" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

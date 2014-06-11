@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fb="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lay_pantalla_main_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.bizeu.escandaloh.util.TextureVideoView
+        android:id="@+id/vid_splash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/txt_loginmain_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="@string/aun_no_tienes_cuenta"
+        android:textColor="@color/blanco"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/but_log_in_scandaloh"
+        style="@style/LoginButton"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/but_log_in_facebook"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:drawableLeft="@drawable/s_pequenia"
+        android:paddingLeft="10dp"
+        android:text="@string/entra_con_scandaloh" />
+
+    <Button
+        android:id="@+id/but_log_in_comienza"
+        style="@style/LoginButton"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/but_log_in_scandaloh"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@drawable/puerta_pequenia"
+        android:paddingLeft="10dp"
+        android:text="@string/comienza_ya" />
+
+    <com.facebook.widget.LoginButton
+        android:id="@+id/but_log_in_facebook"
+        style="@style/LoginButton"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/txt_loginmain_register"
+        android:layout_alignLeft="@+id/but_log_in_scandaloh"
+        android:layout_marginBottom="55dp"
+        android:drawableLeft="@drawable/f_pequenia"
+        android:paddingLeft="15dp"
+        fb:login_text="@string/entra_con_facebook" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="165dp"
+        android:layout_height="165dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="121dp"
+        android:src="@drawable/s_splash" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="380dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/imageView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/scandaloh_splash" />
+
+</RelativeLayout>

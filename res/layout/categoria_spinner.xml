@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<TextView  
-    xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_height="?android:attr/listPreferredItemHeight"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/txt_actionbar_spinner"
     android:layout_width="fill_parent"
-    android:textSize="18sp"
-    android:paddingLeft="6dip"
-    android:paddingRight="6dip" 
+    android:layout_height="?android:attr/listPreferredItemHeight"
     android:gravity="right|center_horizontal|center_vertical"
-    android:textColor= "@color/blanco"         
+    android:paddingLeft="6dip"
+    android:paddingRight="6dip"
+    android:textColor="@color/morado"
+    android:textSize="18sp" />
 
-    />

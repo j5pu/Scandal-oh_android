@@ -1,54 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fb="http://schemas.android.com/apk/res-auto"
     android:id="@+id/lay_pantalla_main_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo_inicio_2"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <com.bizeu.escandaloh.util.TextureVideoView
+        android:id="@+id/vid_splash"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="bottom|center_horizontal"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_weight="1.6"
-        android:gravity="bottom|center_horizontal"
-        android:orientation="vertical" >
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:src="@drawable/s_splash" />
 
-        <com.facebook.widget.LoginButton
-            android:id="@+id/but_log_in_facebook"
-            android:layout_width="200dp"
-            android:layout_height="45dp"
-            android:text="Button"
-            fb:login_text="@string/facebook"
-            fb:logout_text="@string/facebook" />
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="250dp"
+        android:layout_height="65dp"
+        android:layout_below="@+id/imageView1"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/scandaloh_splash" />
 
-        <Button
-            android:id="@+id/but_log_in_scandaloh"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/blue_button_selector"
-            android:text="@string/scandaloh"
-            android:textColor="@color/blanco"
-            android:textSize="17sp" />
+    <TextView
+        android:id="@+id/txt_loginmain_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14dp"
+        android:text="@string/crea_tu_cuenta"
+        android:textColor="@color/azul" />
 
-        <TextView
-            android:id="@+id/txt_loginmain_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/crea_tu_cuenta"
-            android:textColor="@color/azul" />
+    <com.facebook.widget.LoginButton
+        android:id="@+id/but_log_in_facebook"
+        android:layout_width="200dp"
+        android:layout_height="45dp"
+        android:layout_above="@+id/but_log_in_scandaloh"
+        android:layout_alignLeft="@+id/but_log_in_scandaloh"
+        android:layout_marginBottom="12dp"
+        android:text="Button"
+        fb:login_text="@string/facebook"
+        fb:logout_text="@string/facebook" />
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/but_log_in_comienza"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/but_log_in_facebook"
+        android:layout_alignLeft="@+id/imageView1"
+        android:layout_marginBottom="12dp"
+        android:text="@string/comienza_ya" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/but_log_in_scandaloh"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/txt_loginmain_register"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/blue_button_selector"
+        android:text="@string/scandaloh"
+        android:textColor="@color/blanco"
+        android:textSize="17sp" />
+
+</RelativeLayout>

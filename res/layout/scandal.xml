@@ -10,24 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <ImageView
-            android:id="@+id/img_escandalo_audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/altavoz_azul"
-            android:visibility="gone" />
-
-        <ProgressBar
-            android:id="@+id/prog_escandalo_loading_audio"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone" />
-
         <com.applidium.shutterbug.FetchableImageView
             android:id="@+id/img_escandalo_foto"
             android:layout_width="match_parent"
@@ -35,7 +17,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:scaleType="centerCrop"
-            android:src="@color/morado" />
+            android:src="@color/blanco" />
 
         <LinearLayout
             android:id="@+id/ll_escandalo_lastcomment"
@@ -43,8 +25,7 @@
             android:layout_height="80dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:background="#bb000000"
-            android:gravity="center_vertical"
+            android:background="#ff000000"
             android:orientation="vertical"
             android:paddingLeft="2dp"
             android:paddingRight="2dp" >
@@ -53,19 +34,50 @@
                 android:id="@+id/ll_escandalo_com_izquierda"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:orientation="vertical" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="18dp"
+                    android:gravity="center_horizontal|center_vertical" >
+
+                    <View
+                        android:id="@+id/view_scandal_abajo_izquierda"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="3"
+                        android:background="@color/morado" />
+
+                    <TextView
+                        android:id="@+id/txt_scandal_numcomments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:text="3 comentarios"
+                        android:textColor="@color/morado"
+                        android:textSize="11dp" />
+
+                    <View
+                        android:id="@+id/view_scandal_abajo_derecha"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="3"
+                        android:background="@color/morado" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="62dp"
                     android:layout_gravity="center_vertical"
                     android:orientation="horizontal" >
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:gravity="center_horizontal|center_vertical"
                         android:orientation="vertical" >
@@ -80,19 +92,19 @@
 
                     <LinearLayout
                         android:id="@+id/ll_escandalo_lastcomment_info_user"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_gravity="left|top"
                         android:layout_marginLeft="6dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_weight="3.90"
+                        android:layout_marginRight="6dp"
                         android:gravity="left"
                         android:orientation="vertical" >
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
                             android:layout_gravity="top"
+                            android:layout_weight="1.5"
                             android:gravity="top" >
 
                             <ImageView
@@ -110,89 +122,75 @@
                                 android:gravity="center_vertical"
                                 android:scrollHorizontally="true"
                                 android:text="joseantonio.puertolasmontanes"
-                                android:textColor="#aaaaaa"
+                                android:textColor="@color/gris_info"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txt_comment_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="right"
+                                android:text="12-02-2014"
+                                android:textColor="@color/gris_info"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/txt_comment_text"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:maxLines="2"
-                            android:paddingBottom="4dp"
-                            android:paddingLeft="1dp"
-                            android:paddingTop="4dp"
-                            android:text="coscosff sdfdfdsd asdfadsasdfadfafddfadfafsdf"
-                            android:textColor="@color/blanco"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal" >
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1.5"
-                        android:orientation="vertical" >
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="6"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical" >
 
-                        <TextView
-                            android:id="@+id/txt_comment_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
-                            android:text="12-02-2014"
-                            android:textColor="#aaaaaa"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/txt_comment_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="2"
+                                    android:paddingBottom="4dp"
+                                    android:paddingLeft="1dp"
+                                    android:paddingTop="4dp"
+                                    android:text="coscosff sdfdf  d d d d d d d d d d d d d"
+                                    android:textColor="@color/blanco"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:gravity="center_horizontal" >
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center_vertical|center_horizontal"
+                                android:layout_weight="0.5"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:orientation="vertical" >
 
-                            <ImageView
-                                android:id="@+id/img_profile_picture"
-                                android:layout_width="15dp"
-                                android:layout_height="15dp"
-                                android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginLeft="29dp"
-                                android:src="@drawable/flecha_blanca_derecha" />
-
-                            <ImageView
-                                android:id="@+id/imageView2"
-                                android:layout_width="17dp"
-                                android:layout_height="17dp"
-                                android:layout_alignRight="@+id/img_profile_picture"
-                                android:layout_alignTop="@+id/img_profile_picture"
-                                android:layout_marginRight="19dp"
-                                android:src="@drawable/comentario_blanco" />
-
-                            <TextView
-                                android:id="@+id/txt_lastcomment_num_comments"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignLeft="@+id/imageView2"
-                                android:layout_alignRight="@+id/imageView2"
-                                android:layout_centerVertical="true"
-                                android:gravity="center_horizontal"
-                                android:text="33"
-                                android:textColor="@color/gris_oscuro"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-                        </RelativeLayout>
+                                <ImageView
+                                    android:id="@+id/img_profile_picture"
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:src="@drawable/flecha_blanca_derecha" />
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
         <RelativeLayout
-            android:id="@+id/relativeLayout1"
+            android:id="@+id/rl_likes"
             android:layout_width="wrap_content"
-            android:layout_height="100dp"
+            android:layout_height="200dp"
             android:layout_above="@+id/ll_escandalo_lastcomment"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
@@ -247,31 +245,45 @@
                 android:layout_toRightOf="@+id/img_escandalo_dislike"
                 android:text="0000"
                 android:textColor="@color/blanco" />
-
-            <View
-                android:id="@+id/view_scandal_linea_abajo"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:background="@color/line_scandal" />
-
         </RelativeLayout>
 
+        <ImageView
+            android:id="@+id/img_escandalo_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/altavoz_azul"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/prog_escandalo_loading_audio"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rl_scandal_infouser"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/back_title_scandal" >
+        android:layout_alignParentTop="true" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/back_title_scandal"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -297,7 +309,7 @@
                     android:maxLines="3"
                     android:text="Soy un título paarruseadfadfadfadfaddasfl de ScandalOh con 75 caracteres !!!"
                     android:textColor="@color/blanco"
-                    android:textSize="@dimen/text_title_size"
+                    android:textSize="25sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -335,15 +347,15 @@
                         android:textColor="@color/blanco"
                         android:textSize="13sp"
                         android:textStyle="bold" />
-
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/linearLayout2"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true" >
+                    android:layout_alignParentTop="true"
+                    android:gravity="right" >
 
                     <com.applidium.shutterbug.FetchableImageView
                         android:id="@+id/img_escandalo_favicon"
@@ -366,7 +378,6 @@
                         android:textStyle="bold"
                         android:visibility="visible" />
                 </LinearLayout>
-
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
@@ -376,7 +387,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentLeft="true"
-        android:background="@color/line_scandal"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:background="@color/morado" />
 
 </RelativeLayout>

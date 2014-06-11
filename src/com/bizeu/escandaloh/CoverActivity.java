@@ -56,10 +56,11 @@ public class CoverActivity extends Activity {
 			prefs.edit().putString(MyApplication.CODE_COUNTRY, country_code).commit();
 			
 			MyApplication.logged_user = false;
-			// TODO Mostrar pantalla de bienvenida
 		}
+		
+		// No es la primera vez
 		else{
-			// Obtenemos si el usuario estaba logueado
+			// Obtenemos lo datos del usuario
 			String session_token = prefs.getString(MyApplication.SESSION_TOKEN, null);
 			if (session_token != null){
 				MyApplication.logged_user = true;
@@ -77,7 +78,7 @@ public class CoverActivity extends Activity {
 		String shared = null;
 		int sharing_type = 0;
 		
-		// La aplicación se ha iniciado porque se ha compartido desde otra app 
+		// LA APP SE HA INICIADO PORQUE SE HA COMPARTIDO DESDE OTRA APP
 		if (getIntent().getAction().equals(Intent.ACTION_SEND)){
 			Bundle extras = getIntent().getExtras();
 			Intent i = getIntent();
@@ -113,18 +114,32 @@ public class CoverActivity extends Activity {
 			finish();
 		}
 		
-		else{
+		// LA APP SE HA INICIADO PORQUE VIENE DE UNA NOTIFICACIÓN PUSH
+		else if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
 			Intent i = new Intent(CoverActivity.this, MainActivity.class);
-			// La aplicación se ha iniciado porque viene de una notificación push
-			if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION)){
-				i.setAction(PushReceiver.PUSH_NOTIFICATION);
-			}
-			// Modo normal
-			else{
-				i.setAction(Intent.ACTION_DEFAULT);
-			}
+			i.setAction(PushReceiver.PUSH_NOTIFICATION);
 			startActivity(i);
 			finish();
-		}			
+		}	
+		
+		// LA APP SE HA INICIADO POR EL MODO NORMAL
+		else{
+			Intent i;
+			
+			// Usuario logueado
+			if (MyApplication.logged_user){
+				i = new Intent(CoverActivity.this, MainActivity.class);
+				i.setAction(Intent.ACTION_DEFAULT);		
+			}
+			
+			// Usuario no logueado
+			else{
+				i = new Intent(CoverActivity.this, LoginSelectActivity.class);
+				i.putExtra(LoginSelectActivity.DESDE_COVER, true);
+			}
+			
+			startActivity(i);
+			finish();
+		}
 	}
 }

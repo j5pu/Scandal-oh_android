@@ -76,7 +76,7 @@ public class BrowserNewsActivity extends SherlockActivity {
 		img_back = (ImageView) findViewById(R.id.img_browser_back);
 		img_forward = (ImageView) findViewById(R.id.img_browser_forward);
 		img_cancel = (ImageView) findViewById(R.id.img_actionbarsearch_cancel);
-		img_share = (ImageView) findViewById(R.id.img_browser_share);
+		img_share = (ImageView) findViewById(R.id.img_login_scandaloh_aceptar);
 		
 		img_back.setOnClickListener(new View.OnClickListener() {
 			

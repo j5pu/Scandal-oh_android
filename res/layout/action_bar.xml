@@ -36,7 +36,8 @@
                     android:gravity="bottom|left"
                     android:paddingBottom="3dp"
                     android:text="ES"
-                    android:textColor="@color/blanco" />
+                    android:textColor="@color/blanco"
+                    android:typeface="sans" />
 
             </LinearLayout>
 

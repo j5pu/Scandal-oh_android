@@ -22,5 +22,8 @@
     <color name="gris_busqueda">#dddddd</color>
     <color name="info_usuario_escandalo">#cccccc</color>
     <color name="line_scandal">#359ce3</color>
+    <color name="gris_info">#aaaaaa</color>
+    <color name="transparente">#FFFFFFFF</color>
+    <color name="gris_hint">#c3c3c3</color>
     
 </resources>

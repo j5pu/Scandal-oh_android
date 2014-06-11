@@ -55,7 +55,7 @@
                 android:layout_marginRight="10dp" />
 
             <ImageView
-                android:id="@+id/img_browser_share"
+                android:id="@+id/img_login_scandaloh_aceptar"
                 android:layout_width="28dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/share_blanco" />

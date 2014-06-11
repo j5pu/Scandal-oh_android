@@ -191,6 +191,18 @@ public class Utils {
     
     
     /**
+     * Convierte de px a dp
+     * @param px
+     * @param context
+     * @return
+     */
+    public static float pxToDp(float px, Context context)
+    {
+        return px / context.getResources().getDisplayMetrics().density;
+    }
+    
+    
+    /**
      * Obtiene la fecha actual
      * @return
      */

@@ -29,17 +29,15 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
-import com.parse.ParseAnalytics;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
-import com.parse.SaveCallback;
 import com.bizeu.escandaloh.dialogs.RememberPasswordDialog;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.Fuente;
@@ -49,10 +47,10 @@ public class LoginScandalohActivity extends SherlockActivity {
 	
 	private EditText edit_nombre_email;
 	private EditText edit_password;
-	private Button boton_aceptar;
 	private TextView txt_recordar_contrasenia;
 	private ProgressDialog progress;
 	private ViewGroup pantalla;
+	private ImageView img_aceptar;
 	
 	private String name_error;
 	private String password_error;
@@ -82,15 +80,22 @@ public class LoginScandalohActivity extends SherlockActivity {
 		Fuente.cambiaFuente(pantalla);
 		
 		mContext = this;
-		// Ocultamos el action bar
-		getSupportActionBar().hide();
+		
+		// Action Bar
+		ActionBar actBar = getSupportActionBar();
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_login, null);
+		actBar.setCustomView(view);
+		actBar.setHomeButtonEnabled(true);
+		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setIcon(R.drawable.s_mezcla);
 		
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
-		boton_aceptar = (Button) findViewById(R.id.but_confirmar_login);
 		txt_recordar_contrasenia = (TextView) findViewById(R.id.txt_recordar_contrasenia);
+		img_aceptar = (ImageView) findViewById(R.id.img_login_scandaloh_aceptar);
 		
-		boton_aceptar.setOnClickListener(new View.OnClickListener() {
+		img_aceptar.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

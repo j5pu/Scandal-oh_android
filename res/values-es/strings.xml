@@ -234,5 +234,11 @@
     <string name="escandalo_borrado">Escándalo borrado con éxito</string>
     <string name="borrando_escandalo">Borrando escándalo ...</string>
     <string name="ese_escandalo_ha_sido_borrado">Ese escándalo ha sido borrado</string>
+    <string name="comienza_ya">¡Comienza ya!</string>
+    <string name="aun_no_tienes_cuenta">¿Aún no tienes cuenta? <b>Regístrate</b></string>
+    <string name="entra_con_scandaloh">Entra con ScandalOh</string>
+    <string name="entra_con_facebook">Entra con Facebook</string>
+    <string name="usuario_o_email">Usuario o email</string>
+    <string name="contrasenia">Contraseña</string>
 
 </resources>

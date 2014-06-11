@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lay_pantalla_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fondo_login" >
+
+    <EditText
+        android:id="@+id/edit_login_pasword"
+        style="@style/EditLogin"
+        android:layout_width="245dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txt_recordar_contrasenia"
+        android:layout_alignLeft="@+id/edit_login_nombre_email"
+        android:layout_marginBottom="53dp"
+        android:hint="@string/contrasenia"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/edit_login_nombre_email"
+        style="@style/EditLogin"
+        android:layout_width="245dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edit_login_pasword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:ems="10"
+        android:hint="@string/usuario_o_email"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLength="25" />
+
+    <TextView
+        android:id="@+id/txt_recordar_contrasenia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="194dp"
+        android:ems="10"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/olvidaste_la_contrasenia"
+        android:textColor="@color/blanco"
+        android:textSize="13sp" />
+
+</RelativeLayout>

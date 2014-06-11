@@ -37,6 +37,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -120,6 +121,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageViewRounded img_lateral_avatar;
 	private ExpandableListView explist_lateral_filtros;
 	private TextView txt_action_bar_num_notis;
+	private ImageView img_take_photo;
 
 	
 	private TextView txt_num_notifs;
@@ -133,7 +135,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private boolean any_error;
 	private GetScandalsTask getEscandalosAsync;
 	private GetNewScandals getNewEscandalosAsync;
-	private String category;
+	public static String current_category;
 	private boolean getting_escandalos = true;
 	private boolean there_are_more_scandals = true;
 	public static ArrayList<Scandaloh> escandalos;
@@ -176,11 +178,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_negro, null);
 		actBar.setCustomView(view);
+
 		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setIcon(R.drawable.logo_blanco);
-		
+		actBar.setIcon(R.drawable.logo_gris);
+
 		// Si viene de una notificación push y el usuario está logueado abrimos la pantalla de notificaciones
 		if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION) && MyApplication.logged_user){
 			Intent i = new Intent(MainActivity.this, NotificationsActivity.class);
@@ -196,6 +199,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
 		txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
 		txt_action_bar_num_notis = (TextView) findViewById(R.id.txt_action_bar_num_notis);
+		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
@@ -204,7 +208,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		adapter_spinner.setDropDownViewResource(R.layout.categoria_spinner_desplegaba);
 		spinner_categorias.setAdapter(adapter_spinner);
 		spinner_categorias.setOnItemSelectedListener(this);
-
+		
 		// VIEWPAGER
 		pager = (ViewPager) this.findViewById(R.id.pager);
 		adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
@@ -262,7 +266,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer_blanco, R.string.drawer_open,
+				R.drawable.ic_drawer, R.string.drawer_open,
 				R.string.drawer_close) {
 
 			public void onDrawerClosed(View view) {
@@ -466,7 +470,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		// Separación entre escándalos
 		pager.setPageMargin(3);
-		category = HAPPY;
+		current_category = HAPPY;
 
 		// Si hay conexión: obtenemos los primeros escándalos
 		if (Connectivity.isOnline(mContext)) {
@@ -753,7 +757,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?limit=" + NUM_SCANDALS_TO_LOAD;
 				
 				// HUMOR
-				if (category.equals(MainActivity.HAPPY)) {
+				if (current_category.equals(MainActivity.HAPPY)) {
 					url += "&category__id=1";
 				}
 				// DENUNCIA
@@ -958,7 +962,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			
 			url = MyApplication.SERVER_ADDRESS + "/api/v1/photo/?id__gt=" + escandalos.get(0).getId();
 			// HAPPY
-			if (category.equals(MainActivity.HAPPY)) {
+			if (current_category.equals(MainActivity.HAPPY)) {
 				url += "&category__id=1";
 			}
 			else{
@@ -1199,7 +1203,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			long id) {
 
 		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
-		if ((pos == 0 && category.equals(ANGRY))|| (pos == 1 && category.equals(HAPPY))) {
+		if ((pos == 0 && current_category.equals(ANGRY))|| (pos == 1 && current_category.equals(HAPPY))) {
 			// Si hay conexión
 			if (Connectivity.isOnline(mContext)) {
 				cancelGetScandals();
@@ -1213,12 +1217,30 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 				switch (pos) {
 					case 0: // Humor
-						if (category.equals(ANGRY)) {
-							category = HAPPY;
+						if (current_category.equals(ANGRY)) {
+							current_category = HAPPY;
+							
+							((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.morado));
+							/*
+							getSupportActionBar().setIcon(R.drawable.logo_morado);
+							txt_code_country.setTextColor(getResources().getColor(R.color.morado));
+							img_update_list.setImageResource(R.drawable.recargar_morado);
+							img_take_photo.setImageResource(R.drawable.cam_micro_morado);
+							*/
+							// TODO
 						}
 						break;
 					case 1: // Denuncia
-						category = ANGRY;
+						current_category = ANGRY;
+						// TODO
+						
+						((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.azul));
+						/*
+						getSupportActionBar().setIcon(R.drawable.logo_azul);
+						txt_code_country.setTextColor(getResources().getColor(R.color.azul));
+						img_update_list.setImageResource(R.drawable.recargar_azul);
+						img_take_photo.setImageResource(R.drawable.cam_micro_azul);
+						*/
 						break;
 				}
 

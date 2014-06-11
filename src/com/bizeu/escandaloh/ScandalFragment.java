@@ -85,13 +85,12 @@ public class ScandalFragment extends SherlockFragment {
     public static final int FROM_SCANDAL_FRAGMENT = 235;
 
     private ImageView img_aud;
-	private ImageView img_arrow;
 	private TextView comment_text;
 	private TextView txt_user_name; 
     private ImageViewRounded img_avatar;
     private ImageView social_net;
 	private TextView txt_date;
-	private TextView num_com;
+	private TextView txt_num_comm;
 	private LinearLayout ll_last_comment ;
     private ImageView iLike;
     private ImageView iDislike;
@@ -105,6 +104,9 @@ public class ScandalFragment extends SherlockFragment {
     private TextView tit;
     private TextView user_na;
     private ProgressBar prog_loading_audio;
+    private View v_linea_arriba;
+    private View v_linea_abajo_izq;
+    private View v_linea_abajo_der;
  
     private String id;
     private String user_id;
@@ -256,11 +258,17 @@ public class ScandalFragment extends SherlockFragment {
 	            // Actualizamos el adaptador
 	            MainActivity.updateNumComments(num_comments);
 	            // Actualizamos la vista
-	            num_com.setText(Integer.toString(num_comments));
+	            if (num_comments == 1){
+	            	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentario));
+	            }
+	            else{
+	            	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentarios));
+	            }
 	    	} 
 	    }
 	  }
 
+	
     
     /**
      * Se ejecuta cuando el fragmento cambia su visibilidad
@@ -270,6 +278,10 @@ public class ScandalFragment extends SherlockFragment {
         super.setUserVisibleHint(isVisibleToUser); 
 
         if (isVisibleToUser) {   
+        	
+			// Paramos si hubiera algún audio reproduciéndose
+			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
+			
         	// Si tiene audio 
             if(has_audio){
             	 // Si tiene autoreproducir activado reproducimos el audio          	
@@ -279,10 +291,8 @@ public class ScandalFragment extends SherlockFragment {
                 	if (prog_loading_audio != null){
                 		play_when_viewcreated = false;
                 		reproduciendo = true;
-            			// Paramos si hubiera algún audio reproduciéndose
-            			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
             			// Reproducimos
-                    	new PlayAudioTask().execute(uri_audio);
+            			new PlayAudioTask().execute(uri_audio);
                 	}
                 	// Indicamos que se debe reproducir al cargarse la vista
                 	else{
@@ -290,7 +300,7 @@ public class ScandalFragment extends SherlockFragment {
                 	}
                 }
             }
-        }    
+        } 
     }
    
 
@@ -320,18 +330,20 @@ public class ScandalFragment extends SherlockFragment {
         social_net = (ImageView) rootView.findViewById(R.id.img_lastcomment_socialnetwork);
 		txt_date = (TextView) rootView.findViewById(R.id.txt_comment_date);
         ll_last_comment = (LinearLayout) rootView.findViewById(R.id.ll_escandalo_lastcomment);
-		num_com = (TextView) rootView.findViewById(R.id.txt_lastcomment_num_comments);
+        txt_num_comm = (TextView) rootView.findViewById(R.id.txt_scandal_numcomments);
     	TextView txt_fuente = (TextView) rootView.findViewById(R.id.img_escandalo_fuente);
     	prog_loading_audio = (ProgressBar) rootView.findViewById(R.id.prog_escandalo_loading_audio);
+    	v_linea_arriba = rootView.findViewById(R.id.view_scandal_linea_arriba);
+    	v_linea_abajo_izq = rootView.findViewById(R.id.view_scandal_abajo_izquierda);
+    	v_linea_abajo_der = rootView.findViewById(R.id.view_scandal_abajo_derecha);
     	
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
-        }  
-       
+        }     
         
         // FOTO
         img.setTag(109);
-        img.setImage(this.url);    
+        img.setImage(this.url, R.drawable.cargando);    
         Paint mShadow = new Paint(); 
         mShadow.setShadowLayer(10.0f, 0.0f, 2.0f, 0xFF000000); // radius=10, y-offset=2, color=black 
            
@@ -425,6 +437,11 @@ public class ScandalFragment extends SherlockFragment {
     			}
     		});
         }
+        
+        // Audio
+        else if (media_type == 2){
+        	img.setClickable(false);
+        }
 		
                        
         // AUDIO    
@@ -435,6 +452,7 @@ public class ScandalFragment extends SherlockFragment {
         
         if (play_when_viewcreated){
     		reproduciendo = true;
+    		play_when_viewcreated = false;
 			// Paramos si hubiera algún audio reproduciéndose
 			Audio.getInstance(getActivity().getBaseContext()).releaseResources();
 			// Reproducimos
@@ -686,7 +704,6 @@ public class ScandalFragment extends SherlockFragment {
    			                
    			                // Guardar foto en la galería
    			                else if (opciones_compartir[item].equals(getResources().getString(R.string.guardar_foto_galeria))) {
-   			                	Log.v("WE","url_big: " + url_big);
    			                	new SaveImageTask(getActivity()).execute(url_big);
    			                }
    			            }
@@ -713,8 +730,27 @@ public class ScandalFragment extends SherlockFragment {
         // COMENTARIOS    
         // Último comentario               
         updateLastComment();
- 		// Número de comentarios        
-		num_com.setText(Integer.toString(num_comments));
+ 		// Número de comentarios   
+        if (num_comments == 1){
+        	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentario));
+        }
+        else{
+        	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentarios));
+        }
+        
+        // Color de la categoria
+		if (MainActivity.current_category.equals(MainActivity.HAPPY)){
+			txt_num_comm.setTextColor(getResources().getColor(R.color.morado));
+			v_linea_arriba.setBackgroundColor(getResources().getColor(R.color.morado));
+			v_linea_abajo_izq.setBackgroundColor(getResources().getColor(R.color.morado));
+			v_linea_abajo_der.setBackgroundColor(getResources().getColor(R.color.morado));
+		}
+		else if (MainActivity.current_category.equals(MainActivity.ANGRY)){
+			txt_num_comm.setTextColor(getResources().getColor(R.color.azul));
+			v_linea_arriba.setBackgroundColor(getResources().getColor(R.color.azul));
+			v_linea_abajo_izq.setBackgroundColor(getResources().getColor(R.color.azul));
+			v_linea_abajo_der.setBackgroundColor(getResources().getColor(R.color.azul));
+		}
    
         // Devolvemos la vista
         return rootView;
@@ -968,6 +1004,11 @@ public class ScandalFragment extends SherlockFragment {
 			audio.startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);
 	    	return null;
 	    }	
+		
+		@Override
+		protected void onPostExecute(Integer result) {
+			
+		}
 
 	}
 	
@@ -977,7 +1018,7 @@ public class ScandalFragment extends SherlockFragment {
 	
 
 	// ---------------------------------------------------------------------------------------------
-	// --------------------    MÉTODOS PRIVADOS       ----------------------------------------------
+	// --------------------    MÉTODOS      ----------------------------------------------
 	// ---------------------------------------------------------------------------------------------
 	
 
@@ -1132,6 +1173,5 @@ public class ScandalFragment extends SherlockFragment {
         	}
         }
 	}
-	
    
 }

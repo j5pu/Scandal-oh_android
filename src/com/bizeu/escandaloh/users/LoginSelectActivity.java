@@ -11,6 +11,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -19,13 +20,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,8 +37,10 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.CreateScandalohActivity;
+import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.util.Fuente;
+import com.bizeu.escandaloh.util.Audio;
+import com.bizeu.escandaloh.util.TextureVideoView;
 import com.facebook.FacebookException;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -61,11 +67,15 @@ public class LoginSelectActivity extends SherlockActivity {
 	static final String URL_TWITTER_AUTH = "auth_url";
 	static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
+	public static final String DESDE_COVER = "desde_cover";
 	private String TAG_FACEBOOK = "Facebook Login";
+	
 	
 	private Button but_login_scandaloh;
 	private LoginButton but_login_facebook;
 	private TextView txt_crea_tu_cuenta;
+	private TextureVideoView video_splash;
+	private Button but_login_comienza;
 	
 	private ProgressDialog progress;
 	private Activity acti;
@@ -77,6 +87,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	private String shared;
 	private int sharing_type;
 	private String device_token;
+	private boolean desde_cover = false;
 
 	/**
 	 * onCreate
@@ -85,16 +96,17 @@ public class LoginSelectActivity extends SherlockActivity {
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Pantalla completa
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.login_main);
 		
-		// Si tiene datos, obtenemos si viene de haber compartido desde la galería
+		// Si tiene datos: obtenemos si viene de haber compartido desde la galería
 		if (getIntent().getExtras() != null){
 			shared = getIntent().getExtras().getString("photoUri");
 			sharing_type = getIntent().getExtras().getInt("photo_from");
+			desde_cover = getIntent().getExtras().getBoolean(DESDE_COVER, false);
 		}
-		
-		// Cambiamos la fuente de la pantalla
-		Fuente.cambiaFuente((ViewGroup) findViewById(R.id.lay_pantalla_main_login));
 
 		acti = this;
 		mContext = this;
@@ -104,15 +116,17 @@ public class LoginSelectActivity extends SherlockActivity {
 		progress.setMessage(getResources().getString(R.string.espera_por_favor));
 		progress.setCancelable(false);
 
-		// Ocultamos el action bar
-		getSupportActionBar().hide();
-
 		but_login_scandaloh = (Button) findViewById(R.id.but_log_in_scandaloh);
 		but_login_facebook = (LoginButton) findViewById(R.id.but_log_in_facebook);
+		but_login_comienza = (Button) findViewById(R.id.but_log_in_comienza);
 		txt_crea_tu_cuenta = (TextView) findViewById(R.id.txt_loginmain_register);
+		video_splash = (TextureVideoView) findViewById(R.id.vid_splash);
+			
+		// Si no viene desde la cover ocultamos el botón de "Comienza ya"
+		if (!desde_cover){
+			but_login_comienza.setVisibility(View.GONE);
+		}
 		
-		// Subrayamos el TextView
-		txt_crea_tu_cuenta.setPaintFlags(txt_crea_tu_cuenta.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 		txt_crea_tu_cuenta.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -122,7 +136,19 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 		});
 		
-
+		but_login_comienza.getBackground().setColorFilter(0x88444444, PorterDuff.Mode.MULTIPLY);
+		but_login_comienza.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(LoginSelectActivity.this, MainActivity.class);
+				i.setAction(Intent.ACTION_DEFAULT);
+				startActivity(i);
+				finish();
+			}
+		});
+		
+		but_login_facebook.getBackground().setColorFilter(0x88444444, PorterDuff.Mode.MULTIPLY);
 		but_login_facebook.setOnErrorListener(new OnErrorListener() {
 
 			@Override
@@ -130,9 +156,9 @@ public class LoginSelectActivity extends SherlockActivity {
 				Log.i(TAG_FACEBOOK, "Error " + error.getMessage());
 			}
 		});
-
+		
 		but_login_facebook.setReadPermissions(Arrays.asList("basic_info", "email"));
-		// Callback de cuando cambia el estado de la sesión
+		// Callback para cambia el estado de la sesión
 		but_login_facebook.setSessionStatusCallback(new Session.StatusCallback() {
 
 			@Override
@@ -166,6 +192,12 @@ public class LoginSelectActivity extends SherlockActivity {
 					if (device_token != null){
 						// Si el usuario está logueado 
 						if (MyApplication.logged_user || login_error){
+							// Si venimos desde la pantalla cover llamamos al carrusel
+							if (desde_cover){
+								Intent i = new Intent(LoginSelectActivity.this, MainActivity.class);
+								i.setAction(Intent.ACTION_DEFAULT);	
+								startActivity(i);
+							}
 							finish();
 						}
 					}
@@ -180,6 +212,7 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 		});
 
+		but_login_scandaloh.getBackground().setColorFilter(0x88444444, PorterDuff.Mode.MULTIPLY);
 		but_login_scandaloh.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -190,7 +223,23 @@ public class LoginSelectActivity extends SherlockActivity {
 				acti.startActivityForResult(i, LoginSelectActivity.LOG_IN);
 			}
 		});
-
+		
+		// Mostramos el video de fondo
+		video_splash.setScaleType(TextureVideoView.ScaleType.CENTER_CROP);
+		Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video_splash); //do not add any extension
+		video_splash.setDataSource(mContext, video);
+		video_splash.setLooping(true);
+		video_splash.play();
+		
+		/*
+		MediaPlayer mp = new MediaPlayer();
+		mp = MediaPlayer.create(LoginSelectActivity.this, R.raw.scandaloh);
+		mp.setLooping(true);
+        mp.start();
+        */
+        
+        
+        
 	}
 
 	/**
@@ -223,6 +272,7 @@ public class LoginSelectActivity extends SherlockActivity {
 	 */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		
 		// Si viene de hacer log in o registro
 		if (requestCode == LOG_IN || requestCode == REGISTRATION) {
 			// Y lo ha hecho exitosamente
@@ -233,6 +283,21 @@ public class LoginSelectActivity extends SherlockActivity {
 					in.putExtra("photo_from", sharing_type);
 					in.putExtra("photoUri", shared);
 					startActivity(in);
+				}
+				
+				// No viene de compartir
+				else{
+					// Si venimos desde la pantalla cover iniciamos el carrusel
+					if (desde_cover){
+						Intent in = new Intent(LoginSelectActivity.this, MainActivity.class);
+						in.setAction(Intent.ACTION_DEFAULT);	
+						startActivity(in);
+					}
+					
+					// Si no indicamos que el resultado fue OK
+					else{
+						setResult(RESULT_OK);
+					}
 				}
 				// Cerramos directamente la pantalla
 				finish();
@@ -248,8 +313,7 @@ public class LoginSelectActivity extends SherlockActivity {
 
 
 	/**
-	 * Loguea un usuario a partir de un nombre de usuario (obtenido de facebook,
-	 * twitter o google+)
+	 * Loguea un usuario a partir de un nombre de usuario obtenido de Facebook
 	 * 
 	 */
 	private class LogInSocialNetwork extends AsyncTask<Integer, Integer, Void> {
@@ -354,8 +418,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				// Indicamos que está logueado
 				MyApplication.logged_user = true;
 				Toast.makeText(mContext, R.string.sesion_iniciada_exito,
-						Toast.LENGTH_SHORT).show();
-				
+						Toast.LENGTH_SHORT).show();			
 				editor.commit();
 				
 				// Reiniciamos los escándalos
@@ -368,6 +431,7 @@ public class LoginSelectActivity extends SherlockActivity {
 					in.putExtra("photoUri", shared);
 					startActivity(in);
 				}
+				// No viene de compartir
 				else{
 					// Le indicamos a la anterior actividad que ha habido éxito en el login
 					setResult(Activity.RESULT_OK);
@@ -376,8 +440,7 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 
 			// Ha habido algún error extraño: mostramos el mensaje
-			else {		
-				
+			else {					
 				if (device_token  == null){
 					// Si el device token es nulo es porque no tiene cuenta de Google: mostramos un dialog
 					AlertDialog.Builder alert_accounts = new AlertDialog.Builder(mContext);
