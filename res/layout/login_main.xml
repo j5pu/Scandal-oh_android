@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/img_profile_seguir_siguiendo"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:layout_alignParentTop="true"
@@ -28,7 +28,7 @@
         android:id="@+id/imageView2"
         android:layout_width="250dp"
         android:layout_height="65dp"
-        android:layout_below="@+id/imageView1"
+        android:layout_below="@+id/img_profile_seguir_siguiendo"
         android:layout_centerHorizontal="true"
         android:src="@drawable/scandaloh_splash" />
 
@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/but_log_in_facebook"
-        android:layout_alignLeft="@+id/imageView1"
+        android:layout_alignLeft="@+id/img_profile_seguir_siguiendo"
         android:layout_marginBottom="12dp"
         android:text="@string/comienza_ya" />
 

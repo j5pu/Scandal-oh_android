@@ -277,6 +277,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				super.onDrawerOpened(drawerView);
 			}
 		};
+		
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
 		// Menu Lateral: si no toca una opción que no haga nada

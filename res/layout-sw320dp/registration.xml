@@ -7,29 +7,14 @@
     android:orientation="vertical" >
 
     <EditText
-        android:id="@+id/edit_registro_nombre"
-        style="@style/EditLogin"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="20dp"
-        android:ems="10"
-        android:hint="@string/usuario"
-        android:imeOptions="actionNext"
-        android:inputType="text"
-        android:maxLength="25" />
-
-    <EditText
         android:id="@+id/edit_registro_email"
         style="@style/EditLogin"
-        android:layout_width="300dp"
+        android:layout_width="245dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/edit_registro_nombre"
         android:layout_below="@+id/edit_registro_nombre"
+        android:layout_marginBottom="15dp"
         android:ems="10"
-        android:layout_marginBottom="20dp"
         android:hint="@string/correo_electronico"
         android:imeOptions="actionNext"
         android:inputType="textEmailAddress" >
@@ -38,7 +23,7 @@
     <EditText
         android:id="@+id/edit_registro_password"
         style="@style/EditLogin"
-        android:layout_width="300dp"
+        android:layout_width="245dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/edit_registro_email"
         android:layout_below="@+id/edit_registro_email"
@@ -46,5 +31,23 @@
         android:hint="@string/contrasenia"
         android:imeOptions="actionDone"
         android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/edit_registro_nombre"
+        style="@style/EditLogin"
+        android:layout_width="245dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="50dp"
+        android:ems="10"
+        android:hint="@string/usuario"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLength="25" >
+
+        <requestFocus />
+    </EditText>
 
 </RelativeLayout>

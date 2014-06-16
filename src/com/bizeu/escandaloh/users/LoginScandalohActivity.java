@@ -51,11 +51,9 @@ public class LoginScandalohActivity extends SherlockActivity {
 	private ProgressDialog progress;
 	private ViewGroup pantalla;
 	private ImageView img_aceptar;
-	
 	private String name_error;
 	private String password_error;
 	private int reason_code;
-	private String user_uri;
 	private String reason;
 	private boolean has_name_error;
 	private boolean has_password_error;

@@ -217,9 +217,9 @@
     <string name="nuevos_avisos">nuevos avisos</string>
     <string name="dejar_de_seguir">Dejar de seguir</string>
     <string name="seguir">Seguir</string>
-    <string name="seguidores">Seguidores</string>
-    <string name="siguiendo">Siguiendo</string>
-    <string name="seguidor">Seguidor</string>
+    <string name="seguidores">seguidores</string>
+    <string name="siguiendo">siguiendo</string>
+    <string name="seguidor">seguidor</string>
     <string name="debes_tener_una_cuenta_de_google">Debes tener una cuenta de Google asociada al dispositivo</string>
     <string name="quieres_aniadir_una">¿Quieres añadir una ahora?</string>
     <string name="no_se_ha_encontrado_ningun">No se ha encontrado ningún resultado</string>
@@ -240,5 +240,8 @@
     <string name="entra_con_facebook">Entra con Facebook</string>
     <string name="usuario_o_email">Usuario o email</string>
     <string name="contrasenia">Contraseña</string>
+    <string name="correo_electronico">Correo electrónico</string>
+    <string name="configuracion">Configuración</string>
+    <string name="siguiendo_may">Siguiendo</string>
 
 </resources>

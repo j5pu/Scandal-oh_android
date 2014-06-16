@@ -32,7 +32,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
@@ -46,7 +49,7 @@ public class RegistrationActivity extends SherlockActivity {
 	private EditText edit_nombre_usuario;
 	private EditText edit_password_usuario;
 	private EditText edit_email_usuario;
-	private Button aceptar;
+	private ImageView img_aceptar;
 	
 	private boolean has_name_error;
 	private boolean has_password_error;
@@ -74,15 +77,21 @@ public class RegistrationActivity extends SherlockActivity {
 		
 		mContext = this;
 		
-		// Ocultamos el action bar
-		getSupportActionBar().hide();
+		// Action Bar
+		ActionBar actBar = getSupportActionBar();
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_registro, null);
+		actBar.setCustomView(view);
+		actBar.setHomeButtonEnabled(true);
+		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setIcon(R.drawable.s_mezcla);
 		
 		edit_nombre_usuario = (EditText) findViewById(R.id.edit_registro_nombre);
 		edit_password_usuario = (EditText) findViewById(R.id.edit_registro_password);
 		edit_email_usuario = (EditText) findViewById(R.id.edit_registro_email);
-		aceptar = (Button) findViewById(R.id.but_confirmar_registro);
+		img_aceptar = (ImageView) findViewById(R.id.img_registro_aceptar);
 		
-		aceptar.setOnClickListener(new View.OnClickListener() {
+		img_aceptar.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

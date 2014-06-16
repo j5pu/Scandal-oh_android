@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.AdapterView;
@@ -55,6 +56,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.ScandalActivity;
 import com.bizeu.escandaloh.adapters.HistoryAdapter;
@@ -79,18 +81,22 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	public static final String FOLLOW = "follow";
 	public static final String UNFOLLOW = "unfollow";
 	
-	private ImageViewRounded img_picture;
+	private FetchableImageView img_picture;
 	private TextView txt_username;
-	private Button but_follow_unfollow;
 	private TextView txt_followers;
 	private TextView txt_following;
-	private ImageView img_settings;
-	private LinearLayout ll_num_seguidores;
-	private LinearLayout ll_num_seguidos;
-	private LinearLayout ll_userinfo_data;
-	private LinearLayout ll_userinfo_loading;
+	private ProgressBar prog_userinfo;
+	private ProgressBar prog_history;
+	private LinearLayout ll_seguir_siguiendo;
+	private LinearLayout ll_seguidores;
+	private LinearLayout ll_siguiendo;
+	private TextView txt_seguir_siguiendo;
+	private ImageView img_seguir_siguiendo;
+	private TextView txt_seguidores;
+	private TextView txt_settings;
+
 	
-	private boolean is_me = false; // Nos indica si soy el mismo que el del perfil
+	private boolean is_me = false; // Nos indica si soy el usuario del perfil
 	private Context mContext;
 	private String user_id;
 	private Uri mImageUri;
@@ -102,6 +108,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
     private ViewPager mViewPager;
     HistoryPageAdapter pageAdapter;
     private TabHost mTabHost;
+	private boolean is_following;
 	
 	/**
 	 * OnCreate
@@ -113,37 +120,76 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		
 		mContext = this;
 		
-		// Activamos el logo del menu para el menu lateral
+		// Activamos el logo dell menu para el menu lateral
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_profile, null);
 		actBar.setCustomView(view);
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setIcon(R.drawable.logo_blanco);
+		actBar.setIcon(R.drawable.s_mezcla);
 		actBar.setDisplayShowTitleEnabled(true);
 		actBar.setTitle(getResources().getString(R.string.perfil));
 	
-		img_picture = (ImageViewRounded) findViewById(R.id.img_profile_picture);
+		img_picture = (FetchableImageView) findViewById(R.id.img_profile_picture);
 		txt_username = (TextView) findViewById(R.id.txt_profile_username);
-		but_follow_unfollow = (Button) findViewById(R.id.but_profile_follow_unfollow);
 		txt_followers = (TextView) findViewById(R.id.txt_profile_num_seguidores);
 		txt_following = (TextView) findViewById(R.id.txt_profile_num_siguiendo);
-		img_settings = (ImageView) findViewById(R.id.img_profile_settings);
-		ll_num_seguidores = (LinearLayout) findViewById(R.id.ll_profile_numseguidores);
-		ll_num_seguidos = (LinearLayout) findViewById(R.id.ll_profile_numsiguiendo);
-		ll_userinfo_data = (LinearLayout) findViewById(R.id.ll_profile_userinfo_data);
-		ll_userinfo_loading = (LinearLayout) findViewById(R.id.ll_profile_userinfo_loading);		
+		txt_settings = (TextView) findViewById(R.id.txt_profile_settings);
+		ll_seguir_siguiendo = (LinearLayout) findViewById(R.id.ll_profile_seguir_siguiendo);
+		prog_userinfo = (ProgressBar) findViewById(R.id.prog_profile_userinfo);
+		//prog_history = (ProgressBar) findViewById(R.id.prog_profile_history);
+		txt_seguir_siguiendo = (TextView) findViewById(R.id.txt_profile_seguir_siguiendo);
+		txt_seguidores = (TextView) findViewById(R.id.txt_profile_seguidores);
+		ll_seguidores = (LinearLayout) findViewById(R.id.ll_profile_seguidores);
+		ll_siguiendo = (LinearLayout) findViewById(R.id.ll_profile_siguiendo);
+		img_seguir_siguiendo = (ImageView) findViewById(R.id.img_profile_seguir_siguiendo);
 		
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		
-        // Settings del usuario
-		img_settings.setOnClickListener(new View.OnClickListener() {
+        // Configuración del usuario
+		txt_settings.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(ProfileActivity.this, ProfileSettingsActivity.class);
 				startActivityForResult(i, PROFILE_SETTINGS);	
+			}
+		});
+		
+		ll_seguir_siguiendo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				// Obtenemos el nº de seguidores
+				int num_seguidores = Integer.parseInt(txt_followers.getText().toString());
+			
+				// Si estoy siguiendo a ese usuario lo dejo de seguir
+				if (is_following){
+					is_following = false;
+					showFollowMenu();
+					new FollowUnfollowUserTask(UNFOLLOW).execute();	
+					num_seguidores--;
+				}
+				
+				// Si no, lo empiezo a seguir
+				else{
+					is_following = true;
+					showFollowingMenu();
+					new FollowUnfollowUserTask(FOLLOW).execute();	
+					num_seguidores++;
+				}	
+				
+				// Actualizamos el nº de seguidores
+				txt_followers.setText(Integer.toString(num_seguidores));
+				if (num_seguidores == 1){
+					txt_seguidores.setText(getResources().getString(R.string.seguidor));
+				}
+				
+				else{
+					txt_seguidores.setText(getResources().getString(R.string.seguidores));
+				}
 			}
 		});
 		
@@ -235,10 +281,11 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 					
 					// Si es versión 14+ mostramos animación
 					if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-						zoomImageFromThumb(img_picture);
-						
+						zoomImageFromThumb(img_picture);		
+					} 
+					
 				    // Si no, lo mostramos en otra pantalla
-					} else{
+					else{
 					    Intent i = new Intent(ProfileActivity.this, ProfilePhotoActivity.class);
 					    i.putExtra(ProfilePhotoActivity.AVATAR, avatar);
 					    startActivity(i);
@@ -248,6 +295,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			}
 		});	
 		
+		// Guardar avatar
 		img_picture.setOnLongClickListener(new View.OnLongClickListener() {
 			
 			@Override
@@ -274,7 +322,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 
 		
 		// Mostramos la lista de seguidores
-		ll_num_seguidores.setOnClickListener(new View.OnClickListener() {
+		ll_seguidores.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -289,8 +337,8 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			}
 		});
 		
-		// Mostramos la lista de seguidos
-		ll_num_seguidos.setOnClickListener(new View.OnClickListener() {
+		// Mostramos la lista de siguiendo
+		ll_siguiendo.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -303,8 +351,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 					startActivity(i);	
 				}
 			}
-		});
-		
+		});		
 	}
 	
 	
@@ -352,18 +399,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		// Paramos Flurry
 		FlurryAgent.onEndSession(mContext);
 	}
-	
-	
-	/**
-	 * onDestroy
-	 */
-	/*
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		cancelGetHistorys();
-	}
-	*/
 	
 
 	/**
@@ -414,12 +449,34 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	
 	
 	
+	// ------------------------    METODOS     -------------------------------------------------------------
+	
+	/**
+	 * Muestra en el menú que se está siguiendo al usuario
+	 */
+	private void showFollowingMenu(){
+		txt_seguir_siguiendo.setText(getResources().getString(R.string.siguiendo_may));
+		txt_seguir_siguiendo.setTextColor(getResources().getColor(R.color.verde));
+		img_seguir_siguiendo.setImageResource(R.drawable.tick_verde);
+	}
+	
+	
+	/**
+	 * Muestra en el menú la opción de seguir
+	 */
+	private void showFollowMenu(){
+		txt_seguir_siguiendo.setText(getResources().getString(R.string.seguir));
+		txt_seguir_siguiendo.setTextColor(getResources().getColor(R.color.negro));
+		img_seguir_siguiendo.setImageResource(R.drawable.mas_negro);
+	}
+	
+	
 	/**
 	 * Oculta el loading y muestra la información del usuario (nombre, nº seguidores y siguiendo y botón de seguir)
 	 */
 	private void showUserInfo(){
-		ll_userinfo_loading.setVisibility(View.GONE);
-		ll_userinfo_data.setVisibility(View.VISIBLE);
+		prog_userinfo.setVisibility(View.GONE);
+		//ll_userinfo_data.setVisibility(View.VISIBLE);
 	}
 	
 	
@@ -432,226 +489,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	}
 	
 
-	
-	/**
-	 * Muestra la información del usuario
-	 * 
-	 */
-	private class ShowUserInformation extends AsyncTask<Void, Integer, Integer> {
 
-		String username;
-		String followers_count;
-		String follows_count;
-		boolean is_following;
-
-		@Override
-		protected void onPreExecute() {
-			any_error_user_info= false;	
-			txt_username.setText("");
-		}
-
-		
-		@Override
-		protected Integer doInBackground(Void... params) {
-
-			String url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/" + user_id + "/profile/" ;			
-
-			HttpResponse response = null;
-
-			try {
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet get = new HttpGet(url);
-				get.setHeader("content-type", "application/json");
-				
-				if (MyApplication.logged_user){
-					get.setHeader("session-token", MyApplication.session_token);
-				}
-
-				// Hacemos la petición al servidor
-				response = httpClient.execute(get);
-				String respStr = EntityUtils.toString(response.getEntity());
-				Log.i("WE", respStr);
-
-				// Parseamos el json devuelto
-				JSONObject respJson = new JSONObject(respStr);
-				
-				username = respJson.getString("username");
-				avatar = respJson.getString("avatar");
-				followers_count = respJson.getString("followers_count");
-				follows_count = respJson.getString("follows_count");
-				is_following = respJson.getBoolean("is_following");
-				is_me = respJson.getBoolean("is_me");
-				
-			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error obteniendo información del usuario", ex);
-				// Hubo algún error inesperado
-				any_error_user_info = true;
-			}
-
-			// Si hubo algún error devolvemos 666
-			if (any_error_user_info) {
-				return 666;
-			} else {
-				// Devolvemos el código resultado
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			showUserInfo();
-			
-			// Si hubo algún error inesperado mostramos un mensaje
-			if (result == 666) {
-				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-			
-			// No hubo error: mostramos el avatar, nombre de usuario, seguidores y si le está siguiendo
-			else{
-				if (is_me){
-					img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_mas);
-				}
-				else{
-					img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar, R.drawable.avatar_defecto);
-				}
-				txt_username.setText(username);
-				if (followers_count.equals("1")){
-					txt_followers.setText(followers_count + " " + getResources().getString(R.string.seguidor));
-				}
-				else{
-					txt_followers.setText(followers_count + " " + getResources().getString(R.string.seguidores));
-
-				}
-				txt_following.setText(follows_count + " " + getResources().getString(R.string.siguiendo));
-				
-				if (is_following){
-					but_follow_unfollow.setText(getResources().getString(R.string.dejar_de_seguir));
-					but_follow_unfollow.setOnClickListener(new View.OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							new FollowUnfollowUserTask(UNFOLLOW).execute();	
-						}
-					});
-				}
-				
-				else{
-					but_follow_unfollow.setText(getResources().getString(R.string.seguir));
-					but_follow_unfollow.setOnClickListener(new View.OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							new FollowUnfollowUserTask(FOLLOW).execute();		
-						}
-					});
-				}
-				
-				// Si soy el del perfil o no soy usuario logueado ocultamos el botón de seguir
-				if (is_me || !MyApplication.logged_user){
-					but_follow_unfollow.setVisibility(View.GONE);
-				}
-				
-				// Si no soy el usuario del perfil, ocultamos todas las opciones de feedback y ajustes de cuenta
-				if (!is_me && !username.equals(MyApplication.user_name)){
-					img_settings.setVisibility(View.GONE);
-				}
-			}
-		}
-	}
-	
-	
-	/**
-	 * Sigue/Deja de seguir a un usuario
-	 * 
-	 */
-	private class FollowUnfollowUserTask extends AsyncTask<Void, Integer, Integer> {
-
-		String status;
-		private String follow_unfollow;
-
-		public FollowUnfollowUserTask(String follow_unfollow){
-			this.follow_unfollow = follow_unfollow;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			any_error_follow= false;
-		}
-
-		
-		@Override
-		protected Integer doInBackground(Void... params) {
-
-			String url = null;
-
-			if (follow_unfollow.equals(FOLLOW)){
-				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/follow/" ;		
-			}
-			
-			else{
-				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/unfollow/" ;
-			}	
-		
-			HttpResponse response = null;
-
-			try {
-	            HttpClient httpClient = new DefaultHttpClient();
-	            HttpPost post = new HttpPost(url);
-	            post.setHeader("Content-Type", "application/json");
-	            post.setHeader("Session-Token", MyApplication.session_token);
-	            
-	             JSONObject dato = new JSONObject();	                        
-	             dato.put("user_id", user_id);
-	             
-	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
-	             post.setEntity(entity);
-
-				// Hacemos la petición al servidor
-				response = httpClient.execute(post);
-				String respStr = EntityUtils.toString(response.getEntity());
-				Log.i("WE", respStr);
-
-				// Parseamos el json devuelto
-				JSONObject respJson = new JSONObject(respStr);
-				
-				status = respJson.getString("status");
-				
-				if (status.equals("error")){
-					any_error_follow = true;
-				}
-							
-			} catch (Exception ex) {
-				Log.e("ServicioRest", "Error siguiendo/dejando de seguir a un usuario", ex);
-				// Hubo algún error inesperado
-				any_error_follow = true;
-			}
-
-			// Si hubo algún error devolvemos 666
-			if (any_error_follow) {
-				return 666;
-			} else {
-				// Devolvemos el código resultado
-				return (response.getStatusLine().getStatusCode());
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-
-			// Si hubo algún error inesperado mostramos un mensaje
-			if (result == 666) {
-				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-			
-			// No hubo error: mostramos el avatar, nombre de usuario, seguidores y si le está siguiendo
-			else{
-				new ShowUserInformation().execute();
-			}
-		}
-	}
 	
 	
 	/**
@@ -728,7 +566,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	    // bounds, since that's the origin for the positioning animation
 	    // properties (X, Y).
 	    thumbView.getGlobalVisibleRect(startBounds);
-	    findViewById(R.id.ll_profile_screen).getGlobalVisibleRect(finalBounds, globalOffset);
+	    findViewById(R.id.rl_profile_screen).getGlobalVisibleRect(finalBounds, globalOffset);
 	    startBounds.offset(-globalOffset.x, -globalOffset.y);
 	    finalBounds.offset(-globalOffset.x, -globalOffset.y);
 
@@ -862,6 +700,252 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			}
 		});
 	}
+
+	
+	
+	
+	
+	// --------------------- LISTENERS VIEWPAGER Y TABS ------------------------------
+	
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+    }
+
+    @Override
+    public void onPageScrolled(int arg0, float arg1, int arg2) {
+        int pos = this.mViewPager.getCurrentItem();
+        this.mTabHost.setCurrentTab(pos);
+    }
+
+    @Override
+        public void onPageSelected(int arg0) {
+    }
+
+	@Override
+	public void onTabChanged(String tag) {
+		int pos = this.mTabHost.getCurrentTab();
+        this.mViewPager.setCurrentItem(pos);	
+	}
+	
+	// --------------------------------------------------------------------------------
+	
+	
+	
+
+	/**
+	 * Muestra la información del usuario
+	 * 
+	 */
+	private class ShowUserInformation extends AsyncTask<Void, Integer, Integer> {
+
+		String username;
+		String followers_count;
+		String follows_count;
+
+		@Override
+		protected void onPreExecute() {
+			any_error_user_info= false;	
+			txt_username.setText("");
+		}
+
+		
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			String url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/" + user_id + "/profile/" ;			
+
+			HttpResponse response = null;
+
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet get = new HttpGet(url);
+				get.setHeader("content-type", "application/json");
+				
+				if (MyApplication.logged_user){
+					get.setHeader("session-token", MyApplication.session_token);
+				}
+
+				// Hacemos la petición al servidor
+				response = httpClient.execute(get);
+				String respStr = EntityUtils.toString(response.getEntity());
+				Log.i("WE", respStr);
+
+				// Parseamos el json devuelto
+				JSONObject respJson = new JSONObject(respStr);
+				
+				username = respJson.getString("username");
+				avatar = respJson.getString("avatar");
+				followers_count = respJson.getString("followers_count");
+				follows_count = respJson.getString("follows_count");
+				is_following = respJson.getBoolean("is_following");
+				is_me = respJson.getBoolean("is_me");
+				
+			} catch (Exception ex) {
+				Log.e("ServicioRest", "Error obteniendo información del usuario", ex);
+				// Hubo algún error inesperado
+				any_error_user_info = true;
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error_user_info) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			showUserInfo();
+			
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+			
+			// No hubo error
+			else{		
+				// Mostramos avatar, nombre de usuario y nº seguidores
+				txt_username.setText(username);		
+				img_picture.setImage(MyApplication.DIRECCION_BUCKET + avatar);
+				txt_following.setText(follows_count);
+				txt_followers.setText(followers_count);
+				if (followers_count.equals("1")){
+					txt_seguidores.setText(getResources().getString(R.string.seguidor));
+				}			
+				else{
+					txt_seguidores.setText(getResources().getString(R.string.seguidores));
+				}
+
+				
+				// Estoy logueado
+				if (MyApplication.logged_user){
+					
+					// Soy el usuario del perfil
+					if (is_me){					
+						// Mostramos opción de configuracion y ocultamos seguir/siguiendo
+						txt_settings.setVisibility(View.VISIBLE);
+						ll_seguir_siguiendo.setVisibility(View.GONE);
+					}
+					
+					// No soy usuario del perfil
+					else{				
+						// Si estoy siguiendo a ese perfil mostramos "Siguiendo"
+						if (is_following){
+							showFollowingMenu();
+						}
+						
+						// Si no, mostramos "Seguir"
+						else{
+							showFollowMenu();
+						}
+						
+						// Mostramos seguir/siguiendo y ocultamos opción de configuración
+						txt_settings.setVisibility(View.GONE);
+						ll_seguir_siguiendo.setVisibility(View.VISIBLE);
+					}
+				}
+				
+				// Soy anónimo
+				else{
+					// Ocultamos opciones de configuración y seguir/siguiendo
+					txt_settings.setVisibility(View.GONE);
+					ll_seguir_siguiendo.setVisibility(View.GONE);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Sigue/Deja de seguir a un usuario
+	 * 
+	 */
+	private class FollowUnfollowUserTask extends AsyncTask<Void, Integer, Integer> {
+
+		String status;
+		private String follow_unfollow;
+
+		public FollowUnfollowUserTask(String follow_unfollow){
+			this.follow_unfollow = follow_unfollow;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			any_error_follow= false;
+		}
+
+		
+		@Override
+		protected Integer doInBackground(Void... params) {
+
+			String url = null;
+
+			if (follow_unfollow.equals(FOLLOW)){
+				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/follow/" ;		
+			}
+			
+			else{
+				url =  MyApplication.SERVER_ADDRESS + "/api/v1/user/unfollow/" ;
+			}	
+		
+			HttpResponse response = null;
+
+			try {
+	            HttpClient httpClient = new DefaultHttpClient();
+	            HttpPost post = new HttpPost(url);
+	            post.setHeader("Content-Type", "application/json");
+	            post.setHeader("Session-Token", MyApplication.session_token);
+	            
+	             JSONObject dato = new JSONObject();	                        
+	             dato.put("user_id", user_id);
+	             
+	             StringEntity entity = new StringEntity(dato.toString(), HTTP.UTF_8);
+	             post.setEntity(entity);
+
+				// Hacemos la petición al servidor
+				response = httpClient.execute(post);
+				String respStr = EntityUtils.toString(response.getEntity());
+				Log.i("WE", respStr);
+
+				// Parseamos el json devuelto
+				JSONObject respJson = new JSONObject(respStr);
+				
+				status = respJson.getString("status");
+				
+				if (status.equals("error")){
+					any_error_follow = true;
+				}
+							
+			} catch (Exception ex) {
+				Log.e("ServicioRest", "Error siguiendo/dejando de seguir a un usuario", ex);
+				// Hubo algún error inesperado
+				any_error_follow = true;
+			}
+
+			// Si hubo algún error devolvemos 666
+			if (any_error_follow) {
+				return 666;
+			} else {
+				// Devolvemos el código resultado
+				return (response.getStatusLine().getStatusCode());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+
+			// Si hubo algún error inesperado mostramos un mensaje
+			if (result == 666) {
+				Toast toast = Toast.makeText(mContext,R.string.lo_sentimos_hubo, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		}
+	}
+	
 	
 	
 	/**
@@ -929,30 +1013,5 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	        }
 	    }
 	}
-	
-	
-	// --------------------- LISTENERS VIEWPAGER Y TABS ------------------------------
-	
-    @Override
-    public void onPageScrollStateChanged(int arg0) {
-    }
-
-    @Override
-    public void onPageScrolled(int arg0, float arg1, int arg2) {
-        int pos = this.mViewPager.getCurrentItem();
-        this.mTabHost.setCurrentTab(pos);
-    }
-
-    @Override
-        public void onPageSelected(int arg0) {
-    }
-
-	@Override
-	public void onTabChanged(String tag) {
-		int pos = this.mTabHost.getCurrentTab();
-        this.mViewPager.setCurrentItem(pos);	
-	}
-	
-	// --------------------------------------------------------------------------------
 	
 }
