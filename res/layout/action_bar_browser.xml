@@ -3,65 +3,54 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill_horizontal"
-    android:background="@color/azul_verdoso" >
+    android:background="@color/blanco" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ll_browser_action_bar"
         android:layout_width="match_parent"
         android:layout_height="62dp"
-        android:gravity="center_vertical"
         android:orientation="horizontal" >
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="2"
-            android:gravity="center_vertical|center_horizontal" >
+        <ImageView
+            android:id="@+id/img_browser_compartir"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="18dp"
+            android:src="@drawable/compartir_negro" />
 
-            <ImageView
-                android:id="@+id/img_browser_back"
-                android:layout_width="28dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/flecha_back"
-                android:layout_marginRight="10dp" />
+        <ImageView
+            android:id="@+id/img_browser_cancel"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_alignBottom="@+id/img_browser_compartir"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="18dp"
+            android:layout_toLeftOf="@+id/img_browser_compartir"
+            android:src="@drawable/recargar_negro" />
 
-            <ImageView
-                android:id="@+id/img_browser_forward"
-                android:layout_width="28dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/flecha_forward" />
+        <ImageView
+            android:id="@+id/img_browser_forward"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_alignBottom="@+id/img_browser_cancel"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="24dp"
+            android:layout_toLeftOf="@+id/img_browser_cancel"
+            android:src="@drawable/flecha_adelante_gris" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3" >
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:gravity="center_vertical|center_horizontal" >
-
-            <ImageView
-                android:id="@+id/img_actionbarsearch_cancel"
-                android:layout_width="28dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/cancel_blanco"
-                android:layout_marginRight="10dp" />
-
-            <ImageView
-                android:id="@+id/img_login_scandaloh_aceptar"
-                android:layout_width="28dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/share_blanco" />
-
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/img_browser_backk"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_alignBottom="@+id/img_browser_forward"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/img_browser_forward"
+            android:src="@drawable/flecha_atras_gris" />
         
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

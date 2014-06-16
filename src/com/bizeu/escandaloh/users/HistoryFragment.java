@@ -42,9 +42,9 @@ import android.widget.Toast;
 
 public class HistoryFragment extends Fragment {
 
-	public static final String ESCANDALOS = "escandalos";
-	public static final String COMENTARIOS = "comentarios";
-	public static final String LIKES = "likes";
+	public static final String ESCANDALOS = "subidos";
+	public static final String COMENTARIOS = "comentados";
+	public static final String LIKES = "valorados";
 	
 	private ListView list_historys;
 	private static View mView;
@@ -132,7 +132,6 @@ public class HistoryFragment extends Fragment {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialogo1, int id) {
 									History historyAux = ((History) list_historys.getItemAtPosition(pos));
-									Log.v("WE","Voy a borrarlo: " + historyAux.getId());
 									new DeleteScandalTask(historyAux.getId()).execute();
 								}
 							});
@@ -275,12 +274,17 @@ public class HistoryFragment extends Fragment {
 					final String photo_id = historyObject.getString("photo_id");
 					final String photo_img = historyObject.getString("photo_img");
 					final String text = new String(historyObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-
+					final String num_comments = historyObject.getString("num_comments");
+					final String likes = historyObject.getString("likes");
+					final String dislikes = historyObject.getString("dislikes");
+					final String username = historyObject.getString("username");
+					final String category = historyObject.getString("category");
+					
 					acti.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {							
 							// Añadimos el history al ArrayList
-							History history_aux = new History(photo_id, photo_img, action, date, text);
+							History history_aux = new History(photo_id, photo_img, action, date, text, num_comments, likes, dislikes, username, category);
 							array_history.add(history_aux);
 						}
 					});		

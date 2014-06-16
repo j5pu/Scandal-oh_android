@@ -243,5 +243,8 @@
     <string name="correo_electronico">Correo electrónico</string>
     <string name="configuracion">Configuración</string>
     <string name="siguiendo_may">Siguiendo</string>
+    <string name="subidos">subidos</string>
+    <string name="valorados">valorados</string>
+    <string name="comentados">comentados</string>
 
 </resources>

@@ -35,7 +35,7 @@
         android:src="@drawable/s_splash" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/img_browser_forward"
         android:layout_width="230dp"
         android:layout_height="65dp"
         android:layout_below="@+id/img_profile_seguir_siguiendo"

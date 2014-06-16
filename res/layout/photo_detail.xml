@@ -5,7 +5,7 @@
     android:background="@color/negro"
     android:orientation="vertical" >
 
-    <it.sephiroth.android.library.imagezoom.ImageViewTouch
+    <ImageView
         android:id="@+id/img_photo_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />

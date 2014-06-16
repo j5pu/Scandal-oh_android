@@ -2,10 +2,8 @@ package com.bizeu.escandaloh.users;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -14,7 +12,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -32,7 +29,6 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -40,37 +36,32 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.ScandalActivity;
-import com.bizeu.escandaloh.adapters.HistoryAdapter;
 import com.bizeu.escandaloh.adapters.HistoryPageAdapter;
-import com.bizeu.escandaloh.model.History;
-import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class ProfileActivity extends SherlockFragmentActivity implements OnTabChangeListener, OnPageChangeListener{
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	public static final int AVATAR_FROM_CAMERA = 15;
 	public static final int AVATAR_FROM_GALLERY = 14;
 	public static final int CROP_PICTURE = 16;
@@ -86,7 +77,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	private TextView txt_followers;
 	private TextView txt_following;
 	private ProgressBar prog_userinfo;
-	private ProgressBar prog_history;
 	private LinearLayout ll_seguir_siguiendo;
 	private LinearLayout ll_seguidores;
 	private LinearLayout ll_siguiendo;
@@ -94,8 +84,9 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	private ImageView img_seguir_siguiendo;
 	private TextView txt_seguidores;
 	private TextView txt_settings;
+	private ImageView img_editar_avatar;
+	private View view_pantalla_negra;
 
-	
 	private boolean is_me = false; // Nos indica si soy el usuario del perfil
 	private Context mContext;
 	private String user_id;
@@ -109,6 +100,12 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
     HistoryPageAdapter pageAdapter;
     private TabHost mTabHost;
 	private boolean is_following;
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
 	
 	/**
 	 * OnCreate
@@ -138,12 +135,13 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		txt_settings = (TextView) findViewById(R.id.txt_profile_settings);
 		ll_seguir_siguiendo = (LinearLayout) findViewById(R.id.ll_profile_seguir_siguiendo);
 		prog_userinfo = (ProgressBar) findViewById(R.id.prog_profile_userinfo);
-		//prog_history = (ProgressBar) findViewById(R.id.prog_profile_history);
 		txt_seguir_siguiendo = (TextView) findViewById(R.id.txt_profile_seguir_siguiendo);
 		txt_seguidores = (TextView) findViewById(R.id.txt_profile_seguidores);
 		ll_seguidores = (LinearLayout) findViewById(R.id.ll_profile_seguidores);
 		ll_siguiendo = (LinearLayout) findViewById(R.id.ll_profile_siguiendo);
 		img_seguir_siguiendo = (ImageView) findViewById(R.id.img_profile_seguir_siguiendo);
+		view_pantalla_negra = (View) findViewById(R.id.view_profile_pantalla_negra);
+		img_editar_avatar = (ImageView) findViewById(R.id.img_profile_editar);
 		
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		
@@ -157,6 +155,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			}
 		});
 		
+		// Seguir/dejar de seguir usuario
 		ll_seguir_siguiendo.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -205,95 +204,96 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
         mViewPager.setAdapter(pageAdapter);
         mViewPager.setOnPageChangeListener(this);
 		
-		// Cambiar avatar
+		// Mostrar avatar en pantalla completa
 		img_picture.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				
-				if (is_me){
-					// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
-					final CharSequence[] items = {
-						getResources().getString(R.string.hacer_foto_con_camara),
-						getResources().getString(R.string.seleccionar_foto_galeria) };
-					AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
-					builder.setTitle(R.string.avatar);
-					builder.setItems(items, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int item) {
-
-							// Cámara
-							if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
-
-								// Comprobamos disponibilidad de la cámara
-								if (Utils.checkCameraHardware(mContext)) {
-									
-									// Comprobamos disponibilidad del almacenamiento externo
-									if (Utils.isExternalStorageWritable(mContext)){
-										
-										Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-										
-										// Nos aseguramos que hay una actividad para la cámara
-									    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-									    	
-									        File photoFile = null;
-									        photoFile = Utils.createProfilePhotoScandalOh(mContext);
-			        						       
-									        if (photoFile != null) {
-									        	mImageUri = Uri.fromFile(photoFile);
-									            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-									            startActivityForResult(takePictureIntent, AVATAR_FROM_CAMERA);
-									        }
-									    }
-									}
-									
-									// Almacenamiento externo no disponible
-									else{
-										Toast toast = Toast.makeText(mContext,R.string.no_se_puede_acceder_al_sistema_de_archivos,Toast.LENGTH_LONG);
-										toast.show();
-									}											
-								}
-
-								// Cámara no disponible
-								else {
-									Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,Toast.LENGTH_LONG);
-									toast.show();
-								}															
-							}
-
-							// Galería
-							else if (items[item].equals(getResources().getString(
-									R.string.seleccionar_foto_galeria))) {
-
-								Intent i = new Intent(
-										Intent.ACTION_PICK,
-										android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-								startActivityForResult(i, AVATAR_FROM_GALLERY);
-							}
-						}
-					});
-					builder.show();	
-				}
+				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 				
-				// !is_me: mostramos el avatar del usuario
+				// Si es versión 14+ mostramos animación
+				if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+					zoomImageFromThumb(img_picture);		
+				} 
+				
+			    // Si no, lo mostramos en otra pantalla
 				else{
-					int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-					
-					// Si es versión 14+ mostramos animación
-					if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-						zoomImageFromThumb(img_picture);		
-					} 
-					
-				    // Si no, lo mostramos en otra pantalla
-					else{
-					    Intent i = new Intent(ProfileActivity.this, ProfilePhotoActivity.class);
-					    i.putExtra(ProfilePhotoActivity.AVATAR, avatar);
-					    startActivity(i);
-					}
-
-				}
+				    Intent i = new Intent(ProfileActivity.this, ProfilePhotoActivity.class);
+				    i.putExtra(ProfilePhotoActivity.AVATAR, avatar);
+				    startActivity(i);
+				}		
 			}
 		});	
+		
+		// Editar avatar
+		img_editar_avatar.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Creamos un popup para elegir entre hacer foto con la cámara o cogerla de la galería
+				final CharSequence[] items = {
+					getResources().getString(R.string.hacer_foto_con_camara),
+					getResources().getString(R.string.seleccionar_foto_galeria) };
+				AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+				builder.setTitle(R.string.avatar);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int item) {
+
+						// Cámara
+						if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
+
+							// Comprobamos disponibilidad de la cámara
+							if (Utils.checkCameraHardware(mContext)) {
+								
+								// Comprobamos disponibilidad del almacenamiento externo
+								if (Utils.isExternalStorageWritable(mContext)){
+									
+									Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+									
+									// Nos aseguramos que hay una actividad para la cámara
+								    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+								    	
+								        File photoFile = null;
+								        photoFile = Utils.createProfilePhotoScandalOh(mContext);
+		        						       
+								        if (photoFile != null) {
+								        	mImageUri = Uri.fromFile(photoFile);
+								            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+								            startActivityForResult(takePictureIntent, AVATAR_FROM_CAMERA);
+								        }
+								    }
+								}
+								
+								// Almacenamiento externo no disponible
+								else{
+									Toast toast = Toast.makeText(mContext,R.string.no_se_puede_acceder_al_sistema_de_archivos,Toast.LENGTH_LONG);
+									toast.show();
+								}											
+							}
+
+							// Cámara no disponible
+							else {
+								Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,Toast.LENGTH_LONG);
+								toast.show();
+							}															
+						}
+
+						// Galería
+						else if (items[item].equals(getResources().getString(
+								R.string.seleccionar_foto_galeria))) {
+
+							Intent i = new Intent(
+									Intent.ACTION_PICK,
+									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+							startActivityForResult(i, AVATAR_FROM_GALLERY);
+						}
+					}
+				});
+				builder.show();			
+			}
+		});
 		
 		// Guardar avatar
 		img_picture.setOnLongClickListener(new View.OnLongClickListener() {
@@ -319,7 +319,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			}
 		});
 		
-
 		
 		// Mostramos la lista de seguidores
 		ll_seguidores.setOnClickListener(new View.OnClickListener() {
@@ -351,7 +350,20 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 					startActivity(i);	
 				}
 			}
-		});		
+		});	
+		
+		
+		// Cambiamos el color de los tabs
+		TabHost host = (TabHost) findViewById(R.id.tabhost_profile);
+		TabWidget widget = host.getTabWidget();
+		for(int i = 0; i < widget.getChildCount(); i++) {
+		    View v = widget.getChildAt(i);
+		    TextView tv = (TextView)v.findViewById(android.R.id.title);
+		    if(tv == null) {
+		        continue;
+		    }
+		    v.setBackgroundResource(R.drawable.apptheme_tab_indicator_holo);
+		}
 	}
 	
 	
@@ -376,6 +388,18 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	
 	
 	/**
+	 * onStop
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		// Paramos Flurry
+		FlurryAgent.onEndSession(mContext);
+	}
+	
+	
+	
+	/**
 	 * onOptionsItemSelected
 	 */
 	@Override
@@ -390,17 +414,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	
 	
 	
-	/**
-	 * onStop
-	 */
-	@Override
-	public void onStop() {
-		super.onStop();
-		// Paramos Flurry
-		FlurryAgent.onEndSession(mContext);
-	}
-	
-
 	/**
 	 * onActivityResult
 	 */
@@ -449,7 +462,10 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	
 	
 	
-	// ------------------------    METODOS     -------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+	
 	
 	/**
 	 * Muestra en el menú que se está siguiendo al usuario
@@ -488,9 +504,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		return mTabHost.getCurrentTab();
 	}
 	
-
-
-	
 	
 	/**
 	 * Añade los tabs de Mi Actividad
@@ -505,7 +518,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
     
 	
     /**
-     * Devuelve los fragmentos correspondientes a Mi Actividad
+     * Devuelve los fragmentos correspondientes a "Mi Actividad"
      * @return
      */
     private List<Fragment> getFragments(){
@@ -521,16 +534,17 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
         return fList;
     }
 
+    
     /**
      * Inicializa los tabs
      */
     private void initialiseTabHost() {
-        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+        mTabHost = (TabHost) findViewById(R.id.tabhost_profile);
         mTabHost.setup();
 
-        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.escandalos)).setIndicator(getResources().getString(R.string.escandalos)));
-        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.comentarios)).setIndicator(getResources().getString(R.string.comentarios)));
-        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.likes)).setIndicator(getResources().getString(R.string.likes)));
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.subidos)).setIndicator(getResources().getString(R.string.subidos)));
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.comentados)).setIndicator(getResources().getString(R.string.comentados)));
+        ProfileActivity.AddTab(this, this.mTabHost, this.mTabHost.newTabSpec(getResources().getString(R.string.valorados)).setIndicator(getResources().getString(R.string.valorados)));
 
         mTabHost.setOnTabChangedListener(this);
     }
@@ -595,6 +609,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	    // begins, it will position the zoomed-in view in the place of the
 	    // thumbnail.
 	    thumbView.setAlpha(0f);
+	    view_pantalla_negra.setVisibility(View.VISIBLE);
 	    expandedImageView.setVisibility(View.VISIBLE);
 
 	    // Set the pivot point for SCALE_X and SCALE_Y transformations
@@ -661,6 +676,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	                @Override
 	                public void onAnimationEnd(Animator animation) {
 	                    thumbView.setAlpha(1f);
+	                    view_pantalla_negra.setVisibility(View.GONE);
 	                    expandedImageView.setVisibility(View.GONE);
 	                    mCurrentAnimator = null;
 	                }
@@ -705,7 +721,10 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	
 	
 	
-	// --------------------- LISTENERS VIEWPAGER Y TABS ------------------------------
+	// -----------------------------------------------------------------------------------------------------
+	// |                           OnTabChangeListener, OnPageChangeListener                               |                           |
+	// -----------------------------------------------------------------------------------------------------
+	
 	
     @Override
     public void onPageScrollStateChanged(int arg0) {
@@ -727,9 +746,14 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
         this.mViewPager.setCurrentItem(pos);	
 	}
 	
-	// --------------------------------------------------------------------------------
+
 	
 	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
 	
 
 	/**
@@ -747,7 +771,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 			any_error_user_info= false;	
 			txt_username.setText("");
 		}
-
 		
 		@Override
 		protected Integer doInBackground(Void... params) {
@@ -819,7 +842,6 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 				else{
 					txt_seguidores.setText(getResources().getString(R.string.seguidores));
 				}
-
 				
 				// Estoy logueado
 				if (MyApplication.logged_user){
@@ -829,6 +851,8 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 						// Mostramos opción de configuracion y ocultamos seguir/siguiendo
 						txt_settings.setVisibility(View.VISIBLE);
 						ll_seguir_siguiendo.setVisibility(View.GONE);
+						// Mostramos botón para editar el avatar
+						img_editar_avatar.setVisibility(View.VISIBLE);
 					}
 					
 					// No soy usuario del perfil

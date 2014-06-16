@@ -11,7 +11,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -21,8 +20,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -33,13 +30,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.CreateScandalohActivity;
 import com.bizeu.escandaloh.MainActivity;
 import com.bizeu.escandaloh.MyApplication;
-import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.TextureVideoView;
 import com.facebook.FacebookException;
 import com.facebook.Request;
@@ -55,6 +50,11 @@ import com.parse.ParseInstallation;
 
 public class LoginSelectActivity extends SherlockActivity {
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	public static int LOG_IN = 1;
 	public static int REGISTRATION = 2;
 	public static int LOG_FACEBOOK = 3;
@@ -69,7 +69,6 @@ public class LoginSelectActivity extends SherlockActivity {
 	static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
 	public static final String DESDE_COVER = "desde_cover";
 	private String TAG_FACEBOOK = "Facebook Login";
-	
 	
 	private Button but_login_scandaloh;
 	private LoginButton but_login_facebook;
@@ -89,6 +88,12 @@ public class LoginSelectActivity extends SherlockActivity {
 	private String device_token;
 	private boolean desde_cover = false;
 
+
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
+	
 	/**
 	 * onCreate
 	 */
@@ -206,9 +211,7 @@ public class LoginSelectActivity extends SherlockActivity {
 					if (progress.isShowing()) {
 						progress.dismiss();
 					}
-
 				}
-
 			}
 		});
 
@@ -225,11 +228,13 @@ public class LoginSelectActivity extends SherlockActivity {
 		});
 		
 		// Mostramos el video de fondo
+		/*
 		video_splash.setScaleType(TextureVideoView.ScaleType.CENTER_CROP);
 		Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video_splash); //do not add any extension
 		video_splash.setDataSource(mContext, video);
 		video_splash.setLooping(true);
 		video_splash.play();
+		*/
 		
 		/*
 		MediaPlayer mp = new MediaPlayer();
@@ -311,6 +316,12 @@ public class LoginSelectActivity extends SherlockActivity {
 
 
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
 
 	/**
 	 * Loguea un usuario a partir de un nombre de usuario obtenido de Facebook

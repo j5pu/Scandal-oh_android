@@ -19,5 +19,10 @@
         <item name="android:background">@drawable/apptheme_edit_text_holo_light</item>
         <item name="android:ems">10</item>
     </style>
+    
+        <style name="TextoPerfilSeguidores">
+        <item name="android:textColor">@color/blanco</item>
+        <item name="android:textSize">24sp</item>
+    </style>
 
 </resources>

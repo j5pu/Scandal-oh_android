@@ -65,6 +65,11 @@ public class LoginScandalohActivity extends SherlockActivity {
 	
 	
 	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	/**
 	 * onCreate
 	 */
@@ -91,7 +96,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 		edit_nombre_email = (EditText) findViewById(R.id.edit_login_nombre_email);
 		edit_password = (EditText) findViewById(R.id.edit_login_pasword);
 		txt_recordar_contrasenia = (TextView) findViewById(R.id.txt_recordar_contrasenia);
-		img_aceptar = (ImageView) findViewById(R.id.img_login_scandaloh_aceptar);
+		img_aceptar = (ImageView) findViewById(R.id.img_browser_compartir);
 		
 		img_aceptar.setOnClickListener(new View.OnClickListener() {
 			
@@ -100,7 +105,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 				
 				if (Connectivity.isOnline(mContext)){
 					
-					if (checkFields()){
+					if (camposCorrectos()){
 						
 						// Pedimos login si tenemos device token
 						if (ParseInstallation.getCurrentInstallation().getString("deviceToken") != null){
@@ -201,6 +206,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 		progress = new ProgressDialog(this);
 	}
 	
+	
 
 	/**
 	 * onStart
@@ -224,11 +230,66 @@ public class LoginScandalohActivity extends SherlockActivity {
 		FlurryAgent.onEndSession(mContext);
 	}
 	  
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Comprueba si todos los campos son correctos
+	 * @return True si todos los campos son correctos. False si alguno no lo es.
+	 */
+	private boolean camposCorrectos(){
+		boolean all_correct = true ;
+		
+		edit_nombre_email.setError(null);
+		edit_password.setError(null);
+		
+		// Nombre/Email menos de 4 caracteres
+		if (edit_nombre_email.getText().toString().length() < 4){
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_debe_tener_4_caracteres));
+			all_correct = false;
+		}
+		
+		// Nombre/Email con espacio en blanco
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
+		if (m.find()){
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_no_permite_espacios));
+			all_correct = false;
+		}
+		
+		// Nombre/Email vacío
+		if (edit_nombre_email.getText().toString().length() == 0){
+			edit_nombre_email.setError(getResources().getString(R.string.este_campo_es_obligatorio));
+			all_correct = false;
+		}
 
+		// Password vacío
+		if (edit_password.getText().toString().length() == 0){
+			edit_password.setError(getResources().getString(R.string.este_campo_es_obligatorio));
+			all_correct = false;
+		}
+		// Password menos de 4 caracteres
+		if (edit_password.getText().toString().length() < 6){
+			edit_password.setError(getResources().getString(R.string.este_campo_debe_tener_6));
+			all_correct = false;
+		}
+
+		return all_correct;
+	}
+	
+
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
 	
 	/**
 	 * Loguea un usuario
-	 * @author Alejandro
 	 *
 	 */
 	private class LogInUser extends AsyncTask<Void,Integer,Void> {
@@ -409,52 +470,5 @@ public class LoginScandalohActivity extends SherlockActivity {
 	}
 	
 	
-	
-	// ---------------------------------------------------------------------------------------------------------
-	// ----------------------             MÉTODOS PRIVADOS             -----------------------------------------
-	// ---------------------------------------------------------------------------------------------------------
-	
-	/**
-	 * Comprueba si todos los campos son correctos
-	 * @return True si todos los campos son correctos. False si alguno no lo es.
-	 */
-	private boolean checkFields(){
-		boolean all_correct = true ;
-		
-		edit_nombre_email.setError(null);
-		edit_password.setError(null);
-		
-		// Nombre/Email menos de 4 caracteres
-		if (edit_nombre_email.getText().toString().length() < 4){
-			edit_nombre_email.setError(getResources().getString(R.string.este_campo_debe_tener_4_caracteres));
-			all_correct = false;
-		}
-		
-		// Nombre/Email con espacio en blanco
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher m = pattern.matcher(edit_nombre_email.getText().toString());
-		if (m.find()){
-			edit_nombre_email.setError(getResources().getString(R.string.este_campo_no_permite_espacios));
-			all_correct = false;
-		}
-		
-		// Nombre/Email vacío
-		if (edit_nombre_email.getText().toString().length() == 0){
-			edit_nombre_email.setError(getResources().getString(R.string.este_campo_es_obligatorio));
-			all_correct = false;
-		}
 
-		// Password vacío
-		if (edit_password.getText().toString().length() == 0){
-			edit_password.setError(getResources().getString(R.string.este_campo_es_obligatorio));
-			all_correct = false;
-		}
-		// Password menos de 4 caracteres
-		if (edit_password.getText().toString().length() < 6){
-			edit_password.setError(getResources().getString(R.string.este_campo_debe_tener_6));
-			all_correct = false;
-		}
-
-		return all_correct;
-	}
 }

@@ -1,10 +1,6 @@
 package com.bizeu.escandaloh;
 
 
-
-import it.sephiroth.android.library.imagezoom.ImageViewTouch;
-import it.sephiroth.android.library.imagezoom.ImageViewTouch.OnImageViewTouchSingleTapListener;
-import it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,6 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.bizeu.escandaloh.util.Audio;
 import com.bizeu.escandaloh.util.ImageUtils;
@@ -21,7 +19,7 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class PhotoDetailActivity extends SherlockActivity {
 
-	private ImageViewTouch mImage;
+	private ImageView mImage;
 	
 	private Bitmap photo;
 	private String uri_audio;
@@ -52,8 +50,8 @@ public class PhotoDetailActivity extends SherlockActivity {
 			// Obtenemos y mostramos la foto pequeña	
 			byte[] bytes = getIntent().getByteArrayExtra("bytes");
 			photo = ImageUtils.bytesToBitmap(bytes);
-			mImage = (ImageViewTouch) findViewById(R.id.img_photo_detail);
-			mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
+			mImage = (ImageView) findViewById(R.id.img_photo_detail);
+			//mImage.setDisplayType(DisplayType.FIT_TO_SCREEN);
 			mImage.setImageBitmap(photo);
 			
 			// Obtenemos y mostramos la foto grande
@@ -66,6 +64,7 @@ public class PhotoDetailActivity extends SherlockActivity {
 			uri_audio = getIntent().getStringExtra("uri_audio");
 			orientation_changed = false ;
 			
+			/*
 			mImage.setSingleTapListener(new OnImageViewTouchSingleTapListener() {
 				
 				@Override
@@ -73,6 +72,7 @@ public class PhotoDetailActivity extends SherlockActivity {
 					finish();	
 				}
 			});
+			*/
 		}
 	}
 	

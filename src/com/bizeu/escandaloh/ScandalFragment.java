@@ -409,7 +409,7 @@ public class ScandalFragment extends SherlockFragment {
         		@Override
 				public void onClick(View v) {
 					// Cargamos nuestro navegador con la noticia
-        			Intent i = new Intent(getActivity(), BrowserNewsActivity.class);
+        			Intent i = new Intent(getActivity(), BrowserActivity.class);
         			i.putExtra("source", source);
         			startActivity(i);	
 				}

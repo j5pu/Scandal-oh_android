@@ -9,7 +9,7 @@
     <color name="gris_medio">#6f6f6f</color>
     <color name="gris_sombra">#776b6b</color>
     <color name="gris_oscuro">#5b5b5b</color>
-    <color name="morado">#b21b72 </color>
+    <color name="morado">#b21ba2 </color>
     <color name="azul">#359ce3</color>
     <color name="azul_hint">#b5d2e5</color>
     <color name="azul_facebook">#3b5998</color>
@@ -26,5 +26,7 @@
     <color name="transparente">#FFFFFFFF</color>
     <color name="gris_hint">#c3c3c3</color>
     <color name="verde">#88bf67</color>
+    <color name="gris_letra">#565656</color>
+    <color name="gris_fondo_perfil">#d2d2d2</color>
     
 </resources>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_profile_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:orientation="vertical" >
+
+    <com.applidium.shutterbug.FetchableImageView
+        android:id="@+id/img_profile_picture"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:id="@+id/view_history_linea_color"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_alignParentLeft="true"
+        android:background="#55000000" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/img_profile_picture"
+        android:layout_weight="4"
+        android:orientation="vertical" >
+
+        <TabHost
+            android:id="@+id/tabhost_profile"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:orientation="horizontal" >
+                </TabWidget>
+
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="0" >
+                </FrameLayout>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gris_fondo_perfil"
+                    android:layout_gravity="bottom" >
+                </android.support.v4.view.ViewPager>
+            </LinearLayout>
+        </TabHost>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/prog_profile_userinfo"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/img_profile_picture"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ll_profile_siguiendo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/img_profile_picture"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="13dp"
+        android:layout_marginRight="14dp" >
+
+        <TextView
+            android:id="@+id/txt_profile_num_siguiendo"
+            style="@style/TextoPerfilSeguidores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="128"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_history_likes"
+            style="@style/TextoPerfilSeguidores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/siguiendo" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_profile_seguidores"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ll_profile_siguiendo"
+        android:layout_marginRight="15dp"
+        android:layout_toLeftOf="@+id/ll_profile_siguiendo" >
+
+        <TextView
+            android:id="@+id/txt_profile_num_seguidores"
+            style="@style/TextoPerfilSeguidores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="238"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_profile_seguidores"
+            style="@style/TextoPerfilSeguidores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/seguidores" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_profile_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ll_profile_siguiendo"
+        android:layout_alignRight="@+id/ll_profile_siguiendo"
+        android:layout_marginBottom="5dp"
+        android:gravity="right"
+        android:maxLines="1"
+        android:text="joseantonio.puertolasmontanes"
+        android:textColor="@color/blanco"
+        android:textSize="29sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/img_profile_editar"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/txt_profile_username"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/editar"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/view_profile_pantalla_negra"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#000000"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/img_profile_expanded"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logout"
+        android:visibility="gone" />
+
+</RelativeLayout>

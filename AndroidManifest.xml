@@ -145,7 +145,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden" >
         </activity>
         <activity
-            android:name="com.bizeu.escandaloh.BrowserNewsActivity"
+            android:name="com.bizeu.escandaloh.BrowserActivity"
             android:configChanges="orientation|screenSize" >
         </activity>
         <activity
