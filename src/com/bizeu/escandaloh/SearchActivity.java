@@ -3,6 +3,7 @@ package com.bizeu.escandaloh;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -11,14 +12,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-import com.bizeu.escandaloh.adapters.SearchAdapter;
-import com.bizeu.escandaloh.model.Search;
-import com.bizeu.escandaloh.util.Connectivity;
-import com.flurry.android.FlurryAgent;
-import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -32,26 +26,41 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AbsListView.OnScrollListener;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.bizeu.escandaloh.adapters.SearchAdapter;
+import com.bizeu.escandaloh.model.Search;
+import com.bizeu.escandaloh.util.Connectivity;
+import com.flurry.android.FlurryAgent;
+import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class SearchActivity extends SherlockActivity {
 
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	private static int NUM_SEARCHS_TO_LOAD = 20;
 	public static String PHOTO_ID = "photo_id";
 	
 	private EditText edit_search;
-	private LinearLayout ll_clean_text;
 	private LinearLayout ll_screen;
 	private ListView list_searches;
 	private LinearLayout ll_loading;
 	private LinearLayout ll_list_searchs;
 	private TextView txt_not_found;
+	private ImageView img_clean;
 	
 	private ArrayList<Search> array_search = new ArrayList<Search>();
 	private SearchAdapter searchAdapter;
@@ -61,6 +70,11 @@ public class SearchActivity extends SherlockActivity {
 	private Context mContext;
 	private String meta_next_search = null;
 	private SearchScandalsTask getSearchsAsync;
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
 	
 	/**
 	 * onCreate
@@ -81,10 +95,10 @@ public class SearchActivity extends SherlockActivity {
 		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setIcon(R.drawable.logo_blanco);
+		actBar.setIcon(R.drawable.s_mezcla);
 		
 		edit_search = (EditText) findViewById(R.id.edit_actionbarsearch_search);
-		ll_clean_text = (LinearLayout) findViewById(R.id.ll_actionbarsearch_cancel);
+		img_clean = (ImageView) findViewById(R.id.img_actionbarsearch_cancel);
 		ll_screen = (LinearLayout) findViewById(R.id.ll_search_screen);
 		list_searches = (ListView) findViewById(R.id.list_search_scandaloh);
 		ll_loading = (LinearLayout) findViewById(R.id.ll_search_loading);
@@ -103,10 +117,10 @@ public class SearchActivity extends SherlockActivity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,int count) {
 				if (s.length() == 0){
-					ll_clean_text.setVisibility(View.INVISIBLE);
+					img_clean.setVisibility(View.INVISIBLE);
 				}
 				else{
-					ll_clean_text.setVisibility(View.VISIBLE);
+					img_clean.setVisibility(View.VISIBLE);
 				}
 			}
 			
@@ -165,7 +179,7 @@ public class SearchActivity extends SherlockActivity {
 
 		
 		// Al pulsar la "x" limpiamos el texto introducido
-		ll_clean_text.setOnClickListener(new View.OnClickListener() {
+		img_clean.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -174,7 +188,7 @@ public class SearchActivity extends SherlockActivity {
 					edit_search.setText("");
 				}
 				// Ocultamos la X
-				ll_clean_text.setVisibility(View.GONE);				
+				img_clean.setVisibility(View.INVISIBLE);				
 			}
 		});
 		
@@ -220,8 +234,6 @@ public class SearchActivity extends SherlockActivity {
 
 
 	
-	
-	
 	/**
 	 * onStart
 	 */
@@ -231,7 +243,7 @@ public class SearchActivity extends SherlockActivity {
 		// Iniciamos Flurry
 		FlurryAgent.onStartSession(mContext, MyApplication.FLURRY_KEY);
 	}
-	
+		
 	
 	/**
 	 * onPause
@@ -242,9 +254,6 @@ public class SearchActivity extends SherlockActivity {
 		// Ocultamos el teclado
 		hideKeyboard();
 	}
-	
-	
-	
 	
 	
 	/**
@@ -282,7 +291,6 @@ public class SearchActivity extends SherlockActivity {
 	}
 	
 	
-	
 	/**
 	 * onActivityResult
 	 */
@@ -290,8 +298,73 @@ public class SearchActivity extends SherlockActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
+		
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+		
+	/**
+	 * Muestra un texto indicando que la búsqueda no encontró ningún resultado y oculta el listado
+	 */
+	private void showSearchNotFound(){
+		txt_not_found.setVisibility(View.VISIBLE);
+		list_searches.setVisibility(View.GONE);
+	}
 	
 	
+	/**
+	 * Oculta el texto de "No se encontró ningún resultado" y muestra el listado
+	 */
+	private void hideSearchNotFound(){
+		txt_not_found.setVisibility(View.GONE);
+		list_searches.setVisibility(View.VISIBLE);
+		ll_list_searchs.setGravity(Gravity.TOP);
+	}
+	
+	/**
+	 * Muestra el loading en pantalla
+	 */
+	private void showLoading(){
+		ll_list_searchs.setVisibility(View.GONE);
+		ll_loading.setVisibility(View.VISIBLE);
+	}
+	
+	
+	/**
+	 * Oculta el loading y muestra el listado de searchs
+	 */
+	private void showListSearchs(){
+		ll_list_searchs.setVisibility(View.VISIBLE);
+		ll_loading.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Oculta el teclado
+	 */
+	private void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(ll_screen.getWindowToken(), 0);
+	}
+	
+	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo searchs
+	 */
+	private void cancelGetSearchs() {
+		if (getSearchsAsync != null) {
+			if (getSearchsAsync.getStatus() == AsyncTask.Status.PENDING|| getSearchsAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getSearchsAsync.cancel(true);
+			}
+		}
+	}
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
 	
 
 	/**
@@ -373,13 +446,19 @@ public class SearchActivity extends SherlockActivity {
 					final String id = searchObject.getString("id");
 					final String title = new String(searchObject.getString("title").getBytes("ISO-8859-1"), HTTP.UTF_8);
 					final String username = searchObject.getString("username");	
-					final String img_small = searchObject.getString("img_small");
+					final String img_small = searchObject.getString("img_small");					
+					final String date = searchObject.getString("date");
+					final String likes = searchObject.getString("likes");
+					final String dislikes = searchObject.getString("dislikes");
+					final String category = searchObject.getString("category");
+					final String num_comments = searchObject.getString("comments_count");
+
 
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {							
 							// Añadimos el search al ArrayList
-							Search search_aux = new Search(id, img_small, title, username);
+							Search search_aux = new Search(id, img_small, title, username, date, likes, dislikes, category, num_comments);
 							array_search.add(search_aux);
 						}
 					});		
@@ -417,7 +496,6 @@ public class SearchActivity extends SherlockActivity {
 				// Si es codigo 2xx --> OK 
 				searchAdapter.notifyDataSetChanged();
 				
-				Log.v("WE","arraysearch size: " + array_search.size());
 				// 0 resultados: mostramos un mensaje
 				if (array_search.isEmpty()){
 					Log.v("WE","Esta vacio");
@@ -427,63 +505,6 @@ public class SearchActivity extends SherlockActivity {
 			
 			// Ya se ha realizado una búsqueda: permitimos a onScroll funcionar
 			waiting_first_search = false;
-		}
-	}
-	
-	
-	/**
-	 * Muestra un texto indicando que la búsqueda no encontró ningún resultado y oculta el listado
-	 */
-	private void showSearchNotFound(){
-		txt_not_found.setVisibility(View.VISIBLE);
-		list_searches.setVisibility(View.GONE);
-	}
-	
-	
-	/**
-	 * Oculta el texto de "No se encontró ningún resultado" y muestra el listado
-	 */
-	private void hideSearchNotFound(){
-		txt_not_found.setVisibility(View.GONE);
-		list_searches.setVisibility(View.VISIBLE);
-		ll_list_searchs.setGravity(Gravity.TOP);
-	}
-	
-	/**
-	 * Muestra el loading en pantalla
-	 */
-	private void showLoading(){
-		ll_list_searchs.setVisibility(View.GONE);
-		ll_loading.setVisibility(View.VISIBLE);
-	}
-	
-	
-	/**
-	 * Oculta el loading y muestra el listado de searchs
-	 */
-	private void showListSearchs(){
-		ll_list_searchs.setVisibility(View.VISIBLE);
-		ll_loading.setVisibility(View.GONE);
-	}
-	
-	
-	/**
-	 * Oculta el teclado
-	 */
-	private void hideKeyboard(){
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(ll_screen.getWindowToken(), 0);
-	}
-	
-	
-	/**
-	 * Cancela si hubiese alguna hebra obteniendo searchs
-	 */
-	private void cancelGetSearchs() {
-		if (getSearchsAsync != null) {
-			if (getSearchsAsync.getStatus() == AsyncTask.Status.PENDING|| getSearchsAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				getSearchsAsync.cancel(true);
-			}
 		}
 	}
 	

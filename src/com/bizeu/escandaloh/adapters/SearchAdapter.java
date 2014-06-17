@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.model.Search;
+import com.bizeu.escandaloh.util.Utils;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class SearchAdapter extends ArrayAdapter<Search> {
@@ -47,9 +48,14 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 			LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
 			convertView = inflater.inflate(layoutResourceId, null);
 			holder = new SearchHolder();
-			holder.txtTitle = (TextView) convertView.findViewById(R.id.txt_history_action);
-			holder.txtUserName = (TextView) convertView.findViewById(R.id.txt_history_text);
-			holder.imgScandaloh = (FetchableImageView) convertView.findViewById(R.id.img_history_scandaloh);
+			holder.txtTitle = (TextView) convertView.findViewById(R.id.txt_search_title);
+			holder.txtUserName = (TextView) convertView.findViewById(R.id.txt_search_username);
+			holder.imgScandaloh = (FetchableImageView) convertView.findViewById(R.id.img_search_scandaloh);
+			holder.txtDate = (TextView) convertView.findViewById(R.id.txt_search_date);
+			holder.txtLikes = (TextView) convertView.findViewById(R.id.txt_search_likes);
+			holder.txtDislikes = (TextView) convertView.findViewById(R.id.txt_search_dislikes);
+			holder.txtNumComments = (TextView) convertView.findViewById(R.id.txt_search_numcomm);
+			holder.viewLinea = (View) convertView.findViewById(R.id.view_search_linea_color);
 			convertView.setTag(holder);
 		}
 
@@ -64,6 +70,18 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 		holder.txtUserName.setText(search.getUserName());
 		holder.imgScandaloh.setImage(MyApplication.DIRECCION_BUCKET + search.getUrlScandal(),
 				mContext.getResources().getDrawable(R.drawable.logo_blanco));
+		holder.txtLikes.setText(search.getLikes());
+		holder.txtDislikes.setText(search.getDislikes());
+		holder.txtNumComments.setText(search.getNumComments());
+		holder.txtDate.setText(Utils.changeDateFormat(search.getDate()));
+		
+		// Color de la linea dependiendo de si el escándalo es de humor o denuncia
+		if (search.getCategory().equals("1")){
+			holder.viewLinea.setBackgroundColor(mContext.getResources().getColor(R.color.morado));
+		}
+		else{
+			holder.viewLinea.setBackgroundColor(mContext.getResources().getColor(R.color.azul));
+		}	
 
 		return convertView;
 	}
@@ -76,6 +94,12 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 		FetchableImageView imgScandaloh;
 		TextView txtTitle;
 		TextView txtUserName;
+		TextView txtDate;
+		TextView txtLikes;
+		TextView txtDislikes;
+		TextView txtCategory;
+		TextView txtNumComments;
+		View viewLinea;
 
 		public TextView getTitle() {
 			return txtTitle;
@@ -87,6 +111,30 @@ public class SearchAdapter extends ArrayAdapter<Search> {
 
 		public FetchableImageView getAvatar() {
 			return imgScandaloh;
+		}
+		
+		public TextView getDate(){
+			return txtDate;
+		}
+		
+		public TextView getLikes(){
+			return txtLikes;
+		}
+		
+		public TextView getDislikes(){
+			return txtDislikes;
+		}
+		
+		public TextView getCategory(){
+			return txtCategory;
+		}
+		
+		public TextView getNumComments(){
+			return txtNumComments;
+		}
+		
+		public View getLinea(){
+			return viewLinea;
 		}
 	}
 

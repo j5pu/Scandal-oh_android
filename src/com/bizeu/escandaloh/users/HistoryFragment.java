@@ -7,8 +7,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -42,6 +40,10 @@ import android.widget.Toast;
 
 public class HistoryFragment extends Fragment {
 
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	public static final String ESCANDALOS = "subidos";
 	public static final String COMENTARIOS = "comentados";
 	public static final String LIKES = "valorados";
@@ -62,17 +64,12 @@ public class HistoryFragment extends Fragment {
 	private Activity acti;
 	private boolean any_error_deleting;
 	private ProgressDialog delete_progress;
-
-    public static final HistoryFragment newInstance(String user_id, String history_type) {
-        HistoryFragment f = new HistoryFragment();
-
-        Bundle b = new Bundle();
-        b.putString("user_id", user_id);
-        b.putString("history_type", history_type);
-        f.setArguments(b);
-
-        return f;
-    }
+    
+    
+   
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
     
 
 	/**
@@ -178,6 +175,29 @@ public class HistoryFragment extends Fragment {
     }
     
 	
+    
+    
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+    
+    /**
+     * Devuelve una nueva instancia del fragmento
+     * @param user_id
+     * @param history_type
+     * @return
+     */
+    public static final HistoryFragment newInstance(String user_id, String history_type) {
+        HistoryFragment f = new HistoryFragment();
+
+        Bundle b = new Bundle();
+        b.putString("user_id", user_id);
+        b.putString("history_type", history_type);
+        f.setArguments(b);
+
+        return f;
+    }
+    
 	
 	/**
 	 * Oculta el loading y muestra el listado de history
@@ -201,7 +221,12 @@ public class HistoryFragment extends Fragment {
 	
     
     
-
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	/**
 	 * Obtiene y muestra la actividad de un usuario
 	 * 

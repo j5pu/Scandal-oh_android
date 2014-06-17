@@ -45,6 +45,12 @@ import com.flurry.android.FlurryAgent;
 
 public class LoginScandalohActivity extends SherlockActivity {
 	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	private EditText edit_nombre_email;
 	private EditText edit_password;
 	private TextView txt_recordar_contrasenia;
@@ -66,7 +72,7 @@ public class LoginScandalohActivity extends SherlockActivity {
 	
 	
 	// -----------------------------------------------------------------------------------------------------
-	// |                                    VARIABLES                                                      |
+	// |                                    METODOS  ACTIVITY                                              |
 	// -----------------------------------------------------------------------------------------------------
 	
 	
