@@ -21,8 +21,8 @@
 
             <com.bizeu.escandaloh.util.ImageViewRounded
                 android:id="@+id/img_comment_avatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:gravity="top"
                 android:scaleType="fitXY"
                 android:src="@drawable/icono_app" />
@@ -62,8 +62,8 @@
 
                 <ImageView
                     android:id="@+id/img_comment_socialnetwork"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="3dp"
                     android:src="@drawable/s_circular_gris" />
@@ -76,7 +76,7 @@
                     android:gravity="center_vertical"
                     android:text="alejandro.leonrodriguez.7"
                     android:textColor="@color/gris_letra"
-                    android:textSize="10sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -88,7 +88,7 @@
                     android:gravity="right"
                     android:text="12-02-2014"
                     android:textColor="@color/gris_letra"
-                    android:textSize="10sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -104,7 +104,7 @@
                 android:paddingTop="4dp"
                 android:text="comentasgfssgfsgfsfgfsdgfsgsgsrio prueba"
                 android:textColor="@color/negro"
-                android:textSize="15sp" />
+                android:textSize="21sp" />
         </LinearLayout>
     </LinearLayout>
 

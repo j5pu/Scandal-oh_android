@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,10 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.model.Comment;
-import com.bizeu.escandaloh.users.FollowersActivity;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
@@ -57,7 +54,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
 
         comment = data.get(position);
         LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
-            
+        
         // Si soy el usuario del comentario, éste aparecerá a la derecha
         if (MyApplication.user_name.equals(comment.getUsername())){
         	convertView = inflater.inflate(layoutResourceIdDerecha, parent, false);
@@ -102,11 +99,11 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         // Scandaloh
         int social_net = Integer.parseInt(comment.getSocialNetwork());
         if (social_net == 0){
-        	holder.imgUser.setImageResource(R.drawable.s_rosa);
+        	holder.imgUser.setImageResource(R.drawable.s_circular_gris);
         }
         // Facebook
         else if (social_net == 1){
-        	holder.imgUser.setImageResource(R.drawable.facebook_rosa);
+        	holder.imgUser.setImageResource(R.drawable.f_circular_gris);
         }  
         
         holder.imgUser.setTag(comment.getUserId());

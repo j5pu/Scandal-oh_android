@@ -13,7 +13,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -26,11 +25,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.applidium.shutterbug.FetchableImageView;
 import com.bizeu.escandaloh.adapters.CommentAdapter;
 import com.bizeu.escandaloh.model.Comment;
@@ -41,16 +39,18 @@ import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class CommentsActivity extends SherlockActivity {
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	public static String LST_COMMENT = "last_comment";
 	public static String NUM_COMMENTS = "num_comments";
 	
 	private ListView list_comments;
 	private LinearLayout img_send;
-	private LinearLayout ll_icon;
 	private EditText edit_comment;
 	private LinearLayout ll_screen;
-	private FetchableImageView photo;
-	private TextView txt_title;
 	private FetchableImageView img_fondo;
 	private ProgressBar prog_loading;
 
@@ -60,10 +60,14 @@ public class CommentsActivity extends SherlockActivity {
 	private String id;
 	private ProgressDialog send_progress;
 	private Context mContext;
-	private String title;
 	private String url_photo;
 	private GetCommentsTask getCommentsAsync;
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
+	
 	/**
 	 * onCreate
 	 */
@@ -77,7 +81,6 @@ public class CommentsActivity extends SherlockActivity {
 
 		if (getIntent() != null) {
 			id = getIntent().getExtras().getString(ScandalFragment.ID);
-			title = getIntent().getExtras().getString(ScandalFragment.TITLE);
 			url_photo = getIntent().getExtras().getString(ScandalFragment.URL);
 		}
 
@@ -86,41 +89,19 @@ public class CommentsActivity extends SherlockActivity {
 		img_send = (LinearLayout) findViewById(R.id.ll_comments_send);
 		ll_screen = (LinearLayout) findViewById(R.id.ll_comments_screen);
 		img_fondo = (FetchableImageView) findViewById(R.id.img_comments_background);
-		prog_loading = (ProgressBar) findViewById(R.id.prog_comments_loading);
+		prog_loading = (ProgressBar) findViewById(R.id.prog_comments_loading);	
 		
 		// Action Bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_comments, null);
 		actBar.setCustomView(view);
-		actBar.setDisplayShowHomeEnabled(false);
-		actBar.setDisplayShowTitleEnabled(false);
-		photo = (FetchableImageView) findViewById(R.id.img_actionbar_comments_photo);
-		photo.setImage(url_photo, R.drawable.cargando);
-		txt_title = (TextView) findViewById(R.id.txt_actionbar_comments_title);
-		txt_title.setText(title);
+		actBar.setHomeButtonEnabled(true);
+		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setIcon(R.drawable.s_mezcla);
 		
 		// Fondo de la pantalla
-		img_fondo.setImage(url_photo, R.drawable.cargando);
-		
-		// Volvemos al carrusel
-		ll_icon = (LinearLayout) findViewById(R.id.ll_actionbar_comments_icon);
-		ll_icon.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent returnIntent = new Intent();
-				if (array_comments.size() > 0){
-					// Devolvemos el último comentario
-					returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
-				 	// Devolvemos el nº de comentarios
-				 	returnIntent.putExtra(NUM_COMMENTS, array_comments.size());
-				}
-				setResult(RESULT_OK, returnIntent);
-				finish();			
-			}
-		});
-		
+		img_fondo.setImage(url_photo, R.drawable.cargando);		
 
 		// Obtenemos los comentarios
 		commentsAdapter = new CommentAdapter(this, R.layout.comment_izquierda,
@@ -135,6 +116,8 @@ public class CommentsActivity extends SherlockActivity {
 		send_progress.setCancelable(false);
 	}
 
+	
+	
 	/**
 	 * onStart
 	 */
@@ -148,7 +131,7 @@ public class CommentsActivity extends SherlockActivity {
 		// Si está logueado puede escribir comentarios
 		if (MyApplication.logged_user) {
 			edit_comment.setHint(getResources().getString(
-					R.string.escribe_un_comentario));
+					R.string.que_opinas));
 			edit_comment.setOnClickListener(null);
 			img_send.setOnClickListener(new View.OnClickListener() {
 
@@ -188,6 +171,30 @@ public class CommentsActivity extends SherlockActivity {
 		}
 	}
 	
+	
+	
+	/**
+	 * onOptionsItemSelected
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				Intent returnIntent = new Intent();
+				   // Cancelamos si se estuviesen obteniendo comentarios
+				   cancelGetComments();
+				if (array_comments.size() > 0){
+					// Devolvemos el último comentario
+					returnIntent.putExtra(LST_COMMENT, array_comments.get(array_comments.size()-1));
+				 	// Devolvemos el nº de comentarios
+				 	returnIntent.putExtra(NUM_COMMENTS, array_comments.size());
+				}
+				setResult(RESULT_OK, returnIntent);
+				finish();	
+	    	break;
+		}
+		return true;
+	}
 
 	
 	
@@ -224,6 +231,8 @@ public class CommentsActivity extends SherlockActivity {
 		cancelGetComments();
 	}
 	
+	
+	
 	/**
 	 * onBackPressed
 	 */
@@ -239,10 +248,15 @@ public class CommentsActivity extends SherlockActivity {
 		   returnIntent.putExtra(NUM_COMMENTS, array_comments.size());
 	   }
 	   setResult(RESULT_OK, returnIntent);
-	   finish();
+	   finish();   
 	}
 	
 	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
 	
 
 	/**
@@ -256,6 +270,13 @@ public class CommentsActivity extends SherlockActivity {
 			}
 		}
 	}
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
 	
 	
 
@@ -310,11 +331,8 @@ public class CommentsActivity extends SherlockActivity {
 					c_date = escanObject.getString("date");
 					c_id = escanObject.getString("id");
 					c_photo = null;
-					//c_photo = escanObject.getString("photo");
-					//c_resource_uri = escanObject.getString("user");
 					c_social_network = escanObject.getString("social_network");
 					c_text = new String(escanObject.getString("text").getBytes("ISO-8859-1"), HTTP.UTF_8);
-					//c_user = escanObject.getString("user");
 					c_user_id = escanObject.getString("user_id");
 					c_username = escanObject.getString("username");
 					c_avatar = escanObject.getString("avatar");
@@ -375,6 +393,7 @@ public class CommentsActivity extends SherlockActivity {
 		}
 	}
 
+	
 	/**
 	 * Envia un comentario
 	 * 
@@ -409,8 +428,7 @@ public class CommentsActivity extends SherlockActivity {
 				String written_comment = edit_comment.getText().toString();
 
 				dato.put("user", MyApplication.resource_uri);
-				dato.put("photo", "/api/v1/photo/" + id + "/"); // Formato:
-																// /api/v1/photo/id/
+				dato.put("photo", "/api/v1/photo/" + id + "/"); // Formato: /api/v1/photo/id/
 				dato.put("text", written_comment);
 
 				// Formato UTF-8 (ñ,á,ä,...)
@@ -478,7 +496,5 @@ public class CommentsActivity extends SherlockActivity {
 			}
 		}
 	}
-
-
 
 }

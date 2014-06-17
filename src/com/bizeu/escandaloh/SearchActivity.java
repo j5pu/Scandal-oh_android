@@ -229,7 +229,7 @@ public class SearchActivity extends SherlockActivity {
 				  i.putExtra(PHOTO_ID, s.getPhotoId());
 				  startActivity(i);	     
 			  }
-		});
+		});	
 	}
 
 

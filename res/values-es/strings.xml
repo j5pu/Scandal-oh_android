@@ -246,5 +246,7 @@
     <string name="subidos">subidos</string>
     <string name="valorados">valorados</string>
     <string name="comentados">comentados</string>
+    <string name="may_comentarios">Comentarios</string>
+    <string name="que_opinas">¿Qué opinas?</string>
 
 </resources>

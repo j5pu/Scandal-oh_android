@@ -178,7 +178,8 @@ public class LoginSelectActivity extends SherlockActivity {
 								public void onCompleted(GraphUser user,Response response) {
 									
 									if (user != null) {									
-										username = user.getUsername();
+										//username = user.getUsername();
+										Log.v("WE","Username: " + username);
 										new LogInSocialNetwork().execute(LOGGING_FACEBOOK);
 									}
 									else{
@@ -342,8 +343,7 @@ public class LoginSelectActivity extends SherlockActivity {
 		protected Void doInBackground(Integer... params) {
 			
 			HttpEntity resEntity;
-			String urlString = MyApplication.SERVER_ADDRESS
-					+ "/api/v1/user/login/";
+			String urlString = MyApplication.SERVER_ADDRESS + "/api/v1/user/login/";
 
 			try {
 				HttpClient client = new DefaultHttpClient();
@@ -392,6 +392,7 @@ public class LoginSelectActivity extends SherlockActivity {
 						//user_uri = respJSON.getString("user_uri");
 						avatar = respJSON.getString("avatar");
 						session_token = respJSON.getString("session_token");
+						username = respJSON.getString("username");
 						login_error = false;
 					} else {
 						login_error = true;

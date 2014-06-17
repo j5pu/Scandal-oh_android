@@ -3,9 +3,10 @@
     android:id="@+id/ll_search_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gris_fondo_perfil"
     android:orientation="vertical" >
 
-   <LinearLayout
+    <LinearLayout
         android:id="@+id/ll_search_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +19,6 @@
             android:id="@+id/prog_comments_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -42,10 +42,10 @@
             android:id="@+id/list_search_scandaloh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:divider="@null"
+            android:dividerHeight="0dp"
             android:visibility="visible" >
-
         </ListView>
-
     </LinearLayout>
 
 </LinearLayout>
