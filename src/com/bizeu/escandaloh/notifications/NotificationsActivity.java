@@ -38,11 +38,16 @@ import com.bizeu.escandaloh.adapters.NotificationAdapter;
 import com.bizeu.escandaloh.model.Notification;
 import com.bizeu.escandaloh.users.ProfileActivity;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Utils;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class NotificationsActivity extends SherlockActivity {
 
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	private static int NUM_NOTIFICATIONS_TO_LOAD = 20;
 	
 	private ListView list_notifications;
@@ -61,6 +66,9 @@ public class NotificationsActivity extends SherlockActivity {
 	private boolean connection_available = true;
 	
 	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
 	
 	/**
 	 * OnCreate
@@ -71,14 +79,15 @@ public class NotificationsActivity extends SherlockActivity {
 		setContentView(R.layout.notifications);
 
 		mContext = this;
-		
-		// Action Bar
+	
+		// Action Bar	
 		ActionBar actBar = getSupportActionBar();
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_notifications, null);
+		actBar.setCustomView(view);
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setDisplayShowTitleEnabled(true);
-		actBar.setTitle(getResources().getString(R.string.notificaciones));
-		actBar.setIcon(R.drawable.logo_blanco);
+		actBar.setIcon(R.drawable.s_mezcla);
 		
 		list_notifications = (ListView) findViewById(R.id.list_notifications);
 		ll_loading = (LinearLayout) findViewById(R.id.ll_notifications_loading);
@@ -96,14 +105,14 @@ public class NotificationsActivity extends SherlockActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-							  
+				
 				// Marcamos la notificación como leída
 				Notification notiAux =  ((Notification) list_notifications.getItemAtPosition(position));
 				notiAux.setIsRead(true);
 				notificationsAdapter.notifyDataSetChanged();
 				new MarkNotificationAsReadTask(notiAux.getPhotoId(), notiAux.getType()).execute();
 				  
-				// Si es de tipo 6 le llevamos la perfil del usuario, si no le llevamos al escándalo
+				// Si es de tipo 6 le llevamos al perfil del usuario, si no le llevamos al escándalo
 				if (notiAux.getType() == 6){ 
 					Intent i = new Intent(NotificationsActivity.this, ProfileActivity.class);
 					i.putExtra(ProfileActivity.USER_ID, notiAux.getPhotoId());
@@ -211,7 +220,48 @@ public class NotificationsActivity extends SherlockActivity {
 	
 	
 	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
+	/**
+	 * Muestra el loading en pantalla
+	 */
+	private void showLoading(){
+		ll_list_notis.setVisibility(View.GONE);
+		ll_loading.setVisibility(View.VISIBLE);
+	}
+	
+	
+	/**
+	 * Oculta el loading y muestra el listado de notificaciones
+	 */
+	private void showListNotifications(){
+		ll_list_notis.setVisibility(View.VISIBLE);
+		ll_loading.setVisibility(View.GONE);
+	}
+	
+	
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo notificaciones
+	 */
+	private void cancelGetNotifications() {
+		if (getNotisAsync != null) {
+			if (getNotisAsync.getStatus() == AsyncTask.Status.PENDING|| getNotisAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getNotisAsync.cancel(true);
+			}
+		}
+	}
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	/**
 	 * Muestra la lista de comentarios
 	 * 
@@ -219,6 +269,7 @@ public class NotificationsActivity extends SherlockActivity {
 	private class GetNotificationsTask extends AsyncTask<Void, Integer, Integer> {
 
 		String n_text;
+		String n_date;
 		String n_photo_img_p = null;
 		String n_avatar = null;
 		String n_photo_id;
@@ -279,22 +330,36 @@ public class NotificationsActivity extends SherlockActivity {
 				for (int i = 0; i < notificationsObject.length(); i++) {
 					
 					JSONObject notiObject = notificationsObject.getJSONObject(i);
-
-					n_count = notiObject.getString("count");
-					n_is_read = notiObject.getString("is_read");
+					
+					if (notiObject.has("count")){
+						n_count = notiObject.getString("count");
+					}
+					
+					if (notiObject.has("is_read")){
+						n_is_read = notiObject.getString("is_read");
+						Log.v("WE","n_is_read: " + n_is_read);
+					}
+					
+					if (notiObject.has("date")){
+						n_date = Utils.changeDateFormat(notiObject.getString("date"));
+					}
 					
 					if (notiObject.has("photo_img_small")){
 						n_photo_img_p = notiObject.getString("photo_img_small");
 					}
+					
 					if (notiObject.has("avatar")){
 						n_avatar = notiObject.getString("avatar");
 					}
+					
 					if (notiObject.has("user_id")){
 						n_user_id = notiObject.getString("user_id");
-					}	
+					}
+					
 					if (notiObject.has("photo_id")){
 						n_photo_id = notiObject.getString("photo_id");
-					}	
+					}
+					
 					if (notiObject.has("type")){
 						type = notiObject.getInt("type");
 					}
@@ -304,10 +369,10 @@ public class NotificationsActivity extends SherlockActivity {
 					Notification notiAux = null;
 					
 					if (type == 6){ // Notificación de tipo usuario --> al clickear le llevamos al perfil
-						notiAux = new Notification(type, n_text, n_avatar, n_user_id, n_is_read);
+						notiAux = new Notification(type, n_text, n_avatar, n_photo_img_p, n_user_id, n_is_read, n_date);
 					}
 					else{ // Notificación de tipo escándalo --> al clickear le llevamos al escándalo
-						notiAux = new Notification(type, n_text, n_photo_img_p, n_photo_id, n_is_read);
+						notiAux = new Notification(type, n_text, n_avatar, n_photo_img_p, n_photo_id, n_is_read, n_date);
 					}
 					
 					array_notifications.add(notiAux);
@@ -415,35 +480,5 @@ public class NotificationsActivity extends SherlockActivity {
 	        
 	        return null;
 	    }	
-	}
-	
-	
-	/**
-	 * Muestra el loading en pantalla
-	 */
-	private void showLoading(){
-		ll_list_notis.setVisibility(View.GONE);
-		ll_loading.setVisibility(View.VISIBLE);
-	}
-	
-	
-	/**
-	 * Oculta el loading y muestra el listado de notificaciones
-	 */
-	private void showListNotifications(){
-		ll_list_notis.setVisibility(View.VISIBLE);
-		ll_loading.setVisibility(View.GONE);
-	}
-	
-	
-	/**
-	 * Cancela si hubiese alguna hebra obteniendo notificaciones
-	 */
-	private void cancelGetNotifications() {
-		if (getNotisAsync != null) {
-			if (getNotisAsync.getStatus() == AsyncTask.Status.PENDING|| getNotisAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				getNotisAsync.cancel(true);
-			}
-		}
 	}
 }

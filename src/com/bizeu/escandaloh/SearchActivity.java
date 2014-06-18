@@ -41,6 +41,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.bizeu.escandaloh.adapters.SearchAdapter;
 import com.bizeu.escandaloh.model.Search;
 import com.bizeu.escandaloh.util.Connectivity;
+import com.bizeu.escandaloh.util.Utils;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
@@ -87,7 +88,7 @@ public class SearchActivity extends SherlockActivity {
 		
 		mContext = this;
 		
-		// ACTION BAR
+		// ACTION BAR	
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_search, null);
@@ -96,6 +97,7 @@ public class SearchActivity extends SherlockActivity {
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setIcon(R.drawable.s_mezcla);
+		
 		
 		edit_search = (EditText) findViewById(R.id.edit_actionbarsearch_search);
 		img_clean = (ImageView) findViewById(R.id.img_actionbarsearch_cancel);
