@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -228,15 +229,20 @@ public class LoginSelectActivity extends SherlockActivity {
 			}
 		});
 		
-		// Mostramos el video de fondo
-		/*
-		video_splash.setScaleType(TextureVideoView.ScaleType.CENTER_CROP);
-		Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video_splash); //do not add any extension
-		video_splash.setDataSource(mContext, video);
-		video_splash.setLooping(true);
-		video_splash.play();
-		*/
+		try{
+			// Mostramos el video de fondo		
+			video_splash.setScaleType(TextureVideoView.ScaleType.CENTER_CROP);
+			Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video_splash); 
+			video_splash.setDataSource(mContext, video);
+			video_splash.setLooping(true);
+			video_splash.play();	
+		}
+		catch(Exception e){
+			Log.e("Video splash exception", e.toString());
+		}
+
 		
+		// Audio del video
 		/*
 		MediaPlayer mp = new MediaPlayer();
 		mp = MediaPlayer.create(LoginSelectActivity.this, R.raw.scandaloh);
