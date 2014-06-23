@@ -53,7 +53,7 @@
                 android:layout_weight="10"
                 android:background="@drawable/edit_busqueda"
                 android:ems="10"
-                android:textColor="@color/gris_claro"
+                android:textColor="@color/negro"
                 android:gravity="center_vertical"
                 android:hint="@string/que_opinas"
                 android:inputType="text"

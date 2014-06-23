@@ -52,7 +52,7 @@ public class ScandalActivity extends SherlockFragmentActivity {
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
 		actBar.setDisplayShowTitleEnabled(false);
-		actBar.setIcon(R.drawable.logo_blanco);
+		actBar.setIcon(R.drawable.s_mezcla);
 
 	}
 	

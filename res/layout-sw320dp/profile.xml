@@ -18,12 +18,12 @@
         android:id="@+id/view_history_linea_color"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:layout_above="@+id/linearLayout1"
+        android:layout_above="@+id/ll_history_infoscandal"
         android:layout_alignParentLeft="true"
         android:background="#55000000" />
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/ll_history_infoscandal"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_alignParentBottom="true"

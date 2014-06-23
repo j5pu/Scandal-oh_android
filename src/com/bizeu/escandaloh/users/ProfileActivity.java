@@ -76,6 +76,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 	private TextView txt_username;
 	private TextView txt_followers;
 	private TextView txt_following;
+	private TextView txt_siguiendo;
 	private ProgressBar prog_userinfo;
 	private LinearLayout ll_seguir_siguiendo;
 	private LinearLayout ll_seguidores;
@@ -142,6 +143,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		img_seguir_siguiendo = (ImageView) findViewById(R.id.img_profile_seguir_siguiendo);
 		view_pantalla_negra = (View) findViewById(R.id.view_profile_pantalla_negra);
 		img_editar_avatar = (ImageView) findViewById(R.id.img_profile_editar);
+		txt_siguiendo = (TextView) findViewById(R.id.txt_profile_siguiendo);
 		
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		
@@ -842,6 +844,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 				else{
 					txt_seguidores.setText(getResources().getString(R.string.seguidores));
 				}
+				txt_siguiendo.setText(getResources().getString(R.string.siguiendo));
 				
 				// Estoy logueado
 				if (MyApplication.logged_user){

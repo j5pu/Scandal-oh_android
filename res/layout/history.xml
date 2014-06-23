@@ -70,12 +70,12 @@
             android:textSize="11sp" />
 
         <LinearLayout
-            android:id="@+id/linearLayout1"
+            android:id="@+id/ll_history_infoscandal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/img_history_scandaloh"
             android:layout_alignRight="@+id/txt_history_text"
-            android:gravity="center_vertical" >
+            android:gravity="center_vertical|right" >
 
             <ImageView
                 android:id="@+id/img_browser_cancel"

@@ -2,7 +2,7 @@
 <resources>
     <color name="blanco">#FFFFFF</color>
     <color name="negro">#000000</color>
-    <color name="rojo">#FF0000</color>
+    <color name="rojo">#E88792</color>
     <color name="gris_claro">#eeeeee</color>  
     <color name="gris_action_bar">#DDDDDD</color>
     <color name="gris_action_bar_2">#cdcdcd</color>

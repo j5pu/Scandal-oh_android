@@ -94,8 +94,8 @@ public class ScandalFragment extends SherlockFragment {
 	private LinearLayout ll_last_comment ;
     private ImageView iLike;
     private ImageView iDislike;
-    private TextView tLikes;
-    private TextView tDislikes;
+    private TextView txt_likes;
+    private TextView txt_dislikes;
     private FetchableImageView img;
     private FetchableImageView img_favicon;
     private ImageView user_type;
@@ -106,7 +106,7 @@ public class ScandalFragment extends SherlockFragment {
     private ProgressBar prog_loading_audio;
     private View v_linea_arriba;
     private View v_linea_abajo_izq;
-    private View v_linea_abajo_der;
+    private ImageView img_bocadillo;
  
     private String id;
     private String user_id;
@@ -247,10 +247,10 @@ public class ScandalFragment extends SherlockFragment {
 	            // Red social
 	            int social_ne = Integer.parseInt(last_comm.getSocialNetwork());
 	            if (social_ne == 0){
-	            	social_net.setImageResource(R.drawable.s_gris);
+	            	social_net.setImageResource(R.drawable.s_circular_gris);
 	            }
 	            else if (social_ne == 1){
-	            	social_net.setImageResource(R.drawable.facebook_gris);
+	            	social_net.setImageResource(R.drawable.f_circular_gris);
 	            }
 	            
 	            // ACTUALIZAMOS EL Nº DE COMENTARIOS
@@ -258,12 +258,7 @@ public class ScandalFragment extends SherlockFragment {
 	            // Actualizamos el adaptador
 	            MainActivity.updateNumComments(num_comments);
 	            // Actualizamos la vista
-	            if (num_comments == 1){
-	            	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentario));
-	            }
-	            else{
-	            	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentarios));
-	            }
+	            txt_num_comm.setText(Integer.toString(num_comments));
 	    	} 
 	    }
 	  }
@@ -314,8 +309,8 @@ public class ScandalFragment extends SherlockFragment {
     	
         iLike = (ImageView) rootView.findViewById(R.id.img_escandalo_like);
         iDislike = (ImageView) rootView.findViewById(R.id.img_escandalo_dislike);
-        tLikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
-        tDislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
+        txt_likes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_likes);
+        txt_dislikes = (TextView) rootView.findViewById(R.id.txt_escandalo_num_dislikes);
         img = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_foto);
         img_favicon = (FetchableImageView) rootView.findViewById(R.id.img_escandalo_favicon);
         img_aud = (ImageView) rootView.findViewById(R.id.img_escandalo_audio);
@@ -335,7 +330,7 @@ public class ScandalFragment extends SherlockFragment {
     	prog_loading_audio = (ProgressBar) rootView.findViewById(R.id.prog_escandalo_loading_audio);
     	v_linea_arriba = rootView.findViewById(R.id.view_scandal_linea_arriba);
     	v_linea_abajo_izq = rootView.findViewById(R.id.view_scandal_abajo_izquierda);
-    	v_linea_abajo_der = rootView.findViewById(R.id.view_scandal_abajo_derecha);
+    	img_bocadillo = (ImageView) rootView.findViewById(R.id.img_scandal_bocadillo);
     	
         if (!getSherlockActivity().getSupportActionBar().isShowing()) {
             getSherlockActivity().getSupportActionBar().show();
@@ -423,8 +418,8 @@ public class ScandalFragment extends SherlockFragment {
         	txt_fuente.setVisibility(View.INVISIBLE); 	
             iLike.setVisibility(View.INVISIBLE);
             iDislike.setVisibility(View.INVISIBLE);
-            tLikes.setVisibility(View.INVISIBLE);
-            tDislikes.setVisibility(View.INVISIBLE);
+            txt_likes.setVisibility(View.INVISIBLE);
+            txt_dislikes.setVisibility(View.INVISIBLE);
             share.setVisibility(View.INVISIBLE);
             ll_last_comment.setVisibility(View.INVISIBLE);
         	
@@ -475,11 +470,11 @@ public class ScandalFragment extends SherlockFragment {
         // SOCIAL NETWORK 
         // Scandaloh
         if (Integer.parseInt(social_network) == 0){
-        	user_type.setImageResource(R.drawable.s_blanca);
+        	user_type.setImageResource(R.drawable.s_circular_blanca);
         }
         // Facebook
         else if (Integer.parseInt(social_network) == 1){
-        	user_type.setImageResource(R.drawable.f_blanca);
+        	user_type.setImageResource(R.drawable.f_circular_blanca);
         }
         user_type.setOnClickListener(new View.OnClickListener() {
 			
@@ -508,18 +503,20 @@ public class ScandalFragment extends SherlockFragment {
       	
                     
         // LIKES
-        tLikes.setText(Integer.toString(likes));
-        tDislikes.setText(Integer.toString(dislikes));
+        txt_likes.setText(Integer.toString(likes));
+        txt_dislikes.setText(Integer.toString(dislikes));
       
         // Si está logueado
         if (MyApplication.logged_user){
         	// Mostramos si ya había marcado likes/dislikes anteriormente
             if (already_voted != 0){ // Si ya ha votado
             	if (already_voted == 1){ // Ha hecho like
-            		iLike.setImageResource(R.drawable.like_azul);
+            		iLike.setImageResource(R.drawable.mas_con_circulo_verde);
+            		txt_likes.setTextColor(getResources().getColor(R.color.verde));
             	}
             	else if (already_voted == 2){ // Ha hecho dislike
-            		iDislike.setImageResource(R.drawable.dislike_azul);
+            		iDislike.setImageResource(R.drawable.menos_con_circulo_rojo);
+            		txt_dislikes.setTextColor(getResources().getColor(R.color.rojo));
             	}
             }
         }
@@ -530,40 +527,44 @@ public class ScandalFragment extends SherlockFragment {
     		public void onClick(View v) {
     				
     			if (MyApplication.logged_user){
-    				int old_likes = Integer.parseInt(tLikes.getText().toString());  
-                	int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+    				int old_likes = Integer.parseInt(txt_likes.getText().toString());  
+                	int old_dislikes = Integer.parseInt(txt_dislikes.getText().toString());
                 		
                 	new SendLikeDislikeTask(LIKE).execute();
         				
         			// Había puesto like: quitamos like
         			if (already_voted == 1){
         				// Indicamos que no hay likes/dislikes marcados
-        				iLike.setImageResource(R.drawable.like_blanco);
+        				iLike.setImageResource(R.drawable.mas_con_circulo_blanco);
+                		txt_likes.setTextColor(getResources().getColor(R.color.blanco));
         	        	already_voted = 0;
         	        	// Decrementamos el nº de likes
-        	        	tLikes.setText(Integer.toString(old_likes-1));
+        	        	txt_likes.setText(Integer.toString(old_likes-1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(0, old_likes-1, old_dislikes);
         			}
         			// Habia puesto dislike: quitamos dislike y marcamos like
         			else if (already_voted == 2){
         				// Indicamos que está marcado like
-        				iDislike.setImageResource(R.drawable.dislike_blanco);
-        				iLike.setImageResource(R.drawable.like_azul);
+        				iDislike.setImageResource(R.drawable.menos_con_circulo_blanco);
+                		txt_dislikes.setTextColor(getResources().getColor(R.color.blanco));
+        				iLike.setImageResource(R.drawable.mas_con_circulo_verde);
+                		txt_likes.setTextColor(getResources().getColor(R.color.verde));
         	        	already_voted = 1;
         	        	// Incrementamos like y decrementamos dislike
-        	        	tLikes.setText(Integer.toString(old_likes+1));
-        	        	tDislikes.setText(Integer.toString(old_dislikes-1));
+        	        	txt_likes.setText(Integer.toString(old_likes+1));
+        	        	txt_dislikes.setText(Integer.toString(old_dislikes-1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(1, old_likes+1, old_dislikes-1);
         			}
         			// No había puesto nada: marcamos like
         			else{
         				// Indicamos que está marcado like
-        				iLike.setImageResource(R.drawable.like_azul);
+        				iLike.setImageResource(R.drawable.mas_con_circulo_verde);
+                		txt_likes.setTextColor(getResources().getColor(R.color.verde));
         	        	already_voted = 1;
         	        	// Incrementamos like
-        	        	tLikes.setText(Integer.toString(old_likes+1));
+        	        	txt_likes.setText(Integer.toString(old_likes+1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(1, old_likes+1, old_dislikes);
         			}
@@ -581,40 +582,44 @@ public class ScandalFragment extends SherlockFragment {
     		public void onClick(View v) {
     				
     			if (MyApplication.logged_user){
-    				int old_likes = Integer.parseInt(tLikes.getText().toString());  
-                	int old_dislikes = Integer.parseInt(tDislikes.getText().toString());
+    				int old_likes = Integer.parseInt(txt_likes.getText().toString());  
+                	int old_dislikes = Integer.parseInt(txt_dislikes.getText().toString());
                 		
                 	new SendLikeDislikeTask(DISLIKE).execute();
                 	
         			// Había puesto dislike: quitamos dislike
         			if (already_voted == 2){
         				// Indicamos que está marcado dislike
-        				iDislike.setImageResource(R.drawable.dislike_blanco);
+        				iDislike.setImageResource(R.drawable.menos_con_circulo_blanco);
+                		txt_dislikes.setTextColor(getResources().getColor(R.color.blanco));
         	        	already_voted = 0;
         	        	// Decrementamos dislike
-        	        	tDislikes.setText(Integer.toString(old_dislikes-1));
+        	        	txt_dislikes.setText(Integer.toString(old_dislikes-1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(0, old_likes, old_dislikes-1);
         				}
         			// Había puesto like: quitamos like y ponemos dislike
         			else if (already_voted == 1){
         				// Indicamos que está marcado dislike
-        				iLike.setImageResource(R.drawable.like_blanco);
-        				iDislike.setImageResource(R.drawable.dislike_azul);
+        				iLike.setImageResource(R.drawable.mas_con_circulo_blanco);
+                		txt_likes.setTextColor(getResources().getColor(R.color.blanco));
+        				iDislike.setImageResource(R.drawable.menos_con_circulo_rojo);
+                		txt_dislikes.setTextColor(getResources().getColor(R.color.rojo));
         	        	already_voted = 2;
         	        	// Decrementamos nº likes e incrementamos nº dislikes
-        	        	tLikes.setText(Integer.toString(old_likes-1));
-        	        	tDislikes.setText(Integer.toString(old_dislikes+1));
+        	        	txt_likes.setText(Integer.toString(old_likes-1));
+        	        	txt_dislikes.setText(Integer.toString(old_dislikes+1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(2, old_likes-1, old_dislikes+1);
         			}
         			// No había puesto nada: marcamos dislike
         			else{
         				// Indicamos que está marcado dislike
-        				iDislike.setImageResource(R.drawable.dislike_azul);
+        				iDislike.setImageResource(R.drawable.menos_con_circulo_rojo);
+                		txt_dislikes.setTextColor(getResources().getColor(R.color.rojo));
         	        	already_voted = 2;
         	        	// Incrementamos nº dislikes
-        	        	tDislikes.setText(Integer.toString(old_dislikes+1));
+        	        	txt_dislikes.setText(Integer.toString(old_dislikes+1));
         	        	// Actualizamos el fragmento
         	        	MainActivity.updateLikesDislikes(2, old_likes, old_dislikes+1);
         			}
@@ -727,29 +732,49 @@ public class ScandalFragment extends SherlockFragment {
 			}
 		});
         
-        // COMENTARIOS    
+        // COMENTARIOS   
+		// Si se pulsa accedemos a los comentarios
+        txt_num_comm.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), CommentsActivity.class);
+				i.putExtra(SOURCE_NAME, source_name);
+				i.putExtra(ID, id);
+				i.putExtra(TITLE, title);
+				i.putExtra(URL, url);			
+				startActivityForResult(i,SHOW_COMMENTS);		
+			}
+		}); 
+        
+		// Si se pulsa accedemos a los comentarios
+        img_bocadillo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), CommentsActivity.class);
+				i.putExtra(SOURCE_NAME, source_name);
+				i.putExtra(ID, id);
+				i.putExtra(TITLE, title);
+				i.putExtra(URL, url);			
+				startActivityForResult(i,SHOW_COMMENTS);		
+			}
+		});
+        
+        
         // Último comentario               
         updateLastComment();
- 		// Número de comentarios   
-        if (num_comments == 1){
-        	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentario));
-        }
-        else{
-        	txt_num_comm.setText(Integer.toString(num_comments) + " " + getResources().getString(R.string.comentarios));
-        }
+ 		// Número de comentarios  
+        txt_num_comm.setText(Integer.toString(num_comments));
         
         // Color de la categoria
 		if (MainActivity.current_category.equals(MainActivity.HAPPY)){
-			txt_num_comm.setTextColor(getResources().getColor(R.color.morado));
 			v_linea_arriba.setBackgroundColor(getResources().getColor(R.color.morado));
 			v_linea_abajo_izq.setBackgroundColor(getResources().getColor(R.color.morado));
-			v_linea_abajo_der.setBackgroundColor(getResources().getColor(R.color.morado));
 		}
 		else if (MainActivity.current_category.equals(MainActivity.ANGRY)){
-			txt_num_comm.setTextColor(getResources().getColor(R.color.azul));
 			v_linea_arriba.setBackgroundColor(getResources().getColor(R.color.azul));
 			v_linea_abajo_izq.setBackgroundColor(getResources().getColor(R.color.azul));
-			v_linea_abajo_der.setBackgroundColor(getResources().getColor(R.color.azul));
 		}
    
         // Devolvemos la vista
@@ -1122,10 +1147,10 @@ public class ScandalFragment extends SherlockFragment {
             // Red social
             int social_ne = Integer.parseInt(last_comment.getSocialNetwork());
             if (social_ne == 0){
-            	social_net.setImageResource(R.drawable.s_gris);
+            	social_net.setImageResource(R.drawable.s_circular_gris);
             }
             else if (social_ne == 1){
-            	social_net.setImageResource(R.drawable.facebook_gris);
+            	social_net.setImageResource(R.drawable.f_circular_gris);
             }
             
             // Avatar
@@ -1143,10 +1168,10 @@ public class ScandalFragment extends SherlockFragment {
         		txt_user_name.setText(MyApplication.user_name);
         		txt_date.setText(Utils.getCurrentDate());
         		if (MyApplication.social_network == 0){
-        			social_net.setImageResource(R.drawable.s_gris);
+        			social_net.setImageResource(R.drawable.s_circular_gris);
         		}
         		else{
-        			social_net.setImageResource(R.drawable.facebook_gris);
+        			social_net.setImageResource(R.drawable.f_circular_gris);
         		}
         		
                 // Avatar
