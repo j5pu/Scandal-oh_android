@@ -18,7 +18,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:scaleType="centerCrop"
-            android:src="@color/blanco" />
+            android:src="@color/morado" />
 
         <LinearLayout
             android:id="@+id/ll_escandalo_lastcomment"
@@ -173,7 +173,7 @@
         <RelativeLayout
             android:id="@+id/rl_likes"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_height="47dp"
             android:layout_above="@+id/ll_escandalo_lastcomment"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
@@ -255,25 +255,8 @@
                 android:textSize="20sp" />
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/img_escandalo_audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/play_blanco"
-            android:visibility="gone" />
-
-        <ProgressBar
-            android:id="@+id/prog_escandalo_loading_audio"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone" />
-
         <RelativeLayout
+            android:id="@+id/relativeLayout2"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_alignParentLeft="true"
@@ -283,12 +266,33 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/relativeLayout1"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_above="@+id/rl_likes"
             android:layout_alignParentLeft="true"
             android:background="@drawable/back_likes_scandal" >
         </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/img_escandalo_audio"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/relativeLayout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="106dp"
+            android:src="@drawable/play_blanco"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/prog_escandalo_loading_audio"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/relativeLayout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="102dp"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

@@ -24,5 +24,10 @@
         <item name="android:textColor">@color/blanco</item>
         <item name="android:textSize">19sp</item>
     </style>
+    
+        <style name="TextoConfiguracionUsuario">
+        <item name="android:textColor">@color/negro</item>
+        <item name="android:textSize">17sp</item>
+    </style>
 
 </resources>

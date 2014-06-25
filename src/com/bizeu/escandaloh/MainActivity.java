@@ -1,11 +1,9 @@
 package com.bizeu.escandaloh;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -14,7 +12,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -23,12 +20,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
@@ -37,16 +32,12 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -74,7 +65,6 @@ import com.bizeu.escandaloh.util.Connectivity;
 import com.bizeu.escandaloh.util.DepthPageTransformer;
 import com.bizeu.escandaloh.util.Fuente;
 import com.bizeu.escandaloh.util.ImageUtils;
-import com.bizeu.escandaloh.util.ImageViewRounded;
 import com.bizeu.escandaloh.util.Utils;
 import com.countrypicker.CountryPicker;
 import com.countrypicker.CountryPickerListener;
@@ -85,6 +75,12 @@ import com.parse.ParseAnalytics;
 public class MainActivity extends SherlockFragmentActivity implements
 		OnClickListener, OnItemSelectedListener {
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	public static final int NUM_SCANDALS_TO_LOAD = 15;
 	public static final int NUM_SCANDALS_TO_LOAD_FIRST_TIME = 10;
 	public static final int FROM_CAMERA = 10;
@@ -109,22 +105,23 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private LinearLayout ll_lateral_notificaciones;
 	private LinearLayout ll_lateral_pais;
 	private LinearLayout ll_lateral_busqueda;
-	private LinearLayout ll_lateral_perfil;
 	private LinearLayout ll_lateral_ajustes;
-	private LinearLayout ll_lateral_login;
+	private LinearLayout ll_lateral_mas_recientes;
+	private LinearLayout ll_lateral_mas_comentados;
+	private LinearLayout ll_lateral_mas_votados;
 	private TextView txt_lateral_nombreusuario;
+	private TextView txt_lateral_mas_recientes;
+	private TextView txt_lateral_mas_votados;
+	private TextView txt_lateral_mas_comentados;
 	private ProgressBar progress_refresh;
 	private LinearLayout ll_menu_lateral;
-	private TextView txt_code_country;
 	private Spinner spinner_categorias;
 	DrawerLayout mDrawerLayout;
-	private ImageViewRounded img_lateral_avatar;
-	private ExpandableListView explist_lateral_filtros;
+	private FetchableImageView img_lateral_avatar;
 	private TextView txt_action_bar_num_notis;
-	private ImageView img_take_photo;
-
-	
+	private TextView txt_country_selected;
 	private TextView txt_num_notifs;
+	
 	private Uri mImageUri;
 	AmazonS3Client s3Client;
 	private static Activity acti;
@@ -146,13 +143,20 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ArrayAdapter<CharSequence> adapter_spinner;
 	private String actual_avatar = null; // Usado para saber si el usuario ha cambiado de avatar
 	private String meta_next_scandals = null;
-	private List<String> filter_header;
-    private List<String> filter_childs;
-    private Map<String, List<String>> filterCollection;
     private String actual_filter = FILTRO_RECIENTES ;
 	public static boolean activity_is_showing = false;
 	private String path_photo_file;
 
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
+	
 	/**
 	 * onCreate
 	 */
@@ -176,13 +180,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// ACTION BAR
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
-		View view = getLayoutInflater().inflate(R.layout.action_bar_negro, null);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_main, null);
 		actBar.setCustomView(view);
 
 		// Activamos el logo del menu para el menu lateral
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
-		actBar.setIcon(R.drawable.logo_gris);
+		actBar.setIcon(R.drawable.s_mezcla);
 
 		// Si viene de una notificación push y el usuario está logueado abrimos la pantalla de notificaciones
 		if (getIntent().getAction().equals(PushReceiver.PUSH_NOTIFICATION) && MyApplication.logged_user){
@@ -197,9 +201,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ll_take_photo = (LinearLayout) findViewById(R.id.ll_main_take_photo);
 		ll_take_photo.setOnClickListener(this);
 		progress_refresh = (ProgressBar) findViewById(R.id.prog_refresh_action_bar);
-		txt_code_country = (TextView) findViewById(R.id.txt_action_bar_codecountry);
 		txt_action_bar_num_notis = (TextView) findViewById(R.id.txt_action_bar_num_notis);
-		img_take_photo = (ImageView) findViewById(R.id.img_actionbar_takephoto);
 
 		// SPINNER
 		spinner_categorias = (Spinner) findViewById(R.id.sp_categorias);
@@ -251,16 +253,20 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// MENU LATERAL
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.lay_pantalla_main);
 		ll_menu_lateral = (LinearLayout) findViewById(R.id.ll_menu_lateral);
-		img_lateral_avatar = (ImageViewRounded) findViewById(R.id.img_mLateral_avatar);
+		img_lateral_avatar = (FetchableImageView) findViewById(R.id.img_mLateral_avatar);
 		ll_lateral_notificaciones = (LinearLayout) findViewById(R.id.ll_mLateral_notificaciones);
 		ll_lateral_pais = (LinearLayout) findViewById(R.id.ll_mLateral_pais);
-		ll_lateral_perfil = (LinearLayout) findViewById(R.id.ll_mLateral_profile);
 		ll_lateral_busqueda = (LinearLayout) findViewById(R.id.ll_mLateral_buscar);
 		ll_lateral_ajustes = (LinearLayout) findViewById(R.id.ll_mLateral_ajustes);
-		ll_lateral_login = (LinearLayout) findViewById(R.id.ll_mLateral_login);
+		ll_lateral_mas_recientes = (LinearLayout) findViewById(R.id.ll_mLateral_mas_recientes);
+		ll_lateral_mas_votados = (LinearLayout) findViewById(R.id.ll_mLateral_mas_votados);
+		ll_lateral_mas_comentados = (LinearLayout) findViewById(R.id.ll_mLateral_mas_comentados);
 		txt_lateral_nombreusuario = (TextView) findViewById(R.id.txt_lateral_nombreusuario);
-		explist_lateral_filtros = (ExpandableListView) findViewById(R.id.explist_mLateral_filtros);
+		txt_lateral_mas_comentados = (TextView) findViewById(R.id.txt_mLateral_mas_comentados);
+		txt_lateral_mas_votados = (TextView) findViewById(R.id.txt_mLateral_mas_votados);
+		txt_lateral_mas_recientes = (TextView) findViewById(R.id.txt_mLateral_mas_recientes);
 		txt_num_notifs = (TextView) findViewById(R.id.txt_mLateral_numNotificaciones);
+		txt_country_selected = (TextView) findViewById(R.id.txt_mLateral_countryselected);
 		
 		// Sombra del menu sobre la pantalla
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
@@ -299,6 +305,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		});
 		
 		// Pais
+		Locale loc = new Locale("", MyApplication.code_selected_country);
+		txt_country_selected.setText(loc.getDisplayCountry());
+		
 		ll_lateral_pais.setOnClickListener(new View.OnClickListener() {
 					
 			@Override
@@ -315,7 +324,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 						// Si el país seleccionado es distinto al actual
 						if (!MyApplication.code_selected_country.equals(code)){
 							MyApplication.code_selected_country = code;
-							txt_code_country.setText(code);
+							Locale lo = new Locale("", code);
+							txt_country_selected.setText(lo.getDisplayCountry());
 							SharedPreferences prefs = getBaseContext().getSharedPreferences(
 						      		      "com.bizeu.escandaloh", Context.MODE_PRIVATE);
 							// Guardamos el código del país
@@ -399,7 +409,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		
 		img_lateral_avatar.setOnClickListener(onClickLisPerfil);
 		txt_lateral_nombreusuario.setOnClickListener(onClickLisPerfil);
-		ll_lateral_perfil.setOnClickListener(onClickLisPerfil);
 
 		// Ajustes
 		ll_lateral_ajustes.setOnClickListener(new View.OnClickListener() {
@@ -412,62 +421,61 @@ public class MainActivity extends SherlockFragmentActivity implements
 				mDrawerLayout.closeDrawer(ll_menu_lateral);
 			}
 		});
-
-		// Login
-		ll_lateral_login.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(MainActivity.this,LoginSelectActivity.class);
-				startActivity(i);
-			}
-		});
 				
 		
 		// Filtros
-		// Los rellenamos
-		filter_header = new ArrayList<String>();
-		filter_header.add(getResources().getString(R.string.filtrado_por));
-		String[] filter_types = { getResources().getString(R.string.mas_recientes),
-				getResources().getString(R.string.mas_votados), 
-				getResources().getString(R.string.mas_comentados) };
-		filterCollection = new LinkedHashMap<String, List<String>>();
-        for (String laptop : filter_header) {
-            if (laptop.equals(getResources().getString(R.string.filtrado_por))) {
-            	filter_childs = new ArrayList<String>();
-                for (String model : filter_types)
-                	filter_childs.add(model);
-            } 
-            filterCollection.put(laptop, filter_childs);
-        }
-        
-        // Asignamos los listeners
-        final ExpandableListAdapter expListAdapter = new FilterAdapter(this, filter_header, filterCollection);
-        explist_lateral_filtros.setAdapter(expListAdapter);
-        explist_lateral_filtros.setOnChildClickListener(new OnChildClickListener() {
- 
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                final String selected_filter = (String) expListAdapter.getChild(groupPosition, childPosition);
-                
-                // Más recientes
-                if (selected_filter.equals(getResources().getString(R.string.mas_recientes))){
-                	actual_filter = FILTRO_RECIENTES;
-                }
-                // Más votados
-                else if (selected_filter.equals(getResources().getString(R.string.mas_votados))){
-                	actual_filter = FILTRO_VOTADAS;
-                }
-                // Más comentados
-                else if (selected_filter.equals(getResources().getString(R.string.mas_comentados))){
-                	actual_filter = FILTRO_COMENTADAS;
-                }
- 
-                resetScandals();
-				// Cerramos el menu
-				mDrawerLayout.closeDrawer(ll_menu_lateral);
-                return true;
-            }
-        });
+		txt_lateral_mas_recientes.setTypeface(null, Typeface.BOLD);   // Por defecto seleccionado los más recientes
+		
+		ll_lateral_mas_recientes.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (!actual_filter.equals(FILTRO_RECIENTES)){
+	            	actual_filter = FILTRO_RECIENTES;
+					txt_lateral_mas_recientes.setTypeface(null, Typeface.BOLD);
+					txt_lateral_mas_votados.setTypeface(null, Typeface.NORMAL);
+					txt_lateral_mas_comentados.setTypeface(null, Typeface.NORMAL);
+	            	// Reiniciamos los escándalos con el nuevo filtro
+	                resetScandals();
+					// Cerramos el menu
+					mDrawerLayout.closeDrawer(ll_menu_lateral);
+				}			
+			}
+		});
+		
+		ll_lateral_mas_votados.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (!actual_filter.equals(FILTRO_VOTADAS)){
+					actual_filter = FILTRO_VOTADAS;
+					txt_lateral_mas_recientes.setTypeface(null, Typeface.NORMAL);
+					txt_lateral_mas_votados.setTypeface(null, Typeface.BOLD);
+					txt_lateral_mas_comentados.setTypeface(null, Typeface.NORMAL);
+	            	// Reiniciamos los escándalos con el nuevo filtro
+	                resetScandals();
+					// Cerramos el menu
+					mDrawerLayout.closeDrawer(ll_menu_lateral);
+				}			
+			}
+		});
+		
+		ll_lateral_mas_comentados.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (!actual_filter.equals(FILTRO_COMENTADAS)){
+					actual_filter = FILTRO_COMENTADAS;
+					txt_lateral_mas_recientes.setTypeface(null, Typeface.NORMAL);
+					txt_lateral_mas_votados.setTypeface(null, Typeface.NORMAL);
+					txt_lateral_mas_comentados.setTypeface(null, Typeface.BOLD);
+	            	// Reiniciamos los escándalos con el nuevo filtro
+	                resetScandals();
+					// Cerramos el menu
+					mDrawerLayout.closeDrawer(ll_menu_lateral);
+				}			
+			}
+		});
 
 		// Separación entre escándalos
 		pager.setPageMargin(3);
@@ -489,6 +497,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 	
 
+	
+	
 	/**
 	 * onPostCreate
 	 */
@@ -497,6 +507,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onPostCreate(savedInstanceState);
 		mDrawerToggle.syncState();
 	}
+	
+	
+	
 
 	/**
 	 * onConfigurationChanged
@@ -507,6 +520,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
+	
+	
+	
 	/**
 	 * onStart
 	 */
@@ -518,6 +534,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// Indicamos que la actividad se está mostrando
 		activity_is_showing = true;
 	}
+	
+	
+	
 
 	/**
 	 * onResume
@@ -528,8 +547,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		
 		// Si está logueado
 		if (MyApplication.logged_user) {
-			ll_lateral_login.setVisibility(View.GONE); // Ocultamos Login
-			ll_lateral_perfil.setVisibility(View.VISIBLE); // Mostramos Perfil
 			ll_lateral_notificaciones.setVisibility(View.VISIBLE); // Mostramos notificaciones
 			txt_lateral_nombreusuario.setText(MyApplication.user_name); // Nombre de usuario
 			
@@ -552,11 +569,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			txt_action_bar_num_notis.setText("");
 			
 			// Actualizamos el menu lateral
-			ll_lateral_login.setVisibility(View.VISIBLE); // Mostramos Login
-			ll_lateral_perfil.setVisibility(View.GONE); // Ocultamos Perfil
 			ll_lateral_notificaciones.setVisibility(View.GONE); // Ocultamos notificaciones
 			img_lateral_avatar.setImageResource(R.drawable.avatar_defecto); // Avatar por defecto
-			txt_lateral_nombreusuario.setText(getResources().getString(R.string.invitado)); // Usuario invitado 
+			txt_lateral_nombreusuario.setText(getResources().getString(R.string.iniciar_sesion)); // Usuario invitado 
 		}
 		
 		// Si ha iniciado/cerrado sesión: reiniciamos los escándalos y eliminamos las push que hubiesen
@@ -567,6 +582,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
+	
+	
 
 	/**
 	 * onStop
@@ -580,6 +597,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		activity_is_showing = false;
 	}
 
+	
+	
+	
 	/**
 	 * onDestroy
 	 */
@@ -590,6 +610,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		cancelGetScandals();
 	}
 
+	
+	
+	
 	/**
 	 * onOptionsItemSelected
 	 */
@@ -663,6 +686,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		}
 	}
+	
+	
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+	
 
 	/**
 	 * onClick
@@ -723,7 +756,524 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 		}
 	}
+	
+	
+	
 
+	/**
+	 * Seleccionar opción del spinner
+	 */
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,
+			long id) {
+
+		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
+		if ((pos == 0 && current_category.equals(ANGRY))|| (pos == 1 && current_category.equals(HAPPY))) {
+			// Si hay conexión
+			if (Connectivity.isOnline(mContext)) {
+				cancelGetScandals();
+				hideLoadingFromMenu();
+				// Inhabilitamos el spinner
+				spinner_categorias.setClickable(false);
+				// Abrimos llave de hay más escandalos
+				there_are_more_scandals = true;
+				// Quitamos los escándalos actuales
+				escandalos.clear();
+
+				switch (pos) {
+					case 0: // Humor
+						if (current_category.equals(ANGRY)) {
+							current_category = HAPPY;						
+							((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.morado));
+						}
+						break;
+						
+					case 1: // Denuncia
+						current_category = ANGRY;						
+						((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.azul));
+						break;
+				}
+
+				pager.setCurrentItem(0);
+				adapter.clearFragments();
+				adapter = new ScandalohFragmentPagerAdapter(
+						getSupportFragmentManager());
+				pager.setAdapter(adapter);
+				// Obtenemos los 10 primeros escándalos para la categoría seleccionada
+				// Mostramos el progressBar y ocultamos la lista de escandalos
+				loading.setVisibility(View.VISIBLE);
+				pager.setVisibility(View.GONE);
+				getEscandalosAsync = new GetScandalsTask();
+				getEscandalosAsync.execute();
+			}
+
+			// No hay conexión
+			else {
+				Toast toast = Toast.makeText(mContext,
+						R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		}
+	}
+	
+	
+	
+	
+
+	/**
+	 * Al no seleccionar nada del spinner
+	 */
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+	}
+
+	
+
+	/**
+	 * Cancela si hubiese alguna hebra obteniendo escándalos
+	 */
+	private void cancelGetScandals() {
+		if (getEscandalosAsync != null) {
+			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING
+					|| getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getEscandalosAsync.cancel(true);
+			}
+		}
+
+		if (getNewEscandalosAsync != null) {
+			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING
+					|| getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING) {
+				getNewEscandalosAsync.cancel(true);
+			}
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * Resetea los escándalos del carrusel
+	 */
+	private void resetScandals(){
+		// Abrimos llave de hay más escandalos
+		there_are_more_scandals = true;
+		// Quitamos los escándalos actuales
+		escandalos.clear();
+		pager.setCurrentItem(0);
+		adapter.clearFragments();
+		adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
+		pager.setAdapter(adapter);
+		// Obtenemos los 10 primeros escándalos para la categoría seleccionada
+		// Mostramos el progressBar y ocultamos la lista de escandalos
+		loading.setVisibility(View.VISIBLE);
+		pager.setVisibility(View.GONE);
+		getEscandalosAsync = new GetScandalsTask();
+		getEscandalosAsync.execute();
+		
+		// Cerramos llave
+		MyApplication.reset_scandals = false;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Oculta el botón actualizar y muestra el loading en el menu
+	 */
+	private void showLoadingOnMenu(){
+		// Cambiamos la imagen de actualizar por un loading
+		progress_refresh.setVisibility(View.VISIBLE);
+		img_update_list.setVisibility(View.GONE);
+	}
+	
+	
+	
+	
+	/**
+	 * Oculta el loading del menu y muestra el botón actualizar
+	 */
+	private void hideLoadingFromMenu() {
+		// Cambiamos el loading del menu por el botón de actualizar
+		progress_refresh.setVisibility(View.GONE);
+		img_update_list.setVisibility(View.VISIBLE); 
+	}
+	
+	
+	
+	
+	/**
+	 * Actualiza el already_voted del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param already_voted
+	 */
+	public  static void updateLikesDislikes(int already_voted, int num_likes, int num_dislikes){
+		adapter.updateFragmentLike(already_voted, num_likes, num_dislikes);
+	}
+	
+	
+	
+	/**
+	 * Actualiza el último comentario del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param lst_comm
+	 */
+	public static void updateLastComment(Comment lst_comm){
+		adapter.updateLastComment(lst_comm);
+	}
+	
+	
+	/**
+	 * Actualiza el número de comentarios del escandalo (fragmento) que esté actualmente visualizándose
+	 * @param num_comments
+	 */
+	public static void updateNumComments(int num_comments){
+		adapter.updateNumComments(num_comments);
+	}
+	
+	
+	
+	/**
+	 * Actualiza el avatar del usuario en todos los escándalos (fragmentos) 
+	 */
+	private void updateUserAvatar(){
+		adapter.updateUserAvatar();
+		adapter.notifyDataSetChanged();
+	}
+	
+	
+	
+	
+	/**
+	 * Sube un escándalo
+	 */
+	public void uploadScandal(){
+		// Paramos si hubiera algún audio reproduciéndose
+		Audio.getInstance(mContext).releaseResources();
+
+		// Si dispone de conexión
+		if (Connectivity.isOnline(mContext)) {
+
+			// Si está logueado
+			if (MyApplication.logged_user) {
+
+				// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
+				final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara),
+											getResources().getString(R.string.seleccionar_foto_galeria),
+											getResources().getString(R.string.subir_audio),
+											getResources().getString(R.string.subir_desde_url)
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						MainActivity.this);
+				builder.setTitle(R.string.subir_escandalo);
+				builder.setItems(items,new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,int item) {
+
+						// SUBIR FOTO CON LA CAMARA
+						if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
+
+							// Comprobamos disponibilidad de la cámara
+							if (Utils.checkCameraHardware(mContext)) {
+								
+								// Comprobamos disponibilidad del almacenamiento externo
+								if (Utils.isExternalStorageWritable(mContext)){
+									
+									Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+									
+									// Nos aseguramos que hay una actividad para la cámara
+								    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+								    	
+								        File photoFile = null;
+								        photoFile = Utils.createPhotoScandalOh(mContext);
+								        path_photo_file = photoFile.getAbsolutePath();
+		        						       
+								        if (photoFile != null) {
+								        	mImageUri = Uri.fromFile(photoFile);
+								            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+								            startActivityForResult(takePictureIntent, FROM_CAMERA);
+								        }
+								    }
+								}
+								
+								// Almacenamiento externo no disponible
+								else{
+									Toast toast = Toast.makeText(mContext,R.string.no_se_puede_acceder_al_sistema_de_archivos,Toast.LENGTH_LONG);
+									toast.show();
+								}											
+							}
+
+							// Cámara no disponible
+							else {
+								Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,Toast.LENGTH_LONG);
+								toast.show();
+							}
+						}
+
+						// SUBIR FOTO DE LA GALERIA
+						else if (items[item].equals(getResources().getString(R.string.seleccionar_foto_galeria))) {
+
+							Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+							startActivityForResult(i, FROM_GALLERY);
+						}
+
+						// SUBIR AUDIO
+						else if (items[item].equals(getResources().getString(R.string.subir_audio))){
+
+							// Mostramos el dialog de grabación de audio
+							RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
+							record_audio.setDialogResult(new OnMyDialogResult() {
+								public void finish(String result) {
+									if (result.equals("OK")) {
+										Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
+										i.putExtra("photo_from", FROM_AUDIO);
+										startActivity(i);
+									}
+								}
+							});
+							record_audio.setCancelable(false);
+							record_audio.show();
+						}
+
+						// SUBIR DESDE URL
+						else if (items[item].equals(getResources().getString(R.string.subir_desde_url))){
+
+							// Mostramos el dialog de introducir url
+							EnterUrlDialog record_audio = new EnterUrlDialog(mContext);
+							record_audio.setCancelable(false);
+							record_audio.show();
+						}
+					}
+				});
+				builder.show();
+			}
+
+			// No está logueado: mostramos un popup preguntando si quiere loguearse
+			else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.debes_iniciar_sesion_para_compartir);		
+				builder.setPositiveButton(R.string.iniciar_sesion, new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			               Intent i = new Intent(MainActivity.this, LoginSelectActivity.class);
+			               startActivity(i);
+			           }
+			       });
+				builder.setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			               dialog.dismiss();
+			           }
+			       });
+
+				AlertDialog dialog = builder.create();
+				dialog.show();
+			}
+			
+		}
+
+		// No dispone de conexión
+		else {
+			Toast toast = Toast.makeText(mContext,
+					R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
+			toast.show();
+		}
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Actualiza el nº de notificaciones
+	 */
+	public static void updateNumNotifications(){
+		((MainActivity) acti).new  UpdateNumNotificationsTask().execute();
+	}
+	
+
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                ADAPTADOR VIEWPAGER                                                |
+	// -----------------------------------------------------------------------------------------------------
+
+	public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter {
+
+		// Lista de fragmentos con los escándalos
+		List<ScandalFragment> fragments;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
+		 */
+		public ScandalohFragmentPagerAdapter(FragmentManager fm) {
+			super(fm);
+			this.fragments = new ArrayList<ScandalFragment>();
+		}
+
+	
+		/**
+		 * Devuelve el fragmento de una posición dada
+		 * 
+		 * @param position Posición
+		 */
+		@Override
+		public ScandalFragment getItem(int position) {
+			// return ScandalohFragment.newInstance(escandalos.get(position));
+			return fragments.get(position);
+		}
+
+		/**
+		 * Devuelve el número de fragmentos
+		 */
+		@Override
+		public int getCount() {
+			return fragments.size();
+		}
+
+		/**
+		 * getItemPosition
+		 */
+		@Override
+		public int getItemPosition(Object item) {
+			ScandalFragment fragment = (ScandalFragment) item;
+			if (pager.getCurrentItem() == fragments.indexOf(fragment)) {
+				return fragments.indexOf(fragment);
+			} else {
+				return POSITION_NONE;
+			}
+
+		}
+
+		/**
+		 * Añade un fragmento al final de la lista
+		 * @param fragment Fragmento a añadir
+		 */
+		public void addFragment(ScandalFragment fragment) {
+			this.fragments.add(fragment);
+		}
+
+		/**
+		 * Añade un fragmento al principio de la lista
+		 * @param fragment
+		 */
+		public void addFragmentAtStart(ScandalFragment fragment) {
+			this.fragments.add(0, fragment);
+		}
+
+		/**
+		 * Modifica un fragmento
+		 * @param position
+		 * @param fragment
+		 */
+		public void setFragment(int position, ScandalFragment fragment) {
+			this.fragments.set(position, fragment);
+		}
+		
+		
+		/**
+		 * Actualiza el campo already_voted del fragmento que esté actualmente visualizándose
+		 * @param already_voted
+		 */
+		public void updateFragmentLike(int already_voted, int num_likes, int num_dislikes){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el already_voted
+			scan.setAlreadyVoted(already_voted);
+			scan.setLikes(num_likes);
+			scan.setDislikes(num_dislikes);
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		
+		/**
+		 * Actualiza el último comentario del fragmento que esté actualmente visualizándose
+		 * @param comment_text
+		 */
+		public void updateLastComment(Comment comm){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el último comentario
+			scan.setLastComment(comm);
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		
+		/**
+		 * Actualiza el nº de comentarios del fragmento que esté actualmente visualizándose
+		 * @param num_c
+		 */
+		public void updateNumComments(int num_c){
+			// Obtenemos el escandalo que está en pantalla
+			Scandaloh scan = escandalos.get(pager.getCurrentItem());
+			// Le modificamos el último comentario
+			scan.setNumComments(num_c);
+			// Actualizamos el adaptador con el nuevo fragmento
+			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
+			this.fragments.set(pager.getCurrentItem(), sf2);
+		}
+		
+		
+		/**
+		 * Actualiza el avatar del usuario en todos los escándalos
+		 */
+		public void updateUserAvatar(){
+			 for (int i=0; i<escandalos.size(); i++){
+				 
+				 // Obtenemos el escándalo
+				 Scandaloh scan = escandalos.get(i);
+				 
+				 // Si soy el usuario del escándalo actualizo mi avatar
+				 if (scan.getUser().equals(MyApplication.user_name)){
+					 scan.setAvatar(MyApplication.avatar);
+				 }
+				 
+				 // Si soy el usuario del último comentario actualizo mi avatar
+				 Comment cAux = escandalos.get(i).getLastComment();
+				 if (cAux != null){
+					 if (cAux.getUsername().equals(MyApplication.user_name)){
+						 cAux.setAvatar(MyApplication.avatar);
+						 scan.setLastComment(cAux);
+					 }
+				 }
+				 
+				 ScandalFragment sf2 = ScandalFragment.newInstance(scan);
+				 this.fragments.set(i, sf2); 
+			 }
+		}
+
+		/**
+		 * Obtiene un fragmento a partir de una posición
+		 * @param position
+		 * @return
+		 */
+		public ScandalFragment getFragment(int position) {
+			return this.fragments.get(position);
+		}
+		
+
+		/**
+		 * Elimina todos los fragmentos
+		 */
+		public void clearFragments() {
+			this.fragments.clear();
+		}
+	}
+
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	/**
 	 * Obtiene los siguientes 10 escándalos anteriores a partir de uno dado
 	 * 
@@ -931,6 +1481,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
+	
+	
+	
+	
+	
 	/**
 	 * Obtiene (si hay) nuevos escandalos
 	 * 
@@ -1116,8 +1671,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	
 	
 	
-	
-
 
 	/**
 	 * Actualiza el nº de notificaciones
@@ -1193,509 +1746,5 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 
 	
-	
-	
-
-	/**
-	 * Seleccionar opción del spinner
-	 */
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int pos,
-			long id) {
-
-		// Si ha seleccionado una categoria diferente de la que se encuentra actualmente
-		if ((pos == 0 && current_category.equals(ANGRY))|| (pos == 1 && current_category.equals(HAPPY))) {
-			// Si hay conexión
-			if (Connectivity.isOnline(mContext)) {
-				cancelGetScandals();
-				hideLoadingFromMenu();
-				// Inhabilitamos el spinner
-				spinner_categorias.setClickable(false);
-				// Abrimos llave de hay más escandalos
-				there_are_more_scandals = true;
-				// Quitamos los escándalos actuales
-				escandalos.clear();
-
-				switch (pos) {
-					case 0: // Humor
-						if (current_category.equals(ANGRY)) {
-							current_category = HAPPY;
-							
-							((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.morado));
-							/*
-							getSupportActionBar().setIcon(R.drawable.logo_morado);
-							txt_code_country.setTextColor(getResources().getColor(R.color.morado));
-							img_update_list.setImageResource(R.drawable.recargar_morado);
-							img_take_photo.setImageResource(R.drawable.cam_micro_morado);
-							*/
-							// TODO
-						}
-						break;
-					case 1: // Denuncia
-						current_category = ANGRY;
-						// TODO
-						
-						((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.azul));
-						/*
-						getSupportActionBar().setIcon(R.drawable.logo_azul);
-						txt_code_country.setTextColor(getResources().getColor(R.color.azul));
-						img_update_list.setImageResource(R.drawable.recargar_azul);
-						img_take_photo.setImageResource(R.drawable.cam_micro_azul);
-						*/
-						break;
-				}
-
-				pager.setCurrentItem(0);
-				adapter.clearFragments();
-				adapter = new ScandalohFragmentPagerAdapter(
-						getSupportFragmentManager());
-				pager.setAdapter(adapter);
-				// Obtenemos los 10 primeros escándalos para la categoría seleccionada
-				// Mostramos el progressBar y ocultamos la lista de escandalos
-				loading.setVisibility(View.VISIBLE);
-				pager.setVisibility(View.GONE);
-				getEscandalosAsync = new GetScandalsTask();
-				getEscandalosAsync.execute();
-			}
-
-			// No hay conexión
-			else {
-				Toast toast = Toast.makeText(mContext,
-						R.string.no_dispones_de_conexion, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-		}
-	}
-
-	/**
-	 * Al no seleccionar nada del spinner
-	 */
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-	}
-
-	
-
-	// -----------------------------------------------------------------------------
-	// ------------------------------ MÉTODOS --------------------------------------
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Cancela si hubiese alguna hebra obteniendo escándalos
-	 */
-	private void cancelGetScandals() {
-		if (getEscandalosAsync != null) {
-			if (getEscandalosAsync.getStatus() == AsyncTask.Status.PENDING
-					|| getEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				getEscandalosAsync.cancel(true);
-			}
-		}
-
-		if (getNewEscandalosAsync != null) {
-			if (getNewEscandalosAsync.getStatus() == AsyncTask.Status.PENDING
-					|| getNewEscandalosAsync.getStatus() == AsyncTask.Status.RUNNING) {
-				getNewEscandalosAsync.cancel(true);
-			}
-		}
-	}
-	
-	/**
-	 * Resetea los escándalos del carrusel
-	 */
-	private void resetScandals(){
-		// Abrimos llave de hay más escandalos
-		there_are_more_scandals = true;
-		// Quitamos los escándalos actuales
-		escandalos.clear();
-		pager.setCurrentItem(0);
-		adapter.clearFragments();
-		adapter = new ScandalohFragmentPagerAdapter(getSupportFragmentManager());
-		pager.setAdapter(adapter);
-		// Obtenemos los 10 primeros escándalos para la categoría seleccionada
-		// Mostramos el progressBar y ocultamos la lista de escandalos
-		loading.setVisibility(View.VISIBLE);
-		pager.setVisibility(View.GONE);
-		getEscandalosAsync = new GetScandalsTask();
-		getEscandalosAsync.execute();
-		
-		// Cerramos llave
-		MyApplication.reset_scandals = false;
-	}
-	
-	/**
-	 * Oculta el botón actualizar y muestra el loading en el menu
-	 */
-	private void showLoadingOnMenu(){
-		// Cambiamos la imagen de actualizar por un loading
-		progress_refresh.setVisibility(View.VISIBLE);
-		img_update_list.setVisibility(View.GONE);
-	}
-	
-	/**
-	 * Oculta el loading del menu y muestra el botón actualizar
-	 */
-	private void hideLoadingFromMenu() {
-		// Cambiamos el loading del menu por el botón de actualizar
-		progress_refresh.setVisibility(View.GONE);
-		img_update_list.setVisibility(View.VISIBLE); 
-	}
-	
-	
-	
-	/**
-	 * Actualiza el already_voted del escandalo (fragmento) que esté actualmente visualizándose
-	 * @param already_voted
-	 */
-	public  static void updateLikesDislikes(int already_voted, int num_likes, int num_dislikes){
-		adapter.updateFragmentLike(already_voted, num_likes, num_dislikes);
-	}
-	
-	
-	/**
-	 * Actualiza el último comentario del escandalo (fragmento) que esté actualmente visualizándose
-	 * @param lst_comm
-	 */
-	public static void updateLastComment(Comment lst_comm){
-		adapter.updateLastComment(lst_comm);
-	}
-	
-	/**
-	 * Actualiza el número de comentarios del escandalo (fragmento) que esté actualmente visualizándose
-	 * @param num_comments
-	 */
-	public static void updateNumComments(int num_comments){
-		adapter.updateNumComments(num_comments);
-	}
-	
-	/**
-	 * Actualiza el avatar del usuario en todos los escándalos (fragmentos) 
-	 */
-	private void updateUserAvatar(){
-		adapter.updateUserAvatar();
-		adapter.notifyDataSetChanged();
-	}
-	
-	
-	/**
-	 * Sube un escándalo
-	 */
-	public void uploadScandal(){
-		// Paramos si hubiera algún audio reproduciéndose
-		Audio.getInstance(mContext).releaseResources();
-
-		// Si dispone de conexión
-		if (Connectivity.isOnline(mContext)) {
-
-			// Si está logueado
-			if (MyApplication.logged_user) {
-
-				// Creamos un menu para elegir entre hacer foto con la cámara o cogerla de la galería
-				final CharSequence[] items = {getResources().getString(R.string.hacer_foto_con_camara),
-											getResources().getString(R.string.seleccionar_foto_galeria),
-											getResources().getString(R.string.subir_audio),
-											getResources().getString(R.string.subir_desde_url)
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
-				builder.setTitle(R.string.subir_escandalo);
-				builder.setItems(items,new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog,int item) {
-
-						// SUBIR FOTO CON LA CAMARA
-						if (items[item].equals(getResources().getString(R.string.hacer_foto_con_camara))) {
-
-							// Comprobamos disponibilidad de la cámara
-							if (Utils.checkCameraHardware(mContext)) {
-								
-								// Comprobamos disponibilidad del almacenamiento externo
-								if (Utils.isExternalStorageWritable(mContext)){
-									
-									Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-									
-									// Nos aseguramos que hay una actividad para la cámara
-								    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-								    	
-								        File photoFile = null;
-								        photoFile = Utils.createPhotoScandalOh(mContext);
-								        path_photo_file = photoFile.getAbsolutePath();
-		        						       
-								        if (photoFile != null) {
-								        	mImageUri = Uri.fromFile(photoFile);
-								            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-								            startActivityForResult(takePictureIntent, FROM_CAMERA);
-								        }
-								    }
-								}
-								
-								// Almacenamiento externo no disponible
-								else{
-									Toast toast = Toast.makeText(mContext,R.string.no_se_puede_acceder_al_sistema_de_archivos,Toast.LENGTH_LONG);
-									toast.show();
-								}											
-							}
-
-							// Cámara no disponible
-							else {
-								Toast toast = Toast.makeText(mContext,R.string.este_dispositivo_no_dispone_camara,Toast.LENGTH_LONG);
-								toast.show();
-							}
-						}
-
-						// SUBIR FOTO DE LA GALERIA
-						else if (items[item].equals(getResources().getString(R.string.seleccionar_foto_galeria))) {
-
-							Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-							startActivityForResult(i, FROM_GALLERY);
-						}
-
-						// SUBIR AUDIO
-						else if (items[item].equals(getResources().getString(R.string.subir_audio))){
-
-							// Mostramos el dialog de grabación de audio
-							RecordAudioDialog record_audio = new RecordAudioDialog(mContext, Audio.getInstance(mContext));
-							record_audio.setDialogResult(new OnMyDialogResult() {
-								public void finish(String result) {
-									if (result.equals("OK")) {
-										Intent i = new Intent(MainActivity.this, CreateScandalohActivity.class);
-										i.putExtra("photo_from", FROM_AUDIO);
-										startActivity(i);
-									}
-								}
-							});
-							record_audio.setCancelable(false);
-							record_audio.show();
-						}
-
-						// SUBIR DESDE URL
-						else if (items[item].equals(getResources().getString(R.string.subir_desde_url))){
-
-							// Mostramos el dialog de introducir url
-							EnterUrlDialog record_audio = new EnterUrlDialog(mContext);
-							record_audio.setCancelable(false);
-							record_audio.show();
-						}
-					}
-				});
-				builder.show();
-			}
-
-			// No está logueado: mostramos un popup preguntando si quiere loguearse
-			else {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.debes_iniciar_sesion_para_compartir);		
-				builder.setPositiveButton(R.string.iniciar_sesion, new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			               Intent i = new Intent(MainActivity.this, LoginSelectActivity.class);
-			               startActivity(i);
-			           }
-			       });
-				builder.setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			               dialog.dismiss();
-			           }
-			       });
-
-				AlertDialog dialog = builder.create();
-				dialog.show();
-			}
-			
-		}
-
-		// No dispone de conexión
-		else {
-			Toast toast = Toast.makeText(mContext,
-					R.string.no_dispones_de_conexion, Toast.LENGTH_LONG);
-			toast.show();
-		}
-	}
-	
-	
-	
-	/**
-	 * Actualiza el nº de notificaciones
-	 */
-	public static void updateNumNotifications(){
-		((MainActivity) acti).new  UpdateNumNotificationsTask().execute();
-	}
-	
-	
-	
-	// ---------------------------------------------------------------------------------------------------------
-	
-	
-	/**
-	 * Adaptador del view pager
-	 * 
-	 */
-	public class ScandalohFragmentPagerAdapter extends FragmentStatePagerAdapter {
-
-		// Lista de fragmentos con los escándalos
-		List<ScandalFragment> fragments;
-
-		/**
-		 * Constructor
-		 * 
-		 * @param fm Interfaz para interactuar con los fragmentos dentro de una actividad
-		 */
-		public ScandalohFragmentPagerAdapter(FragmentManager fm) {
-			super(fm);
-			this.fragments = new ArrayList<ScandalFragment>();
-		}
-
-	
-		/**
-		 * Devuelve el fragmento de una posición dada
-		 * 
-		 * @param position Posición
-		 */
-		@Override
-		public ScandalFragment getItem(int position) {
-			// return ScandalohFragment.newInstance(escandalos.get(position));
-			return fragments.get(position);
-		}
-
-		/**
-		 * Devuelve el número de fragmentos
-		 */
-		@Override
-		public int getCount() {
-			return fragments.size();
-		}
-
-		/**
-		 * getItemPosition
-		 */
-		@Override
-		public int getItemPosition(Object item) {
-			ScandalFragment fragment = (ScandalFragment) item;
-			if (pager.getCurrentItem() == fragments.indexOf(fragment)) {
-				return fragments.indexOf(fragment);
-			} else {
-				return POSITION_NONE;
-			}
-
-		}
-
-		/**
-		 * Añade un fragmento al final de la lista
-		 * @param fragment Fragmento a añadir
-		 */
-		public void addFragment(ScandalFragment fragment) {
-			this.fragments.add(fragment);
-		}
-
-		/**
-		 * Añade un fragmento al principio de la lista
-		 * @param fragment
-		 */
-		public void addFragmentAtStart(ScandalFragment fragment) {
-			this.fragments.add(0, fragment);
-		}
-
-		/**
-		 * Modifica un fragmento
-		 * @param position
-		 * @param fragment
-		 */
-		public void setFragment(int position, ScandalFragment fragment) {
-			this.fragments.set(position, fragment);
-		}
-		
-		
-		/**
-		 * Actualiza el campo already_voted del fragmento que esté actualmente visualizándose
-		 * @param already_voted
-		 */
-		public void updateFragmentLike(int already_voted, int num_likes, int num_dislikes){
-			// Obtenemos el escandalo que está en pantalla
-			Scandaloh scan = escandalos.get(pager.getCurrentItem());
-			// Le modificamos el already_voted
-			scan.setAlreadyVoted(already_voted);
-			scan.setLikes(num_likes);
-			scan.setDislikes(num_dislikes);
-			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
-			this.fragments.set(pager.getCurrentItem(), sf2);
-		}
-		
-		
-		/**
-		 * Actualiza el último comentario del fragmento que esté actualmente visualizándose
-		 * @param comment_text
-		 */
-		public void updateLastComment(Comment comm){
-			// Obtenemos el escandalo que está en pantalla
-			Scandaloh scan = escandalos.get(pager.getCurrentItem());
-			// Le modificamos el último comentario
-			scan.setLastComment(comm);
-			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
-			this.fragments.set(pager.getCurrentItem(), sf2);
-		}
-		
-		
-		/**
-		 * Actualiza el nº de comentarios del fragmento que esté actualmente visualizándose
-		 * @param num_c
-		 */
-		public void updateNumComments(int num_c){
-			// Obtenemos el escandalo que está en pantalla
-			Scandaloh scan = escandalos.get(pager.getCurrentItem());
-			// Le modificamos el último comentario
-			scan.setNumComments(num_c);
-			// Actualizamos el adaptador con el nuevo fragmento
-			ScandalFragment sf2 = ScandalFragment.newInstance(scan);
-			this.fragments.set(pager.getCurrentItem(), sf2);
-		}
-		
-		
-		/**
-		 * Actualiza el avatar del usuario en todos los escándalos
-		 */
-		public void updateUserAvatar(){
-			 for (int i=0; i<escandalos.size(); i++){
-				 
-				 // Obtenemos el escándalo
-				 Scandaloh scan = escandalos.get(i);
-				 
-				 // Si soy el usuario del escándalo actualizo mi avatar
-				 if (scan.getUser().equals(MyApplication.user_name)){
-					 scan.setAvatar(MyApplication.avatar);
-				 }
-				 
-				 // Si soy el usuario del último comentario actualizo mi avatar
-				 Comment cAux = escandalos.get(i).getLastComment();
-				 if (cAux != null){
-					 if (cAux.getUsername().equals(MyApplication.user_name)){
-						 cAux.setAvatar(MyApplication.avatar);
-						 scan.setLastComment(cAux);
-					 }
-				 }
-				 
-				 ScandalFragment sf2 = ScandalFragment.newInstance(scan);
-				 this.fragments.set(i, sf2); 
-			 }
-		}
-
-		/**
-		 * Obtiene un fragmento a partir de una posición
-		 * @param position
-		 * @return
-		 */
-		public ScandalFragment getFragment(int position) {
-			return this.fragments.get(position);
-		}
-		
-
-		/**
-		 * Elimina todos los fragmentos
-		 */
-		public void clearFragments() {
-			this.fragments.clear();
-		}
-	}
 
 }

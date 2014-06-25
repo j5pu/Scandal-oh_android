@@ -23,7 +23,16 @@
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_mytabsstyle</item>
         <item name="android:background">@color/blanco</item>
-
+    </style>
+    
+    <style name="LineaPrincipalUserSettingStyle">
+        <item name="android:background">#999999</item>
+        <item name="android:layout_height">2dp</item>
+    </style>
+    
+    <style name="LineaSecuendariaUserSettingStyle">
+        <item name="android:background">#dddddd</item>
+        <item name="android:layout_height">1dp</item>
     </style>
     
 

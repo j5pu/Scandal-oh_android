@@ -10,6 +10,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -17,6 +18,7 @@ import com.bizeu.escandaloh.MyApplication;
 import com.bizeu.escandaloh.util.Connectivity;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -27,11 +29,17 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 
 public class SettingsActivity extends SherlockPreferenceActivity {
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	private SharedPreferences prefs;
 	private CheckBoxPreference checkA;
 	private CheckBoxPreference checkN;
@@ -39,6 +47,12 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 
 	private Context mContext;
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
+	
 	/**
 	 * onCreate
 	 */
@@ -48,9 +62,16 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		addPreferencesFromResource(R.xml.settings);
 
 		// Título action bar
+		// Activamos el logo dell menu para el menu lateral
 		ActionBar actBar = getSupportActionBar();
-		actBar.setTitle(R.string.ajustes);
-		actBar.setIcon(R.drawable.logo_blanco);
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_settings, null);
+		actBar.setCustomView(view);
+		actBar.setHomeButtonEnabled(true);
+		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setIcon(R.drawable.s_mezcla);
+		actBar.setDisplayShowTitleEnabled(true);
+
 
 		checkA = (CheckBoxPreference) findPreference("autoreproduccion");
 		checkN = (CheckBoxPreference) findPreference("notifications");
@@ -174,6 +195,14 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 	}
     
     
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	/**
 	 * Activa/Desactiva las notificaciones
 	 * 

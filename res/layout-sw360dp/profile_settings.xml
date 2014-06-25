@@ -36,9 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="13"
             android:gravity="center_vertical"
-            android:text="@string/compartir_con_twitter"
-            android:textColor="@color/negro"
-            android:textSize="17sp" />
+            android:text="@string/compartir_con_twitter" />
 
         <View
             android:id="@+id/View02"

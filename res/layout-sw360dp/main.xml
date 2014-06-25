@@ -109,9 +109,9 @@
                 <TextView
                     android:id="@+id/txt_mLateral_numNotificaciones"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="10dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="top|left"
+                    android:gravity="top|left"
                     android:textColor="@color/negro"
                     android:textSize="22sp" />
 
@@ -119,6 +119,7 @@
                     android:id="@+id/txt_mLateral_notificaciones"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginLeft="12dp"
                     android:gravity="center_vertical"
                     android:text="@string/notificaciones"
                     android:textColor="@color/negro"
@@ -169,7 +170,7 @@
                         android:layout_marginLeft="12dp"
                         android:layout_toRightOf="@+id/img_escandalo_dislike"
                         android:gravity="center_vertical"
-                        android:text="País"
+                        android:text="@string/pais"
                         android:textColor="@color/negro"
                         android:textSize="25sp" />
                 </RelativeLayout>
@@ -200,7 +201,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="10dp"
-                    android:text="Buscar"
+                    android:text="@string/buscar"
                     android:textColor="@color/negro"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -230,7 +231,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingLeft="10dp"
-                    android:text="Ajustes"
+                    android:text="@string/ajustes"
                     android:textColor="@color/negro"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -254,7 +255,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
-                    android:text="Mostrar por"
+                    android:text="@string/mostrar_por"
                     android:textColor="@color/blanco"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -271,7 +272,7 @@
                     android:id="@+id/txt_mLateral_mas_recientes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Más recientes"
+                    android:text="@string/mas_recientes"
                     android:textColor="@color/negro"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -295,7 +296,7 @@
                     android:id="@+id/txt_mLateral_mas_votados"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Más votados"
+                    android:text="@string/mas_votados"
                     android:textColor="@color/negro"
                     android:textSize="22sp" />
             </LinearLayout>
@@ -318,7 +319,7 @@
                     android:id="@+id/txt_mLateral_mas_comentados"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Más comentados"
+                    android:text="@string/mas_comentados"
                     android:textColor="@color/negro"
                     android:textSize="22sp" />
             </LinearLayout>

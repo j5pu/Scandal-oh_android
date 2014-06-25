@@ -88,7 +88,6 @@
     <string name="este_dispositivo_no_dispone_camara">Este dispositivo no dispone de cámara</string>
     <string name="no_se_puede_acceder_camara">No se puede acceder a la cámara</string>
     <string name="audio_grabado_dospuntos">Audio grabado:</string>
-    <string name="grabar">Grabar</string>
     <string name="grabando_audio">Grabando audio ...</string>
     <string name="parar">Parar</string>
     <string name="reproduciendo">Reproduciendo ...</string>
@@ -113,7 +112,6 @@
     <string name="crear_cuenta">Crear cuenta</string>
     <string name="crea_una_cuenta_de_usuario">Crea una cuenta de usuario</string>
     <string name="inicia_sesion_en_una_cuenta">Inicia sesión en una cuenta de usuario</string>
-    <string name="iniciar_sesion">Iniciar sesión</string>
     <string name="seguro_que_quieres_cerrar">¿Seguro que desea cerrar la sesión actual?</string>
     <string name="cerrar_sesion_usuario">Cerrar sesión usuario</string>
     <string name="confirmar">Confirmar</string>
@@ -148,9 +146,6 @@
     <string name="comentario">comentario</string>
     <string name="inicia_sesion_para_comentar">Inicia sesión para comentar</string>
     <string name="nuevo_usuario">Nuevo usuario</string>
-    <string name="iniciar_sesion">Iniciar sesión</string>
-    <string name="ajustes">Ajustes</string>
-    <string name="notificaciones">Notificaciones</string>
     <string name="avatar">Avatar</string>
     <string name="actualizando_avatar">Actualizando avatar ...</string>
     <string name="hubo_algun_problema_actualizando_avatar">Hubo algún problema actualizando el avatar</string>
@@ -248,5 +243,11 @@
     <string name="comentados">comentados</string>
     <string name="may_comentarios">Comentarios</string>
     <string name="que_opinas">¿Qué opinas?</string>
+    <string name="may_ajustes">Ajustes</string>
+    <string name="may_configuracion">Configuración</string>
+    <string name="edita_tu_escandalo">Edita tu escándalo</string>
+    <string name="buscar">Buscar</string>
+    <string name="mostrar_por">Mostrar por</string>
+    <string name="may_notificaciones">Notificaciones</string>
 
 </resources>

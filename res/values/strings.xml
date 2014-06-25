@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ScándalOh!</string>
+    <string name="app_name">ScandalOh</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="mexico">México</string>
@@ -48,7 +48,7 @@
     <string name="crear">Crear</string>
     <string name="inicia_sesion">Inicia sesión</string>
     <string name="usuario_o_email_dospuntos">Usuario o email:</string>
-    <string name="olvidaste_la_contrasenia">¿Olvidaste tu contraseña?</string>
+    <string name="olvidaste_la_contrasenia">¿Olvidaste la contraseña?</string>
     <string name="entrar">Entrar</string>
     <string name="titulo_dospuntos">Título:</string>
     <string name="categoria_dospuntos">Categoría:</string>
@@ -62,16 +62,16 @@
     <string name="introduce_el_email_con_el">Introduce el email con el que te registraste para recibir una nueva contraseña:</string>
     <string name="enviar">Enviar</string>
     <string name="cancelar">Cancelar</string>
-    <string name="subiendo_scandaloh">Subiendo scándalOh!...</string>
+    <string name="subiendo_scandaloh">Subiendo escándalo...</string>
     <string name="espera_por_favor">Espera, por favor</string>
     <string name="debes_introducir_primero">Debes introducir primero un título</string>
     <string name="quieres_aniadir_un_audio">¿Quieres añadir un audio?</string>
     <string name="si">Sí</string>
     <string name="no">No</string>
     <string name="no_dispones_de_conexion">No dispones de conexión a internet</string>
-    <string name="no_se_pudo_enviar_el_scandaloh">No se pudo enviar el scándalOh!</string>
-    <string name="scandaloh_enviado_con_exito">scándalOh! enviado con éxito</string>
-    <string name="error_enviando_el_scandaloh">Error enviando el scándalOh!</string>
+    <string name="no_se_pudo_enviar_el_scandaloh">No se pudo enviar el escándalo!</string>
+    <string name="scandaloh_enviado_con_exito">escándalo enviado con éxito</string>
+    <string name="error_enviando_el_scandaloh">Error enviando el escándalo</string>
     <string name="enviando_comentario">Enviando comentario ...</string>
     <string name="lo_sentimos_hubo">Lo sentimos, hubo un error inesperado</string>
     <string name="hubo_algun_error_enviando_comentario">Hubo algún error enviando el comentario</string>
@@ -88,7 +88,6 @@
     <string name="este_dispositivo_no_dispone_camara">Este dispositivo no dispone de cámara</string>
     <string name="no_se_puede_acceder_camara">No se puede acceder a la cámara</string>
     <string name="audio_grabado_dospuntos">Audio grabado:</string>
-    <string name="grabar">Grabar</string>
     <string name="grabando_audio">Grabando audio ...</string>
     <string name="parar">Parar</string>
     <string name="reproduciendo">Reproduciendo ...</string>
@@ -100,9 +99,9 @@
     <string name="guardar_foto_galeria">Guardar foto en la galería</string>
     <string name="preparando_para_compartir">Preparando para compartir ...</string>
     <string name="deberias_ver_esto_que">Deberías ver esto. ¡Qué escándalo!</string>
-    <string name="compartir_scandaloh_con">Compartir scándalOh! con...</string>
+    <string name="compartir_scandaloh_con">Compartir escándalo con...</string>
     <string name="guardando_dospuntos">Guardando ...</string>
-    <string name="reportando_scandaloh">Reportando scándalOh! ...</string>
+    <string name="reportando_scandaloh">Reportando escándalo ...</string>
     <string name="report_enviado_correctamente">Foto reportada correctamente</string>
     <string name="esta_opcion_no_se_podra">Esta opción no se podrá cambiar en el futuro. ¿Estás seguro?</string>
     <string name="pais_elegido_dospuntos">País elegido: </string>
@@ -113,7 +112,6 @@
     <string name="crear_cuenta">Crear cuenta</string>
     <string name="crea_una_cuenta_de_usuario">Crea una cuenta de usuario</string>
     <string name="inicia_sesion_en_una_cuenta">Inicia sesión en una cuenta de usuario</string>
-    <string name="iniciar_sesion">Iniciar sesión</string>
     <string name="seguro_que_quieres_cerrar">¿Seguro que desea cerrar la sesión actual?</string>
     <string name="cerrar_sesion_usuario">Cerrar sesión usuario</string>
     <string name="confirmar">Confirmar</string>
@@ -128,27 +126,26 @@
     <string name="introduce_una_direccion_email_valida">Introduce una dirección de email válida</string>
     <string name="este_campo_debe_tener_6">Este campo debe tener al menos 6 caracteres</string>
     <string name="lo_sentimos_se_ha_producido">Lo sentimos, se ha producido un error inesperado</string>
-    <string name="compartir_escandalo">Compartir scándalOh!</string>
-    <string name="reportar_escandalo">Reportar scándalOh!</string>
+    <string name="compartir_escandalo">Compartir escándalo</string>
+    <string name="reportar_escandalo">Reportar escándalo</string>
     <string name="selecciona_opcion">Selecciona opción</string>
     <string name="material_ofensivo">Material ofensivo</string>
     <string name="spam">Spam</string>
     <string name="copyright">Copyright</string>
     <string name="reportar_esta_foto_por">Reportar esta foto por</string>
-    <string name="debes_iniciar_sesion_para_reportar">Debes iniciar sesión para reportar</string>   
+    <string name="debes_iniciar_sesion_para_reportar">Debes iniciar sesión para reportar</string>
+
     <string-array name="array_categorias">
         <item>Humor</item>
         <item>Denuncia</item>
     </string-array>
+
     <string name="reproduce_el_audio_automaticamente">Reproduce el audio automáticamente</string>
     <string name="ha_llegado_al_limite">Has llegado al límite de caracteres</string>
     <string name="comentarios">comentarios</string>
     <string name="comentario">comentario</string>
     <string name="inicia_sesion_para_comentar">Inicia sesión para comentar</string>
     <string name="nuevo_usuario">Nuevo usuario</string>
-    <string name="iniciar_sesion">Iniciar sesión</string>
-    <string name="ajustes">Ajustes</string>
-    <string name="notificaciones">Notificaciones</string>
     <string name="avatar">Avatar</string>
     <string name="actualizando_avatar">Actualizando avatar ...</string>
     <string name="hubo_algun_problema_actualizando_avatar">Hubo algún problema actualizando el avatar</string>
@@ -158,9 +155,98 @@
     <string name="twitter">Twitter</string>
     <string name="scandaloh">ScandalOh</string>
     <string name="selecciona_pais">Selecciona país</string>
+    <string name="se_el_primero_en_comentar">¡Se el primero en comentar este escándalo!</string>
     <string name="inicia_sesion_para_comentar_este_escandalo">Inicia sesión para comentar este escándalo</string>
-    <string name="may_notificaciones">Notificaciones</string>
-
-
+    <string name="anonimo">Anónimo</string>
+    <string name="debes_iniciar_sesion_para_compartir">Debes iniciar sesión para compartir contenidos</string>
+    <string name="foto_sin_titulo">Foto sin título</string>
+    <string name="quieres_hacerlo_ahora">¿Quieres hacerlo ahora?</string>
+    <string name="recortar">Recortar</string>
+    <string name="cerrando_sesion">Cerrando sesión...</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_expandable_list">ExpandableList Demo</string>
+    <string name="filtrado_por">Filtrado por</string>
+    <string name="mas_recientes">Más recientes</string>
+    <string name="mas_votados">Más votados</string>
+    <string name="mas_comentados">Más comentados</string>
+    <string name="lo_sentimos_dicho_contenido_no_se_puede_compartir">Lo sentimos, dicho contenido no se puede compartir</string>
+    <string name="compartir">Compartir</string>
+    <string name="compartir_con_twitter">Compartir con Twitter</string>
+    <string name="compartir_con_facebook">Compartir con Facebook</string>
+    <string name="invitar_via_correo_elec">Invitar vía correo electrónico</string>
+    <string name="valoranos">Valóranos</string>
+    <string name="ayuda">Ayuda</string>
+    <string name="soporte">Soporte</string>
+    <string name="feedback">Feedback</string>
+    <string name="condiciones_de_uso">Condiciones de uso</string>
+    <string name="politica_de_privacidad">Política de privacidad</string>
+    <string name="faq">FAQ</string>
+    <string name="desactivar_cuenta">Desactivar cuenta</string>
+    <string name="sigueme_en_scandaloh">Sígueme en ScandalOh</string>
+    <string name="selecciona_cliente_de_correo">Selecciona cliente de correo electrónico</string>
+    <string name="no_hay_clientes_de_correo">No hay clientes de correo instalados en el dispositivo</string>
+    <string name="eliminar_tu_cuenta">¿Eliminar tu cuenta?</string>
+    <string name="tu_perfil_y_su_contenido">Tu perfil y su contenido serán eliminados en un plazo de 30 días. Puedes reactivar tu cuenta iniciando sesión dentro de dicho plazo. Después de ese límite tu cuenta será eliminada permanentemente.</string>
+    <string name="eliminando_usuario">Eliminando usuario...</string>
+    <string name="cambiar_contrasenia">Cambiar contraseña</string>
+    <string name="introduce_la_nueva_contrasenia">Introduce la nueva contraseña</string>
+    <string name="nueva_contrasenia">Nueva contraseña</string>
+    <string name="repite_nueva_contrasenia">Repite nueva contraseña</string>
+    <string name="buscar_en_scandaloh">Buscar en ScandalOh</string>
+    <string name="actualizar_avatar">Actualizar avatar</string>
+    <string name="no_tienes_notificaciones">No tienes notificaciones.</string>
+    <string name="recibir_notificaciones">Recibir notificaciones</string>
+    <string name="escandalo_enviado_con_exito">¡Escándalo enviado con éxito!</string>
+    <string name="reproducir">Reproducir</string>
+    <string name="introduce_url">Introduce la url:</string>
+    <string name="url">URL</string>
+    <string name="aniade_un_primer_comentario">Añade un primer comentario (opcional):</string>
+    <string name="introduce_un_titulo">Introduce un título (opcional)</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="subir_escandalo">Subir escándalo</string>
+    <string name="subir_audio">Subir grabación de audio</string>
+    <string name="subir_desde_url">Subir desde url</string>
+    <string name="mLateral_pais">País</string>
+    <string name="mLateral_buscar">Buscar</string>
+    <string name="nuevo_aviso">nuevo aviso</string>
+    <string name="nuevos_avisos">nuevos avisos</string>
+    <string name="dejar_de_seguir">Dejar de seguir</string>
+    <string name="seguir">Seguir</string>
+    <string name="seguidores">seguidores</string>
+    <string name="siguiendo">siguiendo</string>
+    <string name="seguidor">seguidor</string>
+    <string name="debes_tener_una_cuenta_de_google">Debes tener una cuenta de Google asociada al dispositivo</string>
+    <string name="quieres_aniadir_una">¿Quieres añadir una ahora?</string>
+    <string name="no_se_ha_encontrado_ningun">No se ha encontrado ningún resultado</string>
+    <string name="foto_guardada_en_este_dispositivo">Foto guardada en este dispositivo</string>
+    <string name="desconecta_el_modo_multimedia">Desconecta el modo multimedia y vuelve a intentarlo</string>
+    <string name="no_se_puede_acceder_al_sistema_de_archivos">No se puede acceder al sistema de archivos</string>
+    <string name="hubo_algun_error_creando_archivo">Hubo algún error creando el archivo</string>
+    <string name="likes">Likes</string>
+    <string name="escandalos">Escándalos</string>
+    <string name="quieres_borrar_el_escandalo_selec">¿Quieres borrar el escándalo seleccionado?</string>
+    <string name="borrar">Borrar</string>
+    <string name="escandalo_borrado">Escándalo borrado con éxito</string>
+    <string name="borrando_escandalo">Borrando escándalo ...</string>
+    <string name="ese_escandalo_ha_sido_borrado">Ese escándalo ha sido borrado</string>
+    <string name="comienza_ya">¡Comienza ya!</string>
+    <string name="aun_no_tienes_cuenta">¿Aún no tienes cuenta? <b>Regístrate</b></string>
+    <string name="entra_con_scandaloh">Entra con ScandalOh</string>
+    <string name="entra_con_facebook">Entra con Facebook</string>
+    <string name="usuario_o_email">Usuario o email</string>
+    <string name="contrasenia">Contraseña</string>
+    <string name="correo_electronico">Correo electrónico</string>
+    <string name="configuracion">Configuración</string>
+    <string name="siguiendo_may">Siguiendo</string>
+    <string name="subidos">subidos</string>
+    <string name="valorados">valorados</string>
+    <string name="comentados">comentados</string>
+    <string name="may_comentarios">Comentarios</string>
+    <string name="que_opinas">¿Qué opinas?</string>
+    <string name="may_ajustes">Ajustes</string>
+    <string name="may_configuracion">Configuración</string>
+    <string name="edita_tu_escandalo">Edita tu escándalo</string>
+    <string name="buscar">Buscar</string>
+    <string name="mostrar_por">Mostrar por</string>
 
 </resources>

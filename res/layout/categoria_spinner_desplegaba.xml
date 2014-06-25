@@ -5,8 +5,9 @@
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content"
     android:textSize="18sp"
+    android:text="Humor"
     android:gravity="left"  
-    android:textColor= "@color/blanco"         
+    android:textColor= "@color/negro"         
     android:padding="5dip"
-    android:background="#bb3d99b7"
+    android:background="@color/blanco"
     />

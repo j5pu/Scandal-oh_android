@@ -414,7 +414,7 @@ public class ScandalFragment extends SherlockFragment {
         // Escándalo de mentira ("se el primero en subir un escándalo")
         else if (media_type == -1){
         	
-        	// Ocultamos la fuente, los likes y el último comentario
+        	// Ocultamos la fuente, los likes, comentarios y último comentario
         	txt_fuente.setVisibility(View.INVISIBLE); 	
             iLike.setVisibility(View.INVISIBLE);
             iDislike.setVisibility(View.INVISIBLE);
@@ -422,6 +422,8 @@ public class ScandalFragment extends SherlockFragment {
             txt_dislikes.setVisibility(View.INVISIBLE);
             share.setVisibility(View.INVISIBLE);
             ll_last_comment.setVisibility(View.INVISIBLE);
+            img_bocadillo.setVisibility(View.INVISIBLE);
+            txt_num_comm.setVisibility(View.INVISIBLE);
         	
         	// Listeners del escándalo
             img.setOnClickListener(new View.OnClickListener() {
@@ -1026,7 +1028,14 @@ public class ScandalFragment extends SherlockFragment {
 				public void onPlayFinished() {			
 				}
 			});
-			audio.startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);
+			
+			try{
+				audio.startPlaying(MyApplication.DIRECCION_BUCKET + params[0]);
+			}
+			catch(Exception e){
+				
+			}
+
 	    	return null;
 	    }	
 		

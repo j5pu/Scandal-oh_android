@@ -21,7 +21,7 @@
             android:gravity="bottom"
             android:text="@string/compartir"
             android:textColor="#999999"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <View
@@ -36,9 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="13"
             android:gravity="center_vertical"
-            android:text="@string/compartir_con_twitter"
-            android:textColor="@color/negro"
-            android:textSize="17sp" />
+            android:text="@string/compartir_con_twitter" />
 
         <View
             android:id="@+id/View02"
@@ -95,7 +93,7 @@
             android:gravity="bottom"
             android:text="@string/ayuda"
             android:textColor="#999999"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <View
@@ -205,11 +203,11 @@
     <Button
         android:id="@+id/but_profile_logout"
         android:layout_width="wrap_content"
-        android:layout_height="45dp"
+        android:layout_height="55dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:text="@string/cerrar_sesion"
-        android:textSize="17sp" />
+        android:textSize="20sp" />
 
 </RelativeLayout>

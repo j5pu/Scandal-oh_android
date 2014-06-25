@@ -7,8 +7,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,10 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -33,8 +29,14 @@ import com.bizeu.escandaloh.dialogs.ChangePasswordDialog;
 import com.flurry.android.FlurryAgent;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
+
+
 public class ProfileSettingsActivity extends SherlockActivity {
 
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
 	private TextView txt_valoranos;
 	private TextView txt_compartir_twitter;
 	private TextView txt_compartir_facebook;
@@ -47,17 +49,19 @@ public class ProfileSettingsActivity extends SherlockActivity {
 	private TextView txt_soporte;
 	private TextView txt_desactivar_cuenta;
 	private Button but_logout;
-	private LinearLayout ll_share;
-	private LinearLayout ll_help;
 
 	private Context mContext;
-	private boolean isDeletingUser = false; // Nos indica si al hacer logout es
-											// porque se está borrando el
-											// usuario
+	private boolean isDeletingUser = false; // Nos indica si al hacer logout es porque se está borrando el usuario
 	private ProgressDialog progress;
 	private boolean any_error;
 	private SharedPreferences prefs;
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS  ACTIVITY                                              |
+	// -----------------------------------------------------------------------------------------------------
+	
 	/**
 	 * OnCreate
 	 */
@@ -67,8 +71,7 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		setContentView(R.layout.profile_settings);
 
 		mContext = this;
-		prefs = this.getSharedPreferences("com.bizeu.escandaloh",
-				Context.MODE_PRIVATE);
+		prefs = this.getSharedPreferences("com.bizeu.escandaloh", Context.MODE_PRIVATE);
 
 		txt_valoranos = (TextView) findViewById(R.id.txt_profile_valoranos);
 		txt_compartir_twitter = (TextView) findViewById(R.id.txt_profile_compartir_twitter);
@@ -82,16 +85,16 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		txt_desactivar_cuenta = (TextView) findViewById(R.id.txt_profile_desactivar_cuenta);
 		txt_cambiar_pass = (TextView) findViewById(R.id.txt_profile_change_pass);
 		but_logout = (Button) findViewById(R.id.but_profile_logout);
-		ll_share = (LinearLayout) findViewById(R.id.ll_profile_share);
-		ll_help = (LinearLayout) findViewById(R.id.ll_profile_help);
 
 		// Action Bar
 		ActionBar actBar = getSupportActionBar();
+		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
+		View view = getLayoutInflater().inflate(R.layout.action_bar_user_settings, null);
+		actBar.setCustomView(view);
 		actBar.setHomeButtonEnabled(true);
 		actBar.setDisplayHomeAsUpEnabled(true);
+		actBar.setIcon(R.drawable.s_mezcla);
 		actBar.setDisplayShowTitleEnabled(true);
-		actBar.setTitle(getResources().getString(R.string.ajustes));
-		actBar.setIcon(R.drawable.logo_blanco);
 		
 		// Si es usuario de Facebook ocultamos la opción de cambiar la
 		// contraseña
@@ -225,6 +228,8 @@ public class ProfileSettingsActivity extends SherlockActivity {
 	}
 	
 	
+	
+	
 	/**
 	 * onStop
 	 */
@@ -234,6 +239,8 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		// Paramos Flurry
 		FlurryAgent.onEndSession(mContext);
 	}
+	
+	
 	
 
 	/**
@@ -249,6 +256,136 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		return true;
 	}
 
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    METODOS                                                        |
+	// -----------------------------------------------------------------------------------------------------
+
+	
+	
+	/**
+	 * Abre la aplicación en Play Store
+	 */
+	private void rateOnPlayStore() {
+		final String appPackageName = getPackageName();
+
+		try {
+			startActivity(new Intent(Intent.ACTION_VIEW,
+					Uri.parse("market://details?id=" + appPackageName)));
+		} catch (android.content.ActivityNotFoundException anfe) {
+			startActivity(new Intent(Intent.ACTION_VIEW,
+					Uri.parse("http://play.google.com/store/apps/details?id="
+							+ appPackageName)));
+		}
+	}
+
+	
+	
+	
+	/**
+	 * Comparte ScandalOh por email
+	 */
+	private void shareByEmail() {
+
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+		emailIntent.setData(Uri.parse("mailto:" + ""));
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT,
+				getResources().getString(R.string.sigueme_en_scandaloh));
+		// TODO emailIntent.putExtra(Intent.EXTRA_TEXT, "Sígueme en ScandalOh:
+		// <url del usuario>
+		// ¿No tienes ScandalOh? Consíguelo en Google Play: <url de la web>");
+
+		try {
+			startActivity(Intent.createChooser(emailIntent, getResources()
+					.getString(R.string.selecciona_cliente_de_correo)));
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(
+					ProfileSettingsActivity.this,
+					getResources()
+							.getString(R.string.no_hay_clientes_de_correo),
+					Toast.LENGTH_SHORT).show();
+
+		}
+	}
+
+	
+	
+	
+	/**
+	 * Envía un email
+	 * 
+	 * @param to  Destinatario
+	 */
+	private void sendEmail(String to) {
+		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+		emailIntent.setData(Uri.parse("mailto:" + to));
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, "");
+
+		try {
+			startActivity(Intent.createChooser(emailIntent, getResources()
+					.getString(R.string.selecciona_cliente_de_correo)));
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(
+					ProfileSettingsActivity.this,
+					getResources()
+							.getString(R.string.no_hay_clientes_de_correo),
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	
+	
+	
+	/**
+	 * Abre la cuenta de ScandalOh de Facebook. Si tiene la app instalada abre
+	 * la app, si no abre el browser
+	 * 
+	 * @param context
+	 */
+	private void followOnFacebook(Context context) {
+
+		Intent i;
+
+		try {
+			context.getPackageManager()
+					.getPackageInfo("com.facebook.katana", 0);
+			i = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("fb://profile/774948052530889"));
+		} catch (Exception e) {
+			i = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("https://www.facebook.com/scandaloh"));
+		}
+
+		startActivity(i);
+	}
+
+	
+	
+	
+	/**
+	 * Abre la cuenta de ScandalOh de Twitter. Si tiene la app instalada abre la
+	 * app, si no abre el browser
+	 */
+	private void followOnTwitter() {
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("twitter://user?user_id=2162938117"));
+			startActivity(intent);
+		} catch (Exception e) {
+			startActivity(new Intent(Intent.ACTION_VIEW,
+					Uri.parse("https://twitter.com/#!/scandaloh")));
+		}
+	}
+	
+	
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                CLASES                                                             |
+	// -----------------------------------------------------------------------------------------------------
+	
 	/**
 	 * Desloguea a un usuario
 	 * 
@@ -347,6 +484,9 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		}
 	}
 
+	
+	
+	
 	/**
 	 * Elimina un usuario
 	 * 
@@ -421,106 +561,4 @@ public class ProfileSettingsActivity extends SherlockActivity {
 		}
 	}
 
-	/**
-	 * Abre la aplicación en Play Store
-	 */
-	private void rateOnPlayStore() {
-		final String appPackageName = getPackageName();
-
-		try {
-			startActivity(new Intent(Intent.ACTION_VIEW,
-					Uri.parse("market://details?id=" + appPackageName)));
-		} catch (android.content.ActivityNotFoundException anfe) {
-			startActivity(new Intent(Intent.ACTION_VIEW,
-					Uri.parse("http://play.google.com/store/apps/details?id="
-							+ appPackageName)));
-		}
-	}
-
-	/**
-	 * Comparte ScandalOh por email
-	 */
-	private void shareByEmail() {
-
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-		emailIntent.setData(Uri.parse("mailto:" + ""));
-		emailIntent.putExtra(Intent.EXTRA_SUBJECT,
-				getResources().getString(R.string.sigueme_en_scandaloh));
-		// TODO emailIntent.putExtra(Intent.EXTRA_TEXT, "Sígueme en ScandalOh:
-		// <url del usuario>
-		// ¿No tienes ScandalOh? Consíguelo en Google Play: <url de la web>");
-
-		try {
-			startActivity(Intent.createChooser(emailIntent, getResources()
-					.getString(R.string.selecciona_cliente_de_correo)));
-		} catch (android.content.ActivityNotFoundException ex) {
-			Toast.makeText(
-					ProfileSettingsActivity.this,
-					getResources()
-							.getString(R.string.no_hay_clientes_de_correo),
-					Toast.LENGTH_SHORT).show();
-
-		}
-	}
-
-	/**
-	 * Envía un email
-	 * 
-	 * @param to
-	 *            Destinatario
-	 */
-	private void sendEmail(String to) {
-		Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-		emailIntent.setData(Uri.parse("mailto:" + to));
-		emailIntent.putExtra(Intent.EXTRA_SUBJECT, "");
-
-		try {
-			startActivity(Intent.createChooser(emailIntent, getResources()
-					.getString(R.string.selecciona_cliente_de_correo)));
-		} catch (android.content.ActivityNotFoundException ex) {
-			Toast.makeText(
-					ProfileSettingsActivity.this,
-					getResources()
-							.getString(R.string.no_hay_clientes_de_correo),
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	/**
-	 * Abre la cuenta de ScandalOh de Facebook. Si tiene la app instalada abre
-	 * la app, si no abre el browser
-	 * 
-	 * @param context
-	 */
-	private void followOnFacebook(Context context) {
-
-		Intent i;
-
-		try {
-			context.getPackageManager()
-					.getPackageInfo("com.facebook.katana", 0);
-			i = new Intent(Intent.ACTION_VIEW,
-					Uri.parse("fb://profile/774948052530889"));
-		} catch (Exception e) {
-			i = new Intent(Intent.ACTION_VIEW,
-					Uri.parse("https://www.facebook.com/scandaloh"));
-		}
-
-		startActivity(i);
-	}
-
-	/**
-	 * Abre la cuenta de ScandalOh de Twitter. Si tiene la app instalada abre la
-	 * app, si no abre el browser
-	 */
-	private void followOnTwitter() {
-		try {
-			Intent intent = new Intent(Intent.ACTION_VIEW,
-					Uri.parse("twitter://user?user_id=2162938117"));
-			startActivity(intent);
-		} catch (Exception e) {
-			startActivity(new Intent(Intent.ACTION_VIEW,
-					Uri.parse("https://twitter.com/#!/scandaloh")));
-		}
-	}
 }

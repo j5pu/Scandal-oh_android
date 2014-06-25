@@ -12,7 +12,7 @@
         android:orientation="horizontal" >
 
         <ImageView
-            android:id="@+id/img_registro_aceptar"
+            android:id="@+id/img_create_aceptar"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentRight="true"
@@ -28,7 +28,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:text="@string/crea_tu_cuenta" />
+            android:text="@string/edita_tu_escandalo" />
         
     </RelativeLayout>
 

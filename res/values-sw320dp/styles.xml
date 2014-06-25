@@ -25,4 +25,9 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TextoConfiguracionUsuario">
+        <item name="android:textColor">@color/negro</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

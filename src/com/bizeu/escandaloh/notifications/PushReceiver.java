@@ -15,20 +15,32 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-
 import com.bizeu.escandaloh.CoverActivity;
 import com.bizeu.escandaloh.MainActivity;
-import com.bizeu.escandaloh.MyApplication;
 import com.mnopi.scandaloh_escandalo_humor_denuncia_social.R;
 
 public class PushReceiver extends BroadcastReceiver {
 
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    VARIABLES                                                      |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	public final static int NOTIFICATION_ID = 5;
 	public final static String PUSH_NOTIFICATION = "push_notification";
 	
 	private String message;
 	private String num_notificaciones;
 	ArrayList<String> notis = new ArrayList<String>();
+	
+	
+	
+	// -----------------------------------------------------------------------------------------------------
+	// |                                    MÉTODOS PUSHRECEIVER                                           |
+	// -----------------------------------------------------------------------------------------------------
+	
+	
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -58,7 +70,7 @@ public class PushReceiver extends BroadcastReceiver {
 				
 			NotificationCompat.Builder mBuilder =
 		        new NotificationCompat.Builder(context)
-		        .setSmallIcon(R.drawable.logo)
+		        .setSmallIcon(R.drawable.logo_blanco)
 		        .setContentTitle(context.getResources().getString(R.string.scandaloh))
 				.setContentText(summary)
 				.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)

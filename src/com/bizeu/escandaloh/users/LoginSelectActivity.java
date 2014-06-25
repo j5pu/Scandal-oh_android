@@ -171,8 +171,10 @@ public class LoginSelectActivity extends SherlockActivity {
 			public void call(Session session, SessionState state,
 					Exception exception) {
 				progress.show();
+				Log.v("WE","LLega");
 				// Sesión abierta
 				if (session.isOpened()) {
+					Log.v("WE","Sesion abierta");
 					access_token = session.getAccessToken();
 					Request.newMeRequest(session,new Request.GraphUserCallback() {
 								@Override
@@ -195,6 +197,7 @@ public class LoginSelectActivity extends SherlockActivity {
 				
 				// Sesión cerrada
 				else {
+					Log.v("WE","SEsion cerrada");
 					// Si existe device_token
 					if (device_token != null){
 						// Si el usuario está logueado 

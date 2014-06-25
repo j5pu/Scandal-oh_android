@@ -10,7 +10,7 @@
         <item name="android:textSize">30sp</item>
         <item name="android:textColor">@color/negro</item>
     </style>
-    
+
     <style name="EditLogin">
         <item name="android:paddingLeft">5dp</item>
         <item name="android:textColor">@color/blanco</item>
@@ -19,10 +19,15 @@
         <item name="android:background">@drawable/apptheme_edit_text_holo_light</item>
         <item name="android:ems">10</item>
     </style>
-    
-        <style name="TextoPerfilSeguidores">
+
+    <style name="TextoPerfilSeguidores">
         <item name="android:textColor">@color/blanco</item>
         <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="TextoConfiguracionUsuario">
+        <item name="android:textColor">@color/negro</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
 </resources>

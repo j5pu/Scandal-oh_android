@@ -118,7 +118,7 @@ public class ProfileActivity extends SherlockFragmentActivity implements OnTabCh
 		
 		mContext = this;
 		
-		// Activamos el logo dell menu para el menu lateral
+		// Action Bar
 		ActionBar actBar = getSupportActionBar();
 		actBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME);
 		View view = getLayoutInflater().inflate(R.layout.action_bar_profile, null);
